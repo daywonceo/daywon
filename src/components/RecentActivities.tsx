@@ -31,12 +31,12 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
     <div className="mb-16">
       <h2 className="text-6xl font-black mb-4">{month}</h2>
       
-      <div className="flex">
+      <div className="flex items-start">
         <div className="flex-1 pr-4">
-          {activities.map((activity) => (
-            <div key={activity.day} className="flex mb-2 items-center h-[40px]">
+          {activities.map((activity, index) => (
+            <div key={activity.day} className="flex mb-2">
               <div className="pr-4 text-5xl font-black">{activity.day}</div>
-              <div>
+              <div className="flex items-center h-[40px]">
                 <p className="text-green-800 font-bold text-xl">{activity.text}</p>
               </div>
             </div>
@@ -57,7 +57,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           
           <div className="border-l border-green-800">
             {activities.map((activity, index) => (
-              <div key={`grid-${activity.day}`} className="flex h-[40px]">
+              <div key={`grid-${activity.day}`} className="flex h-[40px] -mt-[40px]">
                 {activity.categories.map((category) => (
                   <div 
                     key={`${activity.day}-${category}`} 
