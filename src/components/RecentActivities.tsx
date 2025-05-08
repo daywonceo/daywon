@@ -5,7 +5,7 @@ type RecentActivitiesProps = {
   month: string;
 };
 
-const RecentActivities = ({ month }: RecentActivitiesProps) => {
+const RecentActivities = ({ RecentActivitiesProps }) => {
   const activities = [
     {
       day: 1,
@@ -31,15 +31,15 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
     <div className="mb-16">
       <h2 className="text-6xl font-black mb-4">{month}</h2>
       
-      <div className="flex items-start">
+      <div className="flex">
         {/* Text section */}
         <div className="flex-1 pr-4">
           {activities.map((activity) => (
             <div key={activity.day} className="flex h-[40px] items-center">
-              <div className="pr-4 w-[40px] text-center text-5xl font-black flex items-center justify-end">
+              <div className="pr-4 w-[40px] text-center text-5xl font-black">
                 {activity.day}
               </div>
-              <div className="flex items-center">
+              <div>
                 <p className="text-green-800 font-bold text-xl">{activity.text}</p>
               </div>
             </div>
