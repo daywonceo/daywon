@@ -5,7 +5,7 @@ type RecentActivitiesProps = {
   month: string;
 };
 
-const RecentActivities = ({ RecentActivitiesProps }) => {
+const RecentActivities = ({ month }: RecentActivitiesProps) => {
   const activities = [
     {
       day: 1,
@@ -39,7 +39,7 @@ const RecentActivities = ({ RecentActivitiesProps }) => {
               <div className="pr-4 w-[40px] text-center text-5xl font-black">
                 {activity.day}
               </div>
-              <div>
+              <div className="flex items-center">
                 <p className="text-green-800 font-bold text-xl">{activity.text}</p>
               </div>
             </div>
