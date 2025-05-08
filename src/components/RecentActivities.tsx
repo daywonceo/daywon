@@ -57,7 +57,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           
           <div className="border-l border-green-800">
             {activities.map((activity, index) => (
-              <div key={`grid-${activity.day}`} className="flex h-[40px] -mt-[40px]">
+              <div key={`grid-${activity.day}`} className="flex h-[40px]">
                 {activity.categories.map((category) => (
                   <div 
                     key={`${activity.day}-${category}`} 
