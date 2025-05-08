@@ -37,7 +37,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
             <div key={activity.day} className="flex mb-2 items-start">
               <div className="pr-4 text-5xl font-black">{activity.day}</div>
               <div className="pt-2">
-                <p className="text-green-800 font-bold">{activity.text}</p>
+                <p className="text-green-800 font-bold text-lg">{activity.text}</p>
               </div>
             </div>
           ))}
@@ -69,7 +69,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
                     className="w-[50px] h-full flex items-center justify-center border-r border-b border-black"
                   >
                     {activity.completed.includes(category) && (
-                      <div className="w-3 h-3 bg-black"></div>
+                      <div className="w-full h-full bg-black"></div>
                     )}
                   </div>
                 ))}
