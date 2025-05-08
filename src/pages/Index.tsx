@@ -1,12 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import Header from "@/components/Header";
+import RecentActivities from "@/components/RecentActivities";
+import Calendar from "@/components/Calendar";
+import HabitStats from "@/components/HabitStats";
+import Progress from "@/components/Progress";
+import Footer from "@/components/Footer";
 
 const Index = () => {
+  const [currentMonth, setCurrentMonth] = useState("MARCH");
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-white flex flex-col">
+      <Header />
+      
+      <main className="flex-grow px-5 pb-20 max-w-3xl mx-auto w-full">
+        <RecentActivities month={currentMonth} />
+        <Calendar month={currentMonth} />
+        <HabitStats />
+        <Progress />
+      </main>
+      
+      <Footer />
     </div>
   );
 };
