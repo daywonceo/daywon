@@ -14,7 +14,7 @@ const Index = () => {
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
       
-      <main className="flex-grow px-5 pb-24 pt-8 max-w-3xl mx-auto w-full">
+      <main className="flex-grow px-5 pb-24 pt-6 max-w-3xl mx-auto w-full">
         <RecentActivities month={currentMonth} />
         <Calendar month={currentMonth} />
         <HabitStats />
