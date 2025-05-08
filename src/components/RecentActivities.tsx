@@ -48,25 +48,20 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
             {activities[0].categories.map((category) => (
               <div 
                 key={category} 
-                className="w-[50px] h-[22px] flex items-center justify-center border-t border-r border-black font-bold text-[10px] rotate-90 origin-bottom-left"
-                style={{ 
-                  transformBox: "fill-box", 
-                  transform: "translateY(-100%) rotate(-90deg)",
-                  transformOrigin: "bottom left"
-                }}
+                className="w-[50px] flex items-center justify-center font-bold text-[10px] pb-1"
               >
                 {category}
               </div>
             ))}
           </div>
           
-          <div className="border-l border-black">
+          <div className="border-l border-green-800">
             {activities.map((activity) => (
               <div key={`grid-${activity.day}`} className="flex h-[40px]">
                 {activity.categories.map((category) => (
                   <div 
                     key={`${activity.day}-${category}`} 
-                    className="w-[50px] h-full flex items-center justify-center border-r border-b border-black"
+                    className="w-[50px] h-full flex items-center justify-center border-r border-b border-green-800"
                   >
                     {activity.completed.includes(category) && (
                       <div className="w-full h-full bg-black"></div>
