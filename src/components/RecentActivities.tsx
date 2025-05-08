@@ -10,50 +10,63 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
     {
       day: 1,
       text: "WENT OUT TO DINNER WITH FRIENDS",
-      categories: ["workout", "run", "italian", "screen time"],
-      completed: ["workout"],
+      categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
+      completed: ["WORKOUT"],
     },
     {
       day: 2,
       text: "HIT A PR ON BENCH IN THE GYM",
-      categories: ["workout", "run", "italian", "screen time"],
-      completed: ["workout", "run"],
+      categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
+      completed: ["WORKOUT", "RUN"],
     },
     {
       day: 3,
       text: "PLAYED IN A NEW SOCCER LEAGUE AND WON",
-      categories: ["workout", "run", "italian", "screen time"],
-      completed: ["workout", "run", "italian"],
+      categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
+      completed: ["WORKOUT", "RUN", "ITALIAN"],
     },
   ];
 
   return (
-    <div className="mb-12">
-      <h2 className="text-5xl font-black mb-2">{month}</h2>
+    <div className="mb-16">
+      <h2 className="text-6xl font-black mb-4">{month}</h2>
       
-      <div className="space-y-1">
-        {activities.map((activity) => (
-          <div key={activity.day} className="flex">
-            <div className="pr-4 text-5xl font-black">{activity.day}</div>
-            <div className="flex-1">
-              <p className="text-green-800 font-bold text-lg">{activity.text}</p>
-              
-              <div className="flex mt-1 border-t border-b border-black">
-                {activity.categories.map((category, index) => (
+      <div className="flex">
+        <div className="flex-1">
+          {activities.map((activity) => (
+            <div key={activity.day} className="flex mb-2 items-start">
+              <div className="pr-4 text-5xl font-black">{activity.day}</div>
+              <div className="pt-2">
+                <p className="text-green-800 font-bold">{activity.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="w-[200px]">
+          <div className="flex">
+            {activities[0].categories.map((category) => (
+              <div 
+                key={category} 
+                className="w-[50px] h-[22px] flex items-center justify-center border-t border-r border-black font-bold text-[10px] rotate-90 origin-bottom-left"
+                style={{ 
+                  transformBox: "fill-box", 
+                  transform: "translateY(-100%) rotate(-90deg)",
+                  transformOrigin: "bottom left"
+                }}
+              >
+                {category}
+              </div>
+            ))}
+          </div>
+          
+          <div className="border-l border-black">
+            {activities.map((activity) => (
+              <div key={`grid-${activity.day}`} className="flex h-[40px]">
+                {activity.categories.map((category) => (
                   <div 
-                    key={category} 
-                    className={cn(
-                      "py-1 px-4 border-r border-black uppercase text-xs font-bold rotate-180 writing-vertical",
-                      index === 0 && "border-l border-black"
-                    )}
-                  >
-                    {category}
-                  </div>
-                ))}
-                {activity.categories.map((category, index) => (
-                  <div 
-                    key={`${category}-status`} 
-                    className="flex items-center justify-center w-[51px] h-10 border-r border-black"
+                    key={`${activity.day}-${category}`} 
+                    className="w-[50px] h-full flex items-center justify-center border-r border-b border-black"
                   >
                     {activity.completed.includes(category) && (
                       <div className="w-3 h-3 bg-black"></div>
@@ -61,9 +74,9 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
                   </div>
                 ))}
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
