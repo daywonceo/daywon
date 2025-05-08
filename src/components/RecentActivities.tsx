@@ -34,12 +34,12 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       <div className="flex">
         {/* Text section */}
         <div className="flex-1 pr-4">
-          {activities.map((activity) => (
-            <div key={activity.day} className="flex h-[40px] items-center">
-              <div className="pr-4 w-[40px] text-center text-5xl font-black">
+          {activities.map((activity, index) => (
+            <div key={activity.day} className="flex h-[40px]">
+              <div className="pr-4 w-[40px] text-center text-5xl font-black flex items-center justify-center">
                 {activity.day}
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center h-full">
                 <p className="text-green-800 font-bold text-xl">{activity.text}</p>
               </div>
             </div>
