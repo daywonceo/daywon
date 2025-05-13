@@ -1,6 +1,6 @@
 
 import { Clock } from "lucide-react";
-import React from 'react';
+import React from "react";
 
 const STORAGE_KEY = 'dayOne_offlineData';
 

@@ -90,8 +90,6 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         
         {/* Boxes grid section */}
         <div className="w-full md:w-[200px]">
-          {/* Remove the category labels section */}
-          
           {/* Connected boxes grid */}
           <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
             {activities.map((activity, activityIndex) => (
