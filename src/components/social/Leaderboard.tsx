@@ -40,42 +40,45 @@ const Leaderboard = ({ leaderboardData }: LeaderboardProps) => {
   const filteredData = getFilteredData();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Time period filter */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-6">
         <ToggleGroup type="single" value={period} onValueChange={(value) => value && setPeriod(value as TimePeriod)}>
-          <ToggleGroupItem value="today" className="text-xs">TODAY</ToggleGroupItem>
-          <ToggleGroupItem value="week" className="text-xs">WEEK</ToggleGroupItem>
-          <ToggleGroupItem value="month" className="text-xs">MONTH</ToggleGroupItem>
-          <ToggleGroupItem value="all" className="text-xs">ALL TIME</ToggleGroupItem>
+          <ToggleGroupItem value="today" className="text-sm font-medium">TODAY</ToggleGroupItem>
+          <ToggleGroupItem value="week" className="text-sm font-medium">WEEK</ToggleGroupItem>
+          <ToggleGroupItem value="month" className="text-sm font-medium">MONTH</ToggleGroupItem>
+          <ToggleGroupItem value="all" className="text-sm font-medium">ALL TIME</ToggleGroupItem>
         </ToggleGroup>
       </div>
       
-      <div className="flex justify-center items-center mb-6">
-        <div className="w-full grid grid-cols-12 px-4">
-          <div className="col-span-7"></div>
-          <div className="col-span-5 text-center">
-            <h2 className="font-bold text-lg">HABIT SCORE</h2>
-          </div>
-        </div>
+      {/* Header row */}
+      <div className="flex justify-between items-center mb-6 px-4">
+        <div className="font-bold text-lg pl-14">USERS</div>
+        <div className="font-bold text-lg pr-4">HABIT SCORE</div>
       </div>
       
-      <div className="space-y-5">
+      {/* Leaderboard items */}
+      <div className="space-y-6">
         {filteredData.map((item) => (
-          <div key={item.rank} className="flex items-center">
-            <div className="font-bold text-xl w-8 mr-3 text-center">{item.rank}</div>
-            <Avatar className="h-10 w-10 mr-3">
-              <AvatarImage src={item.avatar} alt={item.name} />
-              <AvatarFallback>{item.name[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 flex items-center gap-3">
-              <p className="font-bold text-base w-40 truncate">{item.name}</p>
+          <div key={item.rank} className="flex items-center justify-between px-2">
+            {/* Left side: rank, avatar and name */}
+            <div className="flex items-center space-x-3">
+              <div className="font-bold text-xl w-8 text-center">{item.rank}</div>
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={item.avatar} alt={item.name} />
+                <AvatarFallback>{item.name[0]}</AvatarFallback>
+              </Avatar>
+              <p className="font-bold text-lg truncate max-w-[150px]">{item.name}</p>
+            </div>
+            
+            {/* Right side: progress bar and score */}
+            <div className="flex items-center space-x-4">
               <Progress 
                 value={item.percentage} 
-                className="h-5 bg-gray-100 max-w-[120px]" 
+                className="h-5 bg-gray-100 w-[100px]" 
                 useGradient={true}
               />
-              <div className="font-bold text-xl w-8 text-right">{item.score}</div>
+              <div className="font-bold text-xl w-10 text-center">{item.score}</div>
             </div>
           </div>
         ))}
