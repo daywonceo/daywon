@@ -7,10 +7,11 @@ interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: number
   max?: number
   indicatorColor?: string
+  useGradient?: boolean
 }
 
 const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
-  ({ className, value = 0, max = 100, indicatorColor, ...props }, ref) => (
+  ({ className, value = 0, max = 100, indicatorColor, useGradient, ...props }, ref) => (
     <div
       ref={ref}
       role="progressbar"
@@ -25,7 +26,8 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     >
       <div
         className={cn(
-          "h-full w-full flex-1 bg-primary transition-all",
+          "h-full w-full flex-1 transition-all",
+          useGradient ? "bg-gradient-to-r from-green-700 to-green-400" : "bg-primary",
           indicatorColor || ""
         )}
         style={{ width: `${(value / max) * 100}%` }}
