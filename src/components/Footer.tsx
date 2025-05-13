@@ -1,5 +1,5 @@
 
-import { Grid2x2, Calendar as CalendarIcon, Settings, PlusCircle, MessageSquare } from "lucide-react";
+import { Grid2x2, Calendar as CalendarIcon, Settings, PlusCircle, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,6 +15,7 @@ const Footer = () => {
     { id: "home", icon: Grid2x2, label: "Home", path: "/" },
     { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/" },
     { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
+    { id: "profile", icon: User, label: "Profile", path: "/profile" },
     { id: "settings", icon: Settings, label: "Settings", path: "/" },
   ];
   
