@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserPlus, MessageCircle, ThumbsUp, MessageSquare } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 
 const Social = () => {
   const friends = [
@@ -20,6 +21,19 @@ const Social = () => {
     { id: 8, name: "STEVIE WONDER", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
     { id: 9, name: "CLAIRO", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
     { id: 10, name: "CHRISTIAN PULISIC", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" }
+  ];
+
+  const leaderboardData = [
+    { rank: 1, name: "NATE RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 91, percentage: 91 },
+    { rank: 2, name: "DREW RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 87, percentage: 87 },
+    { rank: 3, name: "JOSH RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 84, percentage: 84 },
+    { rank: 4, name: "ANDY RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 82, percentage: 82 },
+    { rank: 5, name: "PAULA RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 80, percentage: 80 },
+    { rank: 6, name: "PAIGE RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 79, percentage: 79 },
+    { rank: 7, name: "LIONEL MESSI", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 75, percentage: 75 },
+    { rank: 8, name: "STEVIE WONDER", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 74, percentage: 74 },
+    { rank: 9, name: "CLAIRO", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 71, percentage: 71 },
+    { rank: 10, name: "CHRISTIAN PULISIC", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 70, percentage: 70 }
   ];
 
   const feedPosts = [
@@ -167,8 +181,27 @@ const Social = () => {
           </TabsContent>
           
           <TabsContent value="leaderboard">
-            <div className="text-center py-12">
-              <p>Leaderboard content would go here</p>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-bold text-lg">HABIT SCORE</h2>
+              </div>
+              
+              <div className="space-y-6">
+                {leaderboardData.map((item) => (
+                  <div key={item.rank} className="flex items-center space-x-4">
+                    <div className="font-bold text-xl w-8">{item.rank}</div>
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={item.avatar} alt={item.name} />
+                      <AvatarFallback>{item.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-bold text-lg">{item.name}</p>
+                      <Progress value={item.percentage} className="h-2 bg-gray-200" indicatorColor="bg-green-500" />
+                    </div>
+                    <div className="font-bold text-xl">{item.score}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </TabsContent>
           
