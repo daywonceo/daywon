@@ -50,6 +50,10 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Animation duration variables */
+    --animation-duration: 300ms;
+    --animation-timing: ease-out;
   }
 
   .dark {
@@ -100,10 +104,71 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
   }
+  
+  /* Reduced motion settings */
+  .reduce-motion {
+    --animation-duration: 0ms;
+  }
+  
+  .reduce-motion * {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
 }
 
 @layer utilities {
   .writing-vertical {
     writing-mode: vertical-rl;
   }
+  
+  /* Mobile optimization utilities */
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Touch slide animations */
+  .touch-slide-in {
+    animation: slide-in var(--animation-duration) var(--animation-timing);
+  }
+  
+  .touch-slide-out {
+    animation: slide-out var(--animation-duration) var(--animation-timing);
+  }
+  
+  @keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  
+  @keyframes slide-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+  }
 }
+
+/* Custom scrolling behavior for mobile */
+html, body {
+  overscroll-behavior-y: contain;
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  -webkit-overflow-scrolling: touch;
+}
+
