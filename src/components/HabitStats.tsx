@@ -65,7 +65,11 @@ const HabitStats = () => {
                     <span className="font-medium text-sm sm:text-base text-green-800">{habit.name}</span>
                     <span className="text-green-600 text-sm sm:text-base">{habit.score}</span>
                   </div>
-                  <Progress value={habit.percentage} className="h-2" indicatorColor="bg-green-500" />
+                  <Progress 
+                    value={habit.percentage} 
+                    className="h-2" 
+                    useGradient={true}
+                  />
                 </div>
               ))}
             </div>
@@ -86,7 +90,10 @@ const HabitStats = () => {
                     <span className="font-medium text-sm sm:text-base text-red-800">{habit.name}</span>
                     <span className="text-red-600 text-sm sm:text-base">{habit.score}</span>
                   </div>
-                  <Progress value={habit.percentage} className="h-2" indicatorColor="bg-red-500" />
+                  <Progress 
+                    value={habit.percentage} 
+                    className="h-2 bg-gray-100" 
+                  />
                 </div>
               ))}
             </div>
