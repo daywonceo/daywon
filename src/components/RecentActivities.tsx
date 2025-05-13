@@ -1,34 +1,73 @@
 
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Check, X } from "lucide-react";
+import { useState } from "react";
 
 type RecentActivitiesProps = {
   month: string;
 };
 
+type ActivityStatus = "completed" | "failed" | "empty";
+
 const RecentActivities = ({ month }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
   
-  const activities = [
+  const [activities, setActivities] = useState([
     {
       day: 1,
       text: "WENT OUT TO DINNER WITH FRIENDS",
       categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
-      completed: ["WORKOUT"],
+      statuses: {
+        "WORKOUT": "completed" as ActivityStatus,
+        "RUN": "empty" as ActivityStatus,
+        "ITALIAN": "empty" as ActivityStatus,
+        "SCREEN TIME": "empty" as ActivityStatus,
+      },
     },
     {
       day: 2,
       text: "HIT A PR ON BENCH IN THE GYM",
       categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
-      completed: ["WORKOUT", "RUN"],
+      statuses: {
+        "WORKOUT": "completed" as ActivityStatus,
+        "RUN": "completed" as ActivityStatus,
+        "ITALIAN": "empty" as ActivityStatus,
+        "SCREEN TIME": "empty" as ActivityStatus,
+      },
     },
     {
       day: 3,
       text: "PLAYED IN A NEW SOCCER LEAGUE AND WON",
       categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
-      completed: ["WORKOUT", "RUN", "ITALIAN"],
+      statuses: {
+        "WORKOUT": "completed" as ActivityStatus,
+        "RUN": "completed" as ActivityStatus,
+        "ITALIAN": "completed" as ActivityStatus,
+        "SCREEN TIME": "empty" as ActivityStatus,
+      },
     },
-  ];
+  ]);
+
+  const toggleStatus = (dayIndex: number, category: string) => {
+    setActivities(prevActivities => {
+      const newActivities = [...prevActivities];
+      const currentStatus = newActivities[dayIndex].statuses[category];
+      
+      // Cycle through statuses: empty -> completed -> failed -> empty
+      let newStatus: ActivityStatus;
+      if (currentStatus === "empty") {
+        newStatus = "completed";
+      } else if (currentStatus === "completed") {
+        newStatus = "failed";
+      } else {
+        newStatus = "empty";
+      }
+      
+      newActivities[dayIndex].statuses[category] = newStatus;
+      return newActivities;
+    });
+  };
 
   return (
     <div className="mb-8 sm:mb-16">
@@ -51,30 +90,30 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         
         {/* Boxes grid section */}
         <div className="w-full md:w-[200px]">
-          <div className="flex mb-2 md:pl-2 overflow-x-auto pb-1 md:overflow-visible">
-            {activities[0].categories.map((category) => (
-              <div 
-                key={category} 
-                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] flex items-center justify-center font-bold text-[8px] sm:text-[10px] pb-1 text-green-700"
-              >
-                {category}
-              </div>
-            ))}
-          </div>
+          {/* Remove the category labels section */}
           
-          <div className="border-l border-green-800 overflow-x-auto md:overflow-visible">
-            {activities.map((activity, index) => (
+          {/* Connected boxes grid */}
+          <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
+            {activities.map((activity, activityIndex) => (
               <div key={`grid-${activity.day}`} className="flex h-[40px] sm:h-[50px] mb-2">
-                {activity.categories.map((category) => (
+                {activity.categories.map((category, categoryIndex) => (
                   <div 
                     key={`${activity.day}-${category}`} 
                     className={cn(
-                      "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800",
-                      index === 0 && "border-t"
+                      "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer relative",
+                      activityIndex === 0 && "border-t-0" // Remove top border for first row since we added it to the container
                     )}
+                    onClick={() => toggleStatus(activityIndex, category)}
                   >
-                    {activity.completed.includes(category) && (
-                      <div className="w-4/5 h-4/5 bg-green-800 rounded-sm"></div>
+                    {activity.statuses[category] === "completed" && (
+                      <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
+                        <Check size={16} className="text-white" />
+                      </div>
+                    )}
+                    {activity.statuses[category] === "failed" && (
+                      <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
+                        <X size={16} className="text-red-500" />
+                      </div>
                     )}
                   </div>
                 ))}
