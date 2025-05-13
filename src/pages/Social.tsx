@@ -46,7 +46,7 @@ const Social = () => {
       user: "JOSH",
       avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
       content: "SHARED HIS DAILY RECAP!",
-      caption: ""I DROVE BACK TO VT"",
+      caption: "'I DROVE BACK TO VT'",
       timeAgo: "3 HOURS AGO",
       reactions: [],
       comments: 4
