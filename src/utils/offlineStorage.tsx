@@ -1,5 +1,6 @@
 
 import { Clock } from "lucide-react";
+import React from 'react';
 
 const STORAGE_KEY = 'dayOne_offlineData';
 
@@ -58,7 +59,7 @@ export const isOnline = (): boolean => {
   return navigator.onLine;
 };
 
-export const OfflineIndicator = () => {
+export const OfflineIndicator: React.FC = () => {
   const online = isOnline();
   if (online) return null;
   

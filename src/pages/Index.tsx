@@ -54,9 +54,12 @@ const Index = () => {
   
   // Initialize from offline storage when the app loads
   useEffect(() => {
-    const offlineData = getOfflineData();
-    console.log("Loaded offline data:", offlineData);
-    // Would use this data to populate the UI components
+    try {
+      const offlineData = getOfflineData();
+      console.log("Loaded offline data:", offlineData);
+    } catch (error) {
+      console.error("Failed to load offline data:", error);
+    }
   }, []);
   
   return (
@@ -65,6 +68,11 @@ const Index = () => {
       
       <PullToRefresh onRefresh={handleRefresh}>
         <main className="flex-grow px-4 sm:px-5 pb-24 pt-4 sm:pt-6 max-w-3xl mx-auto w-full">
+          <div className="py-4 text-center">
+            <h1 className="text-2xl font-bold">Your Habits</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Track your progress daily</p>
+          </div>
+          
           <RecentActivities month={currentMonth} />
           
           {/* Make Calendar component swipeable on mobile */}
