@@ -1,4 +1,3 @@
-
 import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -182,23 +181,23 @@ const Social = () => {
           
           <TabsContent value="leaderboard">
             <div className="space-y-4">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-end items-center mb-4 pr-8">
                 <h2 className="font-bold text-lg">HABIT SCORE</h2>
               </div>
               
               <div className="space-y-6">
                 {leaderboardData.map((item) => (
-                  <div key={item.rank} className="flex items-center space-x-4">
-                    <div className="font-bold text-xl w-8">{item.rank}</div>
-                    <Avatar className="h-12 w-12">
+                  <div key={item.rank} className="flex items-center">
+                    <div className="font-bold text-xl w-8 mr-3">{item.rank}</div>
+                    <Avatar className="h-12 w-12 mr-3">
                       <AvatarImage src={item.avatar} alt={item.name} />
                       <AvatarFallback>{item.name[0]}</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <p className="font-bold text-lg">{item.name}</p>
-                      <Progress value={item.percentage} className="h-2 bg-gray-200" indicatorColor="bg-green-500" />
+                    <div className="flex-1 flex items-center gap-3">
+                      <p className="font-bold text-lg w-32">{item.name}</p>
+                      <Progress value={item.percentage} className="h-2 bg-gray-200 flex-1" indicatorColor="bg-green-500" />
+                      <div className="font-bold text-xl w-8 text-right">{item.score}</div>
                     </div>
-                    <div className="font-bold text-xl">{item.score}</div>
                   </div>
                 ))}
               </div>
