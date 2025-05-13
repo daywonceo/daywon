@@ -72,10 +72,10 @@ const Leaderboard = ({ leaderboardData }: LeaderboardProps) => {
             </div>
             
             {/* Right side: progress bar and score */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 flex-1 justify-end ml-4">
               <Progress 
                 value={item.percentage} 
-                className="h-5 bg-gray-100 w-[100px]" 
+                className="h-5 bg-gray-100 flex-1 max-w-[200px]" 
                 useGradient={true}
               />
               <div className="font-bold text-xl w-10 text-center">{item.score}</div>
