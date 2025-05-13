@@ -1,25 +1,28 @@
 
-import { Grid2x2, Calendar as CalendarIcon, Settings, PlusCircle, LayoutList } from "lucide-react";
+import { Grid2x2, Calendar as CalendarIcon, Settings, PlusCircle, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { hapticLight } from "@/utils/haptics";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const [activeTab, setActiveTab] = useState("home");
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
   const tabs = [
-    { id: "home", icon: Grid2x2, label: "Home" },
-    { id: "calendar", icon: CalendarIcon, label: "Calendar" },
-    { id: "list", icon: LayoutList, label: "List View" },
-    { id: "settings", icon: Settings, label: "Settings" },
+    { id: "home", icon: Grid2x2, label: "Home", path: "/" },
+    { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/" },
+    { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
+    { id: "settings", icon: Settings, label: "Settings", path: "/" },
   ];
   
-  const handleTabChange = (tabId: string) => {
+  const handleTabChange = (tabId: string, path: string) => {
     if (activeTab !== tabId) {
       setActiveTab(tabId);
       hapticLight(); // Add haptic feedback when changing tabs
+      navigate(path);
     }
   };
   
@@ -35,7 +38,7 @@ const Footer = () => {
                 ? "text-green-700 dark:text-green-400" 
                 : "text-gray-500 dark:text-gray-400"
             )}
-            onClick={() => handleTabChange(tab.id)}
+            onClick={() => handleTabChange(tab.id, tab.path)}
           >
             <tab.icon size={isMobile ? 20 : 24} />
             <span className="text-[10px] sm:text-xs mt-0.5 sm:mt-1">{tab.label}</span>
