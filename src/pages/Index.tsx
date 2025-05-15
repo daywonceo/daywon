@@ -12,11 +12,26 @@ import { toast } from "@/hooks/use-toast";
 import SwipeableCard from "@/components/SwipeableCard";
 import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
+import { initializeDefaultHabits } from "@/utils/habitTracking";
 
 const Index = () => {
   const [currentMonth, setCurrentMonth] = useState("MARCH");
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
+  
+  // Initialize app data on first load
+  useEffect(() => {
+    try {
+      // Load offline data
+      const offlineData = getOfflineData();
+      console.log("Loaded offline data:", offlineData);
+      
+      // Initialize default habits if none exist
+      initializeDefaultHabits();
+    } catch (error) {
+      console.error("Failed to initialize app data:", error);
+    }
+  }, []);
   
   // Simulate data loading
   const handleRefresh = async () => {
@@ -28,8 +43,6 @@ const Index = () => {
       // Simulate updating data
       const newData = {
         lastUpdated: Date.now(),
-        habits: [/* Would contain updated habit data */],
-        activities: [/* Would contain updated activity data */],
       };
       
       saveOfflineData(newData);
@@ -51,16 +64,6 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-  
-  // Initialize from offline storage when the app loads
-  useEffect(() => {
-    try {
-      const offlineData = getOfflineData();
-      console.log("Loaded offline data:", offlineData);
-    } catch (error) {
-      console.error("Failed to load offline data:", error);
-    }
-  }, []);
   
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col text-gray-800 dark:text-gray-200">

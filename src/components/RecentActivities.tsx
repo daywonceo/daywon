@@ -2,7 +2,10 @@
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Check, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { recordHabitActivity, getHabitActivities, getHabitCategories, HabitActivity } from "@/utils/habitTracking";
+import { toast } from "@/hooks/use-toast";
+import { hapticSuccess } from "@/utils/haptics";
 
 type RecentActivitiesProps = {
   month: string;
@@ -10,44 +13,85 @@ type RecentActivitiesProps = {
 
 type ActivityStatus = "completed" | "failed" | "empty";
 
+interface DayActivity {
+  day: number;
+  text: string;
+  categories: string[];
+  statuses: Record<string, ActivityStatus>;
+}
+
 const RecentActivities = ({ month }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
+  const [activities, setActivities] = useState<DayActivity[]>([]);
   
-  const [activities, setActivities] = useState([
-    {
-      day: 1,
-      text: "WENT OUT TO DINNER WITH FRIENDS",
-      categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
-      statuses: {
-        "WORKOUT": "completed" as ActivityStatus,
-        "RUN": "empty" as ActivityStatus,
-        "ITALIAN": "empty" as ActivityStatus,
-        "SCREEN TIME": "empty" as ActivityStatus,
-      },
-    },
-    {
-      day: 2,
-      text: "HIT A PR ON BENCH IN THE GYM",
-      categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
-      statuses: {
-        "WORKOUT": "completed" as ActivityStatus,
-        "RUN": "completed" as ActivityStatus,
-        "ITALIAN": "empty" as ActivityStatus,
-        "SCREEN TIME": "empty" as ActivityStatus,
-      },
-    },
-    {
-      day: 3,
-      text: "PLAYED IN A NEW SOCCER LEAGUE AND WON",
-      categories: ["WORKOUT", "RUN", "ITALIAN", "SCREEN TIME"],
-      statuses: {
-        "WORKOUT": "completed" as ActivityStatus,
-        "RUN": "completed" as ActivityStatus,
-        "ITALIAN": "completed" as ActivityStatus,
-        "SCREEN TIME": "empty" as ActivityStatus,
-      },
-    },
-  ]);
+  // Load activities from storage on component mount
+  useEffect(() => {
+    loadActivities();
+  }, []);
+  
+  const loadActivities = () => {
+    try {
+      // Get habit categories
+      const categories = getHabitCategories();
+      
+      // Get recent dates (past 3 days including today)
+      const today = new Date();
+      const dates = [0, 1, 2].map(daysAgo => {
+        const date = new Date(today);
+        date.setDate(today.getDate() - daysAgo);
+        return date;
+      });
+      
+      // Format dates as YYYY-MM-DD strings
+      const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
+      
+      // Get all habit activities from storage
+      const storedActivities = getHabitActivities();
+      
+      // Create activities for the past 3 days
+      const newActivities = dates.map((date, index) => {
+        const day = date.getDate();
+        const dateStr = dateStrings[index];
+        
+        // Create default text description based on date
+        let text = "";
+        if (index === 0) {
+          text = "TODAY'S ACTIVITIES";
+        } else if (index === 1) {
+          text = "YESTERDAY'S ACTIVITIES";
+        } else {
+          text = `ACTIVITIES FROM ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}`;
+        }
+        
+        // Initialize statuses map
+        const statuses: Record<string, ActivityStatus> = {};
+        
+        // Populate statuses from stored activities
+        categories.forEach(category => {
+          const activity = storedActivities.find(
+            a => a.habitName === category && a.date === dateStr
+          );
+          statuses[category] = activity ? activity.status : "empty";
+        });
+        
+        return {
+          day,
+          text,
+          categories,
+          statuses
+        };
+      });
+      
+      setActivities(newActivities);
+    } catch (error) {
+      console.error("Failed to load activities:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load your recent activities.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const toggleStatus = (dayIndex: number, category: string) => {
     setActivities(prevActivities => {
@@ -65,6 +109,18 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       }
       
       newActivities[dayIndex].statuses[category] = newStatus;
+      
+      // Get the date for this activity
+      const today = new Date();
+      const date = new Date(today);
+      date.setDate(today.getDate() - dayIndex);
+      
+      // Record the habit status change
+      recordHabitActivity(category, newStatus, date);
+      
+      // Provide haptic feedback on status change
+      hapticSuccess();
+      
       return newActivities;
     });
   };
@@ -77,7 +133,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         {/* Text section */}
         <div className="flex-1 pr-0 md:pr-4 mb-4 md:mb-0">
           {activities.map((activity, index) => (
-            <div key={activity.day} className="flex h-[40px] sm:h-[50px] items-center mb-2">
+            <div key={index} className="flex h-[40px] sm:h-[50px] items-center mb-2">
               <div className="pr-2 sm:pr-4 w-[30px] sm:w-[40px] text-center text-4xl sm:text-5xl font-black flex items-center justify-center text-green-800">
                 {activity.day}
               </div>
@@ -93,10 +149,10 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           {/* Connected boxes grid */}
           <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
             {activities.map((activity, activityIndex) => (
-              <div key={`grid-${activity.day}`} className="flex h-[40px] sm:h-[50px] mb-2">
+              <div key={`grid-${activityIndex}`} className="flex h-[40px] sm:h-[50px] mb-2">
                 {activity.categories.map((category, categoryIndex) => (
                   <div 
-                    key={`${activity.day}-${category}`} 
+                    key={`${activityIndex}-${category}`} 
                     className={cn(
                       "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer relative",
                       activityIndex === 0 && "border-t-0" // Remove top border for first row since we added it to the container

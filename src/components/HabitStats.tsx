@@ -1,24 +1,41 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { calculateHabitStats, HabitStats as HabitStatsType } from "@/utils/habitTracking";
+import { toast } from "@/hooks/use-toast";
 
 const HabitStats = () => {
-  const [timeframe, setTimeframe] = useState("month"); // month, week, year
+  const [timeframe, setTimeframe] = useState<"week" | "month" | "year">("month");
+  const [goodHabits, setGoodHabits] = useState<HabitStatsType[]>([]);
+  const [badHabits, setBadHabits] = useState<HabitStatsType[]>([]);
   const isMobile = useIsMobile();
   
-  const goodHabits = [
-    { name: "WORKOUT", score: "21/30", percentage: 70 },
-    { name: "WATER", score: "30/30", percentage: 100 },
-    { name: "LANGUAGE", score: "25/30", percentage: 83 },
-  ];
+  // Load habit statistics when component mounts or timeframe changes
+  useEffect(() => {
+    loadHabitStats();
+  }, [timeframe]);
+  
+  const loadHabitStats = () => {
+    try {
+      const stats = calculateHabitStats(timeframe);
+      setGoodHabits(stats.goodHabits.slice(0, 3)); // Get top 3
+      setBadHabits(stats.badHabits.slice(0, 3)); // Get bottom 3
+    } catch (error) {
+      console.error("Failed to load habit statistics:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load your habit statistics.",
+        variant: "destructive"
+      });
+    }
+  };
 
-  const badHabits = [
-    { name: "RUN", score: "4/30", percentage: 13 },
-    { name: "DEVOTION", score: "6/30", percentage: 20 },
-    { name: "SLEEP GOAL", score: "11/30", percentage: 37 },
-  ];
+  // Format score string (e.g., "21/30")
+  const formatScore = (completed: number, total: number) => {
+    return `${completed}/${total}`;
+  };
 
   return (
     <Card className="mb-8 sm:mb-12 border-green-200 shadow-md">
@@ -59,19 +76,27 @@ const HabitStats = () => {
               <h3 className="font-bold text-base sm:text-lg text-green-700 mb-3 sm:mb-4">Good Habits</h3>
             </div>
             <div className="space-y-3 sm:space-y-4">
-              {goodHabits.map((habit) => (
-                <div key={habit.name} className="space-y-1">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-sm sm:text-base text-green-800">{habit.name}</span>
-                    <span className="text-green-600 text-sm sm:text-base">{habit.score}</span>
+              {goodHabits.length > 0 ? (
+                goodHabits.map((habit) => (
+                  <div key={habit.habitName} className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-sm sm:text-base text-green-800">{habit.habitName}</span>
+                      <span className="text-green-600 text-sm sm:text-base">
+                        {formatScore(habit.completed, habit.total)}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={habit.percentage} 
+                      className="h-2" 
+                      useGradient={true}
+                    />
                   </div>
-                  <Progress 
-                    value={habit.percentage} 
-                    className="h-2" 
-                    useGradient={true}
-                  />
+                ))
+              ) : (
+                <div className="text-center text-gray-500 italic">
+                  Start tracking habits to see your best performances
                 </div>
-              ))}
+              )}
             </div>
           </div>
           
@@ -84,18 +109,26 @@ const HabitStats = () => {
               <h3 className="font-bold text-base sm:text-lg text-red-700 mb-3 sm:mb-4">Bad Habits</h3>
             </div>
             <div className="space-y-3 sm:space-y-4">
-              {badHabits.map((habit) => (
-                <div key={habit.name} className="space-y-1">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-sm sm:text-base text-red-800">{habit.name}</span>
-                    <span className="text-red-600 text-sm sm:text-base">{habit.score}</span>
+              {badHabits.length > 0 ? (
+                badHabits.map((habit) => (
+                  <div key={habit.habitName} className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-sm sm:text-base text-red-800">{habit.habitName}</span>
+                      <span className="text-red-600 text-sm sm:text-base">
+                        {formatScore(habit.completed, habit.total)}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={habit.percentage} 
+                      className="h-2 bg-gray-100" 
+                    />
                   </div>
-                  <Progress 
-                    value={habit.percentage} 
-                    className="h-2 bg-gray-100" 
-                  />
+                ))
+              ) : (
+                <div className="text-center text-gray-500 italic">
+                  Start tracking habits to see areas for improvement
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
