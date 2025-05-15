@@ -150,8 +150,8 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       <h2 className="text-4xl sm:text-6xl font-black mb-4 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
       <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
-        {/* Column headers */}
-        <div className="flex mb-2 pl-[45px] sm:pl-[60px]">
+        {/* Column headers - Now aligned directly above their respective boxes */}
+        <div className="flex mb-4 pl-[45px] sm:pl-[60px]">
           {FIXED_HABITS.map((habit, index) => (
             <div key={`header-${index}`} className="flex-1 text-center">
               <span className="text-xs font-bold text-green-800">{habit}</span>
@@ -186,11 +186,11 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
                     }
                   }}
                   autoFocus
-                  className="text-green-800 text-sm font-semibold py-1"
+                  className="text-green-800 text-md sm:text-lg font-semibold py-1"
                 />
               ) : (
                 <div className="flex items-center">
-                  <p className="text-green-800 text-sm font-semibold">{activity.text}</p>
+                  <p className="text-green-800 text-md sm:text-lg font-semibold">{activity.text}</p>
                   <button 
                     onClick={() => toggleEditMode(activityIndex)}
                     className="ml-2 text-green-700 hover:text-green-900 transition-colors"
@@ -201,22 +201,22 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
               )}
             </div>
             
-            {/* Habit boxes */}
+            {/* Habit boxes - now larger */}
             <div className="flex">
               {activity.categories.map((category, categoryIndex) => (
                 <div 
                   key={`${activityIndex}-${category}`} 
-                  className="h-[40px] sm:h-[50px] w-[40px] sm:w-[50px] border border-green-800 rounded flex items-center justify-center cursor-pointer mr-2 last:mr-0"
+                  className="h-[45px] sm:h-[55px] w-[45px] sm:w-[55px] border border-green-800 rounded flex items-center justify-center cursor-pointer mr-2 last:mr-0"
                   onClick={() => toggleStatus(activityIndex, category)}
                 >
                   {activity.statuses[category] === "completed" && (
                     <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
-                      <Check size={16} className="text-white" />
+                      <Check size={18} className="text-white" />
                     </div>
                   )}
                   {activity.statuses[category] === "failed" && (
                     <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                      <X size={16} className="text-red-500" />
+                      <X size={18} className="text-red-500" />
                     </div>
                   )}
                 </div>
