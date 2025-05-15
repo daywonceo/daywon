@@ -23,6 +23,7 @@ interface DayActivity {
 const RecentActivities = ({ month }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
   const [activities, setActivities] = useState<DayActivity[]>([]);
+  const [habitCategories, setHabitCategories] = useState<string[]>([]);
   
   // Load activities from storage on component mount
   useEffect(() => {
@@ -33,6 +34,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
     try {
       // Get habit categories
       const categories = getHabitCategories();
+      setHabitCategories(categories);
       
       // Get recent dates (past 3 days including today)
       const today = new Date();
@@ -145,12 +147,24 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         </div>
         
         {/* Boxes grid section */}
-        <div className="w-full md:w-[200px]">
+        <div className="w-full md:w-auto">
+          {/* Habit category headers */}
+          <div className="flex mb-1 border-l border-green-800">
+            {habitCategories.map((category, index) => (
+              <div 
+                key={`header-${index}`}
+                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] text-center py-1"
+              >
+                <span className="text-xs font-bold text-green-800 break-words">{category}</span>
+              </div>
+            ))}
+          </div>
+          
           {/* Connected boxes grid */}
           <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
             {activities.map((activity, activityIndex) => (
               <div key={`grid-${activityIndex}`} className="flex h-[40px] sm:h-[50px] mb-2">
-                {activity.categories.map((category, categoryIndex) => (
+                {habitCategories.map((category, categoryIndex) => (
                   <div 
                     key={`${activityIndex}-${category}`} 
                     className={cn(

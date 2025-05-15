@@ -15,13 +15,18 @@ import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitTracking";
 
 const Index = () => {
-  const [currentMonth, setCurrentMonth] = useState("MARCH");
+  const [currentMonth, setCurrentMonth] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
   
-  // Initialize app data on first load
+  // Initialize app data on first load and set current month
   useEffect(() => {
     try {
+      // Set current month
+      const date = new Date();
+      const monthName = date.toLocaleString('default', { month: 'long' }).toUpperCase();
+      setCurrentMonth(monthName);
+      
       // Load offline data
       const offlineData = getOfflineData();
       console.log("Loaded offline data:", offlineData);
