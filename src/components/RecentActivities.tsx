@@ -150,18 +150,18 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       
       <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
         {/* Column headers - align exactly above their boxes */}
-        <div className="flex mb-4">
+        <div className="flex mb-6">
           {/* Empty space for day number column */}
           <div className="w-[45px] sm:w-[60px] mr-3 sm:mr-4"></div>
           
           {/* Space for text description */}
-          <div className="flex-grow mr-3"></div>
+          <div className="flex-grow mr-4"></div>
           
           {/* Habit header labels directly above boxes */}
           <div className="flex">
             {FIXED_HABITS.map((habit, index) => (
-              <div key={`header-${index}`} className="w-[50px] sm:w-[60px] mr-2 last:mr-0 text-center">
-                <span className="text-xs font-bold text-green-800">{habit}</span>
+              <div key={`header-${index}`} className="w-[55px] sm:w-[65px] mr-4 last:mr-0 text-center">
+                <span className="text-sm font-bold text-green-800">{habit}</span>
               </div>
             ))}
           </div>
@@ -169,7 +169,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         
         {/* Activity rows */}
         {activities.map((activity, activityIndex) => (
-          <div key={`activity-${activityIndex}`} className="flex items-center mb-6 last:mb-0">
+          <div key={`activity-${activityIndex}`} className="flex items-center mb-8 last:mb-0">
             {/* Day number */}
             <div className="flex items-center justify-center w-[35px] sm:w-[45px] mr-3 sm:mr-4">
               <div className="text-center text-4xl sm:text-5xl font-black text-green-800">
@@ -178,7 +178,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
             </div>
             
             {/* Activity description - now editable */}
-            <div className="flex-grow mr-3 flex items-center">
+            <div className="flex-grow mr-4 flex items-center">
               {activity.isEditing ? (
                 <Input 
                   value={activity.text}
@@ -214,7 +214,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
               {activity.categories.map((category, categoryIndex) => (
                 <div 
                   key={`${activityIndex}-${category}`} 
-                  className="h-[50px] sm:h-[60px] w-[50px] sm:w-[60px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer mr-2 last:mr-0 hover:bg-green-100 transition-colors"
+                  className="h-[50px] sm:h-[60px] w-[55px] sm:w-[65px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer mr-4 last:mr-0 hover:bg-green-100 transition-colors"
                   onClick={() => toggleStatus(activityIndex, category)}
                 >
                   {activity.statuses[category] === "completed" && (
