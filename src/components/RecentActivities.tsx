@@ -131,60 +131,83 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
     <div className="mb-8 sm:mb-16">
       <h2 className="text-4xl sm:text-6xl font-black mb-4 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
-      <div className="flex flex-col md:flex-row bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
-        {/* Text section */}
-        <div className="flex-1 pr-0 md:pr-4 mb-4 md:mb-0">
-          {activities.map((activity, index) => (
-            <div key={index} className="flex h-[40px] sm:h-[50px] items-center mb-2">
-              <div className="pr-2 sm:pr-4 w-[30px] sm:w-[40px] text-center text-4xl sm:text-5xl font-black flex items-center justify-center text-green-800">
-                {activity.day}
-              </div>
-              <div className="flex items-center h-full">
-                <p className="text-green-800 font-bold text-sm sm:text-lg">{activity.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Boxes grid section */}
-        <div className="w-full md:w-auto">
-          {/* Habit category headers */}
-          <div className="flex mb-1 border-l border-green-800">
+      <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
+        <div className="flex">
+          {/* Empty space for alignment with dates */}
+          <div className="w-[30px] sm:w-[40px] mr-2 sm:mr-4"></div>
+          
+          {/* Habit category headers - now above the grid */}
+          <div className="flex-1 flex">
             {habitCategories.map((category, index) => (
               <div 
                 key={`header-${index}`}
-                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] text-center py-1"
+                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] text-center"
               >
-                <span className="text-xs font-bold text-green-800 break-words">{category}</span>
+                <span className="text-xs font-bold text-green-800 block pb-2 truncate" title={category}>
+                  {category}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex">
+          {/* Days column */}
+          <div className="flex flex-col pr-2 sm:pr-4">
+            {activities.map((activity, index) => (
+              <div 
+                key={`day-${index}`} 
+                className="flex items-center h-[40px] sm:h-[50px] mb-2"
+              >
+                <div className="w-[30px] sm:w-[40px] text-center text-4xl sm:text-5xl font-black text-green-800">
+                  {activity.day}
+                </div>
               </div>
             ))}
           </div>
           
-          {/* Connected boxes grid */}
-          <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
-            {activities.map((activity, activityIndex) => (
-              <div key={`grid-${activityIndex}`} className="flex h-[40px] sm:h-[50px] mb-2">
-                {habitCategories.map((category, categoryIndex) => (
-                  <div 
-                    key={`${activityIndex}-${category}`} 
-                    className={cn(
-                      "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer relative",
-                      activityIndex === 0 && "border-t-0" // Remove top border for first row since we added it to the container
-                    )}
-                    onClick={() => toggleStatus(activityIndex, category)}
-                  >
-                    {activity.statuses[category] === "completed" && (
-                      <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
-                        <Check size={16} className="text-white" />
-                      </div>
-                    )}
-                    {activity.statuses[category] === "failed" && (
-                      <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                        <X size={16} className="text-red-500" />
-                      </div>
-                    )}
-                  </div>
-                ))}
+          {/* Connected boxes grid with labels */}
+          <div className="flex-1">
+            <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
+              {activities.map((activity, activityIndex) => (
+                <div 
+                  key={`grid-${activityIndex}`} 
+                  className="flex h-[40px] sm:h-[50px] mb-2"
+                >
+                  {habitCategories.map((category, categoryIndex) => (
+                    <div 
+                      key={`${activityIndex}-${category}`} 
+                      className={cn(
+                        "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer relative",
+                        activityIndex === 0 && "border-t-0"
+                      )}
+                      onClick={() => toggleStatus(activityIndex, category)}
+                    >
+                      {activity.statuses[category] === "completed" && (
+                        <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
+                          <Check size={16} className="text-white" />
+                        </div>
+                      )}
+                      {activity.statuses[category] === "failed" && (
+                        <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
+                          <X size={16} className="text-red-500" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Description labels for days */}
+        <div className="flex mt-2">
+          <div className="w-[30px] sm:w-[40px] mr-2 sm:mr-4"></div>
+          <div className="flex-1">
+            {activities.map((activity, index) => (
+              <div key={`text-${index}`} className="h-[24px] mb-1 last:mb-0">
+                <p className="text-green-800 text-xs font-semibold">{activity.text}</p>
               </div>
             ))}
           </div>
