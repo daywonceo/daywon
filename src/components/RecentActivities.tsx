@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Check, X } from "lucide-react";
+import { Check, X, Edit } from "lucide-react";
 import { recordHabitActivity, getHabitActivities, getHabitCategories, HabitActivity } from "@/utils/habitTracking";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
+import { Input } from "@/components/ui/input";
 
 type RecentActivitiesProps = {
   month: string;
@@ -18,12 +19,15 @@ interface DayActivity {
   text: string;
   categories: string[];
   statuses: Record<string, ActivityStatus>;
+  isEditing: boolean;
 }
+
+// Define our specific three habits
+const FIXED_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 
 const RecentActivities = ({ month }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
   const [activities, setActivities] = useState<DayActivity[]>([]);
-  const [habitCategories, setHabitCategories] = useState<string[]>([]);
   
   // Load activities from storage on component mount
   useEffect(() => {
@@ -32,10 +36,6 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
   
   const loadActivities = () => {
     try {
-      // Get habit categories
-      const categories = getHabitCategories();
-      setHabitCategories(categories);
-      
       // Get recent dates (past 3 days including today)
       const today = new Date();
       const dates = [0, 1, 2].map(daysAgo => {
@@ -69,7 +69,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         const statuses: Record<string, ActivityStatus> = {};
         
         // Populate statuses from stored activities
-        categories.forEach(category => {
+        FIXED_HABITS.forEach(category => {
           const activity = storedActivities.find(
             a => a.habitName === category && a.date === dateStr
           );
@@ -79,8 +79,9 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         return {
           day,
           text,
-          categories,
-          statuses
+          categories: FIXED_HABITS,
+          statuses,
+          isEditing: false
         };
       });
       
@@ -127,75 +128,102 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
     });
   };
 
+  const toggleEditMode = (dayIndex: number) => {
+    setActivities(prevActivities => {
+      const newActivities = [...prevActivities];
+      newActivities[dayIndex].isEditing = !newActivities[dayIndex].isEditing;
+      return newActivities;
+    });
+  };
+
+  const updateActivityText = (dayIndex: number, newText: string) => {
+    setActivities(prevActivities => {
+      const newActivities = [...prevActivities];
+      newActivities[dayIndex].text = newText;
+      newActivities[dayIndex].isEditing = false;
+      return newActivities;
+    });
+  };
+
   return (
     <div className="mb-8 sm:mb-16">
       <h2 className="text-4xl sm:text-6xl font-black mb-4 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
       <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
-        <div className="flex">
-          {/* Days column */}
-          <div className="flex flex-col pr-2 sm:pr-4">
-            {activities.map((activity, index) => (
-              <div 
-                key={`day-${index}`} 
-                className="flex items-center h-[40px] sm:h-[50px] mb-2"
-              >
-                <div className="w-[30px] sm:w-[40px] text-center text-4xl sm:text-5xl font-black text-green-800">
-                  {activity.day}
-                </div>
+        {/* Column headers */}
+        <div className="flex mb-2 pl-[45px] sm:pl-[60px]">
+          {FIXED_HABITS.map((habit, index) => (
+            <div key={`header-${index}`} className="flex-1 text-center">
+              <span className="text-xs font-bold text-green-800">{habit}</span>
+            </div>
+          ))}
+        </div>
+        
+        {/* Activity rows */}
+        {activities.map((activity, activityIndex) => (
+          <div key={`activity-${activityIndex}`} className="flex items-center mb-6 last:mb-0">
+            {/* Day number */}
+            <div className="flex items-center justify-center w-[30px] sm:w-[40px] mr-3 sm:mr-4">
+              <div className="text-center text-4xl sm:text-5xl font-black text-green-800">
+                {activity.day}
               </div>
-            ))}
-          </div>
-          
-          {/* Connected boxes grid */}
-          <div className="flex-1">
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {activities.map((activity, activityIndex) => (
-                <React.Fragment key={`grid-row-${activityIndex}`}>
-                  {activity.categories.map((category, categoryIndex) => (
-                    <div 
-                      key={`${activityIndex}-${category}`} 
-                      className="relative"
-                    >
-                      {categoryIndex === 0 && activityIndex === 0 && (
-                        <div className="absolute -top-6 w-full text-center">
-                          <span className="text-xs font-bold text-green-800">{category}</span>
-                        </div>
-                      )}
-                      <div
-                        className="h-[40px] sm:h-[50px] border border-green-800 rounded flex items-center justify-center cursor-pointer"
-                        onClick={() => toggleStatus(activityIndex, category)}
-                      >
-                        {activity.statuses[category] === "completed" && (
-                          <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
-                            <Check size={16} className="text-white" />
-                          </div>
-                        )}
-                        {activity.statuses[category] === "failed" && (
-                          <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                            <X size={16} className="text-red-500" />
-                          </div>
-                        )}
-                      </div>
+            </div>
+            
+            {/* Activity description - now editable */}
+            <div className="flex-grow mr-3 flex items-center">
+              {activity.isEditing ? (
+                <Input 
+                  value={activity.text}
+                  onChange={(e) => {
+                    const newActivities = [...activities];
+                    newActivities[activityIndex].text = e.target.value;
+                    setActivities(newActivities);
+                  }}
+                  onBlur={() => toggleEditMode(activityIndex)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      updateActivityText(activityIndex, activity.text);
+                    }
+                  }}
+                  autoFocus
+                  className="text-green-800 text-sm font-semibold py-1"
+                />
+              ) : (
+                <div className="flex items-center">
+                  <p className="text-green-800 text-sm font-semibold">{activity.text}</p>
+                  <button 
+                    onClick={() => toggleEditMode(activityIndex)}
+                    className="ml-2 text-green-700 hover:text-green-900 transition-colors"
+                  >
+                    <Edit size={14} />
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            {/* Habit boxes */}
+            <div className="flex">
+              {activity.categories.map((category, categoryIndex) => (
+                <div 
+                  key={`${activityIndex}-${category}`} 
+                  className="h-[40px] sm:h-[50px] w-[40px] sm:w-[50px] border border-green-800 rounded flex items-center justify-center cursor-pointer mr-2 last:mr-0"
+                  onClick={() => toggleStatus(activityIndex, category)}
+                >
+                  {activity.statuses[category] === "completed" && (
+                    <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
+                      <Check size={16} className="text-white" />
                     </div>
-                  ))}
-                </React.Fragment>
+                  )}
+                  {activity.statuses[category] === "failed" && (
+                    <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
+                      <X size={16} className="text-red-500" />
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
-        </div>
-        
-        {/* Description labels for days */}
-        <div className="flex mt-2">
-          <div className="w-[30px] sm:w-[40px] mr-2 sm:mr-4"></div>
-          <div className="flex-1">
-            {activities.map((activity, index) => (
-              <div key={`text-${index}`} className="h-[24px] mb-1 last:mb-0">
-                <p className="text-green-800 text-xs font-semibold">{activity.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

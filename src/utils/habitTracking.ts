@@ -134,22 +134,23 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
   }
 };
 
-// Initialize some default habit categories if none exist
+// Initialize specific habit categories
 export const initializeDefaultHabits = (): string[] => {
   const offlineData = getOfflineData();
   
-  // If habitCategories already exists, return them
-  if (offlineData.habitCategories && offlineData.habitCategories.length > 0) {
-    return offlineData.habitCategories;
+  // Set our fixed habits
+  const defaultCategories = ["WORKOUT", "DEVOTIONS", "READ"];
+  
+  // Only save if no categories exist or they don't match our fixed ones
+  if (!offlineData.habitCategories || 
+      !Array.isArray(offlineData.habitCategories) || 
+      offlineData.habitCategories.length !== defaultCategories.length) {
+    
+    // Save default categories
+    saveOfflineData({
+      habitCategories: defaultCategories
+    });
   }
-  
-  // Default categories
-  const defaultCategories = ["WORKOUT", "RUN", "WATER", "LANGUAGE", "DEVOTION", "SLEEP GOAL"];
-  
-  // Save default categories
-  saveOfflineData({
-    habitCategories: defaultCategories
-  });
   
   return defaultCategories;
 };
