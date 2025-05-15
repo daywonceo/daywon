@@ -32,8 +32,8 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
   
   const loadActivities = () => {
     try {
-      // Get habit categories
-      const categories = getHabitCategories();
+      // Get habit categories - limit to 3
+      const categories = getHabitCategories().slice(0, 3);
       setHabitCategories(categories);
       
       // Get recent dates (past 3 days including today)
@@ -132,18 +132,22 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       <h2 className="text-4xl sm:text-6xl font-black mb-4 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
       <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
+        {/* Main grid with connected borders */}
         <div className="flex">
-          {/* Empty space for alignment with dates */}
+          {/* Habit headers - vertical text */}
           <div className="w-[30px] sm:w-[40px] mr-2 sm:mr-4"></div>
           
-          {/* Habit category headers - now above the grid */}
+          {/* Headers for habit columns */}
           <div className="flex-1 flex">
             {habitCategories.map((category, index) => (
               <div 
                 key={`header-${index}`}
-                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] text-center"
+                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] flex justify-center items-end pb-2"
               >
-                <span className="text-xs font-bold text-green-800 block pb-2 truncate" title={category}>
+                <span 
+                  className="text-xs font-bold text-green-800 transform -rotate-90 origin-bottom-left whitespace-nowrap"
+                  title={category}
+                >
                   {category}
                 </span>
               </div>
@@ -166,9 +170,9 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
             ))}
           </div>
           
-          {/* Connected boxes grid with labels */}
+          {/* Connected boxes grid */}
           <div className="flex-1">
-            <div className="border-l border-t border-green-800 overflow-x-auto md:overflow-visible">
+            <div className="border-l border-t border-green-800">
               {activities.map((activity, activityIndex) => (
                 <div 
                   key={`grid-${activityIndex}`} 
@@ -178,7 +182,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
                     <div 
                       key={`${activityIndex}-${category}`} 
                       className={cn(
-                        "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer relative",
+                        "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer",
                         activityIndex === 0 && "border-t-0"
                       )}
                       onClick={() => toggleStatus(activityIndex, category)}
