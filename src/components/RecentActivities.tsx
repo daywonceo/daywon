@@ -32,8 +32,8 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
   
   const loadActivities = () => {
     try {
-      // Get habit categories - limit to 3
-      const categories = getHabitCategories().slice(0, 3);
+      // Get habit categories
+      const categories = getHabitCategories();
       setHabitCategories(categories);
       
       // Get recent dates (past 3 days including today)
@@ -132,29 +132,6 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       <h2 className="text-4xl sm:text-6xl font-black mb-4 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
       <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
-        {/* Main grid with connected borders */}
-        <div className="flex">
-          {/* Habit headers - vertical text */}
-          <div className="w-[30px] sm:w-[40px] mr-2 sm:mr-4"></div>
-          
-          {/* Headers for habit columns */}
-          <div className="flex-1 flex">
-            {habitCategories.map((category, index) => (
-              <div 
-                key={`header-${index}`}
-                className="min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] flex justify-center items-end pb-2"
-              >
-                <span 
-                  className="text-xs font-bold text-green-800 transform -rotate-90 origin-bottom-left whitespace-nowrap"
-                  title={category}
-                >
-                  {category}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="flex">
           {/* Days column */}
           <div className="flex flex-col pr-2 sm:pr-4">
@@ -172,34 +149,37 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           
           {/* Connected boxes grid */}
           <div className="flex-1">
-            <div className="border-l border-t border-green-800">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {activities.map((activity, activityIndex) => (
-                <div 
-                  key={`grid-${activityIndex}`} 
-                  className="flex h-[40px] sm:h-[50px] mb-2"
-                >
-                  {habitCategories.map((category, categoryIndex) => (
+                <React.Fragment key={`grid-row-${activityIndex}`}>
+                  {activity.categories.map((category, categoryIndex) => (
                     <div 
                       key={`${activityIndex}-${category}`} 
-                      className={cn(
-                        "min-w-[40px] sm:min-w-[50px] w-[40px] sm:w-[50px] h-full flex items-center justify-center border-r border-b border-green-800 cursor-pointer",
-                        activityIndex === 0 && "border-t-0"
-                      )}
-                      onClick={() => toggleStatus(activityIndex, category)}
+                      className="relative"
                     >
-                      {activity.statuses[category] === "completed" && (
-                        <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
-                          <Check size={16} className="text-white" />
+                      {categoryIndex === 0 && activityIndex === 0 && (
+                        <div className="absolute -top-6 w-full text-center">
+                          <span className="text-xs font-bold text-green-800">{category}</span>
                         </div>
                       )}
-                      {activity.statuses[category] === "failed" && (
-                        <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                          <X size={16} className="text-red-500" />
-                        </div>
-                      )}
+                      <div
+                        className="h-[40px] sm:h-[50px] border border-green-800 rounded flex items-center justify-center cursor-pointer"
+                        onClick={() => toggleStatus(activityIndex, category)}
+                      >
+                        {activity.statuses[category] === "completed" && (
+                          <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
+                            <Check size={16} className="text-white" />
+                          </div>
+                        )}
+                        {activity.statuses[category] === "failed" && (
+                          <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
+                            <X size={16} className="text-red-500" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
-                </div>
+                </React.Fragment>
               ))}
             </div>
           </div>
