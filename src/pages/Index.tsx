@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
-import Calendar from "@/components/Calendar";
 import HabitStats from "@/components/HabitStats";
 import Progress from "@/components/Progress";
 import Footer from "@/components/Footer";
@@ -82,21 +81,6 @@ const Index = () => {
           </div>
           
           <RecentActivities month={currentMonth} />
-          
-          {/* Make Calendar component swipeable on mobile */}
-          {isMobile ? (
-            <SwipeableCard
-              onSwipeLeft={() => console.log("Swiped left - previous month")}
-              onSwipeRight={() => console.log("Swiped right - next month")}
-              leftActionText="Previous"
-              rightActionText="Next"
-            >
-              <Calendar month={currentMonth} />
-            </SwipeableCard>
-          ) : (
-            <Calendar month={currentMonth} />
-          )}
-          
           <HabitStats />
           <Progress />
         </main>

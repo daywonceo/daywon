@@ -1,19 +1,30 @@
 
 import { Grid2x2, Calendar as CalendarIcon, Settings, PlusCircle, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { hapticLight } from "@/utils/haptics";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Footer = () => {
   const [activeTab, setActiveTab] = useState("home");
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Update active tab based on current route
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === "/") setActiveTab("home");
+    else if (path === "/calendar") setActiveTab("calendar");
+    else if (path === "/social") setActiveTab("social");
+    else if (path === "/profile") setActiveTab("profile");
+    else if (path === "/settings") setActiveTab("settings");
+  }, [location]);
   
   const tabs = [
     { id: "home", icon: Grid2x2, label: "Home", path: "/" },
-    { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/" },
+    { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/calendar" },
     { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
     { id: "profile", icon: User, label: "Profile", path: "/profile" },
     { id: "settings", icon: Settings, label: "Settings", path: "/" },
