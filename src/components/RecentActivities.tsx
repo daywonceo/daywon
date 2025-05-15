@@ -1,8 +1,8 @@
 
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Check, X } from "lucide-react";
-import { useState, useEffect } from "react";
 import { recordHabitActivity, getHabitActivities, getHabitCategories, HabitActivity } from "@/utils/habitTracking";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
