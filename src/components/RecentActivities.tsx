@@ -145,40 +145,40 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
   };
 
   return (
-    <div className="mb-8 sm:mb-16">
-      <h2 className="text-4xl sm:text-6xl font-black mb-4 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
+    <div className="mb-6 sm:mb-16">
+      <h2 className="text-3xl sm:text-6xl font-black mb-3 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
-      <div className="flex flex-col bg-green-50 rounded-xl p-4 sm:p-6 shadow-md overflow-hidden">
-        {/* Column headers - align exactly above their boxes */}
-        <div className="flex mb-6">
+      <div className="flex flex-col bg-green-50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
+        {/* Column headers - improved spacing for mobile */}
+        <div className="flex mb-4 sm:mb-6">
           {/* Empty space for day number column */}
-          <div className="w-[45px] sm:w-[60px] mr-3 sm:mr-4"></div>
+          <div className="w-[40px] sm:w-[60px] mr-2 sm:mr-4"></div>
           
           {/* Space for text description */}
-          <div className="flex-grow mr-4"></div>
+          <div className="flex-grow mr-3 sm:mr-4"></div>
           
-          {/* Habit header labels directly above boxes */}
-          <div className="flex">
+          {/* Habit header labels with better spacing */}
+          <div className="flex gap-2 sm:gap-4">
             {FIXED_HABITS.map((habit, index) => (
-              <div key={`header-${index}`} className="w-[55px] sm:w-[65px] mr-4 last:mr-0 text-center">
-                <span className="text-sm font-bold text-green-800">{habit}</span>
+              <div key={`header-${index}`} className="w-[45px] sm:w-[65px] text-center">
+                <span className="text-xs sm:text-sm font-bold text-green-800 leading-tight">{habit}</span>
               </div>
             ))}
           </div>
         </div>
         
-        {/* Activity rows */}
+        {/* Activity rows with improved mobile layout */}
         {activities.map((activity, activityIndex) => (
-          <div key={`activity-${activityIndex}`} className="flex items-center mb-8 last:mb-0">
+          <div key={`activity-${activityIndex}`} className="flex items-center mb-6 sm:mb-8 last:mb-0">
             {/* Day number */}
-            <div className="flex items-center justify-center w-[35px] sm:w-[45px] mr-3 sm:mr-4">
-              <div className="text-center text-4xl sm:text-5xl font-black text-green-800">
+            <div className="flex items-center justify-center w-[30px] sm:w-[45px] mr-2 sm:mr-4">
+              <div className="text-center text-3xl sm:text-5xl font-black text-green-800">
                 {activity.day}
               </div>
             </div>
             
-            {/* Activity description - now editable */}
-            <div className="flex-grow mr-4 flex items-center">
+            {/* Activity description - responsive text size */}
+            <div className="flex-grow mr-3 sm:mr-4 flex items-center">
               {activity.isEditing ? (
                 <Input 
                   value={activity.text}
@@ -194,37 +194,40 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
                     }
                   }}
                   autoFocus
-                  className="text-green-800 text-md sm:text-lg font-semibold py-1"
+                  className="text-green-800 text-sm sm:text-lg font-semibold py-1"
                 />
               ) : (
                 <div className="flex items-center">
-                  <p className="text-green-800 text-md sm:text-lg font-semibold">{activity.text}</p>
+                  <p className="text-green-800 text-sm sm:text-lg font-semibold leading-tight">{activity.text}</p>
                   <button 
                     onClick={() => toggleEditMode(activityIndex)}
                     className="ml-2 text-green-700 hover:text-green-900 transition-colors"
                   >
-                    <Edit size={14} />
+                    <Edit size={12} className="sm:hidden" />
+                    <Edit size={14} className="hidden sm:block" />
                   </button>
                 </div>
               )}
             </div>
             
-            {/* Habit boxes - larger and with consistent spacing */}
-            <div className="flex">
+            {/* Habit boxes - improved sizing and spacing */}
+            <div className="flex gap-2 sm:gap-4">
               {activity.categories.map((category, categoryIndex) => (
                 <div 
                   key={`${activityIndex}-${category}`} 
-                  className="h-[50px] sm:h-[60px] w-[55px] sm:w-[65px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer mr-4 last:mr-0 hover:bg-green-100 transition-colors"
+                  className="h-[45px] w-[45px] sm:h-[60px] sm:w-[65px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors"
                   onClick={() => toggleStatus(activityIndex, category)}
                 >
                   {activity.statuses[category] === "completed" && (
                     <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
-                      <Check size={20} className="text-white" />
+                      <Check size={16} className="sm:hidden text-white" />
+                      <Check size={20} className="hidden sm:block text-white" />
                     </div>
                   )}
                   {activity.statuses[category] === "failed" && (
                     <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                      <X size={20} className="text-red-500" />
+                      <X size={16} className="sm:hidden text-red-500" />
+                      <X size={20} className="hidden sm:block text-red-500" />
                     </div>
                   )}
                 </div>
