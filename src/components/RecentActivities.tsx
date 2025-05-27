@@ -149,7 +149,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       <h2 className="text-3xl sm:text-6xl font-black mb-3 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
       <div className="flex flex-col bg-green-50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
-        {/* Column headers - improved spacing for mobile */}
+        {/* Column headers - improved text alignment and spacing */}
         <div className="flex mb-4 sm:mb-6">
           {/* Empty space for day number column */}
           <div className="w-[40px] sm:w-[60px] mr-2 sm:mr-4"></div>
@@ -157,11 +157,13 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           {/* Space for text description */}
           <div className="flex-grow mr-3 sm:mr-4"></div>
           
-          {/* Habit header labels with better spacing */}
+          {/* Habit header labels with improved alignment and spacing */}
           <div className="flex gap-2 sm:gap-4">
             {FIXED_HABITS.map((habit, index) => (
-              <div key={`header-${index}`} className="w-[45px] sm:w-[65px] text-center">
-                <span className="text-xs sm:text-sm font-bold text-green-800 leading-tight">{habit}</span>
+              <div key={`header-${index}`} className="w-[45px] sm:w-[65px] text-center px-1">
+                <span className="text-[10px] sm:text-xs font-bold text-green-800 leading-tight block break-words">
+                  {habit}
+                </span>
               </div>
             ))}
           </div>
