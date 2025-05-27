@@ -30,19 +30,19 @@ const DayCell = ({
       <Drawer>
         <DrawerTrigger asChild>
           <div 
-            className={`aspect-square border-r border-b border-green-100 dark:border-green-800 last:border-r-0 p-1 min-h-[35px] sm:min-h-[50px] active:bg-green-100 dark:active:bg-green-900 transition-colors ${
+            className={`aspect-square border-r border-b border-green-100 dark:border-green-800 last:border-r-0 p-0.5 sm:p-1 min-h-[32px] sm:min-h-[45px] active:bg-green-100 dark:active:bg-green-900 transition-colors ${
               isToday ? 'bg-green-50 dark:bg-green-900/50' : ''
             }`}
           >
             <div className="h-full">
-              <div className="text-right text-xs sm:text-sm font-medium text-green-800 dark:text-green-200">
+              <div className="text-right text-xs font-medium text-green-800 dark:text-green-200">
                 {day}
               </div>
               {/* Indicators for activities */}
               {isGreenActivity && (
-                <div className="mt-1 sm:mt-2 flex justify-center">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 mx-0.5"></div>
-                  {isBlueActivity && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 mx-0.5"></div>}
+                <div className="mt-0.5 sm:mt-1 flex justify-center">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-green-500 mx-0.5"></div>
+                  {isBlueActivity && <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500 mx-0.5"></div>}
                 </div>
               )}
             </div>
