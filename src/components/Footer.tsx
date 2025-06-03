@@ -1,5 +1,4 @@
-
-import { Grid2x2, Calendar as CalendarIcon, Settings, PlusCircle, MessageSquare, User } from "lucide-react";
+import { Grid2x2, Calendar as CalendarIcon, Book, PlusCircle, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -27,7 +26,7 @@ const Footer = () => {
     { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/calendar" },
     { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
     { id: "profile", icon: User, label: "Profile", path: "/profile" },
-    { id: "settings", icon: Settings, label: "Guidance", path: "/guidance" },
+    { id: "settings", icon: Book, label: "Guidance", path: "/guidance" },
   ];
   
   const handleTabChange = (tabId: string, path: string) => {
