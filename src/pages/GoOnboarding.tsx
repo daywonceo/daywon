@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Target, Bell, Heart, RotateCcw } from "lucide-react";
+import { Sparkles, Target, Bell, Heart, RotateCcw, Palette } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -22,6 +22,16 @@ const GoOnboarding = () => {
       icon: <Sparkles className="w-6 h-6 text-yellow-500" />,
       title: "Welcome",
       description: "Get introduced to your habit tracking journey"
+    },
+    {
+      icon: <Heart className="w-6 h-6 text-red-500" />,
+      title: "Our Mission",
+      description: "Learn about Life Canvas and habit-based personal growth"
+    },
+    {
+      icon: <Palette className="w-6 h-6 text-purple-500" />,
+      title: "Canvas Growth",
+      description: "See how your canvas will grow over time with habits"
     },
     {
       icon: <Target className="w-6 h-6 text-blue-500" />,
@@ -96,7 +106,7 @@ const GoOnboarding = () => {
                       </p>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      {index + 1}/6
+                      {index + 1}/8
                     </Badge>
                   </div>
                 ))}
