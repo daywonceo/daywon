@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,6 +13,7 @@ import WorkoutCard from "@/components/guidance/WorkoutCard";
 import RecipeCard from "@/components/guidance/RecipeCard";
 import VerseCard from "@/components/guidance/VerseCard";
 import TranslationSelector from "@/components/guidance/TranslationSelector";
+import CategorySelector from "@/components/guidance/CategorySelector";
 import { useBibleVerses } from "@/hooks/useBibleVerses";
 import { workoutSuggestions, healthyRecipes } from "@/data/guidanceData";
 
@@ -21,9 +21,10 @@ const Guidance = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [selectedTranslation, setSelectedTranslation] = useState("esv");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
 
-  const { bibleVerses, isLoadingVerses, versesError, fetchBibleVerses } = useBibleVerses(selectedTranslation);
+  const { bibleVerses, isLoadingVerses, versesError, fetchBibleVerses } = useBibleVerses(selectedTranslation, selectedCategory);
 
   const filteredWorkouts = workoutSuggestions.filter(workout => 
     (selectedDifficulty === "all" || workout.difficulty === selectedDifficulty) &&
@@ -38,7 +39,8 @@ const Guidance = () => {
   const filteredVerses = bibleVerses.filter(verse => 
     searchQuery === "" || 
     verse.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    verse.text.toLowerCase().includes(searchQuery.toLowerCase())
+    verse.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    verse.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleTranslationClick = () => {
@@ -48,6 +50,10 @@ const Guidance = () => {
   const handleTranslationChange = (translation: string) => {
     setSelectedTranslation(translation);
     setTranslationDialogOpen(false);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
   };
 
   return (
@@ -123,9 +129,13 @@ const Guidance = () => {
           </TabsContent>
           
           <TabsContent value="devotions" className="animate-fade-in">
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Daily Verses</h3>
-              <div className="flex gap-4 items-center">
+              <div className="flex flex-wrap gap-4 items-center">
+                <CategorySelector 
+                  currentCategory={selectedCategory}
+                  onCategoryChange={handleCategoryChange}
+                />
                 <Dialog open={translationDialogOpen} onOpenChange={setTranslationDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">

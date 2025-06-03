@@ -10,12 +10,31 @@ interface BibleVerse {
   text: string;
   translation_name: string;
   translation_note?: string;
+  category: string;
 }
 
 interface VerseCardProps {
   verse: BibleVerse;
   onTranslationClick: (reference: string) => void;
 }
+
+const getCategoryEmoji = (category: string) => {
+  const categoryEmojis: { [key: string]: string } = {
+    "strength": "💪",
+    "hope": "🌅",
+    "faith": "🙏",
+    "peace": "🕊️",
+    "courage": "🦁",
+    "purpose": "🎯",
+    "comfort": "🤗",
+    "perseverance": "🏃",
+    "friendship": "👥",
+    "trust": "❤️",
+    "transformation": "🦋",
+    "identity": "✨"
+  };
+  return categoryEmojis[category] || "📖";
+};
 
 const VerseCard = ({ verse, onTranslationClick }: VerseCardProps) => {
   const handleVerseClick = () => {
@@ -32,13 +51,16 @@ const VerseCard = ({ verse, onTranslationClick }: VerseCardProps) => {
           <Book className="w-5 h-5 mr-2" />
           {verse.reference}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="flex items-center gap-2">
           <Badge 
             variant="outline" 
             className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => onTranslationClick(verse.reference)}
           >
             {verse.translation_name}
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            {getCategoryEmoji(verse.category)} {verse.category.charAt(0).toUpperCase() + verse.category.slice(1)}
           </Badge>
         </CardDescription>
       </CardHeader>
