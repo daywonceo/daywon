@@ -27,7 +27,7 @@ const Footer = () => {
     { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/calendar" },
     { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
     { id: "profile", icon: User, label: "Profile", path: "/profile" },
-    { id: "settings", icon: Settings, label: "Settings", path: "/" },
+    { id: "settings", icon: Settings, label: "Guidance", path: "/" },
   ];
   
   const handleTabChange = (tabId: string, path: string) => {
