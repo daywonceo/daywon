@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,7 +11,9 @@ import CalendarPage from "./pages/CalendarPage";
 import Guidance from "./pages/Guidance";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import OnboardingFlow, { OnboardingData } from "./components/onboarding/OnboardingFlow";
+import { cn } from "@/lib/utils";
 
 const queryClient = new QueryClient();
 
@@ -26,9 +27,47 @@ const setupReducedMotion = () => {
 };
 
 const App = () => {
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+
   useEffect(() => {
     setupReducedMotion();
+    
+    // Check if user has completed onboarding
+    const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+    if (!onboardingCompleted) {
+      setShowOnboarding(true);
+    } else {
+      setHasCompletedOnboarding(true);
+    }
   }, []);
+
+  const handleOnboardingComplete = (data: OnboardingData) => {
+    console.log('Onboarding completed with data:', data);
+    
+    // Save onboarding data to localStorage
+    localStorage.setItem('onboardingCompleted', 'true');
+    localStorage.setItem('onboardingData', JSON.stringify(data));
+    
+    // Hide onboarding and show main app
+    setShowOnboarding(false);
+    setHasCompletedOnboarding(true);
+  };
+
+  // Show onboarding if not completed
+  if (showOnboarding) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <SettingsProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <OnboardingFlow onComplete={handleOnboardingComplete} />
+          </TooltipProvider>
+        </SettingsProvider>
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
