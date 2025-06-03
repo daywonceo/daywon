@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainFeed from "@/components/social/MainFeed";
 import Leaderboard from "@/components/social/Leaderboard";
 import FriendList from "@/components/social/FriendList";
+import Groups from "@/components/social/Groups";
 import { friends, leaderboardData, feedPosts } from "@/components/social/socialData";
 
 const Social = () => {
@@ -20,9 +21,10 @@ const Social = () => {
         </div>
 
         <Tabs defaultValue="main" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-10 shadow-sm">
+          <TabsList className="grid w-full grid-cols-4 mb-10 shadow-sm">
             <TabsTrigger value="main" className="py-3 text-base">MAIN FEED</TabsTrigger>
             <TabsTrigger value="leaderboard" className="py-3 text-base">LEADERBOARD</TabsTrigger>
+            <TabsTrigger value="groups" className="py-3 text-base">GROUPS</TabsTrigger>
             <TabsTrigger value="friends" className="py-3 text-base">FRIENDS</TabsTrigger>
           </TabsList>
           
@@ -32,6 +34,10 @@ const Social = () => {
           
           <TabsContent value="leaderboard" className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm animate-fade-in">
             <Leaderboard leaderboardData={leaderboardData} />
+          </TabsContent>
+          
+          <TabsContent value="groups" className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm animate-fade-in">
+            <Groups />
           </TabsContent>
           
           <TabsContent value="friends" className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm animate-fade-in">
