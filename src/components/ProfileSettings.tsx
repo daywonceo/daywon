@@ -6,11 +6,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Settings,
   Target,
@@ -26,6 +34,7 @@ import {
   Plus,
   X,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 
 interface ProfileSettingsProps {
@@ -34,6 +43,7 @@ interface ProfileSettingsProps {
 }
 
 const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
+  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState("habits");
   const [habits, setHabits] = useState([
     { id: 1, name: "Morning Workout", active: true },
@@ -331,6 +341,103 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     }
   };
 
+  const renderMobileView = () => (
+    <div className="h-full flex flex-col">
+      {activeSection === "menu" ? (
+        <div className="flex-1 p-4">
+          <div className="space-y-1">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                className="w-full flex items-center justify-between p-4 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                <div className="flex items-center space-x-3">
+                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <span className="font-medium">{item.label}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col">
+          <div className="flex items-center p-4 border-b">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setActiveSection("menu")}
+              className="mr-3"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <h2 className="text-lg font-semibold">
+              {menuItems.find(item => item.id === activeSection)?.label}
+            </h2>
+          </div>
+          <ScrollArea className="flex-1 p-4">
+            {renderContent()}
+          </ScrollArea>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderDesktopView = () => (
+    <div className="flex h-96">
+      {/* Sidebar */}
+      <div className="w-1/3 border-r pr-4">
+        <nav className="space-y-1">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveSection(item.id)}
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                activeSection === item.id
+                  ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              <item.icon className="w-4 h-4" />
+              <span className="text-sm font-medium">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 pl-6 overflow-y-auto">
+        {renderContent()}
+      </div>
+    </div>
+  );
+
+  // Set initial state for mobile
+  React.useEffect(() => {
+    if (isMobile && open) {
+      setActiveSection("menu");
+    } else if (!isMobile && activeSection === "menu") {
+      setActiveSection("habits");
+    }
+  }, [isMobile, open]);
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="h-[90vh] p-0">
+          <SheetHeader className="p-4 border-b">
+            <SheetTitle className="flex items-center space-x-2">
+              <Settings className="w-5 h-5" />
+              <span>Settings</span>
+            </SheetTitle>
+          </SheetHeader>
+          {renderMobileView()}
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
@@ -340,33 +447,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
             <span>Settings</span>
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="flex h-96">
-          {/* Sidebar */}
-          <div className="w-1/3 border-r pr-4">
-            <nav className="space-y-1">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                    activeSection === item.id
-                      ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 pl-6 overflow-y-auto">
-            {renderContent()}
-          </div>
-        </div>
+        {renderDesktopView()}
       </DialogContent>
     </Dialog>
   );
