@@ -9,6 +9,7 @@ import Social from "./pages/Social";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import CalendarPage from "./pages/CalendarPage";
+import Guidance from "./pages/Guidance";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
 import { useEffect } from "react";
@@ -42,6 +43,7 @@ const App = () => {
               <Route path="/social" element={<Social />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/guidance" element={<Guidance />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
