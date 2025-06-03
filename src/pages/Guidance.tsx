@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,11 +6,75 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dumbbell, Utensils, Book, Search, Clock, Users, Star } from "lucide-react";
+import { Dumbbell, Utensils, Book, Search, Clock, Users, Star, RefreshCw } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface BibleVerse {
+  reference: string;
+  text: string;
+  translation_name: string;
+  translation_note?: string;
+}
 
 const Guidance = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [bibleVerses, setBibleVerses] = useState<BibleVerse[]>([]);
+  const [isLoadingVerses, setIsLoadingVerses] = useState(true);
+  const [versesError, setVersesError] = useState<string | null>(null);
+
+  // Predefined list of verses to rotate through
+  const verseReferences = [
+    "philippians 4:13",
+    "1 corinthians 10:31", 
+    "proverbs 27:17",
+    "galatians 6:9",
+    "psalm 23:1",
+    "jeremiah 29:11",
+    "romans 8:28",
+    "matthew 6:26",
+    "joshua 1:9"
+  ];
+
+  const fetchBibleVerses = async () => {
+    setIsLoadingVerses(true);
+    setVersesError(null);
+    
+    try {
+      // Select 4 random verses from our list
+      const selectedRefs = verseReferences
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 4);
+      
+      const fetchPromises = selectedRefs.map(async (ref) => {
+        const response = await fetch(`https://bible-api.com/${encodeURIComponent(ref)}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${ref}`);
+        }
+        return response.json();
+      });
+
+      const results = await Promise.all(fetchPromises);
+      
+      const formattedVerses: BibleVerse[] = results.map((result) => ({
+        reference: result.reference,
+        text: result.text.trim(),
+        translation_name: result.translation_name || "KJV",
+        translation_note: result.translation_note
+      }));
+
+      setBibleVerses(formattedVerses);
+    } catch (error) {
+      console.error('Error fetching Bible verses:', error);
+      setVersesError('Failed to load verses. Please try again.');
+    } finally {
+      setIsLoadingVerses(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBibleVerses();
+  }, []);
 
   const workoutSuggestions = [
     {
@@ -70,37 +133,6 @@ const Guidance = () => {
     }
   ];
 
-  const biblePassages = [
-    {
-      reference: "Philippians 4:13",
-      text: "I can do all things through Christ who strengthens me.",
-      reflection: "Remember that your strength comes from above. When habits feel difficult, lean on this truth.",
-      theme: "Strength",
-      rating: 5.0
-    },
-    {
-      reference: "1 Corinthians 10:31",
-      text: "So whether you eat or drink or whatever you do, do it all for the glory of God.",
-      reflection: "Every healthy choice you make can be an act of worship and stewardship of the body God gave you.",
-      theme: "Purpose",
-      rating: 4.9
-    },
-    {
-      reference: "Proverbs 27:17",
-      text: "As iron sharpens iron, so one person sharpens another.",
-      reflection: "Surround yourself with people who encourage your growth and hold you accountable.",
-      theme: "Community",
-      rating: 4.8
-    },
-    {
-      reference: "Galatians 6:9",
-      text: "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.",
-      reflection: "Persistence in building good habits will yield fruit. Don't give up when progress feels slow.",
-      theme: "Perseverance",
-      rating: 4.9
-    }
-  ];
-
   const filteredWorkouts = workoutSuggestions.filter(workout => 
     (selectedDifficulty === "all" || workout.difficulty === selectedDifficulty) &&
     (searchQuery === "" || workout.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -111,10 +143,10 @@ const Guidance = () => {
     (searchQuery === "" || recipe.title.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const filteredPassages = biblePassages.filter(passage => 
+  const filteredVerses = bibleVerses.filter(verse => 
     searchQuery === "" || 
-    passage.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    passage.theme.toLowerCase().includes(searchQuery.toLowerCase())
+    verse.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    verse.text.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -273,38 +305,70 @@ const Guidance = () => {
           </TabsContent>
           
           <TabsContent value="devotions" className="animate-fade-in">
+            <div className="mb-6 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Daily Verses</h3>
+              <Button
+                onClick={fetchBibleVerses}
+                disabled={isLoadingVerses}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoadingVerses ? 'animate-spin' : ''}`} />
+                Refresh Verses
+              </Button>
+            </div>
+
+            {versesError && (
+              <Card className="mb-6 border-red-200 dark:border-red-800">
+                <CardContent className="p-4">
+                  <p className="text-red-600 dark:text-red-400">{versesError}</p>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid gap-6">
-              {filteredPassages.map((passage, index) => (
-                <Card key={index} className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
+              {isLoadingVerses ? (
+                // Loading skeletons
+                Array.from({ length: 4 }).map((_, index) => (
+                  <Card key={index} className="bg-white dark:bg-gray-800 shadow-sm">
+                    <CardHeader>
+                      <Skeleton className="h-6 w-32" />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Skeleton className="h-20 w-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                filteredVerses.map((verse, index) => (
+                  <Card key={index} className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                    <CardHeader>
                       <CardTitle className="text-green-800 dark:text-green-400 flex items-center">
                         <Book className="w-5 h-5 mr-2" />
-                        {passage.reference}
+                        {verse.reference}
                       </CardTitle>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{passage.theme}</Badge>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1 text-yellow-500" />
-                          <span>{passage.rating}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <blockquote className="border-l-4 border-green-500 pl-4 italic text-lg bg-green-50 dark:bg-green-900/20 p-4 rounded-r-lg">
-                      "{passage.text}"
-                    </blockquote>
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                      <h4 className="font-semibold mb-2 text-blue-800 dark:text-blue-400">Reflection:</h4>
-                      <p className="text-gray-600 dark:text-gray-300">{passage.reflection}</p>
-                    </div>
-                    <Button className="w-full bg-green-600 hover:bg-green-700">
-                      Save for Later
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <CardDescription>
+                        <Badge variant="outline">{verse.translation_name}</Badge>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <blockquote className="border-l-4 border-green-500 pl-4 italic text-lg bg-green-50 dark:bg-green-900/20 p-4 rounded-r-lg">
+                        "{verse.text}"
+                      </blockquote>
+                      {verse.translation_note && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {verse.translation_note}
+                        </p>
+                      )}
+                      <Button className="w-full bg-green-600 hover:bg-green-700">
+                        Save for Later
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>
