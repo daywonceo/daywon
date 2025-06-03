@@ -35,10 +35,13 @@ export const useBibleVerses = (selectedTranslation: string = "esv") => {
         .slice(0, 4);
       
       const fetchPromises = selectedRefs.map(async (ref) => {
-        const apiUrl = selectedTranslation === "esv" 
-          ? `https://bible-api.com/${encodeURIComponent(ref)}?translation=esv`
+        // The Bible API doesn't support ESV, so we'll use the default (WEB) for most translations
+        // and only specify translation for supported ones like KJV
+        const apiUrl = selectedTranslation === "kjv" 
+          ? `https://bible-api.com/${encodeURIComponent(ref)}?translation=kjv`
           : `https://bible-api.com/${encodeURIComponent(ref)}`;
         
+        console.log(`Fetching: ${apiUrl}`);
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error(`Failed to fetch ${ref}`);
@@ -51,7 +54,7 @@ export const useBibleVerses = (selectedTranslation: string = "esv") => {
       const formattedVerses: BibleVerse[] = results.map((result) => ({
         reference: result.reference,
         text: result.text.trim(),
-        translation_name: result.translation_name || (selectedTranslation === "esv" ? "ESV" : "WEB"),
+        translation_name: getTranslationDisplayName(selectedTranslation),
         translation_note: result.translation_note
       }));
 
@@ -62,6 +65,18 @@ export const useBibleVerses = (selectedTranslation: string = "esv") => {
     } finally {
       setIsLoadingVerses(false);
     }
+  };
+
+  const getTranslationDisplayName = (translation: string) => {
+    const translationNames: { [key: string]: string } = {
+      "esv": "English Standard Version",
+      "niv": "New International Version", 
+      "nlt": "New Living Translation",
+      "web": "World English Bible",
+      "kjv": "King James Version",
+      "nasb": "New American Standard Bible"
+    };
+    return translationNames[translation] || "World English Bible";
   };
 
   useEffect(() => {
