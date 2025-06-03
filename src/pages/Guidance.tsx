@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -70,7 +71,7 @@ const Guidance = () => {
           </p>
         </div>
 
-        {/* Search and Filter Bar */}
+        {/* Search Bar */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -80,19 +81,6 @@ const Guidance = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 border-green-200 dark:border-green-800 focus:border-green-400"
             />
-          </div>
-          <div className="flex gap-2">
-            {["all", "beginner", "intermediate"].map((level) => (
-              <Button
-                key={level}
-                variant={selectedDifficulty === level ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedDifficulty(level)}
-                className={selectedDifficulty === level ? "bg-green-600 hover:bg-green-700" : ""}
-              >
-                {level.charAt(0).toUpperCase() + level.slice(1)}
-              </Button>
-            ))}
           </div>
         </div>
 
@@ -113,6 +101,20 @@ const Guidance = () => {
           </TabsList>
           
           <TabsContent value="workouts" className="animate-fade-in">
+            {/* Difficulty Filter - Only for Workouts */}
+            <div className="flex gap-2 mb-6">
+              {["all", "beginner", "intermediate"].map((level) => (
+                <Button
+                  key={level}
+                  variant={selectedDifficulty === level ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedDifficulty(level)}
+                  className={selectedDifficulty === level ? "bg-green-600 hover:bg-green-700" : ""}
+                >
+                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                </Button>
+              ))}
+            </div>
             <div className="grid gap-6">
               {filteredWorkouts.map((workout, index) => (
                 <WorkoutCard key={index} workout={workout} />
