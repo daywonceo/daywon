@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Sparkles, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WelcomeScreenProps {
   onNext: () => void;
