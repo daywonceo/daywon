@@ -1,7 +1,7 @@
-
-import React from "react";
+import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ProfileSettings from "@/components/ProfileSettings";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Trophy, Users, Flame, Calendar, Settings, Share2 } from "lucide-react";
 
 const Profile = () => {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  
   // Sample profile data
   const profile = {
     name: "NATE RODGERS",
@@ -87,7 +89,12 @@ const Profile = () => {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" size="sm" className="border-green-200 dark:border-green-800">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-green-200 dark:border-green-800"
+                  onClick={() => setSettingsOpen(true)}
+                >
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </Button>
@@ -186,6 +193,8 @@ const Profile = () => {
       </main>
       
       <Footer />
+      
+      <ProfileSettings open={settingsOpen} onOpenChange={setSettingsOpen} />
     </div>
   );
 };
