@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import RecipeCard from "./RecipeCard";
 import SpoonacularRecipeCard from "./SpoonacularRecipeCard";
 import DietCategorySelector from "./DietCategorySelector";
+import NutritionGoalSelector from "./NutritionGoalSelector";
 import { healthyRecipes } from "@/data/guidanceData";
 import { useSpoonacularRecipes } from "@/hooks/useSpoonacularRecipes";
 
@@ -14,6 +15,7 @@ interface NutritionTabProps {
 
 const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
   const [selectedDiet, setSelectedDiet] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("high-protein");
   const [showApiRecipes, setShowApiRecipes] = useState(false);
   
   const { recipes, isLoading, error, fetchRecipes } = useSpoonacularRecipes(selectedDiet);
@@ -40,6 +42,11 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
         <DietCategorySelector 
           currentCategory={selectedDiet}
           onCategoryChange={setSelectedDiet}
+        />
+        
+        <NutritionGoalSelector
+          currentGoal={selectedCategory}
+          onGoalChange={setSelectedCategory}
         />
         
         <Button
