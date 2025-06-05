@@ -168,14 +168,6 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
             >
               Create Account
             </Button>
-            
-            <Button 
-              variant="ghost" 
-              onClick={onSkip}
-              className="w-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              Continue without account
-            </Button>
           </div>
 
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
