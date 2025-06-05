@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 interface SpoonacularRecipe {
@@ -47,16 +47,22 @@ export const useSpoonacularRecipes = (selectedCategory: string) => {
     return data;
   };
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, error: queryError, refetch } = useQuery({
     queryKey: ['spoonacular-recipes', selectedCategory],
     queryFn: fetchRecipes,
     enabled: selectedCategory !== 'all',
-    onError: (err: Error) => {
-      console.error('Error fetching recipes:', err);
-      setError(err.message);
-    },
     retry: 2,
   });
+
+  // Handle errors using useEffect to update local error state
+  useEffect(() => {
+    if (queryError) {
+      console.error('Error fetching recipes:', queryError);
+      setError(queryError.message);
+    } else {
+      setError(null);
+    }
+  }, [queryError]);
 
   return {
     recipes: data?.results || [],
