@@ -29,6 +29,8 @@ interface SpoonacularRecipeCardProps {
 const SpoonacularRecipeCard = ({ recipe }: SpoonacularRecipeCardProps) => {
   const calories = recipe.nutrition?.nutrients?.find(n => n.name === 'Calories');
   const protein = recipe.nutrition?.nutrients?.find(n => n.name === 'Protein');
+  const carbs = recipe.nutrition?.nutrients?.find(n => n.name === 'Carbohydrates');
+  const fat = recipe.nutrition?.nutrients?.find(n => n.name === 'Fat');
 
   const handleViewRecipe = () => {
     window.open(recipe.sourceUrl, '_blank');
@@ -59,6 +61,16 @@ const SpoonacularRecipeCard = ({ recipe }: SpoonacularRecipeCardProps) => {
               {protein && (
                 <Badge variant="outline">
                   {Math.round(protein.amount)}g protein
+                </Badge>
+              )}
+              {carbs && (
+                <Badge variant="outline">
+                  {Math.round(carbs.amount)}g carbs
+                </Badge>
+              )}
+              {fat && (
+                <Badge variant="outline">
+                  {Math.round(fat.amount)}g fat
                 </Badge>
               )}
             </CardDescription>
