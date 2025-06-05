@@ -73,7 +73,11 @@ const AppContent = () => {
 
   // Show login if not authenticated
   if (!user) {
-    return <Login />;
+    return (
+      <Routes>
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
   }
 
   // Show onboarding if authenticated but not completed
@@ -82,20 +86,18 @@ const AppContent = () => {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/social" element={<Social />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/guidance" element={<Guidance />} />
-        <Route path="/premium" element={<GoPremium />} />
-        <Route path="/onboarding" element={<GoOnboarding />} />
-        <Route path="/login" element={<Login />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/social" element={<Social />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/calendar" element={<CalendarPage />} />
+      <Route path="/guidance" element={<Guidance />} />
+      <Route path="/premium" element={<GoPremium />} />
+      <Route path="/onboarding" element={<GoOnboarding />} />
+      <Route path="/login" element={<Login />} />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 
@@ -105,10 +107,12 @@ const App = () => {
       <AuthProvider>
         <SettingsProvider>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <OfflineIndicator />
-            <AppContent />
+            <BrowserRouter>
+              <Toaster />
+              <Sonner />
+              <OfflineIndicator />
+              <AppContent />
+            </BrowserRouter>
           </TooltipProvider>
         </SettingsProvider>
       </AuthProvider>
