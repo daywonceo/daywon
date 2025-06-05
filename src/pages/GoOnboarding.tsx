@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Target, Bell, Heart, RotateCcw, Palette } from "lucide-react";
+import { Sparkles, Target, Bell, Heart, RotateCcw, Palette, UserPlus } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -18,6 +18,11 @@ const GoOnboarding = () => {
   };
 
   const onboardingSteps = [
+    {
+      icon: <UserPlus className="w-6 h-6 text-blue-500" />,
+      title: "Sign Up",
+      description: "Create your account to save your progress"
+    },
     {
       icon: <Sparkles className="w-6 h-6 text-yellow-500" />,
       title: "Welcome",
@@ -106,7 +111,7 @@ const GoOnboarding = () => {
                       </p>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      {index + 1}/8
+                      {index + 1}/9
                     </Badge>
                   </div>
                 ))}

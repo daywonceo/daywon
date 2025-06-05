@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import SignUpScreen from "./SignUpScreen";
 import WelcomeScreen from "./WelcomeScreen";
 import MissionScreen from "./MissionScreen";
 import CanvasGrowthScreen from "./CanvasGrowthScreen";
@@ -43,7 +44,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     intent: ""
   });
 
-  const totalSteps = 8; // Updated from 6 to 8
+  const totalSteps = 9; // Updated from 8 to 9 to include sign up
 
   const updateData = (key: keyof OnboardingData, value: any) => {
     setOnboardingData(prev => ({ ...prev, [key]: value }));
@@ -72,8 +73,10 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const renderCurrentScreen = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeScreen onNext={nextStep} onSkip={skipToEnd} />;
+        return <SignUpScreen onNext={nextStep} onSkip={skipToEnd} />;
       case 1:
+        return <WelcomeScreen onNext={nextStep} onSkip={skipToEnd} />;
+      case 2:
         return (
           <MissionScreen
             onNext={nextStep}
@@ -81,7 +84,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 2:
+      case 3:
         return (
           <CanvasGrowthScreen
             onNext={nextStep}
@@ -89,7 +92,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 3:
+      case 4:
         return (
           <PickFocusScreen
             selectedAreas={onboardingData.focusAreas}
@@ -99,7 +102,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 4:
+      case 5:
         return (
           <ChooseHabitsScreen
             focusAreas={onboardingData.focusAreas}
@@ -110,7 +113,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 5:
+      case 6:
         return (
           <NotificationScreen
             preferences={onboardingData.notifications}
@@ -120,7 +123,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 6:
+      case 7:
         return (
           <IntentScreen
             intent={onboardingData.intent}
@@ -130,7 +133,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 7:
+      case 8:
         return (
           <FinalScreen
             onComplete={handleComplete}
