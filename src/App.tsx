@@ -12,11 +12,13 @@ import CalendarPage from "./pages/CalendarPage";
 import Guidance from "./pages/Guidance";
 import GoPremium from "./pages/GoPremium";
 import GoOnboarding from "./pages/GoOnboarding";
+import Login from "./pages/Login";
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
 import { useState, useEffect } from "react";
 import OnboardingFlow, { OnboardingData } from "./components/onboarding/OnboardingFlow";
-import { cn } from "@/lib/utils";
+import { useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -29,21 +31,24 @@ const setupReducedMotion = () => {
   }
 };
 
-const App = () => {
+const AppContent = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     setupReducedMotion();
     
-    // Check if user has completed onboarding
-    const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-    if (!onboardingCompleted) {
-      setShowOnboarding(true);
-    } else {
-      setHasCompletedOnboarding(true);
+    // Only check onboarding status if user is authenticated
+    if (user && !loading) {
+      const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+      if (!onboardingCompleted) {
+        setShowOnboarding(true);
+      } else {
+        setHasCompletedOnboarding(true);
+      }
     }
-  }, []);
+  }, [user, loading]);
 
   const handleOnboardingComplete = (data: OnboardingData) => {
     console.log('Onboarding completed with data:', data);
@@ -57,43 +62,56 @@ const App = () => {
     setHasCompletedOnboarding(true);
   };
 
-  // Show onboarding if not completed
-  if (showOnboarding) {
+  // Show loading while checking auth status
+  if (loading) {
     return (
-      <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
+  if (!user) {
+    return <Login />;
+  }
+
+  // Show onboarding if authenticated but not completed
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/social" element={<Social />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/guidance" element={<Guidance />} />
+        <Route path="/premium" element={<GoPremium />} />
+        <Route path="/onboarding" element={<GoOnboarding />} />
+        <Route path="/login" element={<Login />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <SettingsProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <OnboardingFlow onComplete={handleOnboardingComplete} />
+            <OfflineIndicator />
+            <AppContent />
           </TooltipProvider>
         </SettingsProvider>
-      </QueryClientProvider>
-    );
-  }
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <OfflineIndicator />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/social" element={<Social />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/guidance" element={<Guidance />} />
-              <Route path="/premium" element={<GoPremium />} />
-              <Route path="/onboarding" element={<GoOnboarding />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </SettingsProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

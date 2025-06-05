@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface SignUpScreenProps {
   onNext: () => void;
@@ -19,6 +21,9 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signUp } = useAuth();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -45,12 +50,24 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignUp = () => {
-    if (validateForm()) {
-      console.log("Sign up with:", { email, password });
-      // TODO: Integrate with Supabase authentication
+  const handleSignUp = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    const { error } = await signUp(email, password);
+
+    if (error) {
+      console.error("Sign up error:", error);
+      if (error.message.includes("User already registered")) {
+        setErrors({ email: "An account with this email already exists" });
+      } else {
+        toast.error("Sign up failed: " + error.message);
+      }
+    } else {
+      toast.success("Account created successfully! Please check your email to verify your account.");
       onNext();
     }
+    setIsLoading(false);
   };
 
   return (
@@ -163,10 +180,11 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
           <div className="space-y-3">
             <Button 
               onClick={handleSignUp}
+              disabled={isLoading}
               className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
               size="lg"
             >
-              Create Account
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </div>
 
