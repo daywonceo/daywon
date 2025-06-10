@@ -33,6 +33,7 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
   }, []);
 
   const fetchSupabaseRecipes = async () => {
+    console.log('Fetching recipes from Supabase...');
     setIsLoading(true);
     setError(null);
     
@@ -45,8 +46,14 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
         return;
       }
       
+      console.log('Supabase recipes data:', data);
+      
       if (data && Array.isArray(data)) {
         setSupabaseRecipes(data);
+        console.log(`Successfully loaded ${data.length} recipes from Supabase`);
+      } else {
+        console.log('No recipes data received or data is not an array:', data);
+        setSupabaseRecipes([]);
       }
     } catch (err) {
       console.error('Error calling Supabase function:', err);
@@ -56,13 +63,30 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
     }
   };
 
-  const filteredLocalRecipes = healthyRecipes.filter(recipe => 
-    searchQuery === "" || recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Improved filtering logic
+  const filterRecipesBySearch = (recipes: any[], query: string) => {
+    if (!query || query.trim() === "") return recipes;
+    
+    const searchTerm = query.toLowerCase().trim();
+    console.log('Searching for:', searchTerm);
+    
+    return recipes.filter(recipe => {
+      const titleMatch = recipe.title.toLowerCase().includes(searchTerm);
+      const ingredientMatch = recipe.ingredients && recipe.ingredients.some((ingredient: string) => 
+        ingredient.toLowerCase().includes(searchTerm)
+      );
+      
+      return titleMatch || ingredientMatch;
+    });
+  };
 
-  const filteredSupabaseRecipes = supabaseRecipes.filter(recipe =>
-    searchQuery === "" || recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredLocalRecipes = filterRecipesBySearch(healthyRecipes, searchQuery);
+  const filteredSupabaseRecipes = filterRecipesBySearch(supabaseRecipes, searchQuery);
+
+  console.log('Search query:', searchQuery);
+  console.log('Filtered local recipes:', filteredLocalRecipes.length);
+  console.log('Filtered Supabase recipes:', filteredSupabaseRecipes.length);
+  console.log('Total Supabase recipes available:', supabaseRecipes.length);
 
   return (
     <div className="animate-fade-in">
@@ -78,6 +102,14 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
           onGoalChange={setSelectedCategory}
         />
       </div>
+
+      {/* Debug Info */}
+      {searchQuery && (
+        <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm">
+          <p>Searching for: "{searchQuery}"</p>
+          <p>Found {filteredLocalRecipes.length} local recipes and {filteredSupabaseRecipes.length} Supabase recipes</p>
+        </div>
+      )}
 
       {/* Recipe Grid */}
       <div className="grid gap-6">
@@ -151,6 +183,17 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
         {filteredLocalRecipes.map((recipe, index) => (
           <RecipeCard key={`local-${index}`} recipe={recipe} />
         ))}
+
+        {/* No Results Message */}
+        {searchQuery && filteredLocalRecipes.length === 0 && filteredSupabaseRecipes.length === 0 && !isLoading && (
+          <Card className="bg-white dark:bg-gray-800 shadow-sm">
+            <CardContent className="p-6">
+              <p className="text-center text-gray-600 dark:text-gray-300">
+                No recipes found for "{searchQuery}". Try a different search term.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
