@@ -33,19 +33,16 @@ const setupReducedMotion = () => {
 
 const AppContent = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const { user, loading } = useAuth();
 
   useEffect(() => {
     setupReducedMotion();
     
-    // Only check onboarding status if user is authenticated
+    // Set onboarding as completed by default to skip it
     if (user && !loading) {
       const onboardingCompleted = localStorage.getItem('onboardingCompleted');
       if (!onboardingCompleted) {
-        setShowOnboarding(true);
-      } else {
-        setHasCompletedOnboarding(true);
+        localStorage.setItem('onboardingCompleted', 'true');
       }
     }
   }, [user, loading]);
@@ -59,7 +56,6 @@ const AppContent = () => {
     
     // Hide onboarding and show main app
     setShowOnboarding(false);
-    setHasCompletedOnboarding(true);
   };
 
   // Show loading while checking auth status
@@ -80,7 +76,7 @@ const AppContent = () => {
     );
   }
 
-  // Show onboarding if authenticated but not completed
+  // Show onboarding only if explicitly requested
   if (showOnboarding) {
     return <OnboardingFlow onComplete={handleOnboardingComplete} />;
   }
