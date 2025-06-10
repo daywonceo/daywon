@@ -1,10 +1,10 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dumbbell, Utensils, Book } from "lucide-react";
+import { Dumbbell, Utensils, Book, Zap } from "lucide-react";
 import WorkoutsTab from "./WorkoutsTab";
 import NutritionTab from "./NutritionTab";
 import DevotionsTab from "./DevotionsTab";
+import BoredTab from "./BoredTab";
 
 interface BibleVerse {
   reference: string;
@@ -49,18 +49,22 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-10 shadow-sm h-12">
-        <TabsTrigger value="workouts" className="py-3 text-base">
+      <TabsList className="grid w-full grid-cols-4 mb-10 shadow-sm h-12">
+        <TabsTrigger value="workouts" className="py-3 text-sm">
           <Dumbbell className="w-4 h-4 mr-2" />
           WORKOUTS
         </TabsTrigger>
-        <TabsTrigger value="nutrition" className="py-3 text-base">
+        <TabsTrigger value="nutrition" className="py-3 text-sm">
           <Utensils className="w-4 h-4 mr-2" />
           NUTRITION
         </TabsTrigger>
-        <TabsTrigger value="devotions" className="py-3 text-base">
+        <TabsTrigger value="devotions" className="py-3 text-sm">
           <Book className="w-4 h-4 mr-2" />
           DEVOTIONS
+        </TabsTrigger>
+        <TabsTrigger value="bored" className="py-3 text-sm">
+          <Zap className="w-4 h-4 mr-2" />
+          I'M BORED
         </TabsTrigger>
       </TabsList>
       
@@ -91,6 +95,10 @@ const GuidanceTabs = ({
           onTranslationClick={onTranslationClick}
           onTranslationDialogOpenChange={onTranslationDialogOpenChange}
         />
+      </TabsContent>
+      
+      <TabsContent value="bored">
+        <BoredTab searchQuery={searchQuery} />
       </TabsContent>
     </Tabs>
   );
