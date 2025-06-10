@@ -3,6 +3,7 @@ import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const nutritionGoals = [
+  { id: "all", name: "All Recipes", emoji: "🍽️" },
   { id: "high-protein", name: "High Protein", emoji: "🥩" },
   { id: "high-carb", name: "High Carb", emoji: "🍞" },
   { id: "low-fat", name: "Low Fat", emoji: "🥗" },

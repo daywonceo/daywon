@@ -23,7 +23,7 @@ interface NutritionTabProps {
 
 const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
   const [selectedDiet, setSelectedDiet] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("high-protein");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [supabaseRecipes, setSupabaseRecipes] = useState<SupabaseRecipe[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
