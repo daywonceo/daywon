@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dumbbell, Utensils, Book, Zap } from "lucide-react";
@@ -50,20 +51,20 @@ const GuidanceTabs = ({
   return (
     <Tabs defaultValue="workouts" className="w-full">
       <TabsList className="grid w-full grid-cols-4 mb-10 shadow-sm h-12">
-        <TabsTrigger value="workouts" className="py-3 text-sm">
-          <Dumbbell className="w-4 h-4 mr-2" />
+        <TabsTrigger value="workouts" className="py-3 text-xs">
+          <Dumbbell className="w-4 h-4 mr-1" />
           WORKOUTS
         </TabsTrigger>
-        <TabsTrigger value="nutrition" className="py-3 text-sm">
-          <Utensils className="w-4 h-4 mr-2" />
+        <TabsTrigger value="nutrition" className="py-3 text-xs">
+          <Utensils className="w-4 h-4 mr-1" />
           NUTRITION
         </TabsTrigger>
-        <TabsTrigger value="devotions" className="py-3 text-sm">
-          <Book className="w-4 h-4 mr-2" />
+        <TabsTrigger value="devotions" className="py-3 text-xs">
+          <Book className="w-4 h-4 mr-1" />
           DEVOTIONS
         </TabsTrigger>
-        <TabsTrigger value="bored" className="py-3 text-sm">
-          <Zap className="w-4 h-4 mr-2" />
+        <TabsTrigger value="bored" className="py-3 text-xs">
+          <Zap className="w-4 h-4 mr-1" />
           I'M BORED
         </TabsTrigger>
       </TabsList>
