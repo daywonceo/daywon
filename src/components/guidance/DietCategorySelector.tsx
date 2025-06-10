@@ -23,11 +23,11 @@ const DietCategorySelector = ({ currentCategory, onCategoryChange }: DietCategor
 
   return (
     <Select value={currentCategory} onValueChange={onCategoryChange}>
-      <SelectTrigger className="w-48">
+      <SelectTrigger className="w-40">
         <SelectValue>
           <div className="flex items-center gap-2">
-            <span>{currentCategoryData.emoji}</span>
-            <span>{currentCategoryData.name}</span>
+            <span className="text-sm">{currentCategoryData.emoji}</span>
+            <span className="text-xs truncate">{currentCategoryData.name}</span>
           </div>
         </SelectValue>
       </SelectTrigger>
@@ -35,8 +35,8 @@ const DietCategorySelector = ({ currentCategory, onCategoryChange }: DietCategor
         {dietCategories.map((category) => (
           <SelectItem key={category.id} value={category.id}>
             <div className="flex items-center gap-2">
-              <span>{category.emoji}</span>
-              <span>{category.name}</span>
+              <span className="text-sm">{category.emoji}</span>
+              <span className="text-xs">{category.name}</span>
             </div>
           </SelectItem>
         ))}

@@ -23,11 +23,11 @@ const NutritionGoalSelector = ({ currentGoal, onGoalChange }: NutritionGoalSelec
         Select Nutrition Goal
       </label>
       <Select value={currentGoal} onValueChange={onGoalChange}>
-        <SelectTrigger className="w-48">
+        <SelectTrigger className="w-40">
           <SelectValue>
             <div className="flex items-center gap-2">
-              <span>{currentGoalData.emoji}</span>
-              <span>{currentGoalData.name}</span>
+              <span className="text-sm">{currentGoalData.emoji}</span>
+              <span className="text-xs truncate">{currentGoalData.name}</span>
             </div>
           </SelectValue>
         </SelectTrigger>
@@ -35,8 +35,8 @@ const NutritionGoalSelector = ({ currentGoal, onGoalChange }: NutritionGoalSelec
           {nutritionGoals.map((goal) => (
             <SelectItem key={goal.id} value={goal.id}>
               <div className="flex items-center gap-2">
-                <span>{goal.emoji}</span>
-                <span>{goal.name}</span>
+                <span className="text-sm">{goal.emoji}</span>
+                <span className="text-xs">{goal.name}</span>
               </div>
             </SelectItem>
           ))}
