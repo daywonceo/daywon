@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogIn, UserPlus } from "lucide-react";
@@ -95,7 +94,7 @@ const Login = () => {
           toast.error("Sign in failed: " + error.message);
         }
       } else {
-        toast.success("Welcome back!");
+        toast.success("Welcome!");
         navigate('/');
       }
     }
@@ -137,7 +136,7 @@ const Login = () => {
 
   const getTitle = () => {
     if (showForgotPassword) return "Reset Password";
-    return isSignUp ? "Create Account" : "Welcome Back";
+    return isSignUp ? "Create Account" : "Welcome";
   };
 
   const getSubtitle = () => {
