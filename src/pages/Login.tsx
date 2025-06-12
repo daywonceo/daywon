@@ -19,7 +19,7 @@ const Login = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signUp, signIn, signInWithGoogle, signInWithApple, resetPassword, user } = useAuth();
+  const { signUp, signIn, signInWithGoogle, signInWithApple, signInWithSpotify, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -118,6 +118,14 @@ const Login = () => {
     }
   };
 
+  const handleSpotifySignIn = async () => {
+    const { error } = await signInWithSpotify();
+    if (error) {
+      console.error("Spotify sign in error:", error);
+      toast.error("Spotify sign in failed: " + error.message);
+    }
+  };
+
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setShowForgotPassword(false);
@@ -176,6 +184,7 @@ const Login = () => {
                 <SocialLoginButtons 
                   onGoogleSignIn={handleGoogleSignIn}
                   onAppleSignIn={handleAppleSignIn}
+                  onSpotifySignIn={handleSpotifySignIn}
                 />
                 
                 <div className="relative">
