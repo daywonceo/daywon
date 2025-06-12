@@ -92,11 +92,8 @@ const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabCo
     setNutritionError(null);
   };
 
-  // Filter only Supabase recipes that have nutrition data
-  const filteredSupabaseRecipes = filterRecipesBySearch(
-    supabaseRecipes.filter(recipe => recipe.nutrition), 
-    searchQuery
-  );
+  // Filter all Supabase recipes by search query (don't filter by nutrition data)
+  const filteredSupabaseRecipes = filterRecipesBySearch(supabaseRecipes, searchQuery);
 
   // If a nutrition category is selected, show those results
   if (selectedNutritionCategory) {
@@ -134,7 +131,7 @@ const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabCo
     );
   }
 
-  // Default view with saved recipes button, nutrition categories and recipes with nutrition data
+  // Default view with saved recipes button, nutrition categories and all recipes
   return (
     <div className="animate-fade-in">
       {/* Saved Recipes Button */}
@@ -156,13 +153,13 @@ const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabCo
 
       <div>
         <h3 className="text-lg font-semibold text-green-800 dark:text-green-400 mb-4">
-          Recipes with Nutrition Data
+          All Recipes
         </h3>
 
         {searchQuery && (
           <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm">
             <p>Searching for: "{searchQuery}"</p>
-            <p>Found {filteredSupabaseRecipes.length} recipes with nutrition data</p>
+            <p>Found {filteredSupabaseRecipes.length} recipes</p>
           </div>
         )}
 

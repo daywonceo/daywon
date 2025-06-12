@@ -9,6 +9,15 @@ interface SupabaseRecipe {
   instructions_url?: string;
   category?: string;
   is_dessert?: boolean;
+  nutrition?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    sugar?: number;
+  };
+  readyInMinutes?: number;
+  servings?: number;
 }
 
 export const useRecipeData = () => {
