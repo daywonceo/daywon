@@ -31,13 +31,6 @@ interface SupabaseRecipeCardProps {
 const SupabaseRecipeCard = ({ recipe, index }: SupabaseRecipeCardProps) => {
   const { saveRecipe, isSaving } = useSaveRecipe();
 
-  // Debug logging
-  console.log(`Recipe ${index} - ${recipe.title}:`, {
-    hasNutrition: !!recipe.nutrition,
-    nutritionData: recipe.nutrition,
-    fullRecipe: recipe
-  });
-
   const formatNutritionValue = (value: number | undefined, unit: string) => {
     return value ? `${Math.round(value)}${unit}` : 'N/A';
   };
@@ -89,14 +82,6 @@ const SupabaseRecipeCard = ({ recipe, index }: SupabaseRecipeCardProps) => {
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Debug nutrition data display */}
-        <div className="bg-yellow-100 dark:bg-yellow-900/20 p-2 rounded text-xs">
-          <strong>Debug:</strong> Nutrition data present: {recipe.nutrition ? 'YES' : 'NO'}
-          {recipe.nutrition && (
-            <div>Calories: {recipe.nutrition.calories}, Protein: {recipe.nutrition.protein}</div>
-          )}
-        </div>
-
         {/* Nutrition Facts */}
         {recipe.nutrition && (
           <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
