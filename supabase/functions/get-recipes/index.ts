@@ -39,19 +39,32 @@ serve(async (req) => {
     
     const data = await response.json()
     console.log('Spoonacular response received:', data?.results?.length || 0, 'recipes')
+    console.log('Sample recipe with nutrition:', data?.results?.[0]?.nutrition ? 'has nutrition' : 'no nutrition')
     
     // Transform Spoonacular data to match our expected format with nutrition
     const transformedRecipes = data.results?.map((recipe: any) => {
-      // Extract nutrition data from Spoonacular response
-      const nutrition = recipe.nutrition?.nutrients ? {
-        calories: recipe.nutrition.nutrients.find((n: any) => n.name === 'Calories')?.amount,
-        protein: recipe.nutrition.nutrients.find((n: any) => n.name === 'Protein')?.amount,
-        carbs: recipe.nutrition.nutrients.find((n: any) => n.name === 'Carbohydrates')?.amount,
-        fat: recipe.nutrition.nutrients.find((n: any) => n.name === 'Fat')?.amount,
-        sugar: recipe.nutrition.nutrients.find((n: any) => n.name === 'Sugar')?.amount,
-      } : undefined
+      console.log(`Processing recipe: ${recipe.title}`)
+      console.log('Recipe nutrition data:', recipe.nutrition ? 'present' : 'missing')
+      
+      // Extract nutrition data more carefully from Spoonacular response
+      let nutrition = null
+      if (recipe.nutrition && recipe.nutrition.nutrients && Array.isArray(recipe.nutrition.nutrients)) {
+        const nutrients = recipe.nutrition.nutrients
+        console.log(`Found ${nutrients.length} nutrients for ${recipe.title}`)
+        
+        nutrition = {
+          calories: nutrients.find((n: any) => n.name === 'Calories')?.amount || 0,
+          protein: nutrients.find((n: any) => n.name === 'Protein')?.amount || 0,
+          carbs: nutrients.find((n: any) => n.name === 'Carbohydrates')?.amount || 0,
+          fat: nutrients.find((n: any) => n.name === 'Fat')?.amount || 0,
+          sugar: nutrients.find((n: any) => n.name === 'Sugar')?.amount || 0,
+        }
+        console.log('Extracted nutrition:', nutrition)
+      } else {
+        console.log('No nutrition data found for recipe:', recipe.title)
+      }
 
-      return {
+      const transformedRecipe = {
         title: recipe.title,
         ingredients: recipe.extendedIngredients?.map((ing: any) => ing.original) || [],
         instructions_url: recipe.sourceUrl,
@@ -64,9 +77,13 @@ serve(async (req) => {
         readyInMinutes: recipe.readyInMinutes,
         servings: recipe.servings
       }
+      
+      console.log('Final transformed recipe nutrition:', transformedRecipe.nutrition)
+      return transformedRecipe
     }) || []
 
     console.log('Transformed recipes with nutrition:', transformedRecipes.length)
+    console.log('Recipes with nutrition data:', transformedRecipes.filter(r => r.nutrition).length)
     
     return new Response(
       JSON.stringify(transformedRecipes),
