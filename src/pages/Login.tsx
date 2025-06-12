@@ -25,7 +25,6 @@ const Login = () => {
     isLoading,
     handleSubmit,
     handleGoogleSignIn,
-    handleAppleSignIn,
     toggleMode,
     toggleForgotPassword
   } = useLoginLogic();
@@ -42,7 +41,6 @@ const Login = () => {
               <>
                 <SocialLoginButtons 
                   onGoogleSignIn={handleGoogleSignIn}
-                  onAppleSignIn={handleAppleSignIn}
                 />
                 
                 <div className="relative">
