@@ -14,6 +14,7 @@ import GoPremium from "./pages/GoPremium";
 import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import NutritionGoals from "./pages/NutritionGoals";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
@@ -90,6 +91,7 @@ const AppContent = () => {
       <Route path="/profile" element={<Profile />} />
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/guidance" element={<Guidance />} />
+      <Route path="/nutrition-goals" element={<NutritionGoals />} />
       <Route path="/premium" element={<GoPremium />} />
       <Route path="/onboarding" element={<GoOnboarding />} />
       <Route path="/login" element={<Login />} />
