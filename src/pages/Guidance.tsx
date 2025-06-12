@@ -1,11 +1,9 @@
+
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Utensils } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/guidance/SearchBar";
 import GuidanceTabs from "@/components/guidance/GuidanceTabs";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 interface BibleVerse {
@@ -25,7 +23,6 @@ const Guidance = () => {
   const [bibleVerses, setBibleVerses] = useState<BibleVerse[]>([]);
   const [isLoadingVerses, setIsLoadingVerses] = useState(false);
   const [versesError, setVersesError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBibleVerses();
@@ -76,17 +73,6 @@ const Guidance = () => {
             <p className="text-gray-600 dark:text-gray-300">
               Workouts, nutrition, and spiritual guidance for your journey
             </p>
-          </div>
-          
-          {/* Add Nutrition Goals Button */}
-          <div className="flex gap-2">
-            <Button
-              onClick={() => navigate('/nutrition-goals')}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <Utensils className="w-4 h-4 mr-2" />
-              Nutrition Goals
-            </Button>
           </div>
         </div>
 
