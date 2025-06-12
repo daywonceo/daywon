@@ -26,23 +26,10 @@ serve(async (req) => {
       )
     }
 
-    // Get the category parameters from the request body
     const { categoryParams } = await req.json()
     
-    if (!categoryParams) {
-      return new Response(
-        JSON.stringify({ error: 'Category parameters are required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    // Build Spoonacular API URL with nutrition information
-    const baseUrl = 'https://api.spoonacular.com/recipes/complexSearch'
-    const commonParams = `apiKey=${spoonacularApiKey}&number=12&addRecipeInformation=true&fillIngredients=true&addRecipeNutrition=true&instructionsRequired=true`
-    const spoonacularUrl = `${baseUrl}?${commonParams}&${categoryParams}`
+    // Fetch recipes from Spoonacular API with nutrition information
+    const spoonacularUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${spoonacularApiKey}&${categoryParams}&number=12&addRecipeInformation=true&fillIngredients=true&addRecipeNutrition=true&sort=healthiness`
     
     console.log('Fetching nutrition recipes from Spoonacular with params:', categoryParams)
     const response = await fetch(spoonacularUrl)
@@ -55,33 +42,53 @@ serve(async (req) => {
     const data = await response.json()
     console.log('Spoonacular nutrition response received:', data?.results?.length || 0, 'recipes')
     
-    // Transform Spoonacular data to include nutrition information
+    // Transform Spoonacular data to match our expected format with nutrition
     const transformedRecipes = data.results?.map((recipe: any) => {
+      console.log(`Processing nutrition recipe: ${recipe.title}`)
+      
       // Extract nutrition data from Spoonacular response
-      const nutrition = recipe.nutrition?.nutrients ? {
-        calories: recipe.nutrition.nutrients.find((n: any) => n.name === 'Calories')?.amount,
-        protein: recipe.nutrition.nutrients.find((n: any) => n.name === 'Protein')?.amount,
-        carbs: recipe.nutrition.nutrients.find((n: any) => n.name === 'Carbohydrates')?.amount,
-        fat: recipe.nutrition.nutrients.find((n: any) => n.name === 'Fat')?.amount,
-        sugar: recipe.nutrition.nutrients.find((n: any) => n.name === 'Sugar')?.amount,
-      } : undefined
+      let nutrition = null
+      if (recipe.nutrition && recipe.nutrition.nutrients && Array.isArray(recipe.nutrition.nutrients)) {
+        const nutrients = recipe.nutrition.nutrients
+        console.log(`Found ${nutrients.length} nutrients for ${recipe.title}`)
+        
+        // Helper function to find nutrient by name
+        const findNutrient = (name: string) => {
+          const nutrient = nutrients.find((n: any) => 
+            n.name === name || n.title === name
+          )
+          return nutrient?.amount || 0
+        }
+        
+        nutrition = {
+          calories: findNutrient('Calories'),
+          protein: findNutrient('Protein'),
+          carbs: findNutrient('Carbohydrates'),
+          fat: findNutrient('Fat'),
+          sugar: findNutrient('Sugar'),
+        }
+        console.log('Extracted nutrition for', recipe.title, ':', nutrition)
+      } else {
+        console.log('No nutrition data structure found for recipe:', recipe.title)
+      }
 
       return {
         title: recipe.title,
         ingredients: recipe.extendedIngredients?.map((ing: any) => ing.original) || [],
-        instructions_url: recipe.sourceUrl || recipe.spoonacularSourceUrl,
+        instructions_url: recipe.sourceUrl,
         category: recipe.dishTypes?.[0] || 'Main Course',
         is_dessert: recipe.dishTypes?.some((type: string) => 
           type.toLowerCase().includes('dessert') || 
           type.toLowerCase().includes('sweet')
         ) || false,
+        nutrition,
         readyInMinutes: recipe.readyInMinutes,
-        servings: recipe.servings,
-        nutrition
+        servings: recipe.servings
       }
     }) || []
 
     console.log('Transformed nutrition recipes:', transformedRecipes.length)
+    console.log('Nutrition recipes with nutrition data:', transformedRecipes.filter(r => r.nutrition && Object.values(r.nutrition).some(v => v > 0)).length)
     
     return new Response(
       JSON.stringify(transformedRecipes),

@@ -43,21 +43,18 @@ serve(async (req) => {
     // Transform Spoonacular data to match our expected format with nutrition
     const transformedRecipes = data.results?.map((recipe: any) => {
       console.log(`Processing recipe: ${recipe.title}`)
-      console.log('Full recipe object:', JSON.stringify(recipe, null, 2))
       
-      // Extract nutrition data from Spoonacular response
+      // Extract nutrition data from Spoonacular response - EXACT same logic as get-nutrition-recipes
       let nutrition = null
       if (recipe.nutrition && recipe.nutrition.nutrients && Array.isArray(recipe.nutrition.nutrients)) {
         const nutrients = recipe.nutrition.nutrients
         console.log(`Found ${nutrients.length} nutrients for ${recipe.title}`)
-        console.log('Nutrients array:', nutrients)
         
         // Helper function to find nutrient by name
         const findNutrient = (name: string) => {
           const nutrient = nutrients.find((n: any) => 
             n.name === name || n.title === name
           )
-          console.log(`Looking for ${name}, found:`, nutrient)
           return nutrient?.amount || 0
         }
         
