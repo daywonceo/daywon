@@ -68,10 +68,11 @@ const AppContent = () => {
     );
   }
 
-  // Show login if not authenticated
+  // Show login if not authenticated, but allow access to reset password page
   if (!user) {
     return (
       <Routes>
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Login />} />
       </Routes>
     );
@@ -92,6 +93,7 @@ const AppContent = () => {
       <Route path="/premium" element={<GoPremium />} />
       <Route path="/onboarding" element={<GoOnboarding />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
