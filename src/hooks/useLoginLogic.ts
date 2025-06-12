@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -15,7 +14,7 @@ export const useLoginLogic = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signUp, signIn, signInWithGoogle, signInWithApple, resetPassword, user } = useAuth();
+  const { signUp, signIn, signInWithGoogle, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -106,14 +105,6 @@ export const useLoginLogic = () => {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    const { error } = await signInWithApple();
-    if (error) {
-      console.error("Apple sign in error:", error);
-      toast.error("Apple sign in failed: " + error.message);
-    }
-  };
-
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setShowForgotPassword(false);
@@ -147,7 +138,6 @@ export const useLoginLogic = () => {
     isLoading,
     handleSubmit,
     handleGoogleSignIn,
-    handleAppleSignIn,
     toggleMode,
     toggleForgotPassword
   };
