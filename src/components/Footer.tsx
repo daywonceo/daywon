@@ -1,4 +1,5 @@
-import { Grid2x2, Calendar as CalendarIcon, Book, PlusCircle, MessageSquare, User } from "lucide-react";
+
+import { Grid2x2, Calendar as CalendarIcon, Book, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -55,16 +56,6 @@ const Footer = () => {
             <span className="text-[10px] sm:text-xs mt-0.5 sm:mt-1">{tab.label}</span>
           </button>
         ))}
-        
-        <button 
-          className="flex flex-col items-center py-1 sm:py-2 px-3 sm:px-4"
-          onClick={() => hapticLight()} // Add haptic feedback
-        >
-          <div className="bg-green-700 dark:bg-green-600 rounded-full p-0.5 sm:p-1 -mt-6 sm:-mt-8 shadow-md">
-            <PlusCircle size={isMobile ? 26 : 32} className="text-white" />
-          </div>
-          <span className="text-[10px] sm:text-xs mt-0.5 sm:mt-1 text-gray-500 dark:text-gray-400">Add</span>
-        </button>
       </div>
     </footer>
   );
