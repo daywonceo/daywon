@@ -279,13 +279,13 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
         {searchQuery && (
           <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm">
             <p>Searching for: "{searchQuery}"</p>
-            <p>Found {filteredLocalRecipes.length} local recipes and {filteredSupabaseRecipes.length} Supabase recipes</p>
+            <p>Found {filteredSupabaseRecipes.length} Spoonacular recipes</p>
           </div>
         )}
 
         <RecipeList
           supabaseRecipes={filteredSupabaseRecipes}
-          localRecipes={filteredLocalRecipes}
+          localRecipes={[]} // Remove local recipes since they don't have nutrition data
           isLoading={isLoading}
           error={error}
           searchQuery={searchQuery}

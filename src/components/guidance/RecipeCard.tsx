@@ -14,6 +14,15 @@ interface Recipe {
   ingredients: string[];
   instructions: string;
   category: string;
+  nutrition?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    sugar?: number;
+  };
+  readyInMinutes?: number;
+  servings?: number;
 }
 
 interface RecipeCardProps {
@@ -23,11 +32,18 @@ interface RecipeCardProps {
 const RecipeCard = ({ recipe }: RecipeCardProps) => {
   const { saveRecipe, isSaving } = useSaveRecipe();
 
+  const formatNutritionValue = (value: number | undefined, unit: string) => {
+    return value ? `${Math.round(value)}${unit}` : 'N/A';
+  };
+
   const handleSaveRecipe = () => {
     saveRecipe({
       title: recipe.title,
       ingredients: recipe.ingredients,
       category: recipe.category,
+      nutrition: recipe.nutrition,
+      readyInMinutes: recipe.readyInMinutes,
+      servings: recipe.servings,
       is_dessert: false,
     });
   };
@@ -49,6 +65,18 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
             <Clock className="w-4 h-4" />
             {recipe.prep}
           </div>
+          {recipe.readyInMinutes && (
+            <div className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {recipe.readyInMinutes} min
+            </div>
+          )}
+          {recipe.servings && (
+            <div className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              {recipe.servings} servings
+            </div>
+          )}
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-500" />
             {recipe.rating}
@@ -59,6 +87,37 @@ const RecipeCard = ({ recipe }: RecipeCardProps) => {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Nutrition Facts */}
+        {recipe.nutrition && (
+          <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+            <h4 className="font-semibold mb-2 text-green-800 dark:text-green-400">
+              Nutrition Per Serving
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
+              <div>
+                <span className="font-medium">Calories:</span>
+                <div>{formatNutritionValue(recipe.nutrition.calories, '')}</div>
+              </div>
+              <div>
+                <span className="font-medium">Protein:</span>
+                <div>{formatNutritionValue(recipe.nutrition.protein, 'g')}</div>
+              </div>
+              <div>
+                <span className="font-medium">Carbs:</span>
+                <div>{formatNutritionValue(recipe.nutrition.carbs, 'g')}</div>
+              </div>
+              <div>
+                <span className="font-medium">Fat:</span>
+                <div>{formatNutritionValue(recipe.nutrition.fat, 'g')}</div>
+              </div>
+              <div>
+                <span className="font-medium">Sugar:</span>
+                <div>{formatNutritionValue(recipe.nutrition.sugar, 'g')}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div>
           <h4 className="font-semibold mb-2">Ingredients:</h4>
           <ul className="space-y-1">
