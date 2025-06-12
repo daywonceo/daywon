@@ -65,7 +65,7 @@ export const useLoginLogic = () => {
         console.error("Password reset error:", error);
         toast.error("Failed to send reset email: " + error.message);
       } else {
-        toast.success("Password reset email sent! Please check your inbox.");
+        toast.success("If this email exists, you'll receive a password reset link.");
         setShowForgotPassword(false);
       }
     } else if (isSignUp) {
