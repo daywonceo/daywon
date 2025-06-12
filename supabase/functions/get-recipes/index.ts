@@ -26,10 +26,10 @@ serve(async (req) => {
       )
     }
 
-    // Fetch healthy recipes from Spoonacular API
-    const spoonacularUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${spoonacularApiKey}&diet=healthy&number=10&addRecipeInformation=true&fillIngredients=true`
+    // Fetch healthy recipes from Spoonacular API with nutrition information
+    const spoonacularUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${spoonacularApiKey}&diet=healthy&number=10&addRecipeInformation=true&fillIngredients=true&addRecipeNutrition=true`
     
-    console.log('Fetching recipes from Spoonacular...')
+    console.log('Fetching recipes with nutrition from Spoonacular...')
     const response = await fetch(spoonacularUrl)
     
     if (!response.ok) {
@@ -40,19 +40,33 @@ serve(async (req) => {
     const data = await response.json()
     console.log('Spoonacular response received:', data?.results?.length || 0, 'recipes')
     
-    // Transform Spoonacular data to match our expected format
-    const transformedRecipes = data.results?.map((recipe: any) => ({
-      title: recipe.title,
-      ingredients: recipe.extendedIngredients?.map((ing: any) => ing.original) || [],
-      instructions_url: recipe.sourceUrl,
-      category: recipe.dishTypes?.[0] || 'Main Course',
-      is_dessert: recipe.dishTypes?.some((type: string) => 
-        type.toLowerCase().includes('dessert') || 
-        type.toLowerCase().includes('sweet')
-      ) || false
-    })) || []
+    // Transform Spoonacular data to match our expected format with nutrition
+    const transformedRecipes = data.results?.map((recipe: any) => {
+      // Extract nutrition data from Spoonacular response
+      const nutrition = recipe.nutrition?.nutrients ? {
+        calories: recipe.nutrition.nutrients.find((n: any) => n.name === 'Calories')?.amount,
+        protein: recipe.nutrition.nutrients.find((n: any) => n.name === 'Protein')?.amount,
+        carbs: recipe.nutrition.nutrients.find((n: any) => n.name === 'Carbohydrates')?.amount,
+        fat: recipe.nutrition.nutrients.find((n: any) => n.name === 'Fat')?.amount,
+        sugar: recipe.nutrition.nutrients.find((n: any) => n.name === 'Sugar')?.amount,
+      } : undefined
 
-    console.log('Transformed recipes:', transformedRecipes.length)
+      return {
+        title: recipe.title,
+        ingredients: recipe.extendedIngredients?.map((ing: any) => ing.original) || [],
+        instructions_url: recipe.sourceUrl,
+        category: recipe.dishTypes?.[0] || 'Main Course',
+        is_dessert: recipe.dishTypes?.some((type: string) => 
+          type.toLowerCase().includes('dessert') || 
+          type.toLowerCase().includes('sweet')
+        ) || false,
+        nutrition,
+        readyInMinutes: recipe.readyInMinutes,
+        servings: recipe.servings
+      }
+    }) || []
+
+    console.log('Transformed recipes with nutrition:', transformedRecipes.length)
     
     return new Response(
       JSON.stringify(transformedRecipes),
