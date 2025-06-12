@@ -3,13 +3,14 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Utensils, Clock, Users, ArrowLeft } from "lucide-react";
+import { Utensils, Clock, Users, ArrowLeft, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import RecipeList from "./RecipeList";
 import { useRecipeData } from "./useRecipeData";
 import NutritionCategoryGrid from "./NutritionCategoryGrid";
 import NutritionRecipeResults from "./NutritionRecipeResults";
+import SavedRecipesTab from "./SavedRecipesTab";
 
 interface NutritionTabProps {
   searchQuery: string;
@@ -132,6 +133,7 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
   const [nutritionRecipes, setNutritionRecipes] = useState<RecipeWithNutrition[]>([]);
   const [isLoadingNutrition, setIsLoadingNutrition] = useState(false);
   const [nutritionError, setNutritionError] = useState<string | null>(null);
+  const [showSavedRecipes, setShowSavedRecipes] = useState(false);
   
   const { 
     supabaseRecipes, 
@@ -180,8 +182,38 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
     setNutritionError(null);
   };
 
+  const handleBackToNutrition = () => {
+    setShowSavedRecipes(false);
+  };
+
   const filteredLocalRecipes = filterRecipesBySearch(localRecipes, searchQuery);
   const filteredSupabaseRecipes = filterRecipesBySearch(supabaseRecipes, searchQuery);
+
+  // If saved recipes view is active
+  if (showSavedRecipes) {
+    return (
+      <div className="animate-fade-in">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Heart className="w-6 h-6 text-red-500" />
+            <h2 className="text-xl font-bold text-green-800 dark:text-green-400">
+              Saved Recipes
+            </h2>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleBackToNutrition}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Nutrition
+          </Button>
+        </div>
+
+        <SavedRecipesTab searchQuery={searchQuery} />
+      </div>
+    );
+  }
 
   // If a nutrition category is selected, show those results
   if (selectedNutritionCategory) {
@@ -219,9 +251,21 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
     );
   }
 
-  // Default view with nutrition categories and regular recipes
+  // Default view with saved recipes button, nutrition categories and regular recipes
   return (
     <div className="animate-fade-in">
+      {/* Saved Recipes Button */}
+      <div className="mb-6">
+        <Button
+          onClick={() => setShowSavedRecipes(true)}
+          variant="outline"
+          className="w-full bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100 border-red-200 hover:border-red-300 text-red-700 hover:text-red-800 dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-800 dark:text-red-400 dark:hover:text-red-300"
+        >
+          <Heart className="w-4 h-4 mr-2" />
+          View Saved Recipes
+        </Button>
+      </div>
+
       <NutritionCategoryGrid
         categories={nutritionCategories}
         onCategorySelect={fetchRecipesByCategory}
