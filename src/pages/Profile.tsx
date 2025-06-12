@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,10 +9,22 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Trophy, Users, Flame, Calendar, Settings, Share2 } from "lucide-react";
+import { Trophy, Users, Flame, Calendar, Settings, Share2, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Profile = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { signOut } = useAuth();
+  
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+    } catch (error) {
+      toast.error("Failed to sign out");
+    }
+  };
   
   // Sample profile data
   const profile = {
@@ -88,7 +101,7 @@ const Profile = () => {
                 </Badge>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap justify-center">
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -101,6 +114,15 @@ const Profile = () => {
                 <Button variant="outline" size="sm" className="border-blue-200 dark:border-blue-800">
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-red-200 dark:border-red-800 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
                 </Button>
               </div>
             </div>
