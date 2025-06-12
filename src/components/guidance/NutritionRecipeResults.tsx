@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Utensils, Clock, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSaveRecipe } from "@/hooks/useSaveRecipe";
 
 interface RecipeWithNutrition {
   title: string;
@@ -36,8 +37,23 @@ const NutritionRecipeResults = ({
   error, 
   categoryName 
 }: NutritionRecipeResultsProps) => {
+  const { saveRecipe, isSaving } = useSaveRecipe();
+
   const formatNutritionValue = (value: number | undefined, unit: string) => {
     return value ? `${Math.round(value)}${unit}` : 'N/A';
+  };
+
+  const handleSaveRecipe = (recipe: RecipeWithNutrition) => {
+    saveRecipe({
+      title: recipe.title,
+      ingredients: recipe.ingredients,
+      instructions_url: recipe.instructions_url,
+      category: recipe.category,
+      nutrition: recipe.nutrition,
+      readyInMinutes: recipe.readyInMinutes,
+      servings: recipe.servings,
+      is_dessert: recipe.is_dessert || false,
+    });
   };
 
   // Loading State
@@ -166,16 +182,26 @@ const NutritionRecipeResults = ({
               </ul>
             </div>
 
-            {/* Instructions Link */}
-            {recipe.instructions_url && (
+            {/* Updated buttons section */}
+            <div className="space-y-3">
+              {recipe.instructions_url && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => window.open(recipe.instructions_url, '_blank')}
+                >
+                  View Full Recipe
+                </Button>
+              )}
+              
               <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => window.open(recipe.instructions_url, '_blank')}
+                className="w-full bg-green-600 hover:bg-green-700"
+                onClick={() => handleSaveRecipe(recipe)}
+                disabled={isSaving}
               >
-                View Full Recipe
+                {isSaving ? "Saving..." : "Save Recipe"}
               </Button>
-            )}
+            </div>
           </CardContent>
         </Card>
       ))}
