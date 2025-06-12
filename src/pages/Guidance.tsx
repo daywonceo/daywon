@@ -1,18 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/guidance/SearchBar";
 import GuidanceTabs from "@/components/guidance/GuidanceTabs";
-import { supabase } from "@/integrations/supabase/client";
-
-interface BibleVerse {
-  reference: string;
-  text: string;
-  translation_name: string;
-  translation_note?: string;
-  category: string;
-}
 
 const Guidance = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,45 +11,6 @@ const Guidance = () => {
   const [selectedTranslation, setSelectedTranslation] = useState("esv");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
-  const [bibleVerses, setBibleVerses] = useState<BibleVerse[]>([]);
-  const [isLoadingVerses, setIsLoadingVerses] = useState(false);
-  const [versesError, setVersesError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchBibleVerses();
-  }, [selectedTranslation, selectedCategory]);
-
-  const fetchBibleVerses = async () => {
-    console.log('Fetching Bible verses...');
-    setIsLoadingVerses(true);
-    setVersesError(null);
-
-    try {
-      let query = supabase
-        .from('bible_verses')
-        .select('*')
-        .eq('translation_name', selectedTranslation);
-
-      if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching Bible verses:', error);
-        setVersesError('Failed to fetch Bible verses.');
-      } else {
-        setBibleVerses(data || []);
-        console.log(`Successfully loaded ${data?.length || 0} Bible verses`);
-      }
-    } catch (err) {
-      console.error('Error fetching Bible verses:', err);
-      setVersesError('Failed to fetch Bible verses.');
-    } finally {
-      setIsLoadingVerses(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
@@ -87,15 +39,11 @@ const Guidance = () => {
           selectedTranslation={selectedTranslation}
           selectedCategory={selectedCategory}
           translationDialogOpen={translationDialogOpen}
-          bibleVerses={bibleVerses}
-          isLoadingVerses={isLoadingVerses}
-          versesError={versesError}
           onDifficultyChange={setSelectedDifficulty}
           onTranslationChange={setSelectedTranslation}
           onCategoryChange={setSelectedCategory}
           onTranslationClick={() => setTranslationDialogOpen(true)}
           onTranslationDialogOpenChange={setTranslationDialogOpen}
-          onFetchBibleVerses={fetchBibleVerses}
         />
       </main>
       

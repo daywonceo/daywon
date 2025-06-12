@@ -8,24 +8,13 @@ import { RefreshCw } from "lucide-react";
 import VerseCard from "./VerseCard";
 import TranslationSelector from "./TranslationSelector";
 import CategorySelector from "./CategorySelector";
-
-interface BibleVerse {
-  reference: string;
-  text: string;
-  translation_name: string;
-  translation_note?: string;
-  category: string;
-}
+import { useBibleVerses } from "@/hooks/useBibleVerses";
 
 interface DevotionsTabProps {
-  bibleVerses: BibleVerse[];
-  isLoadingVerses: boolean;
-  versesError: string | null;
   selectedTranslation: string;
   selectedCategory: string;
   translationDialogOpen: boolean;
   searchQuery: string;
-  onFetchBibleVerses: () => void;
   onTranslationChange: (translation: string) => void;
   onCategoryChange: (category: string) => void;
   onTranslationClick: () => void;
@@ -33,19 +22,22 @@ interface DevotionsTabProps {
 }
 
 const DevotionsTab = ({
-  bibleVerses,
-  isLoadingVerses,
-  versesError,
   selectedTranslation,
   selectedCategory,
   translationDialogOpen,
   searchQuery,
-  onFetchBibleVerses,
   onTranslationChange,
   onCategoryChange,
   onTranslationClick,
   onTranslationDialogOpenChange
 }: DevotionsTabProps) => {
+  const {
+    bibleVerses,
+    isLoadingVerses,
+    versesError,
+    fetchBibleVerses
+  } = useBibleVerses(selectedTranslation, selectedCategory);
+
   const filteredVerses = bibleVerses.filter(verse => 
     searchQuery === "" || 
     verse.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -84,7 +76,7 @@ const DevotionsTab = ({
             </DialogContent>
           </Dialog>
           <Button
-            onClick={onFetchBibleVerses}
+            onClick={fetchBibleVerses}
             disabled={isLoadingVerses}
             variant="outline"
             size="sm"

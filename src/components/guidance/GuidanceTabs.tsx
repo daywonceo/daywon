@@ -7,29 +7,17 @@ import NutritionTab from "./NutritionTab";
 import DevotionsTab from "./DevotionsTab";
 import BoredTab from "./BoredTab";
 
-interface BibleVerse {
-  reference: string;
-  text: string;
-  translation_name: string;
-  translation_note?: string;
-  category: string;
-}
-
 interface GuidanceTabsProps {
   searchQuery: string;
   selectedDifficulty: string;
   selectedTranslation: string;
   selectedCategory: string;
   translationDialogOpen: boolean;
-  bibleVerses: BibleVerse[];
-  isLoadingVerses: boolean;
-  versesError: string | null;
   onDifficultyChange: (difficulty: string) => void;
   onTranslationChange: (translation: string) => void;
   onCategoryChange: (category: string) => void;
   onTranslationClick: () => void;
   onTranslationDialogOpenChange: (open: boolean) => void;
-  onFetchBibleVerses: () => void;
 }
 
 const GuidanceTabs = ({
@@ -38,15 +26,11 @@ const GuidanceTabs = ({
   selectedTranslation,
   selectedCategory,
   translationDialogOpen,
-  bibleVerses,
-  isLoadingVerses,
-  versesError,
   onDifficultyChange,
   onTranslationChange,
   onCategoryChange,
   onTranslationClick,
-  onTranslationDialogOpenChange,
-  onFetchBibleVerses
+  onTranslationDialogOpenChange
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
@@ -83,14 +67,10 @@ const GuidanceTabs = ({
       
       <TabsContent value="devotions">
         <DevotionsTab
-          bibleVerses={bibleVerses}
-          isLoadingVerses={isLoadingVerses}
-          versesError={versesError}
           selectedTranslation={selectedTranslation}
           selectedCategory={selectedCategory}
           translationDialogOpen={translationDialogOpen}
           searchQuery={searchQuery}
-          onFetchBibleVerses={onFetchBibleVerses}
           onTranslationChange={onTranslationChange}
           onCategoryChange={onCategoryChange}
           onTranslationClick={onTranslationClick}
