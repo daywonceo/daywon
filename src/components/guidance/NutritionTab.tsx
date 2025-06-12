@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Utensils, Clock, Users, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import RecipeFilters from "./RecipeFilters";
 import RecipeList from "./RecipeList";
 import { useRecipeData } from "./useRecipeData";
+import NutritionCategoryGrid from "./NutritionCategoryGrid";
+import NutritionRecipeResults from "./NutritionRecipeResults";
 
 interface NutritionTabProps {
   searchQuery: string;
@@ -126,8 +128,6 @@ const nutritionCategories: NutritionCategory[] = [
 ];
 
 const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
-  const [selectedDiet, setSelectedDiet] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedNutritionCategory, setSelectedNutritionCategory] = useState<NutritionCategory | null>(null);
   const [nutritionRecipes, setNutritionRecipes] = useState<RecipeWithNutrition[]>([]);
   const [isLoadingNutrition, setIsLoadingNutrition] = useState(false);
@@ -174,8 +174,10 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
     }
   };
 
-  const formatNutritionValue = (value: number | undefined, unit: string) => {
-    return value ? `${Math.round(value)}${unit}` : 'N/A';
+  const handleBackToCategories = () => {
+    setSelectedNutritionCategory(null);
+    setNutritionRecipes([]);
+    setNutritionError(null);
   };
 
   const filteredLocalRecipes = filterRecipesBySearch(localRecipes, searchQuery);
@@ -185,7 +187,6 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
   if (selectedNutritionCategory) {
     return (
       <div className="animate-fade-in">
-        {/* Selected Category Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="text-2xl">{selectedNutritionCategory.emoji}</div>
@@ -201,152 +202,19 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              setSelectedNutritionCategory(null);
-              setNutritionRecipes([]);
-              setNutritionError(null);
-            }}
+            onClick={handleBackToCategories}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
         </div>
 
-        {/* Loading State */}
-        {isLoadingNutrition && (
-          <div className="grid gap-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Card key={index} className="bg-white dark:bg-gray-800">
-                <CardContent className="p-6 space-y-4">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-16" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Error State */}
-        {nutritionError && (
-          <Card className="border-red-200 dark:border-red-800">
-            <CardContent className="p-6">
-              <p className="text-red-600 dark:text-red-400 text-center">{nutritionError}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Recipe Results */}
-        {!isLoadingNutrition && nutritionRecipes.length > 0 && (
-          <div className="grid gap-6">
-            {nutritionRecipes.map((recipe, index) => (
-              <Card key={index} className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-green-800 dark:text-green-400 flex items-center">
-                      <Utensils className="w-5 h-5 mr-2" />
-                      {recipe.title}
-                    </CardTitle>
-                    {recipe.category && (
-                      <Badge variant="secondary">{recipe.category}</Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                    {recipe.readyInMinutes && (
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {recipe.readyInMinutes} min
-                      </div>
-                    )}
-                    {recipe.servings && (
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {recipe.servings} servings
-                      </div>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Nutrition Facts */}
-                  {recipe.nutrition && (
-                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                      <h4 className="font-semibold mb-2 text-green-800 dark:text-green-400">
-                        Nutrition Per Serving
-                      </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
-                        <div>
-                          <span className="font-medium">Calories:</span>
-                          <div>{formatNutritionValue(recipe.nutrition.calories, '')}</div>
-                        </div>
-                        <div>
-                          <span className="font-medium">Protein:</span>
-                          <div>{formatNutritionValue(recipe.nutrition.protein, 'g')}</div>
-                        </div>
-                        <div>
-                          <span className="font-medium">Carbs:</span>
-                          <div>{formatNutritionValue(recipe.nutrition.carbs, 'g')}</div>
-                        </div>
-                        <div>
-                          <span className="font-medium">Fat:</span>
-                          <div>{formatNutritionValue(recipe.nutrition.fat, 'g')}</div>
-                        </div>
-                        <div>
-                          <span className="font-medium">Sugar:</span>
-                          <div>{formatNutritionValue(recipe.nutrition.sugar, 'g')}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Ingredients */}
-                  <div>
-                    <h4 className="font-semibold mb-2">Ingredients:</h4>
-                    <ul className="space-y-1">
-                      {recipe.ingredients.slice(0, 5).map((ingredient, idx) => (
-                        <li key={idx} className="flex items-center text-sm">
-                          <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                          {ingredient}
-                        </li>
-                      ))}
-                      {recipe.ingredients.length > 5 && (
-                        <li className="text-sm text-gray-500 dark:text-gray-400 ml-5">
-                          +{recipe.ingredients.length - 5} more ingredients
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-
-                  {/* Instructions Link */}
-                  {recipe.instructions_url && (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => window.open(recipe.instructions_url, '_blank')}
-                    >
-                      View Full Recipe
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* No Results */}
-        {!isLoadingNutrition && nutritionRecipes.length === 0 && !nutritionError && selectedNutritionCategory && (
-          <Card className="bg-white dark:bg-gray-800">
-            <CardContent className="p-6 text-center">
-              <p className="text-gray-600 dark:text-gray-300">
-                No recipes found for {selectedNutritionCategory.name}. Try another category.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        <NutritionRecipeResults
+          recipes={nutritionRecipes}
+          isLoading={isLoadingNutrition}
+          error={nutritionError}
+          categoryName={selectedNutritionCategory.name}
+        />
       </div>
     );
   }
@@ -354,44 +222,16 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
   // Default view with nutrition categories and regular recipes
   return (
     <div className="animate-fade-in">
-      {/* Nutrition Goals Section */}
-      <div className="mb-8">
-        <h3 className="text-lg font-semibold text-green-800 dark:text-green-400 mb-4">
-          Nutrition Goals
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {nutritionCategories.map((category) => (
-            <Card
-              key={category.id}
-              className="cursor-pointer hover:shadow-md transition-shadow border-green-200 dark:border-green-800"
-              onClick={() => fetchRecipesByCategory(category)}
-            >
-              <CardContent className="p-3 text-center">
-                <div className="text-2xl mb-1">{category.emoji}</div>
-                <h4 className="font-medium text-xs mb-1">{category.name}</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {category.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <NutritionCategoryGrid
+        categories={nutritionCategories}
+        onCategorySelect={fetchRecipesByCategory}
+      />
 
-      {/* Regular Recipe Section */}
       <div>
         <h3 className="text-lg font-semibold text-green-800 dark:text-green-400 mb-4">
           All Recipes
         </h3>
-        
-        <RecipeFilters
-          selectedDiet={selectedDiet}
-          selectedCategory={selectedCategory}
-          onDietChange={setSelectedDiet}
-          onCategoryChange={setSelectedCategory}
-        />
 
-        {/* Debug Info */}
         {searchQuery && (
           <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm">
             <p>Searching for: "{searchQuery}"</p>
