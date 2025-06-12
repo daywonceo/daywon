@@ -15,7 +15,7 @@ export const useLoginLogic = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signUp, signIn, signInWithGoogle, signInWithApple, signInWithSpotify, resetPassword, user } = useAuth();
+  const { signUp, signIn, signInWithGoogle, signInWithApple, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -114,14 +114,6 @@ export const useLoginLogic = () => {
     }
   };
 
-  const handleSpotifySignIn = async () => {
-    const { error } = await signInWithSpotify();
-    if (error) {
-      console.error("Spotify sign in error:", error);
-      toast.error("Spotify sign in failed: " + error.message);
-    }
-  };
-
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setShowForgotPassword(false);
@@ -156,7 +148,6 @@ export const useLoginLogic = () => {
     handleSubmit,
     handleGoogleSignIn,
     handleAppleSignIn,
-    handleSpotifySignIn,
     toggleMode,
     toggleForgotPassword
   };
