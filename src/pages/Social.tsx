@@ -11,36 +11,52 @@ import { friends, leaderboardData, feedPosts } from "@/components/social/socialD
 
 const Social = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-4 sm:px-6 pb-24 pt-6 max-w-4xl mx-auto w-full">
-        <div className="py-6 text-center mb-6">
-          <h1 className="text-4xl font-bold text-green-800 dark:text-green-400 mb-2">DAYONE SOCIAL</h1>
-          <p className="text-gray-600 dark:text-gray-400">Connect with friends and track your progress together</p>
+      <main className="flex-grow px-3 sm:px-4 pb-20 pt-4 max-w-md sm:max-w-2xl mx-auto w-full">
+        {/* Hero Section */}
+        <div className="text-center mb-6 px-2">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+            <span className="text-2xl">🌟</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Connect & Grow
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs mx-auto">
+            Share your journey and celebrate wins with your community
+          </p>
         </div>
 
-        <Tabs defaultValue="main" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 shadow-sm bg-white dark:bg-gray-800 h-12">
-            <TabsTrigger value="main" className="py-3 text-sm font-medium">FEED</TabsTrigger>
-            <TabsTrigger value="leaderboard" className="py-3 text-sm font-medium">RANKS</TabsTrigger>
-            <TabsTrigger value="groups" className="py-3 text-sm font-medium">GROUPS</TabsTrigger>
-            <TabsTrigger value="friends" className="py-3 text-sm font-medium">FRIENDS</TabsTrigger>
+        <Tabs defaultValue="feed" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 h-11">
+            <TabsTrigger value="feed" className="text-xs sm:text-sm font-medium px-2">
+              FEED
+            </TabsTrigger>
+            <TabsTrigger value="ranks" className="text-xs sm:text-sm font-medium px-2">
+              RANKS
+            </TabsTrigger>
+            <TabsTrigger value="groups" className="text-xs sm:text-sm font-medium px-2">
+              GROUPS
+            </TabsTrigger>
+            <TabsTrigger value="friends" className="text-xs sm:text-sm font-medium px-2">
+              FRIENDS
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="main" className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm animate-fade-in border border-gray-100 dark:border-gray-700">
+          <TabsContent value="feed" className="animate-fade-in">
             <MainFeed feedPosts={feedPosts} />
           </TabsContent>
           
-          <TabsContent value="leaderboard" className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm animate-fade-in border border-gray-100 dark:border-gray-700">
+          <TabsContent value="ranks" className="animate-fade-in">
             <Leaderboard leaderboardData={leaderboardData} />
           </TabsContent>
           
-          <TabsContent value="groups" className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm animate-fade-in border border-gray-100 dark:border-gray-700">
+          <TabsContent value="groups" className="animate-fade-in">
             <Groups />
           </TabsContent>
           
-          <TabsContent value="friends" className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm animate-fade-in border border-gray-100 dark:border-gray-700">
+          <TabsContent value="friends" className="animate-fade-in">
             <FriendList friends={friends} />
           </TabsContent>
         </Tabs>
