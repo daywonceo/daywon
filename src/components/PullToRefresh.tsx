@@ -78,7 +78,7 @@ const PullToRefresh = ({ onRefresh, children }: PullToRefreshProps) => {
         ref={refreshRef} 
         className="absolute top-0 left-0 w-full flex justify-center transition-transform duration-300 z-50 pointer-events-none"
       >
-        <div className={`flex items-center justify-center h-16 text-green-700 ${refreshing ? 'animate-spin' : ''}`}>
+        <div className={`flex items-center justify-center h-16 text-green-700 transition-opacity ${isPulling || refreshing ? 'opacity-100' : 'opacity-0'} ${refreshing ? 'animate-spin' : ''}`}>
           <RefreshCcw size={24} />
         </div>
       </div>
