@@ -1,4 +1,3 @@
-
 import { Plus, Search, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,30 +14,10 @@ const Header = () => {
   const [show, setShow] = useState(true);
   const [searchFocused, setSearchFocused] = useState(false);
 
-  // Move habit sheet state here, not shared!
-  const [addHabitSheetOpen, setAddHabitSheetOpen] = useState(false);
-
-  const controlHeader = () => {
-    if (searchFocused) return;
-    if (window.scrollY > lastScrollY && window.scrollY > 100) {
-      setShow(false);
-    } else {
-      setShow(true);
-    }
-    setLastScrollY(window.scrollY);
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', controlHeader);
-    return () => {
-      window.removeEventListener('scroll', controlHeader);
-    };
-  }, [lastScrollY, searchFocused]);
-
   // Handle new habit selected
   const handleHabitSelected = (habit: string) => {
     // Implement logic when a habit is chosen (toast, add, etc.)
-    setAddHabitSheetOpen(false);
+    // Optionally: toast({ title: habit + " added!" });
   };
 
   return (
@@ -86,22 +65,20 @@ const Header = () => {
         <div className="flex-1 flex justify-end items-center space-x-1">
           <ThemeToggle />
           <HapticButton />
-          <Button 
-            variant="outline" 
-            className="text-green-800 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900 rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0"
-            size="icon"
-            onClick={() => setAddHabitSheetOpen(true)}
-            aria-label="Add Habit"
-          >
-            <Plus size={isMobile ? 18 : 20} />
-          </Button>
+          <HabitAddSheet
+            trigger={
+              <Button 
+                variant="outline" 
+                className="text-green-800 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900 rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0"
+                size="icon"
+                aria-label="Add Habit"
+              >
+                <Plus size={isMobile ? 18 : 20} />
+              </Button>
+            }
+            onHabitSelected={handleHabitSelected}
+          />
         </div>
-
-        <HabitAddSheet
-          open={addHabitSheetOpen}
-          onOpenChange={setAddHabitSheetOpen}
-          onHabitSelected={handleHabitSelected}
-        />
       </header>
     </SettingsProvider>
   );

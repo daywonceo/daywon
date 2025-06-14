@@ -1,5 +1,5 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import {
   Drawer,
@@ -10,15 +10,22 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 
+// Accept children as render prop if function (pass close fn for custom sheets)
 type BottomSheetProps = {
   trigger: ReactNode;
   title: string;
-  children: ReactNode;
+  children: ReactNode | ((close: () => void) => ReactNode);
 };
 
 const BottomSheet = ({ trigger, title, children }: BottomSheetProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Provide close handler for render prop use-case
+  const handleClose = () => setIsOpen(false);
+  const isFunctionChild = typeof children === "function";
+
   return (
-    <Drawer>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent className="max-h-[85vh]">
         <div className="mx-auto w-full max-w-md">
@@ -28,11 +35,8 @@ const BottomSheet = ({ trigger, title, children }: BottomSheetProps) => {
               <span>{title}</span>
             </DrawerTitle>
           </DrawerHeader>
-          <div className="p-4 pb-6">{children}</div>
-          <div className="p-4 pt-0">
-            <Button className="w-full bg-green-700 hover:bg-green-800" size="lg">
-              Save
-            </Button>
+          <div className="p-4 pb-6">
+            {isFunctionChild ? (children as (close: () => void) => ReactNode)(handleClose) : children}
           </div>
         </div>
       </DrawerContent>

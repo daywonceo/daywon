@@ -30,74 +30,78 @@ const SUGGESTED_HABITS = [
   "Budget Review",
   "No Social Media Morning",
   "Journal",
-  "20-Minute Cleanup"
+  "20-Minute Cleanup",
+  "Walking after Lunch",
+  "Skincare Routine",
+  "Plan Tomorrow",
+  "Daily Reflection"
 ];
 
 type HabitAddSheetProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  trigger: React.ReactNode;
   onHabitSelected?: (name: string) => void;
 };
 
-const HabitAddSheet = ({ open, onOpenChange, onHabitSelected }: HabitAddSheetProps) => {
+const HabitAddSheet = ({ trigger, onHabitSelected }: HabitAddSheetProps) => {
   const [customHabit, setCustomHabit] = useState("");
 
-  const handleSelect = (habit: string) => {
+  const handleSelect = (habit: string, close: () => void) => {
     if (onHabitSelected) onHabitSelected(habit);
-    onOpenChange(false);
+    close();
   };
 
-  const handleCustomAdd = () => {
+  const handleCustomAdd = (close: () => void) => {
     if (customHabit.trim()) {
       if (onHabitSelected) onHabitSelected(customHabit.trim());
       setCustomHabit("");
-      onOpenChange(false);
+      close();
     }
   };
 
+  // Render trigger via function-as-children in BottomSheet for flexible closing
   return (
     <BottomSheet
-      trigger={null}
+      trigger={trigger}
       title="Choose a Habit"
-      open={open}
-      onOpenChange={onOpenChange}
-      hideSave // Hide default Save button, handled by parent
     >
-      <div>
-        <div className="mb-4">
-          <h4 className="font-semibold text-green-800 mb-2">Recommended Habits</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[250px] overflow-y-auto pr-1">
-            {SUGGESTED_HABITS.map(habit => (
-              <Button
-                key={habit}
-                className="w-full bg-green-50 text-green-800 hover:bg-green-100"
-                variant="outline"
-                onClick={() => handleSelect(habit)}
-              >
-                {habit}
-              </Button>
-            ))}
+      {(close: () => void) => (
+        <div>
+          <div className="mb-4">
+            <h4 className="font-semibold text-green-800 mb-2">Recommended Habits</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[250px] overflow-y-auto pr-1">
+              {SUGGESTED_HABITS.map(habit => (
+                <Button
+                  key={habit}
+                  className="w-full bg-green-50 text-green-800 hover:bg-green-100"
+                  variant="outline"
+                  onClick={() => handleSelect(habit, close)}
+                  tabIndex={0}
+                >
+                  {habit}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="mb-1">
+            <h4 className="font-semibold text-green-800 mb-1">Or add a custom habit</h4>
+            <input
+              type="text"
+              placeholder="Custom habit"
+              className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-md mb-2"
+              value={customHabit}
+              onChange={e => setCustomHabit(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleCustomAdd(close)}
+            />
+            <Button
+              className="w-full bg-blue-600 text-white"
+              onClick={() => handleCustomAdd(close)}
+              disabled={!customHabit.trim()}
+            >
+              Add Custom Habit
+            </Button>
           </div>
         </div>
-        <div className="mb-1">
-          <h4 className="font-semibold text-green-800 mb-1">Or add a custom habit</h4>
-          <input
-            type="text"
-            placeholder="Custom habit"
-            className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-md mb-2"
-            value={customHabit}
-            onChange={e => setCustomHabit(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleCustomAdd()}
-          />
-          <Button
-            className="w-full bg-blue-600 text-white"
-            onClick={handleCustomAdd}
-            disabled={!customHabit.trim()}
-          >
-            Add Custom Habit
-          </Button>
-        </div>
-      </div>
+      )}
     </BottomSheet>
   );
 };

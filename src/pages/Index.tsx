@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
@@ -25,9 +24,6 @@ const Index = () => {
   const [todayProgress, setTodayProgress] = useState(3);
   const [totalHabits, setTotalHabits] = useState(5);
   const isMobile = useIsMobile();
-
-  // Only needed for Quick Add Habit Sheet (separate from Header's state)
-  const [addHabitSheetOpen, setAddHabitSheetOpen] = useState(false);
 
   // Initialize app data on first load and set current month
   useEffect(() => {
@@ -72,7 +68,6 @@ const Index = () => {
   // Handle new habit selected from quick add
   const handleHabitSelected = (habit: string) => {
     // Optionally: toast({ title: habit + " added!" });
-    setAddHabitSheetOpen(false);
   };
 
   return (
@@ -134,20 +129,19 @@ const Index = () => {
 
           {/* Quick Action Button */}
           <div className="flex justify-center mb-8">
-            <Button 
-              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              onClick={() => setAddHabitSheetOpen(true)}
-              aria-label="Quick Add Habit"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Quick Add Habit
-            </Button>
+            <HabitAddSheet
+              trigger={
+                <Button 
+                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                  aria-label="Quick Add Habit"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Quick Add Habit
+                </Button>
+              }
+              onHabitSelected={handleHabitSelected}
+            />
           </div>
-          <HabitAddSheet
-            open={addHabitSheetOpen}
-            onOpenChange={setAddHabitSheetOpen}
-            onHabitSelected={handleHabitSelected}
-          />
 
           <RecentActivities month={currentMonth} />
           <HabitStats />
