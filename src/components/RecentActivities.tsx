@@ -1,4 +1,3 @@
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import PlaylistRecommendations from "./habit/PlaylistRecommendations";
@@ -24,7 +23,6 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
 
   return (
     <div className="mb-6 sm:mb-16">
-      <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
       <div className="flex flex-col overflow-hidden">
         <div
           className={cn(
