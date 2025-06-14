@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -8,6 +7,8 @@ import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 import { Input } from "@/components/ui/input";
 import PlaylistRecommendations from "./habit/PlaylistRecommendations";
+import HabitGridHeader from "./habit/HabitGridHeader";
+import HabitActivityRow from "./habit/HabitActivityRow";
 
 // ADDED: Accept habitList as prop
 type RecentActivitiesProps = {
@@ -170,105 +171,47 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
   return (
     <div className="mb-6 sm:mb-16">
       <h2 className="text-3xl sm:text-6xl font-black mb-3 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
-      
       <div className="flex flex-col bg-green-50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
         {/* Table-like grid for header and items */}
-        <div className="grid grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))] sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))] gap-2 sm:gap-4 mb-4 sm:mb-6">
-          {/* Empty space for day number column */}
-          <div className="" />
-          {/* Empty space for text description */}
-          <div className="" />
-          {/* Header for each habit - placed right above each habit column */}
-          {userHabits.map((habit, index) => (
-            <div key={`header-${index}`} className="flex items-center justify-center">
-              <span
-                className="truncate max-w-[58px] sm:max-w-[100px] text-[11px] sm:text-base px-1 leading-tight font-bold text-green-800"
-                title={habit}
-                style={{ lineHeight: '1.25', whiteSpace: 'nowrap' }}
-              >
-                {habit}
-              </span>
-            </div>
-          ))}
+        <div
+          className={cn(
+            "grid",
+            "grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))]",
+            "sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))]",
+            "gap-2 sm:gap-4 mb-4 sm:mb-6 items-end"
+          )}
+        >
+          <HabitGridHeader habits={userHabits} />
         </div>
-
-        {/* Activity rows, items inside grid align under labels */}
+        {/* Activity rows */}
         {activities.map((activity, activityIndex) => (
           <div
             key={`activity-${activityIndex}`}
-            className="grid grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))] sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))] gap-2 sm:gap-4 mb-6 sm:mb-8 last:mb-0 items-center"
+            className={cn(
+              "grid",
+              "grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))]",
+              "sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))]",
+              "gap-2 sm:gap-4 mb-6 sm:mb-8 last:mb-0 items-center"
+            )}
           >
-            {/* Day number */}
-            <div className="flex items-center justify-center">
-              <div className="text-center text-3xl sm:text-5xl font-black text-green-800">
-                {activity.day}
-              </div>
-            </div>
-
-            {/* Activity description */}
-            <div className="flex items-center">
-              {activity.isEditing ? (
-                <Input
-                  value={activity.text}
-                  onChange={(e) => {
-                    const newActivities = [...activities];
-                    newActivities[activityIndex].text = e.target.value;
-                    setActivities(newActivities);
-                  }}
-                  onBlur={() => toggleEditMode(activityIndex)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      updateActivityText(activityIndex, activity.text);
-                    }
-                  }}
-                  autoFocus
-                  className="text-green-800 text-sm sm:text-lg font-semibold py-1"
-                />
-              ) : (
-                <div className="flex items-center">
-                  <p className="text-green-800 text-sm sm:text-lg font-semibold leading-tight">{activity.text}</p>
-                  <button
-                    onClick={() => toggleEditMode(activityIndex)}
-                    className="ml-2 text-green-700 hover:text-green-900 transition-colors"
-                  >
-                    <Edit size={12} className="sm:hidden" />
-                    <Edit size={14} className="hidden sm:block" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Habit boxes - columns align under their header */}
-            {activity.categories.map((category, categoryIndex) => (
-              <div
-                key={`${activityIndex}-${category}`}
-                className={`h-[45px] w-[45px] sm:h-[60px] sm:w-[85px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors ${
-                  activeHabit === category && activityIndex === 0 ? "ring-2 ring-blue-500 ring-offset-2" : ""
-                }`}
-                onClick={() => toggleStatus(activityIndex, category)}
-              >
-                {activity.statuses[category] === "completed" && (
-                  <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center animate-checkmark">
-                    <Check size={16} className="sm:hidden text-white" />
-                    <Check size={20} className="hidden sm:block text-white" />
-                  </div>
-                )}
-                {activity.statuses[category] === "failed" && (
-                  <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                    <X size={16} className="sm:hidden text-red-500" />
-                    <X size={20} className="hidden sm:block text-red-500" />
-                  </div>
-                )}
-              </div>
-            ))}
+            <HabitActivityRow
+              activity={activity}
+              activityIndex={activityIndex}
+              activities={activities}
+              setActivities={setActivities}
+              activeHabit={activeHabit}
+              setActiveHabit={setActiveHabit}
+              toggleStatus={toggleStatus}
+              toggleEditMode={toggleEditMode}
+              updateActivityText={updateActivityText}
+            />
           </div>
         ))}
       </div>
-
       {/* Show playlist recommendations when a habit is active */}
       {activeHabit && (
-        <PlaylistRecommendations 
-          habitName={activeHabit} 
+        <PlaylistRecommendations
+          habitName={activeHabit}
           isHabitActive={true}
         />
       )}
