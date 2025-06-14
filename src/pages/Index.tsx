@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
@@ -91,9 +92,9 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50/50 via-white to-blue-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
       <PullToRefresh onRefresh={handleRefresh}>
-        <main className="flex-grow px-4 sm:px-5 pb-24 pt-8 sm:pt-12 max-w-4xl mx-auto w-full">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-800 dark:text-gray-100">
+        <main className="flex-grow px-4 sm:px-5 pb-24 pt-6 sm:pt-10 max-w-4xl mx-auto w-full">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gray-800 dark:text-gray-100">
               {getGreeting()}
             </h1>
             <p className="text-md text-gray-500 dark:text-gray-400 mt-2">Ready to build some great habits?</p>
