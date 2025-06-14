@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
@@ -11,7 +12,7 @@ import SwipeableCard from "@/components/SwipeableCard";
 import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitTracking";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Target, Calendar, TrendingUp } from "lucide-react";
@@ -24,41 +25,32 @@ const Index = () => {
   const [todayProgress, setTodayProgress] = useState(3);
   const [totalHabits, setTotalHabits] = useState(5);
   const isMobile = useIsMobile();
+
+  // Only needed for Quick Add Habit Sheet (separate from Header's state)
   const [addHabitSheetOpen, setAddHabitSheetOpen] = useState(false);
-  
+
   // Initialize app data on first load and set current month
   useEffect(() => {
     try {
-      // Set current month
       const date = new Date();
       const monthName = date.toLocaleString('default', { month: 'long' }).toUpperCase();
       setCurrentMonth(monthName);
-      
-      // Load offline data
       const offlineData = getOfflineData();
       console.log("Loaded offline data:", offlineData);
-      
-      // Initialize default habits if none exist
       initializeDefaultHabits();
     } catch (error) {
       console.error("Failed to initialize app data:", error);
     }
   }, []);
-  
+
   // Simulate data loading
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate updating data
-      const newData = {
-        lastUpdated: Date.now(),
-      };
-      
+      const newData = { lastUpdated: Date.now() };
       saveOfflineData(newData);
-      hapticSuccess(); // Provide haptic feedback on successful refresh
+      hapticSuccess();
       toast({
         title: "Data refreshed!",
         description: `Last updated: ${new Date().toLocaleTimeString()}`,
@@ -76,11 +68,17 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-  
+
+  // Handle new habit selected from quick add
+  const handleHabitSelected = (habit: string) => {
+    // Optionally: toast({ title: habit + " added!" });
+    setAddHabitSheetOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
-      
+
       <PullToRefresh onRefresh={handleRefresh}>
         <main className="flex-grow px-4 sm:px-5 pb-24 pt-4 sm:pt-6 max-w-3xl mx-auto w-full">
           <div className="py-4 text-center mb-6">
@@ -103,7 +101,6 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
-
             <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -115,7 +112,6 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
-
             <Card className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -141,26 +137,23 @@ const Index = () => {
             <Button 
               className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={() => setAddHabitSheetOpen(true)}
+              aria-label="Quick Add Habit"
             >
               <Plus className="w-5 h-5 mr-2" />
               Quick Add Habit
             </Button>
-            <HabitAddSheet
-              open={addHabitSheetOpen}
-              onOpenChange={setAddHabitSheetOpen}
-              onHabitSelected={habit =>
-                // Optionally show toast or actually add the habit!
-                setAddHabitSheetOpen(false)
-              }
-            />
           </div>
-          
+          <HabitAddSheet
+            open={addHabitSheetOpen}
+            onOpenChange={setAddHabitSheetOpen}
+            onHabitSelected={handleHabitSelected}
+          />
+
           <RecentActivities month={currentMonth} />
           <HabitStats />
           <Progress />
         </main>
       </PullToRefresh>
-      
       <Footer />
     </div>
   );

@@ -11,7 +11,26 @@ const SUGGESTED_HABITS = [
   "Meditate",
   "Stretch",
   "Morning Walk",
-  "Gratitude Journal"
+  "Gratitude Journal",
+  "Sleep 8 Hours",
+  "Healthy Breakfast",
+  "Focus Work",
+  "No Sugar",
+  "Go Outside",
+  "Family Time",
+  "Evening Walk",
+  "Take Vitamins",
+  "Practice Mindfulness",
+  "Meal Prep",
+  "Eat Fruits",
+  "Yoga",
+  "Call a Loved One",
+  "No Caffeine After 4pm",
+  "Declutter Desk",
+  "Budget Review",
+  "No Social Media Morning",
+  "Journal",
+  "20-Minute Cleanup"
 ];
 
 type HabitAddSheetProps = {
@@ -40,11 +59,14 @@ const HabitAddSheet = ({ open, onOpenChange, onHabitSelected }: HabitAddSheetPro
     <BottomSheet
       trigger={null}
       title="Choose a Habit"
+      open={open}
+      onOpenChange={onOpenChange}
+      hideSave // Hide default Save button, handled by parent
     >
       <div>
         <div className="mb-4">
           <h4 className="font-semibold text-green-800 mb-2">Recommended Habits</h4>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[250px] overflow-y-auto pr-1">
             {SUGGESTED_HABITS.map(habit => (
               <Button
                 key={habit}

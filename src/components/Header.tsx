@@ -1,3 +1,4 @@
+
 import { Plus, Search, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,16 +14,15 @@ const Header = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [show, setShow] = useState(true);
   const [searchFocused, setSearchFocused] = useState(false);
+
+  // Move habit sheet state here, not shared!
   const [addHabitSheetOpen, setAddHabitSheetOpen] = useState(false);
 
   const controlHeader = () => {
     if (searchFocused) return;
-    
     if (window.scrollY > lastScrollY && window.scrollY > 100) {
-      // Scrolling down
       setShow(false);
     } else {
-      // Scrolling up
       setShow(true);
     }
     setLastScrollY(window.scrollY);
@@ -34,6 +34,12 @@ const Header = () => {
       window.removeEventListener('scroll', controlHeader);
     };
   }, [lastScrollY, searchFocused]);
+
+  // Handle new habit selected
+  const handleHabitSelected = (habit: string) => {
+    // Implement logic when a habit is chosen (toast, add, etc.)
+    setAddHabitSheetOpen(false);
+  };
 
   return (
     <SettingsProvider>
@@ -85,18 +91,17 @@ const Header = () => {
             className="text-green-800 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900 rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0"
             size="icon"
             onClick={() => setAddHabitSheetOpen(true)}
+            aria-label="Add Habit"
           >
             <Plus size={isMobile ? 18 : 20} />
           </Button>
-          <HabitAddSheet
-            open={addHabitSheetOpen}
-            onOpenChange={setAddHabitSheetOpen}
-            onHabitSelected={habit =>
-              // Optionally: toast({ title: `${habit} added!`, duration: 2000 })
-              setAddHabitSheetOpen(false)
-            }
-          />
         </div>
+
+        <HabitAddSheet
+          open={addHabitSheetOpen}
+          onOpenChange={setAddHabitSheetOpen}
+          onHabitSelected={handleHabitSelected}
+        />
       </header>
     </SettingsProvider>
   );
