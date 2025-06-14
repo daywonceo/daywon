@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
 import HabitStats from "@/components/HabitStats";
@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Target, Calendar, TrendingUp } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
+import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
+import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
 
 const Index = () => {
   const [currentMonth, setCurrentMonth] = useState("");
@@ -23,21 +25,27 @@ const Index = () => {
   const [streakCount, setStreakCount] = useState(7);
   const [todayProgress, setTodayProgress] = useState(3);
   const [totalHabits, setTotalHabits] = useState(5);
+  const [showHabitsModal, setShowHabitsModal] = useState(false);
+
   const isMobile = useIsMobile();
 
-  // Initialize app data on first load and set current month
+  // get top 3 habits and mutation
+  const { topHabits, isLoading: topHabitsLoading, saveTopHabits, refetch } = useTopHabits();
+
+  // Prompt user at the start of a new month (or if not set)
   useEffect(() => {
-    try {
-      const date = new Date();
-      const monthName = date.toLocaleString('default', { month: 'long' }).toUpperCase();
-      setCurrentMonth(monthName);
-      const offlineData = getOfflineData();
-      console.log("Loaded offline data:", offlineData);
-      initializeDefaultHabits();
-    } catch (error) {
-      console.error("Failed to initialize app data:", error);
+    const date = new Date();
+    const monthName = date.toLocaleString('default', { month: 'long' }).toUpperCase();
+    setCurrentMonth(monthName);
+    const offlineData = getOfflineData();
+    initializeDefaultHabits();
+
+    // Check if need to prompt for top 3 habits
+    // Simplified: if there's no topHabits, open modal (skip on first load if loading)
+    if (!topHabitsLoading && !topHabits) {
+      setShowHabitsModal(true);
     }
-  }, []);
+  }, [topHabits, topHabitsLoading]);
 
   // Simulate data loading
   const handleRefresh = async () => {
@@ -70,10 +78,15 @@ const Index = () => {
     // Optionally: toast({ title: habit + " added!" });
   };
 
+  // Pass selected top 3 habits to RecentActivities.
+  // If not loaded, fall back to previously used or fixed habits.
+  const activityHabits = topHabits && topHabits.length === 3
+    ? topHabits
+    : ["WORKOUT", "DEVOTIONS", "READ"];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
-
       <PullToRefresh onRefresh={handleRefresh}>
         <main className="flex-grow px-4 sm:px-5 pb-24 pt-4 sm:pt-6 max-w-3xl mx-auto w-full">
           <div className="py-4 text-center mb-6">
@@ -143,7 +156,19 @@ const Index = () => {
             />
           </div>
 
-          <RecentActivities month={currentMonth} />
+          {/* Modal for top 3 habits */}
+          <TopHabitsSelectorModal
+            open={showHabitsModal}
+            onClose={() => setShowHabitsModal(false)}
+            initialHabits={topHabits ?? []}
+            onSave={async (habits) => {
+              await saveTopHabits(habits);
+              setShowHabitsModal(false);
+              refetch();
+            }}
+          />
+
+          <RecentActivities month={currentMonth} habitList={activityHabits} />
           <HabitStats />
           <Progress />
         </main>

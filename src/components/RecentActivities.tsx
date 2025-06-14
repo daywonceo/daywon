@@ -8,8 +8,10 @@ import { hapticSuccess } from "@/utils/haptics";
 import { Input } from "@/components/ui/input";
 import PlaylistRecommendations from "./habit/PlaylistRecommendations";
 
+// ADDED: Accept habitList as prop
 type RecentActivitiesProps = {
   month: string;
+  habitList?: string[]; // array of 3 habits to show for this user
 };
 
 type ActivityStatus = "completed" | "failed" | "empty";
@@ -22,19 +24,25 @@ interface DayActivity {
   isEditing: boolean;
 }
 
-// Define our specific three habits
-const FIXED_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
+const DEFAULT_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 
-const RecentActivities = ({ month }: RecentActivitiesProps) => {
+// CHANGE: use `habitList` prop if provided, else fall back
+const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
   const [activities, setActivities] = useState<DayActivity[]>([]);
   const [activeHabit, setActiveHabit] = useState<string | null>(null);
-  
-  // Load activities from storage on component mount
+
+  // Determine which habits to use (user-selected for month or fallback)
+  const userHabits =
+    habitList && habitList.length === 3
+      ? habitList
+      : DEFAULT_HABITS;
+
   useEffect(() => {
     loadActivities();
-  }, []);
-  
+    // eslint-disable-next-line
+  }, [habitList?.join(",")]); // re-calculate if user changes top 3
+
   const loadActivities = () => {
     try {
       // Get recent dates (past 3 days including today)
@@ -70,7 +78,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         const statuses: Record<string, ActivityStatus> = {};
         
         // Populate statuses from stored activities
-        FIXED_HABITS.forEach(category => {
+        userHabits.forEach(category => {
           const activity = storedActivities.find(
             a => a.habitName === category && a.date === dateStr
           );
@@ -80,7 +88,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
         return {
           day,
           text,
-          categories: FIXED_HABITS,
+          categories: userHabits,
           statuses,
           isEditing: false
         };
@@ -173,7 +181,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           
           {/* Habit header labels - responsive text sizing */}
           <div className="flex gap-2 sm:gap-4">
-            {FIXED_HABITS.map((habit, index) => (
+            {userHabits.map((habit, index) => (
               <div key={`header-${index}`} className="w-[45px] sm:w-[65px] text-center">
                 {/* Mobile-specific styling with smaller text and padding */}
                 <span className="text-[10px] px-1 leading-tight block break-words sm:hidden font-bold text-green-800">
@@ -242,7 +250,7 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
                   onClick={() => toggleStatus(activityIndex, category)}
                 >
                   {activity.statuses[category] === "completed" && (
-                    <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center">
+                    <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center animate-checkmark">
                       <Check size={16} className="sm:hidden text-white" />
                       <Check size={20} className="hidden sm:block text-white" />
                     </div>
