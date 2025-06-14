@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -10,9 +11,8 @@ import PlaylistRecommendations from "./habit/PlaylistRecommendations";
 import HabitGridHeader from "./habit/HabitGridHeader";
 import HabitActivityRow from "./habit/HabitActivityRow";
 
-// ADDED: Accept habitList as prop
+// REMOVED: month prop
 type RecentActivitiesProps = {
-  month: string;
   habitList?: string[]; // array of 3 habits to show for this user
 };
 
@@ -29,7 +29,7 @@ interface DayActivity {
 const DEFAULT_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 
 // CHANGE: use `habitList` prop if provided, else fall back
-const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
+const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
   const [activities, setActivities] = useState<DayActivity[]>([]);
   const [activeHabit, setActiveHabit] = useState<string | null>(null);
@@ -170,7 +170,7 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
 
   return (
     <div className="mb-6 sm:mb-16">
-      <h2 className="text-3xl sm:text-6xl font-black mb-3 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
       <div className="flex flex-col bg-green-50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
         {/* Table-like grid for header and items */}
         <div

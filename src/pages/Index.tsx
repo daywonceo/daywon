@@ -20,7 +20,6 @@ import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
 import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
 
 const Index = () => {
-  const [currentMonth, setCurrentMonth] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streakCount, setStreakCount] = useState(7);
   const [todayProgress, setTodayProgress] = useState(3);
@@ -29,14 +28,18 @@ const Index = () => {
 
   const isMobile = useIsMobile();
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   // get top 3 habits and mutation
   const { topHabits, isLoading: topHabitsLoading, saveTopHabits, refetch } = useTopHabits();
 
   // Prompt user at the start of a new month (or if not set)
   useEffect(() => {
-    const date = new Date();
-    const monthName = date.toLocaleString('default', { month: 'long' }).toUpperCase();
-    setCurrentMonth(monthName);
     const offlineData = getOfflineData();
     initializeDefaultHabits();
 
@@ -85,75 +88,40 @@ const Index = () => {
     : ["WORKOUT", "DEVOTIONS", "READ"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-green-50/50 via-white to-blue-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
       <PullToRefresh onRefresh={handleRefresh}>
-        <main className="flex-grow px-4 sm:px-5 pb-24 pt-4 sm:pt-6 max-w-3xl mx-auto w-full">
-          <div className="py-4 text-center mb-6">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              Your Habits Dashboard
+        <main className="flex-grow px-4 sm:px-5 pb-24 pt-8 sm:pt-12 max-w-4xl mx-auto w-full">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-800 dark:text-gray-100">
+              {getGreeting()}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Track your progress daily and build lasting habits</p>
+            <p className="text-md text-gray-500 dark:text-gray-400 mt-2">Ready to build some great habits?</p>
           </div>
 
           {/* Quick Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Current Streak</p>
-                    <p className="text-2xl font-bold text-green-600">{streakCount} days</p>
-                  </div>
-                  <Target className="h-8 w-8 text-green-500" />
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+            <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-green-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+                <Target className="h-10 w-10 text-green-500 mb-3" />
+                <p className="text-4xl font-bold text-green-600 dark:text-green-400">{streakCount}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Day Streak</p>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Progress</p>
-                    <p className="text-2xl font-bold text-blue-600">{todayProgress}/{totalHabits}</p>
-                  </div>
-                  <Calendar className="h-8 w-8 text-blue-500" />
-                </div>
+            <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-blue-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+                <Calendar className="h-10 w-10 text-blue-500 mb-3" />
+                <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{todayProgress}/{totalHabits}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Completed Today</p>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Weekly Goal</p>
-                    <p className="text-2xl font-bold text-purple-600">85%</p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-purple-500" />
-                </div>
+            <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-purple-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+                <TrendingUp className="h-10 w-10 text-purple-500 mb-3" />
+                <p className="text-4xl font-bold text-purple-600 dark:text-purple-400">85%</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Weekly Goal</p>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Status Badge */}
-          <div className="flex justify-center mb-6">
-            <Badge variant="outline" className="px-4 py-2 text-sm font-medium bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
-              🔥 On a {streakCount}-day streak!
-            </Badge>
-          </div>
-
-          {/* Quick Action Button */}
-          <div className="flex justify-center mb-8">
-            <HabitAddSheet
-              trigger={
-                <Button 
-                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                  aria-label="Quick Add Habit"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Quick Add Habit
-                </Button>
-              }
-              onHabitSelected={handleHabitSelected}
-            />
           </div>
 
           {/* Modal for top 3 habits */}
@@ -168,7 +136,7 @@ const Index = () => {
             }}
           />
 
-          <RecentActivities month={currentMonth} habitList={activityHabits} />
+          <RecentActivities habitList={activityHabits} />
           <HabitStats />
           <Progress />
         </main>
