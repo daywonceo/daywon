@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Edit, Check, X } from "lucide-react";
@@ -39,12 +38,12 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     <>
       {/* Day number */}
       <div className="flex items-center justify-center">
-        <div className="text-center text-3xl sm:text-5xl font-bold text-green-800">
+        <div className="text-center text-3xl sm:text-4xl font-bold text-green-800">
           {activity.day}
         </div>
       </div>
       {/* Activity description */}
-      <div className="flex items-center">
+      <div className="flex items-center justify-center text-center">
         {activity.isEditing ? (
           <Input
             value={activity.text.replace('\n', ' ')}
@@ -91,14 +90,14 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
         >
           {activity.statuses[category] === "completed" && (
             <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark">
-              <Check size={16} className="sm:hidden text-white" />
-              <Check size={20} className="hidden sm:block text-white" />
+              <Check size={20} className="sm:hidden text-white" />
+              <Check size={24} className="hidden sm:block text-white" />
             </div>
           )}
           {activity.statuses[category] === "failed" && (
             <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
-              <X size={16} className="sm:hidden text-red-500" />
-              <X size={20} className="hidden sm:block text-red-500" />
+              <X size={20} className="sm:hidden text-red-500" />
+              <X size={24} className="hidden sm:block text-red-500" />
             </div>
           )}
         </div>

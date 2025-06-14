@@ -174,8 +174,10 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
         <div
           className={cn(
             "grid",
-            "grid-cols-[30px_auto_repeat(3,1fr)]",
-            "sm:grid-cols-[50px_auto_repeat(3,1fr)]",
+            // Mobile-first: fixed day, flexible text, fixed habits
+            "grid-cols-[30px_1fr_repeat(3,48px)]",
+            // Desktop: larger fixed sizes
+            "sm:grid-cols-[50px_1fr_repeat(3,64px)]",
             "gap-x-2 sm:gap-x-4 gap-y-4 items-center"
           )}
         >
