@@ -1,21 +1,15 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Edit, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type ActivityStatus = "completed" | "failed" | "empty";
+import { DayActivity } from "@/hooks/useHabitActivities";
 
 interface HabitActivityRowProps {
-  activity: {
-    day: number;
-    text: string;
-    categories: string[];
-    statuses: Record<string, ActivityStatus>;
-    isEditing: boolean;
-  };
+  activity: DayActivity;
   activityIndex: number;
-  activities: any[];
-  setActivities: React.Dispatch<React.SetStateAction<any[]>>;
+  activities: DayActivity[];
+  setActivities: React.Dispatch<React.SetStateAction<DayActivity[]>>;
   activeHabit: string | null;
   setActiveHabit: (habit: string | null) => void;
   toggleStatus: (dayIndex: number, category: string) => void;
