@@ -6,6 +6,7 @@ import { recordHabitActivity, getHabitActivities, getHabitCategories, HabitActiv
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 import { Input } from "@/components/ui/input";
+import PlaylistRecommendations from "./habit/PlaylistRecommendations";
 
 type RecentActivitiesProps = {
   month: string;
@@ -27,6 +28,7 @@ const FIXED_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 const RecentActivities = ({ month }: RecentActivitiesProps) => {
   const isMobile = useIsMobile();
   const [activities, setActivities] = useState<DayActivity[]>([]);
+  const [activeHabit, setActiveHabit] = useState<string | null>(null);
   
   // Load activities from storage on component mount
   useEffect(() => {
@@ -104,10 +106,22 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
       let newStatus: ActivityStatus;
       if (currentStatus === "empty") {
         newStatus = "completed";
+        // Start the habit and show playlists
+        if (dayIndex === 0) { // Only for today's activities
+          setActiveHabit(category);
+        }
       } else if (currentStatus === "completed") {
         newStatus = "failed";
+        // Stop the habit
+        if (dayIndex === 0 && activeHabit === category) {
+          setActiveHabit(null);
+        }
       } else {
         newStatus = "empty";
+        // Stop the habit
+        if (dayIndex === 0 && activeHabit === category) {
+          setActiveHabit(null);
+        }
       }
       
       newActivities[dayIndex].statuses[category] = newStatus;
@@ -222,7 +236,9 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
               {activity.categories.map((category, categoryIndex) => (
                 <div 
                   key={`${activityIndex}-${category}`} 
-                  className="h-[45px] w-[45px] sm:h-[60px] sm:w-[65px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors"
+                  className={`h-[45px] w-[45px] sm:h-[60px] sm:w-[65px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors ${
+                    activeHabit === category && activityIndex === 0 ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+                  }`}
                   onClick={() => toggleStatus(activityIndex, category)}
                 >
                   {activity.statuses[category] === "completed" && (
@@ -243,6 +259,14 @@ const RecentActivities = ({ month }: RecentActivitiesProps) => {
           </div>
         ))}
       </div>
+
+      {/* Show playlist recommendations when a habit is active */}
+      {activeHabit && (
+        <PlaylistRecommendations 
+          habitName={activeHabit} 
+          isHabitActive={true}
+        />
+      )}
     </div>
   );
 };
