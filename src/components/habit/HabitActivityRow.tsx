@@ -62,8 +62,8 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
             className="text-green-800 text-sm sm:text-lg font-semibold py-1"
           />
         ) : (
-          <div className="flex items-center group">
-            <p className="whitespace-pre-line text-xs sm:text-sm font-bold text-green-800/90 tracking-wider leading-tight">
+          <div className="flex items-center justify-center group">
+            <p className="text-sm sm:text-base font-semibold text-green-800/90 tracking-wide">
               {activity.text}
             </p>
             <button

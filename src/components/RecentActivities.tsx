@@ -68,11 +68,11 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
         // Create default text description based on date
         let text = "";
         if (index === 0) {
-          text = "TODAY'S\nACTIVITIES";
+          text = "TODAY";
         } else if (index === 1) {
-          text = "YESTERDAY'S\nACTIVITIES";
+          text = "YESTERDAY";
         } else {
-          text = `ACTIVITIES\nFROM ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}`;
+          text = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
         }
         
         // Initialize statuses map
@@ -170,7 +170,7 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
   return (
     <div className="mb-6 sm:mb-16">
       <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
-      <div className="flex flex-col bg-green-100/70 dark:bg-gray-800/50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
+      <div className="flex flex-col overflow-hidden">
         <div
           className={cn(
             "grid",
@@ -178,7 +178,7 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
             "grid-cols-[30px_1fr_repeat(3,48px)]",
             // Desktop: larger fixed sizes
             "sm:grid-cols-[50px_1fr_repeat(3,64px)]",
-            "gap-x-2 sm:gap-x-4 gap-y-4 items-center"
+            "gap-x-2 sm:gap-x-4 items-center"
           )}
         >
           {/* Grid Header */}
@@ -186,18 +186,22 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
 
           {/* Activity rows */}
           {activities.map((activity, activityIndex) => (
-            <HabitActivityRow
-              key={`activity-${activityIndex}`}
-              activity={activity}
-              activityIndex={activityIndex}
-              activities={activities}
-              setActivities={setActivities}
-              activeHabit={activeHabit}
-              setActiveHabit={setActiveHabit}
-              toggleStatus={toggleStatus}
-              toggleEditMode={toggleEditMode}
-              updateActivityText={updateActivityText}
-            />
+            <React.Fragment key={`activity-${activityIndex}`}>
+              <HabitActivityRow
+                activity={activity}
+                activityIndex={activityIndex}
+                activities={activities}
+                setActivities={setActivities}
+                activeHabit={activeHabit}
+                setActiveHabit={setActiveHabit}
+                toggleStatus={toggleStatus}
+                toggleEditMode={toggleEditMode}
+                updateActivityText={updateActivityText}
+              />
+              {activityIndex < activities.length - 1 && (
+                <div className="col-span-full h-px bg-green-200/70 dark:bg-gray-700 my-3"></div>
+              )}
+            </React.Fragment>
           ))}
         </div>
       </div>
