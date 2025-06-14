@@ -39,7 +39,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     <>
       {/* Day number */}
       <div className="flex items-center justify-center">
-        <div className="text-center text-3xl sm:text-5xl font-black text-green-800">
+        <div className="text-center text-3xl sm:text-5xl font-bold text-green-800">
           {activity.day}
         </div>
       </div>
@@ -47,7 +47,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       <div className="flex items-center">
         {activity.isEditing ? (
           <Input
-            value={activity.text}
+            value={activity.text.replace('\n', ' ')}
             onChange={(e) => {
               const newActivities = [...activities];
               newActivities[activityIndex].text = e.target.value;
@@ -63,11 +63,13 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
             className="text-green-800 text-sm sm:text-lg font-semibold py-1"
           />
         ) : (
-          <div className="flex items-center">
-            <p className="text-green-800 text-sm sm:text-lg font-semibold leading-tight">{activity.text}</p>
+          <div className="flex items-center group">
+            <p className="whitespace-pre-line text-xs sm:text-sm font-bold text-green-800/90 tracking-wider leading-tight">
+              {activity.text}
+            </p>
             <button
               onClick={() => toggleEditMode(activityIndex)}
-              className="ml-2 text-green-700 hover:text-green-900 transition-colors"
+              className="ml-2 text-green-700 hover:text-green-900 transition-colors opacity-0 group-hover:opacity-100"
             >
               <Edit size={12} className="sm:hidden" />
               <Edit size={14} className="hidden sm:block" />
@@ -76,11 +78,11 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
         )}
       </div>
       {/* Habit status boxes */}
-      {activity.categories.map((category, categoryIndex) => (
+      {activity.categories.map((category) => (
         <div
           key={`${activityIndex}-${category}`}
           className={cn(
-            "h-[45px] w-[45px] sm:h-[60px] sm:w-[85px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors",
+            "aspect-square w-full border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors",
             activeHabit === category && activityIndex === 0
               ? "ring-2 ring-blue-500 ring-offset-2"
               : ""
@@ -88,13 +90,13 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           onClick={() => toggleStatus(activityIndex, category)}
         >
           {activity.statuses[category] === "completed" && (
-            <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center animate-checkmark">
+            <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark">
               <Check size={16} className="sm:hidden text-white" />
               <Check size={20} className="hidden sm:block text-white" />
             </div>
           )}
           {activity.statuses[category] === "failed" && (
-            <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
+            <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
               <X size={16} className="sm:hidden text-red-500" />
               <X size={20} className="hidden sm:block text-red-500" />
             </div>

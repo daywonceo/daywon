@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -69,11 +68,11 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
         // Create default text description based on date
         let text = "";
         if (index === 0) {
-          text = "TODAY'S ACTIVITIES";
+          text = "TODAY'S\nACTIVITIES";
         } else if (index === 1) {
-          text = "YESTERDAY'S ACTIVITIES";
+          text = "YESTERDAY'S\nACTIVITIES";
         } else {
-          text = `ACTIVITIES FROM ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}`;
+          text = `ACTIVITIES\nFROM ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}`;
         }
         
         // Initialize statuses map
@@ -171,30 +170,22 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
   return (
     <div className="mb-6 sm:mb-16">
       <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
-      <div className="flex flex-col bg-green-50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
-        {/* Table-like grid for header and items */}
+      <div className="flex flex-col bg-green-100/70 dark:bg-gray-800/50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
         <div
           className={cn(
             "grid",
-            "grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))]",
-            "sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))]",
-            "gap-2 sm:gap-4 mb-4 sm:mb-6 items-end"
+            "grid-cols-[30px_auto_repeat(3,1fr)]",
+            "sm:grid-cols-[50px_auto_repeat(3,1fr)]",
+            "gap-x-2 sm:gap-x-4 gap-y-4 items-center"
           )}
         >
+          {/* Grid Header */}
           <HabitGridHeader habits={userHabits} />
-        </div>
-        {/* Activity rows */}
-        {activities.map((activity, activityIndex) => (
-          <div
-            key={`activity-${activityIndex}`}
-            className={cn(
-              "grid",
-              "grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))]",
-              "sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))]",
-              "gap-2 sm:gap-4 mb-6 sm:mb-8 last:mb-0 items-center"
-            )}
-          >
+
+          {/* Activity rows */}
+          {activities.map((activity, activityIndex) => (
             <HabitActivityRow
+              key={`activity-${activityIndex}`}
               activity={activity}
               activityIndex={activityIndex}
               activities={activities}
@@ -205,8 +196,8 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
               toggleEditMode={toggleEditMode}
               updateActivityText={updateActivityText}
             />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       {/* Show playlist recommendations when a habit is active */}
       {activeHabit && (
