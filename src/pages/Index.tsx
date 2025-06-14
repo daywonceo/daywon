@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
@@ -16,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Target, Calendar, TrendingUp } from "lucide-react";
+import HabitAddSheet from "@/components/habit/HabitAddSheet";
 
 const Index = () => {
   const [currentMonth, setCurrentMonth] = useState("");
@@ -24,6 +24,7 @@ const Index = () => {
   const [todayProgress, setTodayProgress] = useState(3);
   const [totalHabits, setTotalHabits] = useState(5);
   const isMobile = useIsMobile();
+  const [addHabitSheetOpen, setAddHabitSheetOpen] = useState(false);
   
   // Initialize app data on first load and set current month
   useEffect(() => {
@@ -139,11 +140,19 @@ const Index = () => {
           <div className="flex justify-center mb-8">
             <Button 
               className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              onClick={() => toast({ title: "Quick add habit feature coming soon!", duration: 2000 })}
+              onClick={() => setAddHabitSheetOpen(true)}
             >
               <Plus className="w-5 h-5 mr-2" />
               Quick Add Habit
             </Button>
+            <HabitAddSheet
+              open={addHabitSheetOpen}
+              onOpenChange={setAddHabitSheetOpen}
+              onHabitSelected={habit =>
+                // Optionally show toast or actually add the habit!
+                setAddHabitSheetOpen(false)
+              }
+            />
           </div>
           
           <RecentActivities month={currentMonth} />

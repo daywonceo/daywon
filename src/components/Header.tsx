@@ -1,4 +1,3 @@
-
 import { Plus, Search, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -7,12 +6,14 @@ import HapticButton from "./HapticButton";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import BottomSheet from "./BottomSheet";
+import HabitAddSheet from "@/components/habit/HabitAddSheet";
 
 const Header = () => {
   const isMobile = useIsMobile();
   const [lastScrollY, setLastScrollY] = useState(0);
   const [show, setShow] = useState(true);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [addHabitSheetOpen, setAddHabitSheetOpen] = useState(false);
 
   const controlHeader = () => {
     if (searchFocused) return;
@@ -79,36 +80,22 @@ const Header = () => {
         <div className="flex-1 flex justify-end items-center space-x-1">
           <ThemeToggle />
           <HapticButton />
-          <BottomSheet 
-            trigger={
-              <Button 
-                variant="outline" 
-                className="text-green-800 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900 rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0"
-                size="icon"
-              >
-                <Plus size={isMobile ? 18 : 20} />
-              </Button>
-            }
-            title="Add New Habit"
+          <Button 
+            variant="outline" 
+            className="text-green-800 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900 rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0"
+            size="icon"
+            onClick={() => setAddHabitSheetOpen(true)}
           >
-            <div className="flex flex-col gap-4 pt-2">
-              <input
-                type="text"
-                placeholder="Habit name"
-                className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-md"
-              />
-              <div className="grid grid-cols-3 gap-2">
-                {["Daily", "Weekly", "Monthly"].map((freq) => (
-                  <button 
-                    key={freq}
-                    className="p-2 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-green-50 dark:hover:bg-green-900"
-                  >
-                    {freq}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </BottomSheet>
+            <Plus size={isMobile ? 18 : 20} />
+          </Button>
+          <HabitAddSheet
+            open={addHabitSheetOpen}
+            onOpenChange={setAddHabitSheetOpen}
+            onHabitSelected={habit =>
+              // Optionally: toast({ title: `${habit} added!`, duration: 2000 })
+              setAddHabitSheetOpen(false)
+            }
+          />
         </div>
       </header>
     </SettingsProvider>
