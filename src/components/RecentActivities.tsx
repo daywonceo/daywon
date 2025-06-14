@@ -179,16 +179,19 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
           {/* Space for text description */}
           <div className="flex-grow mr-3 sm:mr-4"></div>
           
-          {/* Habit header labels - responsive text sizing */}
+          {/* Habit header labels - improved styling */}
           <div className="flex gap-2 sm:gap-4">
             {userHabits.map((habit, index) => (
-              <div key={`header-${index}`} className="w-[45px] sm:w-[65px] text-center">
-                {/* Mobile-specific styling with smaller text and padding */}
-                <span className="text-[10px] px-1 leading-tight block break-words sm:hidden font-bold text-green-800">
-                  {habit}
-                </span>
-                {/* Desktop styling - original design */}
-                <span className="hidden sm:block text-sm font-bold text-green-800 leading-tight">
+              <div 
+                key={`header-${index}`} 
+                className="w-[58px] sm:w-[85px] text-center flex items-center justify-center"
+              >
+                {/* Mobile label */}
+                <span
+                  className="truncate max-w-[58px] sm:max-w-full text-[11px] px-1 leading-tight block font-bold text-green-800"
+                  title={habit}
+                  style={{ lineHeight: '1.15', whiteSpace: 'nowrap' }}
+                >
                   {habit}
                 </span>
               </div>
