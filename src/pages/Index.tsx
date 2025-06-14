@@ -101,25 +101,25 @@ const Index = () => {
           </div>
 
           {/* Quick Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
             <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-green-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                <Target className="h-10 w-10 text-green-500 mb-3" />
-                <p className="text-4xl font-bold text-green-600 dark:text-green-400">{streakCount}</p>
+              <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center text-center">
+                <Target className="h-8 w-8 sm:h-10 sm:w-10 text-green-500 mb-2 sm:mb-3" />
+                <p className="text-3xl sm:text-4xl font-bold text-green-600 dark:text-green-400">{streakCount}</p>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Day Streak</p>
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-blue-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                <Calendar className="h-10 w-10 text-blue-500 mb-3" />
-                <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{todayProgress}/{totalHabits}</p>
+              <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center text-center">
+                <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500 mb-2 sm:mb-3" />
+                <p className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">{todayProgress}/{totalHabits}</p>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Completed Today</p>
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-purple-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                <TrendingUp className="h-10 w-10 text-purple-500 mb-3" />
-                <p className="text-4xl font-bold text-purple-600 dark:text-purple-400">85%</p>
+              <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center text-center">
+                <TrendingUp className="h-8 w-8 sm:h-10 sm:w-10 text-purple-500 mb-2 sm:mb-3" />
+                <p className="text-3xl sm:text-4xl font-bold text-purple-600 dark:text-purple-400">85%</p>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Weekly Goal</p>
               </CardContent>
             </Card>
