@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -171,48 +172,43 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
       <h2 className="text-3xl sm:text-6xl font-black mb-3 sm:mb-6 text-green-800 tracking-tighter">{month}</h2>
       
       <div className="flex flex-col bg-green-50 rounded-xl p-3 sm:p-6 shadow-md overflow-hidden">
-        {/* Column headers - different styling for mobile vs desktop */}
-        <div className="flex mb-4 sm:mb-6">
+        {/* Table-like grid for header and items */}
+        <div className="grid grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))] sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))] gap-2 sm:gap-4 mb-4 sm:mb-6">
           {/* Empty space for day number column */}
-          <div className="w-[40px] sm:w-[60px] mr-2 sm:mr-4"></div>
-          
-          {/* Space for text description */}
-          <div className="flex-grow mr-3 sm:mr-4"></div>
-          
-          {/* Habit header labels - improved styling */}
-          <div className="flex gap-2 sm:gap-4">
-            {userHabits.map((habit, index) => (
-              <div 
-                key={`header-${index}`} 
-                className="w-[58px] sm:w-[85px] text-center flex items-center justify-center"
+          <div className="" />
+          {/* Empty space for text description */}
+          <div className="" />
+          {/* Header for each habit - placed right above each habit column */}
+          {userHabits.map((habit, index) => (
+            <div key={`header-${index}`} className="flex items-center justify-center">
+              <span
+                className="truncate max-w-[58px] sm:max-w-[100px] text-[11px] sm:text-base px-1 leading-tight font-bold text-green-800"
+                title={habit}
+                style={{ lineHeight: '1.25', whiteSpace: 'nowrap' }}
               >
-                {/* Mobile label */}
-                <span
-                  className="truncate max-w-[58px] sm:max-w-full text-[11px] px-1 leading-tight block font-bold text-green-800"
-                  title={habit}
-                  style={{ lineHeight: '1.15', whiteSpace: 'nowrap' }}
-                >
-                  {habit}
-                </span>
-              </div>
-            ))}
-          </div>
+                {habit}
+              </span>
+            </div>
+          ))}
         </div>
-        
-        {/* Activity rows with improved mobile layout */}
+
+        {/* Activity rows, items inside grid align under labels */}
         {activities.map((activity, activityIndex) => (
-          <div key={`activity-${activityIndex}`} className="flex items-center mb-6 sm:mb-8 last:mb-0">
+          <div
+            key={`activity-${activityIndex}`}
+            className="grid grid-cols-[40px_1fr_repeat(3,minmax(58px,85px))] sm:grid-cols-[60px_1fr_repeat(3,minmax(85px,120px))] gap-2 sm:gap-4 mb-6 sm:mb-8 last:mb-0 items-center"
+          >
             {/* Day number */}
-            <div className="flex items-center justify-center w-[30px] sm:w-[45px] mr-2 sm:mr-4">
+            <div className="flex items-center justify-center">
               <div className="text-center text-3xl sm:text-5xl font-black text-green-800">
                 {activity.day}
               </div>
             </div>
-            
-            {/* Activity description - responsive text size */}
-            <div className="flex-grow mr-3 sm:mr-4 flex items-center">
+
+            {/* Activity description */}
+            <div className="flex items-center">
               {activity.isEditing ? (
-                <Input 
+                <Input
                   value={activity.text}
                   onChange={(e) => {
                     const newActivities = [...activities];
@@ -221,7 +217,7 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
                   }}
                   onBlur={() => toggleEditMode(activityIndex)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       updateActivityText(activityIndex, activity.text);
                     }
                   }}
@@ -231,7 +227,7 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
               ) : (
                 <div className="flex items-center">
                   <p className="text-green-800 text-sm sm:text-lg font-semibold leading-tight">{activity.text}</p>
-                  <button 
+                  <button
                     onClick={() => toggleEditMode(activityIndex)}
                     className="ml-2 text-green-700 hover:text-green-900 transition-colors"
                   >
@@ -241,32 +237,30 @@ const RecentActivities = ({ month, habitList }: RecentActivitiesProps) => {
                 </div>
               )}
             </div>
-            
-            {/* Habit boxes - improved sizing and spacing */}
-            <div className="flex gap-2 sm:gap-4">
-              {activity.categories.map((category, categoryIndex) => (
-                <div 
-                  key={`${activityIndex}-${category}`} 
-                  className={`h-[45px] w-[45px] sm:h-[60px] sm:w-[65px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors ${
-                    activeHabit === category && activityIndex === 0 ? 'ring-2 ring-blue-500 ring-offset-2' : ''
-                  }`}
-                  onClick={() => toggleStatus(activityIndex, category)}
-                >
-                  {activity.statuses[category] === "completed" && (
-                    <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center animate-checkmark">
-                      <Check size={16} className="sm:hidden text-white" />
-                      <Check size={20} className="hidden sm:block text-white" />
-                    </div>
-                  )}
-                  {activity.statuses[category] === "failed" && (
-                    <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
-                      <X size={16} className="sm:hidden text-red-500" />
-                      <X size={20} className="hidden sm:block text-red-500" />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+
+            {/* Habit boxes - columns align under their header */}
+            {activity.categories.map((category, categoryIndex) => (
+              <div
+                key={`${activityIndex}-${category}`}
+                className={`h-[45px] w-[45px] sm:h-[60px] sm:w-[85px] border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors ${
+                  activeHabit === category && activityIndex === 0 ? "ring-2 ring-blue-500 ring-offset-2" : ""
+                }`}
+                onClick={() => toggleStatus(activityIndex, category)}
+              >
+                {activity.statuses[category] === "completed" && (
+                  <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center animate-checkmark">
+                    <Check size={16} className="sm:hidden text-white" />
+                    <Check size={20} className="hidden sm:block text-white" />
+                  </div>
+                )}
+                {activity.statuses[category] === "failed" && (
+                  <div className="w-4/5 h-4/5 rounded-sm border-2 border-red-500 flex items-center justify-center">
+                    <X size={16} className="sm:hidden text-red-500" />
+                    <X size={20} className="hidden sm:block text-red-500" />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         ))}
       </div>
