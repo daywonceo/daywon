@@ -1,10 +1,10 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Users, Trophy, Clock, Heart, MessageCircle, Star, Target } from "lucide-react";
+import ChallengePlaylist from "./ChallengePlaylist";
 
 interface Community {
   id: number;
@@ -256,6 +256,17 @@ const Groups = () => {
                           </Button>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Playlist Component for joined challenges */}
+                  {challenge.joined && (
+                    <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                      <ChallengePlaylist
+                        challengeId={challenge.id}
+                        challengeTitle={challenge.title}
+                        isUserInChallenge={challenge.joined}
+                      />
                     </div>
                   )}
                 </div>
