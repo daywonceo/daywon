@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,14 +5,14 @@ import { useHabits, Habit } from "@/hooks/useHabits";
 import { getHabitActivities, HabitActivity } from "@/utils/habitTracking";
 import { subDays, format } from 'date-fns';
 import HabitCard from "@/components/calendar/HabitCard";
-import { BookOpenText, Apple, Dumbbell, Wind, Footprints, Settings, Plus, BarChart } from 'lucide-react';
+import { BookOpenText, Apple, Dumbbell, Wind, Footprints, Settings, Plus, BarChart, LucideIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
 const TOTAL_GRAPH_DAYS = 180;
 type Color = 'green' | 'purple' | 'red' | 'orange' | 'blue';
 
-const habitDetails: { nameContains: string; color: Color; icon: React.ElementType }[] = [
+const habitDetails: { nameContains: string; color: Color; icon: LucideIcon }[] = [
   { nameContains: 'walk', color: 'green', icon: Footprints },
   { nameContains: 'read', color: 'purple', icon: BookOpenText },
   { nameContains: 'devotion', color: 'purple', icon: BookOpenText },
