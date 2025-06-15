@@ -54,16 +54,11 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col text-gray-200">
+    <div className="min-h-screen bg-white flex flex-col text-gray-900">
       <Header />
       
       <main className="flex-grow px-4 sm:px-6 pb-20 pt-4 sm:pt-6 max-w-3xl mx-auto w-full">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">
-              HabitKit
-            </h1>
-          </div>
+        <div className="flex justify-end items-center mb-6">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon"><Settings className="h-5 w-5" /></Button>
             <Button variant="ghost" size="icon"><BarChart className="h-5 w-5" /></Button>
@@ -74,9 +69,9 @@ const CalendarPage = () => {
         <div className="space-y-4">
           {isLoadingHabits && (
             <>
-              <Skeleton className="h-40 w-full bg-gray-800" />
-              <Skeleton className="h-40 w-full bg-gray-800" />
-              <Skeleton className="h-40 w-full bg-gray-800" />
+              <Skeleton className="h-40 w-full bg-gray-200" />
+              <Skeleton className="h-40 w-full bg-gray-200" />
+              <Skeleton className="h-40 w-full bg-gray-200" />
             </>
           )}
           {habits?.map(habit => {

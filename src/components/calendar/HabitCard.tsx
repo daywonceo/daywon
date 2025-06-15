@@ -30,16 +30,16 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
     };
 
     return (
-        <Card className="bg-gray-800/50 border-gray-700 text-white shadow-lg">
+        <Card className="bg-white border-gray-200 text-gray-900 shadow-lg">
             <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-3 p-4">
-                <div className="bg-gray-700/50 p-3 rounded-lg">
+                <div className="bg-gray-100 p-3 rounded-lg">
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="flex-1">
                     <CardTitle className="text-base sm:text-lg font-bold">{habit.name}</CardTitle>
-                    {habit.description && <CardDescription className="text-xs sm:text-sm text-gray-400 mt-1">{habit.description}</CardDescription>}
+                    {habit.description && <CardDescription className="text-xs sm:text-sm text-gray-500 mt-1">{habit.description}</CardDescription>}
                 </div>
-                <Button size="icon" variant="ghost" className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 ${isCompletedToday ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-700 hover:bg-gray-600'}`} onClick={handleToggleComplete}>
+                <Button size="icon" variant="ghost" className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 ${isCompletedToday ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`} onClick={handleToggleComplete}>
                     {isCompletedToday ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                 </Button>
             </CardHeader>

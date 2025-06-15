@@ -10,11 +10,11 @@ interface HabitActivityGraphProps {
 }
 
 const colorMap: Record<Color, { active: string; inactive: string }> = {
-  green: { active: 'bg-green-400', inactive: 'bg-green-900' },
-  purple: { active: 'bg-purple-400', inactive: 'bg-purple-900' },
-  red: { active: 'bg-red-400', inactive: 'bg-red-900' },
-  orange: { active: 'bg-orange-400', inactive: 'bg-orange-900' },
-  blue: { active: 'bg-sky-400', inactive: 'bg-sky-900' },
+  green: { active: 'bg-green-400', inactive: 'bg-green-100' },
+  purple: { active: 'bg-purple-400', inactive: 'bg-purple-100' },
+  red: { active: 'bg-red-400', inactive: 'bg-red-100' },
+  orange: { active: 'bg-orange-400', inactive: 'bg-orange-100' },
+  blue: { active: 'bg-sky-400', inactive: 'bg-sky-100' },
 };
 
 const TOTAL_DAYS = 180; // approx 6 months
