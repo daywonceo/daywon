@@ -1,5 +1,4 @@
 
-import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subMonths } from "date-fns";
