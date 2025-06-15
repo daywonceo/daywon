@@ -1,69 +1,28 @@
 
-import { useIsMobile } from "@/hooks/use-mobile";
-import DayCell from "./DayCell";
+import { Calendar } from "@/components/ui/calendar";
 
 interface CalendarViewProps {
-  daysOfWeek: string[];
-  compactDays: number[];
-  calendarDays: number[];
-  onDayClick: (day: number) => void;
+  date: Date | undefined;
+  setDate: (date: Date | undefined) => void;
 }
 
-const CalendarView = ({ 
-  daysOfWeek, 
-  compactDays, 
-  calendarDays, 
-  onDayClick 
-}: CalendarViewProps) => {
-  const isMobile = useIsMobile();
-  const today = new Date().getDate();
-
+const CalendarView = ({ date, setDate }: CalendarViewProps) => {
   return (
-    <div className="border border-green-200 dark:border-green-800 rounded-lg overflow-hidden">
-      {/* Calendar Header */}
-      <div className="flex bg-green-50 dark:bg-green-900">
-        {daysOfWeek.map((day) => (
-          <div key={day} className="flex-1 text-center py-1 sm:py-2 font-bold text-green-700 dark:text-green-300 text-xs sm:text-sm">
-            {day}
-          </div>
-        ))}
-      </div>
-      
-      {/* Calendar Grid - Compact View for Mobile */}
-      <div className="grid grid-cols-7">
-        {isMobile ? (
-          // Compact view
-          <>
-            {/* First row - empty cells */}
-            {Array.from({ length: new Date(2023, 2, compactDays[0]).getDay() }).map((_, i) => (
-              <div key={`empty-${i}`} className="aspect-square border-r border-b border-green-100 dark:border-green-800 last:border-r-0"></div>
-            ))}
-            
-            {/* Day cells */}
-            {compactDays.map((day) => (
-              <DayCell 
-                key={`day-${day}`} 
-                day={day} 
-                isToday={day === today}
-                isCompact={true}
-              />
-            ))}
-          </>
-        ) : (
-          // Full calendar view for desktop
-          Array.from({ length: 31 }).map((_, index) => {
-            const day = index + 1;
-            return (
-              <DayCell 
-                key={`day-${day}`} 
-                day={day} 
-                isToday={day === today}
-                onDayClick={onDayClick}
-              />
-            );
-          })
-        )}
-      </div>
+    <div className="flex justify-center">
+      <Calendar
+        mode="single"
+        selected={date}
+        onSelect={setDate}
+        className="rounded-md border border-green-200 dark:border-green-800 p-0"
+        classNames={{
+          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+          month: "space-y-4 w-full",
+          caption: "flex justify-center pt-2 relative items-center text-green-800 dark:text-green-200",
+          nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-green-800 dark:text-green-200",
+          day_selected: "bg-green-600 text-primary-foreground hover:bg-green-600/90 focus:bg-green-600",
+          day_today: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200",
+        }}
+      />
     </div>
   );
 };

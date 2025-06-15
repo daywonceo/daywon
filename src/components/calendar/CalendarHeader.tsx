@@ -1,6 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -36,30 +35,23 @@ const CalendarHeader = ({
           </TabsList>
         </Tabs>
         
-        <div className="flex justify-between sm:justify-start gap-2 order-2 sm:order-none">
-          <div className="flex items-center space-x-1">
-            <Button variant="outline" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 border-green-200 dark:border-green-800">
-              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 border-green-200 dark:border-green-800">
-              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex bg-green-50 dark:bg-green-900 rounded-md p-0.5 sm:p-1 text-xs">
-            <button 
-              className={`px-2 py-1 rounded-md ${currentView === 'calendar' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}
-              onClick={() => setCurrentView('calendar')}
-            >
-              Calendar
-            </button>
-            <button 
-              className={`px-2 py-1 rounded-md ${currentView === 'list' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}
-              onClick={() => setCurrentView('list')}
-            >
-              List
-            </button>
-          </div>
+        <div className="flex justify-center sm:justify-start gap-2 order-2 sm:order-none">
+          {activeTab === 'current' && (
+            <div className="flex bg-green-50 dark:bg-green-900 rounded-md p-0.5 sm:p-1 text-xs">
+              <button 
+                className={`px-2 py-1 rounded-md ${currentView === 'calendar' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}
+                onClick={() => setCurrentView('calendar')}
+              >
+                Calendar
+              </button>
+              <button 
+                className={`px-2 py-1 rounded-md ${currentView === 'list' ? 'bg-white dark:bg-gray-800 shadow-sm' : ''}`}
+                onClick={() => setCurrentView('list')}
+              >
+                List
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
