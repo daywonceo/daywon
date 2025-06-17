@@ -35,26 +35,26 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-12">
-        <TabsTrigger value="workouts" className="py-3 text-xs">
-          <Dumbbell className="w-4 h-4 mr-1" />
-          WORKOUTS
+      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-14 p-1">
+        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
+          <Dumbbell className="w-3 h-3 mb-1" />
+          <span className="leading-tight">WORKOUTS</span>
         </TabsTrigger>
-        <TabsTrigger value="nutrition" className="py-3 text-xs">
-          <Utensils className="w-4 h-4 mr-1" />
-          NUTRITION
+        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
+          <Utensils className="w-3 h-3 mb-1" />
+          <span className="leading-tight">NUTRITION</span>
         </TabsTrigger>
-        <TabsTrigger value="devotions" className="py-3 text-xs">
-          <Book className="w-4 h-4 mr-1" />
-          DEVOTIONS
+        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
+          <Book className="w-3 h-3 mb-1" />
+          <span className="leading-tight">DEVOTIONS</span>
         </TabsTrigger>
-        <TabsTrigger value="mindful" className="py-3 text-xs">
-          <Heart className="w-4 h-4 mr-1" />
-          MINDFUL
+        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
+          <Heart className="w-3 h-3 mb-1" />
+          <span className="leading-tight">MINDFUL</span>
         </TabsTrigger>
-        <TabsTrigger value="bored" className="py-3 text-xs">
-          <Zap className="w-4 h-4 mr-1" />
-          BORED
+        <TabsTrigger value="bored" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
+          <Zap className="w-3 h-3 mb-1" />
+          <span className="leading-tight">BORED</span>
         </TabsTrigger>
       </TabsList>
       
