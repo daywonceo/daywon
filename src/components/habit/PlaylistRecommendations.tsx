@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Music, ExternalLink, Volume2, VolumeX } from "lucide-react";
-import { getPlaylistsForHabit, getSpotifyAuthUrl, extractTokenFromUrl } from "@/services/spotifyService";
+import { getPlaylistsForHabit, getSpotifyAccessToken, isSpotifyConnected } from "@/services/spotifyService";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
 interface Playlist {
@@ -31,25 +31,11 @@ interface PlaylistRecommendationsProps {
 const PlaylistRecommendations = ({ habitName, isHabitActive }: PlaylistRecommendationsProps) => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [musicEnabled, setMusicEnabled] = useState(true);
+  const { signInWithSpotify } = useAuth();
 
-  useEffect(() => {
-    // Check for existing token in localStorage
-    const storedToken = localStorage.getItem('spotify_access_token');
-    if (storedToken) {
-      setAccessToken(storedToken);
-    }
-
-    // Check for token in URL (after OAuth redirect)
-    const tokenFromUrl = extractTokenFromUrl();
-    if (tokenFromUrl) {
-      setAccessToken(tokenFromUrl);
-      localStorage.setItem('spotify_access_token', tokenFromUrl);
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
+  const spotifyConnected = isSpotifyConnected();
+  const accessToken = getSpotifyAccessToken();
 
   useEffect(() => {
     if (isHabitActive && accessToken && musicEnabled) {
@@ -76,9 +62,16 @@ const PlaylistRecommendations = ({ habitName, isHabitActive }: PlaylistRecommend
     }
   };
 
-  const handleSpotifyConnect = () => {
-    const authUrl = getSpotifyAuthUrl();
-    window.location.href = authUrl;
+  const handleSpotifyConnect = async () => {
+    const { error } = await signInWithSpotify();
+    if (error) {
+      console.error("Spotify connection error:", error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to Spotify. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const toggleMusic = () => {
@@ -113,13 +106,19 @@ const PlaylistRecommendations = ({ habitName, isHabitActive }: PlaylistRecommend
       </CardHeader>
       
       <CardContent>
-        {!accessToken ? (
+        {!spotifyConnected ? (
           <div className="text-center py-8">
             <Music className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               Connect to Spotify to get personalized playlists for your habits
             </p>
-            <Button onClick={handleSpotifyConnect} className="bg-green-500 hover:bg-green-600">
+            <Button 
+              onClick={handleSpotifyConnect} 
+              className="bg-[#1DB954] hover:bg-[#1ed760] text-white border-[#1DB954] hover:border-[#1ed760]"
+            >
+              <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
               Connect Spotify
             </Button>
           </div>

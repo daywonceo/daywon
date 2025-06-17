@@ -57,19 +57,14 @@ export const getPlaylistsForHabit = async (habitName: string, accessToken: strin
   }
 };
 
-export const getSpotifyAuthUrl = () => {
-  const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-  const redirectUri = encodeURIComponent(window.location.origin + '/');
-  const scopes = encodeURIComponent('streaming user-read-email user-read-private');
-  
-  return `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&scope=${scopes}`;
+export const getSpotifyAccessToken = (): string | null => {
+  return localStorage.getItem('spotify_access_token');
 };
 
-export const extractTokenFromUrl = (): string | null => {
-  const hash = window.location.hash;
-  if (hash) {
-    const params = new URLSearchParams(hash.substring(1));
-    return params.get('access_token');
-  }
-  return null;
+export const isSpotifyConnected = (): boolean => {
+  const token = getSpotifyAccessToken();
+  return !!token;
 };
+
+// Remove the old OAuth URL generation and token extraction functions
+// as we're now using Supabase OAuth

@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Music, Plus, Play, ExternalLink } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { getSpotifyAuthUrl, extractTokenFromUrl } from "@/services/spotifyService";
+import { getSpotifyAccessToken, isSpotifyConnected } from "@/services/spotifyService";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Track {
   id: string;
@@ -41,21 +42,9 @@ const ChallengePlaylist = ({ challengeId, challengeTitle, isUserInChallenge, onV
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Track[]>([]);
 
-  const accessToken = localStorage.getItem('spotify_access_token');
-
-  useEffect(() => {
-    // Check for Spotify token in URL on component mount
-    const token = extractTokenFromUrl();
-    if (token) {
-      localStorage.setItem('spotify_access_token', token);
-      // Clean up the URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-      toast({
-        title: "Spotify Connected! 🎵",
-        description: "You can now access challenge playlists",
-      });
-    }
-  }, []);
+  const { signInWithSpotify } = useAuth();
+  const spotifyConnected = isSpotifyConnected();
+  const accessToken = getSpotifyAccessToken();
 
   useEffect(() => {
     if (accessToken) {
@@ -63,9 +52,21 @@ const ChallengePlaylist = ({ challengeId, challengeTitle, isUserInChallenge, onV
     }
   }, [challengeId, accessToken]);
 
-  const handleConnectSpotify = () => {
-    const authUrl = getSpotifyAuthUrl();
-    window.location.href = authUrl;
+  const handleConnectSpotify = async () => {
+    const { error } = await signInWithSpotify();
+    if (error) {
+      console.error("Spotify connection error:", error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to Spotify. Please try again.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Spotify Connected! 🎵",
+        description: "You can now access challenge playlists",
+      });
+    }
   };
 
   const loadPlaylist = async () => {
@@ -201,7 +202,7 @@ const ChallengePlaylist = ({ challengeId, challengeTitle, isUserInChallenge, onV
     }
   };
 
-  if (!accessToken) {
+  if (!spotifyConnected) {
     return (
       <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
         <CardContent className="p-4 text-center">

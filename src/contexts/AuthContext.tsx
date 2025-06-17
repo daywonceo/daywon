@@ -26,9 +26,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event, session);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Store Spotify access token if available
+        if (session?.provider_token && session?.provider_refresh_token) {
+          localStorage.setItem('spotify_access_token', session.provider_token);
+          localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
+          console.log('Spotify tokens stored from OAuth');
+        }
       }
     );
 
@@ -37,6 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Store Spotify tokens if available
+      if (session?.provider_token && session?.provider_refresh_token) {
+        localStorage.setItem('spotify_access_token', session.provider_token);
+        localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -78,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       provider: 'spotify',
       options: {
         redirectTo: `${window.location.origin}/`,
-        scopes: 'user-read-email user-read-private'
+        scopes: 'user-read-email user-read-private streaming playlist-modify-public playlist-modify-private'
       }
     });
     return { error };
@@ -92,6 +106,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    // Clear Spotify tokens on logout
+    localStorage.removeItem('spotify_access_token');
+    localStorage.removeItem('spotify_refresh_token');
     await supabase.auth.signOut();
   };
 
