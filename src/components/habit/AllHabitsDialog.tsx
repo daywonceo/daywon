@@ -4,12 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { useHabits, Habit } from "@/hooks/useHabits";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Archive, Edit, Trash2, MoreVertical, ArchiveRestore, RefreshCw } from "lucide-react";
+import { Plus, Archive, Edit, Trash2, MoreVertical, ArchiveRestore, RefreshCw, History } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "./HabitFormDialog";
 import HabitAddSheet from "./HabitAddSheet";
+import AllTimeHabitsModal from "./AllTimeHabitsModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,7 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
   const { habits, isLoading, updateHabit, deleteHabit, refreshHabits, addHabit } = useHabits();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
+  const [showAllTimeHabits, setShowAllTimeHabits] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Refresh habits when dialog opens
@@ -151,15 +153,25 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
           </DialogHeader>
           <div className="flex-grow overflow-y-auto pr-2 -mr-4 space-y-6">
             <div className="flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900 z-10 py-2">
-                <Button
-                  variant="outline"
-                  onClick={handleRefresh}
-                  disabled={isRefreshing}
-                  className="flex items-center gap-2"
-                >
-                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    className="flex items-center gap-2"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAllTimeHabits(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <History className="h-4 w-4" />
+                    All-Time Habits
+                  </Button>
+                </div>
                 <HabitAddSheet
                   trigger={
                     <Button className="flex items-center gap-2">
@@ -205,6 +217,10 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
         open={showHabitForm}
         onOpenChange={setShowHabitForm}
         habitToEdit={habitToEdit}
+      />
+      <AllTimeHabitsModal
+        open={showAllTimeHabits}
+        onOpenChange={setShowAllTimeHabits}
       />
     </>
   );
