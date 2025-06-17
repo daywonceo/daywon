@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { RefreshCw, BookOpen } from "lucide-react";
+import { RefreshCw, BookOpen, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import JournalingPrompt from "./JournalingPrompt";
+import SavedReflections from "./SavedReflections";
 
 interface Quote {
   q: string;
@@ -27,6 +28,7 @@ const MindfulReflectionTab = () => {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(false);
   const [showJournal, setShowJournal] = useState(false);
+  const [showSavedReflections, setShowSavedReflections] = useState(false);
   const { toast } = useToast();
 
   const getRandomFallbackQuote = () => {
@@ -67,6 +69,14 @@ const MindfulReflectionTab = () => {
   useEffect(() => {
     fetchQuote();
   }, []);
+
+  if (showSavedReflections) {
+    return (
+      <SavedReflections 
+        onClose={() => setShowSavedReflections(false)}
+      />
+    );
+  }
 
   if (showJournal) {
     return (
@@ -132,6 +142,17 @@ const MindfulReflectionTab = () => {
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Get Another
+        </Button>
+      </div>
+
+      <div className="flex justify-center px-4 pt-2">
+        <Button
+          onClick={() => setShowSavedReflections(true)}
+          variant="outline"
+          className="border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900 flex items-center gap-2 text-sm w-full max-w-sm"
+        >
+          <FileText className="w-4 h-4" />
+          Saved Reflections
         </Button>
       </div>
     </div>

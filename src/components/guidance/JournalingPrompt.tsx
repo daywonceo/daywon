@@ -17,16 +17,26 @@ const JournalingPrompt = ({ quote, onClose }: JournalingPromptProps) => {
 
   const handleSave = () => {
     if (reflection.trim()) {
-      localStorage.setItem(`reflection_${Date.now()}`, JSON.stringify({
-        quote: quote?.q,
-        author: quote?.a,
+      const savedReflection = {
+        id: Date.now().toString(),
+        quote: quote?.q || "",
+        author: quote?.a || "",
         reflection: reflection.trim(),
         date: new Date().toISOString()
-      }));
+      };
+
+      // Get existing reflections from localStorage
+      const existingReflections = JSON.parse(localStorage.getItem('savedReflections') || '[]');
+      
+      // Add new reflection to the beginning of the array (most recent first)
+      const updatedReflections = [savedReflection, ...existingReflections];
+      
+      // Save back to localStorage
+      localStorage.setItem('savedReflections', JSON.stringify(updatedReflections));
       
       toast({
         title: "Reflection saved",
-        description: "Your thoughts have been saved locally.",
+        description: "Your thoughts have been saved to your reflection log.",
       });
       
       setReflection("");
