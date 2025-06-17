@@ -34,7 +34,7 @@ const setupReducedMotion = () => {
   }
 };
 
-const AppContent = () => {
+const AppContent: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const { user, loading } = useAuth();
 
@@ -103,7 +103,7 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
