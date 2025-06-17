@@ -37,7 +37,7 @@ const HabitItem: React.FC<HabitItemProps> = ({
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 z-50">
           <DropdownMenuItem onClick={() => onEdit(habit)}>
             <Edit className="mr-2 h-4 w-4" />
             <span>Edit</span>

@@ -36,7 +36,6 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
       await refreshHabits();
     } catch (error) {
       console.error('Error refreshing habits:', error);
-      toast({ title: "Error refreshing habits", variant: "destructive" });
     } finally {
       setIsRefreshing(false);
     }
