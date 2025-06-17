@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,6 +28,15 @@ export interface OnboardingData {
     customized: boolean;
   };
   intent: string;
+  selectedTrack?: {
+    id: string;
+    name: string;
+    emoji: string;
+    duration: number;
+    durationUnit: 'days' | 'weeks';
+    habits: string[];
+    description?: string;
+  };
 }
 
 interface OnboardingFlowProps {
@@ -41,7 +49,8 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     focusAreas: [],
     selectedHabits: [],
     notifications: { enabled: false, customized: false },
-    intent: ""
+    intent: "",
+    selectedTrack: undefined
   });
 
   const totalSteps = 9; // Updated from 8 to 9 to include sign up
