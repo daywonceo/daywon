@@ -7,7 +7,8 @@ import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
 import { shouldShowRecoveryDialog, hasRecentRecovery } from "@/utils/streakRecovery";
 import StreakRecoveryDialog from "./StreakRecoveryDialog";
-import PhotoUploadButton from "./PhotoUploadButton";
+import PhotoUploadPrompt from "./PhotoUploadPrompt";
+import ClickableDate from "./ClickableDate";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -42,6 +43,14 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     streakCount: 0
   });
 
+  const [photoPrompt, setPhotoPrompt] = useState<{
+    isOpen: boolean;
+    habitName: string;
+  }>({
+    isOpen: false,
+    habitName: ""
+  });
+
   // Calculate the date for this activity row
   const getDateForActivity = (dayIndex: number) => {
     const today = new Date();
@@ -70,6 +79,17 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     }
     
     toggleStatus(dayIndex, category);
+
+    // Show photo prompt for newly completed habits (today only)
+    if (currentStatus === "empty" && dayIndex === 0) {
+      const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
+      if (!hidePrompt) {
+        setPhotoPrompt({
+          isOpen: true,
+          habitName: category
+        });
+      }
+    }
   };
 
   const handleRecoveryComplete = () => {
@@ -89,11 +109,14 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
 
   return (
     <>
-      {/* Day number */}
+      {/* Day number - now clickable for photo upload */}
       <div className="flex items-center justify-center">
-        <div className="text-center text-3xl sm:text-4xl font-bold text-green-800">
-          {activity.day}
-        </div>
+        <ClickableDate
+          day={activity.day}
+          date={activityDate}
+          habitName={activity.categories[0]} // Use first habit for simplicity
+          onPhotoUpdate={() => {}} // Could trigger refresh if needed
+        />
       </div>
       
       {/* Activity description */}
@@ -129,21 +152,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
                 <Edit size={14} className="hidden sm:block" />
               </button>
             </div>
-            
-            {/* Show photo upload button for completed habits on today */}
-            {activityIndex === 0 && (
-              <div className="flex gap-2 flex-wrap justify-center">
-                {activity.categories.map(category => 
-                  activity.statuses[category] === "completed" && (
-                    <PhotoUploadButton
-                      key={category}
-                      habitName={category}
-                      activityDate={activityDate}
-                    />
-                  )
-                )}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -200,6 +208,14 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           </div>
         );
       })}
+
+      {/* Photo Upload Prompt */}
+      <PhotoUploadPrompt
+        isOpen={photoPrompt.isOpen}
+        onClose={() => setPhotoPrompt({ isOpen: false, habitName: "" })}
+        habitName={photoPrompt.habitName}
+        activityDate={activityDate}
+      />
 
       {/* Streak Recovery Dialog */}
       <StreakRecoveryDialog

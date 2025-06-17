@@ -145,15 +145,25 @@ const Index = () => {
           <HabitGallery open={showGallery} onOpenChange={setShowGallery} />
 
           <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowGallery(true)}>
-                <Camera className="mr-2 h-4 w-4" />
-                Gallery
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
+            <div className="flex gap-1 sm:gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowGallery(true)}
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+              >
+                <Camera className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Gallery</span>
               </Button>
-              <Button variant="outline" onClick={() => setShowAllHabits(true)}>
-                <BookOpen className="mr-2 h-4 w-4" />
-                All Habits
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAllHabits(true)}
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+              >
+                <BookOpen className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">All Habits</span>
               </Button>
             </div>
           </div>
