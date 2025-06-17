@@ -8,7 +8,7 @@ import { ExternalLink, Heart, Trash2, Clock, Users } from "lucide-react";
 import { useSavedRecipes } from "@/hooks/useSavedRecipes";
 
 const SavedRecipesTab = () => {
-  const { savedRecipes, removeSavedRecipe, isLoading } = useSavedRecipes();
+  const { savedRecipes, deleteRecipe, isLoading } = useSavedRecipes();
 
   if (isLoading) {
     return (
@@ -55,12 +55,12 @@ const SavedRecipesTab = () => {
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg text-green-800 dark:text-green-400 pr-4">
-                {recipe.title}
+                {recipe.recipe_title}
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => removeSavedRecipe(recipe.id)}
+                onClick={() => deleteRecipe(recipe.id)}
                 className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
               >
                 <Trash2 className="w-4 h-4" />
@@ -68,57 +68,57 @@ const SavedRecipesTab = () => {
             </div>
             
             <div className="flex flex-wrap gap-2 mt-2">
-              {recipe.category && (
+              {recipe.recipe_category && (
                 <Badge variant="secondary" className="text-xs">
-                  {recipe.category}
+                  {recipe.recipe_category}
                 </Badge>
               )}
-              {recipe.readyInMinutes && (
+              {recipe.recipe_ready_in_minutes && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {recipe.readyInMinutes} min
+                  {recipe.recipe_ready_in_minutes} min
                 </Badge>
               )}
-              {recipe.servings && (
+              {recipe.recipe_servings && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  {recipe.servings} servings
+                  {recipe.recipe_servings} servings
                 </Badge>
               )}
             </div>
           </CardHeader>
           
           <CardContent className="space-y-4">
-            {recipe.nutrition && (
+            {recipe.recipe_nutrition && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                {recipe.nutrition.calories && (
+                {recipe.recipe_nutrition.calories && (
                   <div className="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="font-semibold text-orange-600 dark:text-orange-400">
-                      {Math.round(recipe.nutrition.calories)}
+                      {Math.round(recipe.recipe_nutrition.calories)}
                     </div>
                     <div className="text-gray-600 dark:text-gray-400">calories</div>
                   </div>
                 )}
-                {recipe.nutrition.protein && (
+                {recipe.recipe_nutrition.protein && (
                   <div className="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="font-semibold text-red-600 dark:text-red-400">
-                      {Math.round(recipe.nutrition.protein)}g
+                      {Math.round(recipe.recipe_nutrition.protein)}g
                     </div>
                     <div className="text-gray-600 dark:text-gray-400">protein</div>
                   </div>
                 )}
-                {recipe.nutrition.carbs && (
+                {recipe.recipe_nutrition.carbs && (
                   <div className="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="font-semibold text-blue-600 dark:text-blue-400">
-                      {Math.round(recipe.nutrition.carbs)}g
+                      {Math.round(recipe.recipe_nutrition.carbs)}g
                     </div>
                     <div className="text-gray-600 dark:text-gray-400">carbs</div>
                   </div>
                 )}
-                {recipe.nutrition.fat && (
+                {recipe.recipe_nutrition.fat && (
                   <div className="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="font-semibold text-yellow-600 dark:text-yellow-400">
-                      {Math.round(recipe.nutrition.fat)}g
+                      {Math.round(recipe.recipe_nutrition.fat)}g
                     </div>
                     <div className="text-gray-600 dark:text-gray-400">fat</div>
                   </div>
@@ -126,30 +126,30 @@ const SavedRecipesTab = () => {
               </div>
             )}
 
-            {recipe.ingredients && recipe.ingredients.length > 0 && (
+            {recipe.recipe_ingredients && recipe.recipe_ingredients.length > 0 && (
               <div>
                 <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">
                   Ingredients:
                 </h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                  {recipe.ingredients.slice(0, 5).map((ingredient, index) => (
+                  {recipe.recipe_ingredients.slice(0, 5).map((ingredient, index) => (
                     <li key={index}>{ingredient}</li>
                   ))}
-                  {recipe.ingredients.length > 5 && (
+                  {recipe.recipe_ingredients.length > 5 && (
                     <li className="text-gray-500 italic">
-                      +{recipe.ingredients.length - 5} more ingredients...
+                      +{recipe.recipe_ingredients.length - 5} more ingredients...
                     </li>
                   )}
                 </ul>
               </div>
             )}
 
-            {recipe.instructions_url && (
+            {recipe.recipe_instructions_url && (
               <Button
                 variant="outline"
                 size="sm"
                 className="w-full"
-                onClick={() => window.open(recipe.instructions_url, '_blank')}
+                onClick={() => window.open(recipe.recipe_instructions_url, '_blank')}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 View Full Recipe
