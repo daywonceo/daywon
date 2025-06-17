@@ -10,7 +10,6 @@ import NutritionRecipeResults from "./NutritionRecipeResults";
 import { nutritionCategories } from "./nutritionData";
 
 interface NutritionTabContentProps {
-  searchQuery: string;
   onShowSavedRecipes: () => void;
 }
 
@@ -39,7 +38,7 @@ interface RecipeWithNutrition {
   };
 }
 
-const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabContentProps) => {
+const NutritionTabContent = ({ onShowSavedRecipes }: NutritionTabContentProps) => {
   const [selectedNutritionCategory, setSelectedNutritionCategory] = useState<NutritionCategory | null>(null);
   const [nutritionRecipes, setNutritionRecipes] = useState<RecipeWithNutrition[]>([]);
   const [isLoadingNutrition, setIsLoadingNutrition] = useState(false);
@@ -49,8 +48,7 @@ const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabCo
     supabaseRecipes, 
     localRecipes, 
     isLoading, 
-    error, 
-    filterRecipesBySearch 
+    error
   } = useRecipeData();
 
   const fetchRecipesByCategory = async (category: NutritionCategory) => {
@@ -91,9 +89,6 @@ const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabCo
     setNutritionRecipes([]);
     setNutritionError(null);
   };
-
-  // Filter all Supabase recipes by search query (don't filter by nutrition data)
-  const filteredSupabaseRecipes = filterRecipesBySearch(supabaseRecipes, searchQuery);
 
   // If a nutrition category is selected, show those results
   if (selectedNutritionCategory) {
@@ -156,19 +151,12 @@ const NutritionTabContent = ({ searchQuery, onShowSavedRecipes }: NutritionTabCo
           All Recipes
         </h3>
 
-        {searchQuery && (
-          <div className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm">
-            <p>Searching for: "{searchQuery}"</p>
-            <p>Found {filteredSupabaseRecipes.length} recipes</p>
-          </div>
-        )}
-
         <RecipeList
-          supabaseRecipes={filteredSupabaseRecipes}
+          supabaseRecipes={supabaseRecipes}
           localRecipes={[]}
           isLoading={isLoading}
           error={error}
-          searchQuery={searchQuery}
+          searchQuery=""
         />
       </div>
     </div>

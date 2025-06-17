@@ -13,11 +13,7 @@ import NutritionRecipeResults from "./NutritionRecipeResults";
 import SavedRecipesTab from "./SavedRecipesTab";
 import NutritionTabContent from "./NutritionTabContent";
 
-interface NutritionTabProps {
-  searchQuery: string;
-}
-
-const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
+const NutritionTab = () => {
   const [showSavedRecipes, setShowSavedRecipes] = useState(false);
 
   const handleBackToNutrition = () => {
@@ -45,14 +41,13 @@ const NutritionTab = ({ searchQuery }: NutritionTabProps) => {
           </Button>
         </div>
 
-        <SavedRecipesTab searchQuery={searchQuery} />
+        <SavedRecipesTab />
       </div>
     );
   }
 
   return (
     <NutritionTabContent 
-      searchQuery={searchQuery}
       onShowSavedRecipes={() => setShowSavedRecipes(true)}
     />
   );

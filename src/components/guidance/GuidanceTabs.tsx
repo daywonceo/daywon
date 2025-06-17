@@ -67,7 +67,7 @@ const GuidanceTabs = ({
       </TabsContent>
       
       <TabsContent value="nutrition">
-        <NutritionTab searchQuery={searchQuery} />
+        <NutritionTab />
       </TabsContent>
       
       <TabsContent value="devotions">
@@ -75,7 +75,6 @@ const GuidanceTabs = ({
           selectedTranslation={selectedTranslation}
           selectedCategory={selectedCategory}
           translationDialogOpen={translationDialogOpen}
-          searchQuery={searchQuery}
           onTranslationChange={onTranslationChange}
           onCategoryChange={onCategoryChange}
           onTranslationClick={onTranslationClick}
@@ -88,7 +87,7 @@ const GuidanceTabs = ({
       </TabsContent>
       
       <TabsContent value="bored">
-        <BoredTab searchQuery={searchQuery} />
+        <BoredTab />
       </TabsContent>
     </Tabs>
   );
