@@ -98,6 +98,7 @@ const CalendarPage = () => {
                 date={selectedDate}
                 setDate={setSelectedDate}
                 onDateClick={handleDateClick}
+                timePeriod={timePeriod}
               />
               
               <div className="space-y-4">
