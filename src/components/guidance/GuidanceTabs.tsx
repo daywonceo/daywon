@@ -1,11 +1,12 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dumbbell, Utensils, Book, Zap } from "lucide-react";
+import { Dumbbell, Utensils, Book, Zap, Heart } from "lucide-react";
 import WorkoutsTab from "./WorkoutsTab";
 import NutritionTab from "./NutritionTab";
 import DevotionsTab from "./DevotionsTab";
 import BoredTab from "./BoredTab";
+import MindfulReflectionTab from "./MindfulReflectionTab";
 
 interface GuidanceTabsProps {
   searchQuery: string;
@@ -34,7 +35,7 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 mb-10 shadow-sm h-12">
+      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-12">
         <TabsTrigger value="workouts" className="py-3 text-xs">
           <Dumbbell className="w-4 h-4 mr-1" />
           WORKOUTS
@@ -47,9 +48,13 @@ const GuidanceTabs = ({
           <Book className="w-4 h-4 mr-1" />
           DEVOTIONS
         </TabsTrigger>
+        <TabsTrigger value="mindful" className="py-3 text-xs">
+          <Heart className="w-4 h-4 mr-1" />
+          MINDFUL
+        </TabsTrigger>
         <TabsTrigger value="bored" className="py-3 text-xs">
           <Zap className="w-4 h-4 mr-1" />
-          I'M BORED
+          BORED
         </TabsTrigger>
       </TabsList>
       
@@ -76,6 +81,10 @@ const GuidanceTabs = ({
           onTranslationClick={onTranslationClick}
           onTranslationDialogOpenChange={onTranslationDialogOpenChange}
         />
+      </TabsContent>
+      
+      <TabsContent value="mindful">
+        <MindfulReflectionTab />
       </TabsContent>
       
       <TabsContent value="bored">
