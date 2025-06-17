@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { useHabits, Habit } from "@/hooks/useHabits";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Archive, Edit, Trash2, MoreVertical, ArchiveRestore } from "lucide-react";
+import { Plus, Archive, Edit, Trash2, MoreVertical, ArchiveRestore, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,16 +23,30 @@ type AllHabitsDialogProps = {
 };
 
 const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange }) => {
-  const { habits, isLoading, updateHabit, deleteHabit, ensureTrackedHabitsVisible } = useHabits();
+  const { habits, isLoading, updateHabit, deleteHabit, refreshHabits } = useHabits();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Ensure tracked habits are visible when dialog opens
+  // Refresh habits when dialog opens
   useEffect(() => {
-    if (open && ensureTrackedHabitsVisible) {
-      ensureTrackedHabitsVisible();
+    if (open) {
+      handleRefresh();
     }
-  }, [open, ensureTrackedHabitsVisible]);
+  }, [open]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshHabits();
+      toast({ title: "Habits refreshed!" });
+    } catch (error) {
+      console.error('Error refreshing habits:', error);
+      toast({ title: "Error refreshing habits", variant: "destructive" });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const { activeHabits, archivedHabits } = useMemo(() => {
     const active = habits?.filter(h => h.status === 'active') ?? [];
@@ -112,7 +126,16 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
             <DialogDescription>View, create, and organize all of your habits. Habits you track will automatically appear here as active.</DialogDescription>
           </DialogHeader>
           <div className="flex-grow overflow-y-auto pr-2 -mr-4 space-y-6">
-            <div className="flex justify-end sticky top-0 bg-white dark:bg-gray-900 z-10 py-2">
+            <div className="flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900 z-10 py-2">
+                <Button
+                  variant="outline"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
                 <Button onClick={openAddForm}>
                     <Plus className="mr-2 h-4 w-4" /> Add New Habit
                 </Button>

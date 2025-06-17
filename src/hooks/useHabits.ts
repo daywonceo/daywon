@@ -55,8 +55,10 @@ async function deleteHabit(habitId: string) {
 // Ensure all tracked habits are visible in the database
 async function ensureTrackedHabitsVisible(userId: string) {
   try {
+    console.log('Ensuring tracked habits are visible for user:', userId);
     const activities = getHabitActivities();
     const trackedHabits = [...new Set(activities.map(a => a.habitName))];
+    console.log('Found tracked habits in local storage:', trackedHabits);
     
     // Get existing habits from database
     const { data: existingHabits } = await supabase
@@ -64,12 +66,15 @@ async function ensureTrackedHabitsVisible(userId: string) {
       .select('name, status')
       .eq('user_id', userId);
     
+    console.log('Existing habits in database:', existingHabits);
     const existingHabitNames = existingHabits?.map(h => h.name) || [];
     
     // Find habits that need to be created
     const habitsToCreate = trackedHabits.filter(habitName => 
       !existingHabitNames.includes(habitName)
     );
+    
+    console.log('Habits to create:', habitsToCreate);
     
     // Create missing habits
     if (habitsToCreate.length > 0) {
@@ -80,8 +85,12 @@ async function ensureTrackedHabitsVisible(userId: string) {
         category: getHabitCategory(habitName)
       }));
       
-      await supabase.from('habits').insert(newHabits);
-      console.log(`Created missing habits: ${habitsToCreate.join(', ')}`);
+      const { error } = await supabase.from('habits').insert(newHabits);
+      if (error) {
+        console.error('Error creating habits:', error);
+      } else {
+        console.log(`Created missing habits: ${habitsToCreate.join(', ')}`);
+      }
     }
     
     // Auto-activate habits that have been completed recently
@@ -89,14 +98,20 @@ async function ensureTrackedHabitsVisible(userId: string) {
       ?.filter(h => h.status === 'archived' && isHabitRecentlyActive(h.name))
       .map(h => h.name) || [];
     
+    console.log('Habits to reactivate:', habitsToReactivate);
+    
     if (habitsToReactivate.length > 0) {
-      await supabase
+      const { error } = await supabase
         .from('habits')
         .update({ status: 'active' })
         .eq('user_id', userId)
         .in('name', habitsToReactivate);
       
-      console.log(`Reactivated recently completed habits: ${habitsToReactivate.join(', ')}`);
+      if (error) {
+        console.error('Error reactivating habits:', error);
+      } else {
+        console.log(`Reactivated recently completed habits: ${habitsToReactivate.join(', ')}`);
+      }
     }
   } catch (error) {
     console.error('Failed to ensure tracked habits are visible:', error);
@@ -125,9 +140,13 @@ export function useHabits() {
   const { data: habits, isLoading, isError } = useQuery({
     queryKey,
     queryFn: async () => {
-      const data = await fetchHabits(user!.id);
-      // Ensure all tracked habits are visible
-      await ensureTrackedHabitsVisible(user!.id);
+      if (!user?.id) return [];
+      
+      // First ensure tracked habits are visible
+      await ensureTrackedHabitsVisible(user.id);
+      
+      // Then fetch all habits
+      const data = await fetchHabits(user.id);
       return data;
     },
     enabled: !!user,
@@ -154,6 +173,13 @@ export function useHabits() {
     },
   });
 
+  const refreshHabits = async () => {
+    if (user?.id) {
+      await ensureTrackedHabitsVisible(user.id);
+      queryClient.invalidateQueries({ queryKey });
+    }
+  };
+
   return {
     habits,
     isLoading,
@@ -162,5 +188,6 @@ export function useHabits() {
     updateHabit: updateMutation.mutateAsync,
     deleteHabit: deleteMutation.mutateAsync,
     ensureTrackedHabitsVisible: () => user && ensureTrackedHabitsVisible(user.id),
+    refreshHabits,
   };
 }
