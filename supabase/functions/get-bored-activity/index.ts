@@ -79,6 +79,42 @@ const fallbackActivities = [
     link: "",
     key: "fallback_8",
     accessibility: 0.1
+  },
+  {
+    activity: "Do some stretching exercises",
+    type: "recreational",
+    participants: 1,
+    price: 0,
+    link: "",
+    key: "fallback_9",
+    accessibility: 0.2
+  },
+  {
+    activity: "Write in a journal",
+    type: "relaxation",
+    participants: 1,
+    price: 0,
+    link: "",
+    key: "fallback_10",
+    accessibility: 0.1
+  },
+  {
+    activity: "Learn origami",
+    type: "diy",
+    participants: 1,
+    price: 0.1,
+    link: "",
+    key: "fallback_11",
+    accessibility: 0.3
+  },
+  {
+    activity: "Volunteer at a local organization",
+    type: "charity",
+    participants: 1,
+    price: 0,
+    link: "",
+    key: "fallback_12",
+    accessibility: 0.4
   }
 ];
 
@@ -104,8 +140,8 @@ serve(async (req) => {
   }
 
   try {
-    const { searchParams } = new URL(req.url)
-    const type = searchParams.get('type')
+    const body = await req.json();
+    const type = body?.type;
     
     // Build the BoredAPI URL
     let apiUrl = 'https://www.boredapi.com/api/activity'

@@ -76,6 +76,13 @@ const BoredTab = ({ searchQuery }: BoredTabProps) => {
     fetchActivity();
   }, []);
 
+  // Fetch new activity when type changes
+  useEffect(() => {
+    if (selectedType) {
+      fetchActivity();
+    }
+  }, [selectedType]);
+
   const handleTryThis = () => {
     if (activity) {
       // Log activity to localStorage for now (could be enhanced to use actual habit tracking)
