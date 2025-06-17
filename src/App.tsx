@@ -96,6 +96,7 @@ const AppContent = () => {
       <Route path="/onboarding" element={<GoOnboarding />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/saved-quotes" element={<SavedQuotes />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

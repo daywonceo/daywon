@@ -136,27 +136,23 @@ const DailyEncouragementCard: React.FC = () => {
       onClick={handleCardClick}
     >
       <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-purple-500" />
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Daily Encouragement
-            </h3>
-          </div>
-          
+        <div className="flex items-center gap-2 mb-3">
           <button
             onClick={handleSaveQuote}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             aria-label={isSaved ? "Remove from saved quotes" : "Save quote"}
           >
             <Heart 
-              className={`h-6 w-6 transition-colors ${
+              className={`h-5 w-5 transition-colors ${
                 isSaved 
                   ? 'fill-red-500 text-red-500' 
-                  : 'text-gray-400 hover:text-red-500'
+                  : 'text-purple-500 hover:text-red-500'
               }`}
             />
           </button>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Daily Encouragement
+          </h3>
         </div>
         
         {quote && (
