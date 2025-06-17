@@ -10,11 +10,12 @@ import ActiveWorkoutView from "./ActiveWorkoutView";
 import WorkoutProgress from "./WorkoutProgress";
 import WeekViewCalendar from "./WeekViewCalendar";
 import PlannedWorkoutForm from "./PlannedWorkoutForm";
+import ManualWorkoutCreator from "./ManualWorkoutCreator";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'week-view' | 'schedule-workout'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'week-view' | 'schedule-workout' | 'manual-workout'>('overview');
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -27,8 +28,16 @@ const NewWorkoutsTab = () => {
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
   const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
 
-  // Find active workout session (not completed and from today)
-  const activeWorkoutSession = sessions.find(session => {
+  // Filter sessions to only include today or earlier dates, and ensure future workouts aren't marked as in progress
+  const filteredSessions = sessions.filter(session => {
+    const sessionDate = new Date(session.workout_date);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+    return sessionDate <= today;
+  });
+
+  // Find active workout session (not completed and from today only)
+  const activeWorkoutSession = filteredSessions.find(session => {
     const sessionDate = new Date(session.workout_date);
     const today = new Date();
     const isToday = sessionDate.toDateString() === today.toDateString();
@@ -72,6 +81,10 @@ const NewWorkoutsTab = () => {
 
   if (currentView === 'progress') {
     return <WorkoutProgress onBack={() => setCurrentView('overview')} />;
+  }
+
+  if (currentView === 'manual-workout') {
+    return <ManualWorkoutCreator onBack={() => setCurrentView('overview')} />;
   }
 
   if (currentView === 'week-view') {
@@ -123,8 +136,8 @@ const NewWorkoutsTab = () => {
   }
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
-  const recentSessions = sessions.slice(0, 3);
-  const completedThisWeek = sessions.filter(session => {
+  const recentSessions = filteredSessions.slice(0, 3);
+  const completedThisWeek = filteredSessions.filter(session => {
     const sessionDate = new Date(session.workout_date);
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
@@ -185,13 +198,23 @@ const NewWorkoutsTab = () => {
             <p className="text-green-600 dark:text-green-300 mb-4">
               Create your first workout plan to start tracking your progress and achieving your fitness goals.
             </p>
-            <Button 
-              onClick={() => setCurrentView('plan-selector')}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Plan
-            </Button>
+            <div className="flex gap-2 justify-center">
+              <Button 
+                onClick={() => setCurrentView('plan-selector')}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Plan
+              </Button>
+              <Button 
+                onClick={() => setCurrentView('manual-workout')}
+                variant="outline"
+                className="border-green-600 text-green-600 hover:bg-green-50"
+              >
+                <Dumbbell className="w-4 h-4 mr-2" />
+                Start Manual Workout
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -212,7 +235,7 @@ const NewWorkoutsTab = () => {
           <CardContent className="p-4 text-center">
             <Clock className="w-6 h-6 mx-auto mb-2 text-blue-600" />
             <div className="text-2xl font-bold text-blue-800 dark:text-blue-400">
-              {Math.round(sessions.filter(s => s.duration_minutes).reduce((acc, s) => acc + (s.duration_minutes || 0), 0) / sessions.length) || 0}
+              {Math.round(filteredSessions.filter(s => s.duration_minutes).reduce((acc, s) => acc + (s.duration_minutes || 0), 0) / filteredSessions.length) || 0}
             </div>
             <div className="text-xs text-blue-600 dark:text-blue-400">Avg Minutes</div>
           </CardContent>
@@ -222,7 +245,7 @@ const NewWorkoutsTab = () => {
           <CardContent className="p-4 text-center">
             <TrendingUp className="w-6 h-6 mx-auto mb-2 text-purple-600" />
             <div className="text-2xl font-bold text-purple-800 dark:text-purple-400">
-              {sessions.filter(s => s.is_completed).length}
+              {filteredSessions.filter(s => s.is_completed).length}
             </div>
             <div className="text-xs text-purple-600 dark:text-purple-400">Total Workouts</div>
           </CardContent>
@@ -340,6 +363,9 @@ const NewWorkoutsTab = () => {
                 <div>
                   <div className="font-medium text-gray-800 dark:text-gray-200">
                     {session.workout_type.replace(/_/g, ' ').toUpperCase()}
+                    {!session.workout_plan_id && (
+                      <Badge variant="outline" className="ml-2 text-xs">Manual</Badge>
+                    )}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     {new Date(session.workout_date).toLocaleDateString()}
@@ -372,6 +398,17 @@ const NewWorkoutsTab = () => {
           <span className="text-xs">{workoutPlans.length > 0 ? 'Manage Plans' : 'Create Plan'}</span>
         </Button>
         
+        <Button 
+          variant="outline" 
+          onClick={() => setCurrentView('manual-workout')}
+          className="h-16 flex flex-col items-center gap-1"
+        >
+          <Dumbbell className="w-5 h-5" />
+          <span className="text-xs">Manual Workout</span>
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <Button 
           variant="outline" 
           onClick={() => setCurrentView('week-view')}

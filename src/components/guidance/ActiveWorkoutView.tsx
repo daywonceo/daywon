@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
 
-  // Check for existing active session on component mount
+  // Check for existing active session on component mount - only from today
   useEffect(() => {
     const activeSession = sessions.find(session => {
       const sessionDate = new Date(session.workout_date);
@@ -45,8 +44,8 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       const sessionCreatedAt = new Date(activeSession.created_at);
       setStartTime(sessionCreatedAt);
       
-      // Generate workout plan for the existing session
-      if (activePlan) {
+      // Only generate workout plan if this session has a workout plan
+      if (activeSession.workout_plan_id && activePlan) {
         generateWorkoutPlan(activePlan.plan_type, 'beginner').then(plan => {
           if (plan && plan[activeSession.workout_type]) {
             setWorkoutPlan(plan[activeSession.workout_type]);
@@ -125,7 +124,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     onBack();
   };
 
-  // Workout type selection
+  // Workout type selection (only show if no active session and we have an active plan)
   if (!currentSession && activePlan) {
     const workoutTypes = getWorkoutTypesForPlan(activePlan.plan_type);
     
@@ -174,8 +173,8 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     );
   }
 
-  // Active workout view
-  if (currentSession && workoutPlan) {
+  // Active workout view - show even for manual workouts without a plan
+  if (currentSession) {
     return (
       <div className="animate-fade-in space-y-6">
         <div className="flex items-center justify-between mb-6">
@@ -185,6 +184,9 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
             </Button>
             <h2 className="text-xl font-bold text-green-800 dark:text-green-400">
               {selectedWorkoutType.replace(/_/g, ' ').toUpperCase()}
+              {!currentSession.workout_plan_id && (
+                <Badge variant="outline" className="ml-2">Manual</Badge>
+              )}
             </h2>
           </div>
           <div className="flex items-center gap-2 text-green-600">
@@ -193,19 +195,35 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           </div>
         </div>
 
-        {/* Exercises */}
-        <div className="space-y-4">
-          {workoutPlan.exercises.map((exercise: any, index: number) => (
-            <ExerciseCard
-              key={index}
-              exercise={exercise}
-              onLog={handleLogExercise}
-              isLogged={exerciseLogs.some(log => log.exercise_name === exercise.name)}
-            />
-          ))}
-        </div>
+        {/* Show exercises if we have a workout plan */}
+        {workoutPlan && workoutPlan.exercises && (
+          <div className="space-y-4">
+            {workoutPlan.exercises.map((exercise: any, index: number) => (
+              <ExerciseCard
+                key={index}
+                exercise={exercise}
+                onLog={handleLogExercise}
+                isLogged={exerciseLogs.some(log => log.exercise_name === exercise.name)}
+              />
+            ))}
+          </div>
+        )}
 
-        {/* Complete Workout */}
+        {/* Show message for manual workouts without exercises */}
+        {!workoutPlan && (
+          <Card className="bg-gray-50 dark:bg-gray-700">
+            <CardContent className="p-6 text-center">
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                Manual Workout in Progress
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                This is a manual workout. You can complete it at any time.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Complete Workout - always show regardless of workout type */}
         <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
           <CardContent className="p-6 text-center">
             <h3 className="font-semibold text-green-800 dark:text-green-400 mb-2">
@@ -227,7 +245,33 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     );
   }
 
-  return null;
+  // If no active session and no active plan, show message
+  return (
+    <div className="animate-fade-in space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        <h2 className="text-xl font-bold text-green-800 dark:text-green-400">
+          No Active Workout
+        </h2>
+      </div>
+
+      <Card className="bg-white dark:bg-gray-800">
+        <CardContent className="p-8 text-center">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            No Workout in Progress
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Start a new workout from your active plan or create a manual workout.
+          </p>
+          <Button onClick={onBack} className="bg-green-600 hover:bg-green-700">
+            Back to Overview
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 // Exercise card component
