@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import PlaylistRecommendations from "./habit/PlaylistRecommendations";
 import HabitGridHeader from "./habit/HabitGridHeader";
 import HabitActivityRow from "./habit/HabitActivityRow";
-import TodayProgressSummary from "./habit/TodayProgressSummary";
 import { useHabitActivities } from "@/hooks/useHabitActivities";
 
 type RecentActivitiesProps = {
@@ -25,9 +24,6 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
 
   return (
     <div className="mb-6 sm:mb-16">
-      {/* Today's Progress Summary */}
-      <TodayProgressSummary />
-      
       <div className="flex flex-col overflow-hidden">
         <div
           className={cn(
