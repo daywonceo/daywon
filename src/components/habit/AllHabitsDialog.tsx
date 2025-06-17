@@ -4,20 +4,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { useHabits, Habit } from "@/hooks/useHabits";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Archive, Edit, Trash2, MoreVertical, ArchiveRestore, RefreshCw, History } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Plus, RefreshCw, History } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "./HabitFormDialog";
 import HabitAddSheet from "./HabitAddSheet";
 import AllTimeHabitsModal from "./AllTimeHabitsModal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+import HabitList from "./HabitList";
 
 type AllHabitsDialogProps = {
   open: boolean;
@@ -42,7 +34,6 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
     setIsRefreshing(true);
     try {
       await refreshHabits();
-      // Removed the toast notification here
     } catch (error) {
       console.error('Error refreshing habits:', error);
       toast({ title: "Error refreshing habits", variant: "destructive" });
@@ -109,40 +100,6 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
     return categoryMap[habitName] || 'Personal';
   };
 
-  const HabitItem = ({ habit }: { habit: Habit }) => (
-    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold text-gray-800 dark:text-gray-200">{habit.name}</p>
-        {habit.category && <Badge variant="secondary">{habit.category}</Badge>}
-      </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => openEditForm(habit)}>
-            <Edit className="mr-2 h-4 w-4" />
-            <span>Edit</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleToggleArchive(habit)}>
-            {habit.status === 'active' ? (
-                <><Archive className="mr-2 h-4 w-4" /><span>Archive</span></>
-            ) : (
-                <><ArchiveRestore className="mr-2 h-4 w-4" /><span>Unarchive</span></>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => handleDelete(habit.id)} className="text-red-600 focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-900/40">
-            <Trash2 className="mr-2 h-4 w-4" />
-            <span>Delete</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -190,23 +147,23 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
               </div>
             ) : (
               <>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Active Habits ({activeHabits.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {activeHabits.length > 0 ? activeHabits.map(h => <HabitItem key={h.id} habit={h} />) : <p className="text-sm text-gray-500">No active habits. Add one or start tracking habits to see them here!</p>}
-                  </CardContent>
-                </Card>
+                <HabitList
+                  title="Active Habits"
+                  habits={activeHabits}
+                  emptyMessage="No active habits. Add one or start tracking habits to see them here!"
+                  onEdit={openEditForm}
+                  onToggleArchive={handleToggleArchive}
+                  onDelete={handleDelete}
+                />
                 {archivedHabits.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Archived Habits ({archivedHabits.length})</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      {archivedHabits.map(h => <HabitItem key={h.id} habit={h} />)}
-                    </CardContent>
-                  </Card>
+                  <HabitList
+                    title="Archived Habits"
+                    habits={archivedHabits}
+                    emptyMessage="No archived habits."
+                    onEdit={openEditForm}
+                    onToggleArchive={handleToggleArchive}
+                    onDelete={handleDelete}
+                  />
                 )}
               </>
             )}
