@@ -12,21 +12,19 @@ import SwipeableCard from "@/components/SwipeableCard";
 import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitTracking";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Target, Calendar, TrendingUp, BookOpen, Camera } from "lucide-react";
+import { BookOpen, Camera } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
 import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
 import AllHabitsDialog from "@/components/habit/AllHabitsDialog";
 import HabitGallery from "@/components/habit/HabitGallery";
+import CompletionRateCard from "@/components/progress/CompletionRateCard";
+import MilestoneTracker from "@/components/progress/MilestoneTracker";
+import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [streakCount, setStreakCount] = useState(7);
-  const [todayProgress, setTodayProgress] = useState(3);
-  const [totalHabits, setTotalHabits] = useState(5);
   const [showHabitsModal, setShowHabitsModal] = useState(false);
   const [showAllHabits, setShowAllHabits] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -104,29 +102,11 @@ const Index = () => {
             <p className="text-md text-gray-500 dark:text-gray-400 mt-2">Ready to build some great habits?</p>
           </div>
 
-          {/* Quick Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
-            <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-green-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-                <Target className="h-8 w-8 sm:h-10 sm:w-10 text-green-500 mb-2 sm:mb-3" />
-                <p className="text-3xl sm:text-4xl font-bold text-green-600 dark:text-green-400">{streakCount}</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Day Streak</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-blue-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-                <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500 mb-2 sm:mb-3" />
-                <p className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">{todayProgress}/{totalHabits}</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Completed Today</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-purple-500 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-                <TrendingUp className="h-8 w-8 sm:h-10 sm:w-10 text-purple-500 mb-2 sm:mb-3" />
-                <p className="text-3xl sm:text-4xl font-bold text-purple-600 dark:text-purple-400">85%</p>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Weekly Goal</p>
-              </CardContent>
-            </Card>
+          {/* New Progress Components */}
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-8 sm:mb-12">
+            <CompletionRateCard />
+            <MilestoneTracker />
+            <DailyEncouragementCard />
           </div>
 
           {/* Modal for top 3 habits */}
