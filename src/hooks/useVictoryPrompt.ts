@@ -11,7 +11,7 @@ export const useVictoryPrompt = () => {
     setShowVictoryPrompt(true);
     
     toast({
-      title: "🎉 Habit Completed!",
+      title: "Habit Completed!",
       description: "Add your victory song to the challenge playlist!",
       duration: 5000,
     });

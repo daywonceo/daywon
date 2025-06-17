@@ -33,7 +33,6 @@ const TrackCard: React.FC<TrackCardProps> = ({ track, isSelected, onSelect }) =>
     >
       <CardContent className="p-6">
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-2xl">{track.emoji}</span>
           <div>
             <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-200">
               {track.name}

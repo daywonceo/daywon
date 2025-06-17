@@ -42,7 +42,7 @@ const ActivityCard = ({
   const handleComplete = () => {
     onComplete(activity.id);
     toast({
-      title: "Activity Completed! 🎉",
+      title: "Activity Completed!",
       description: `Great job completing "${activity.title}"!`,
     });
   };
@@ -63,7 +63,6 @@ const ActivityCard = ({
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <CardTitle className="text-green-800 dark:text-green-400 flex items-center text-lg">
-              <span className="text-2xl mr-2">{activity.emoji}</span>
               {activity.title}
               {isCompleted && <Check className="w-5 h-5 ml-2 text-green-600" />}
             </CardTitle>
@@ -98,7 +97,7 @@ const ActivityCard = ({
         </div>
         <div className="flex gap-2">
           <Badge variant="secondary">{activity.category}</Badge>
-          {isFavorite && <Badge variant="outline">⭐ Favorite</Badge>}
+          {isFavorite && <Badge variant="outline">Favorite</Badge>}
         </div>
         <Button 
           onClick={handleComplete}
@@ -109,7 +108,7 @@ const ActivityCard = ({
               : 'bg-green-600 hover:bg-green-700'
           }`}
         >
-          {isCompleted ? "✅ Completed!" : "Mark as Done"}
+          {isCompleted ? "Completed!" : "Mark as Done"}
         </Button>
       </CardContent>
     </Card>

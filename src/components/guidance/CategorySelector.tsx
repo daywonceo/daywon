@@ -4,19 +4,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 
 const categories = [
-  { id: "all", name: "All Categories", emoji: "📖" },
-  { id: "strength", name: "Strength", emoji: "💪" },
-  { id: "hope", name: "Hope", emoji: "🌅" },
-  { id: "faith", name: "Faith", emoji: "🙏" },
-  { id: "peace", name: "Peace", emoji: "🕊️" },
-  { id: "courage", name: "Courage", emoji: "🦁" },
-  { id: "purpose", name: "Purpose", emoji: "🎯" },
-  { id: "comfort", name: "Comfort", emoji: "🤗" },
-  { id: "perseverance", name: "Perseverance", emoji: "🏃" },
-  { id: "friendship", name: "Friendship", emoji: "👥" },
-  { id: "trust", name: "Trust", emoji: "❤️" },
-  { id: "transformation", name: "Transformation", emoji: "🦋" },
-  { id: "identity", name: "Identity", emoji: "✨" }
+  { id: "all", name: "All Categories", emoji: "" },
+  { id: "strength", name: "Strength", emoji: "" },
+  { id: "hope", name: "Hope", emoji: "" },
+  { id: "faith", name: "Faith", emoji: "" },
+  { id: "peace", name: "Peace", emoji: "" },
+  { id: "courage", name: "Courage", emoji: "" },
+  { id: "purpose", name: "Purpose", emoji: "" },
+  { id: "comfort", name: "Comfort", emoji: "" },
+  { id: "perseverance", name: "Perseverance", emoji: "" },
+  { id: "friendship", name: "Friendship", emoji: "" },
+  { id: "trust", name: "Trust", emoji: "" },
+  { id: "transformation", name: "Transformation", emoji: "" },
+  { id: "identity", name: "Identity", emoji: "" }
 ];
 
 interface CategorySelectorProps {
@@ -32,7 +32,6 @@ const CategorySelector = ({ currentCategory, onCategoryChange }: CategorySelecto
       <SelectTrigger className="w-48">
         <SelectValue>
           <div className="flex items-center gap-2">
-            <span>{currentCategoryData.emoji}</span>
             <span>{currentCategoryData.name}</span>
           </div>
         </SelectValue>
@@ -41,7 +40,6 @@ const CategorySelector = ({ currentCategory, onCategoryChange }: CategorySelecto
         {categories.map((category) => (
           <SelectItem key={category.id} value={category.id}>
             <div className="flex items-center gap-2">
-              <span>{category.emoji}</span>
               <span>{category.name}</span>
             </div>
           </SelectItem>

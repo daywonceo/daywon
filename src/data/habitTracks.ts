@@ -5,7 +5,7 @@ export const HABIT_TRACKS: HabitTrack[] = [
   {
     id: "morning-reset",
     name: "7-Day Morning Reset",
-    emoji: "🕊️",
+    emoji: "",
     duration: 7,
     durationUnit: "days",
     description: "Transform your mornings with intentional habits",
@@ -20,7 +20,7 @@ export const HABIT_TRACKS: HabitTrack[] = [
   {
     id: "muscle-kickstart",
     name: "10-Day Muscle Kickstart",
-    emoji: "💪",
+    emoji: "",
     duration: 10,
     durationUnit: "days",
     description: "Build strength and momentum with daily workouts",
@@ -35,7 +35,7 @@ export const HABIT_TRACKS: HabitTrack[] = [
   {
     id: "bible-mindfulness",
     name: "14 Days of Bible & Mindfulness",
-    emoji: "📖",
+    emoji: "",
     duration: 14,
     durationUnit: "days",
     description: "Deepen your faith and mindfulness practice",
@@ -50,7 +50,7 @@ export const HABIT_TRACKS: HabitTrack[] = [
   {
     id: "mental-clarity",
     name: "21-Day Mental Clarity",
-    emoji: "🧠",
+    emoji: "",
     duration: 21,
     durationUnit: "days",
     description: "Sharpen your mind and reduce mental clutter",
@@ -66,7 +66,7 @@ export const HABIT_TRACKS: HabitTrack[] = [
   {
     id: "journaling-jumpstart",
     name: "7-Day Journaling Jumpstart",
-    emoji: "📝",
+    emoji: "",
     duration: 7,
     durationUnit: "days",
     description: "Develop a consistent journaling practice",

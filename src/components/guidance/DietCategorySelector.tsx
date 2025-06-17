@@ -3,14 +3,14 @@ import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const dietCategories = [
-  { id: "all", name: "All Recipes", emoji: "🍽️" },
-  { id: "vegetarian", name: "Vegetarian", emoji: "🥬" },
-  { id: "vegan", name: "Vegan", emoji: "🌱" },
-  { id: "ketogenic", name: "Ketogenic", emoji: "🥑" },
-  { id: "paleo", name: "Paleo", emoji: "🥩" },
-  { id: "gluten-free", name: "Gluten Free", emoji: "🌾" },
-  { id: "dairy-free", name: "Dairy Free", emoji: "🥛" },
-  { id: "whole30", name: "Whole30", emoji: "💪" },
+  { id: "all", name: "All Recipes", emoji: "" },
+  { id: "vegetarian", name: "Vegetarian", emoji: "" },
+  { id: "vegan", name: "Vegan", emoji: "" },
+  { id: "ketogenic", name: "Ketogenic", emoji: "" },
+  { id: "paleo", name: "Paleo", emoji: "" },
+  { id: "gluten-free", name: "Gluten Free", emoji: "" },
+  { id: "dairy-free", name: "Dairy Free", emoji: "" },
+  { id: "whole30", name: "Whole30", emoji: "" },
 ];
 
 interface DietCategorySelectorProps {
@@ -26,7 +26,6 @@ const DietCategorySelector = ({ currentCategory, onCategoryChange }: DietCategor
       <SelectTrigger className="w-40">
         <SelectValue>
           <div className="flex items-center gap-2">
-            <span className="text-sm">{currentCategoryData.emoji}</span>
             <span className="text-xs truncate">{currentCategoryData.name}</span>
           </div>
         </SelectValue>
@@ -35,7 +34,6 @@ const DietCategorySelector = ({ currentCategory, onCategoryChange }: DietCategor
         {dietCategories.map((category) => (
           <SelectItem key={category.id} value={category.id}>
             <div className="flex items-center gap-2">
-              <span className="text-sm">{category.emoji}</span>
               <span className="text-xs">{category.name}</span>
             </div>
           </SelectItem>

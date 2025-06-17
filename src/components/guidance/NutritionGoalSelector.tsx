@@ -3,10 +3,10 @@ import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const nutritionGoals = [
-  { id: "all", name: "All Recipes", emoji: "🍽️" },
-  { id: "high-protein", name: "High Protein", emoji: "🥩" },
-  { id: "high-carb", name: "High Carb", emoji: "🍞" },
-  { id: "low-fat", name: "Low Fat", emoji: "🥗" },
+  { id: "all", name: "All Recipes", emoji: "" },
+  { id: "high-protein", name: "High Protein", emoji: "" },
+  { id: "high-carb", name: "High Carb", emoji: "" },
+  { id: "low-fat", name: "Low Fat", emoji: "" },
 ];
 
 interface NutritionGoalSelectorProps {
@@ -26,7 +26,6 @@ const NutritionGoalSelector = ({ currentGoal, onGoalChange }: NutritionGoalSelec
         <SelectTrigger className="w-40">
           <SelectValue>
             <div className="flex items-center gap-2">
-              <span className="text-sm">{currentGoalData.emoji}</span>
               <span className="text-xs truncate">{currentGoalData.name}</span>
             </div>
           </SelectValue>
@@ -35,7 +34,6 @@ const NutritionGoalSelector = ({ currentGoal, onGoalChange }: NutritionGoalSelec
           {nutritionGoals.map((goal) => (
             <SelectItem key={goal.id} value={goal.id}>
               <div className="flex items-center gap-2">
-                <span className="text-sm">{goal.emoji}</span>
                 <span className="text-xs">{goal.name}</span>
               </div>
             </SelectItem>
