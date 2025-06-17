@@ -11,7 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import SwipeableCard from "@/components/SwipeableCard";
 import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
-import { initializeDefaultHabits } from "@/utils/habitTracking";
+import { initializeDefaultHabits } from "@/utils/habitCategories";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Camera } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";

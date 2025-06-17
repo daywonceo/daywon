@@ -3,7 +3,7 @@ import React from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActivityStatus } from "@/hooks/useHabitActivities";
-import { calculateStreakForDate } from "@/utils/habitTracking";
+import { calculateStreakForDate } from "@/utils/habitStreaks";
 import { hasRecentRecovery } from "@/utils/streakRecovery";
 
 interface HabitStatusBoxProps {

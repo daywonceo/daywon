@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Check } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { Habit } from '@/hooks/useHabits';
-import { recordHabitActivity } from '@/utils/habitTracking';
+import { recordHabitActivity } from '@/utils/habitActivity';
 import { hapticSuccess } from '@/utils/haptics';
 
 type Color = 'green' | 'purple' | 'red' | 'orange' | 'blue';

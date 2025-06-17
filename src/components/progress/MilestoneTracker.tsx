@@ -1,10 +1,9 @@
-
 import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Trophy } from 'lucide-react';
 import { useHabitActivities } from '@/hooks/useHabitActivities';
-import { calculateStreakForDate } from '@/utils/habitTracking';
+import { calculateStreakForDate } from '@/utils/habitStreaks';
 
 const MilestoneTracker: React.FC = () => {
   const { userHabits } = useHabitActivities();

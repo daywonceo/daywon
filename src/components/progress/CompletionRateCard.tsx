@@ -1,10 +1,9 @@
-
 import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle } from 'lucide-react';
 import { useHabitActivities } from '@/hooks/useHabitActivities';
-import { getHabitActivities } from '@/utils/habitTracking';
+import { getHabitActivities } from '@/utils/habitActivity';
 
 const CompletionRateCard: React.FC = () => {
   const { userHabits } = useHabitActivities();

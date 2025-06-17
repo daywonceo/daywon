@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { recordHabitActivity, getHabitActivities } from "@/utils/habitTracking";
+import { recordHabitActivity, getHabitActivities } from "@/utils/habitActivity";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 
