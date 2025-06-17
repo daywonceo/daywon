@@ -84,7 +84,8 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
       await addHabit({
         name: habitName,
         status: "active",
-        category: getHabitCategory(habitName)
+        category: getHabitCategory(habitName),
+        description: null
       });
       toast({ title: `${habitName} added!` });
     } catch (error) {
