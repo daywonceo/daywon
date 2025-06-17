@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -5,6 +6,9 @@ import { useHabits, Habit } from "@/hooks/useHabits";
 import { getHabitActivities, HabitActivity } from "@/utils/habitTracking";
 import { subDays, format } from 'date-fns';
 import HabitCard from "@/components/calendar/HabitCard";
+import CalendarView from "@/components/calendar/CalendarView";
+import CalendarHeader from "@/components/calendar/CalendarHeader";
+import DailySummaryModal from "@/components/calendar/DailySummaryModal";
 import { BookOpenText, Apple, Dumbbell, Wind, Footprints, Settings, Plus, BarChart, LucideIcon } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -33,6 +37,12 @@ const getHabitDetails = (habitName: string) => {
 const CalendarPage = () => {
   const { habits, isLoading: isLoadingHabits } = useHabits();
   const [allActivities, setAllActivities] = useState<HabitActivity[]>([]);
+  const [currentView, setCurrentView] = useState("calendar");
+  const [activeTab, setActiveTab] = useState("current");
+  const [timePeriod, setTimePeriod] = useState("current");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [showDailySummary, setShowDailySummary] = useState(false);
+  const [summaryDate, setSummaryDate] = useState<Date | null>(null);
 
   useEffect(() => {
     setAllActivities(getHabitActivities());
@@ -41,6 +51,11 @@ const CalendarPage = () => {
   const refreshActivities = () => {
     setAllActivities(getHabitActivities());
   }
+
+  const handleDateClick = (date: Date) => {
+    setSummaryDate(date);
+    setShowDailySummary(true);
+  };
 
   const generateActivityData = (habitName: string) => {
       const habitActivities = allActivities.filter(a => a.habitName === habitName && a.status === 'completed');
@@ -66,34 +81,90 @@ const CalendarPage = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          {isLoadingHabits && (
-            <>
-              <Skeleton className="h-40 w-full bg-gray-200" />
-              <Skeleton className="h-40 w-full bg-gray-200" />
-              <Skeleton className="h-40 w-full bg-gray-200" />
-            </>
-          )}
-          {habits?.map(habit => {
-              const details = getHabitDetails(habit.name);
-              const activityData = generateActivityData(habit.name);
-              const todayString = format(new Date(), 'yyyy-MM-dd');
-              const isCompletedToday = allActivities.some(a => a.habitName === habit.name && a.date === todayString && a.status === 'completed');
+        <CalendarHeader
+          title="Calendar & Habits"
+          activeTab={activeTab}
+          currentView={currentView}
+          timePeriod={timePeriod}
+          setActiveTab={setActiveTab}
+          setCurrentView={setCurrentView}
+          setTimePeriod={setTimePeriod}
+        />
 
-              return (
-                  <HabitCard 
-                      key={habit.id}
-                      habit={habit}
-                      activityData={activityData}
-                      color={details.color}
-                      icon={details.icon}
-                      isCompletedToday={isCompletedToday}
-                      onUpdate={refreshActivities}
-                  />
-              )
-          })}
+        <div className="mt-6">
+          {currentView === "calendar" ? (
+            <div className="space-y-6">
+              <CalendarView
+                date={selectedDate}
+                setDate={setSelectedDate}
+                onDateClick={handleDateClick}
+              />
+              
+              <div className="space-y-4">
+                {isLoadingHabits && (
+                  <>
+                    <Skeleton className="h-40 w-full bg-gray-200" />
+                    <Skeleton className="h-40 w-full bg-gray-200" />
+                    <Skeleton className="h-40 w-full bg-gray-200" />
+                  </>
+                )}
+                {habits?.map(habit => {
+                    const details = getHabitDetails(habit.name);
+                    const activityData = generateActivityData(habit.name);
+                    const todayString = format(new Date(), 'yyyy-MM-dd');
+                    const isCompletedToday = allActivities.some(a => a.habitName === habit.name && a.date === todayString && a.status === 'completed');
+
+                    return (
+                        <HabitCard 
+                            key={habit.id}
+                            habit={habit}
+                            activityData={activityData}
+                            color={details.color}
+                            icon={details.icon}
+                            isCompletedToday={isCompletedToday}
+                            onUpdate={refreshActivities}
+                        />
+                    )
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {isLoadingHabits && (
+                <>
+                  <Skeleton className="h-40 w-full bg-gray-200" />
+                  <Skeleton className="h-40 w-full bg-gray-200" />
+                  <Skeleton className="h-40 w-full bg-gray-200" />
+                </>
+              )}
+              {habits?.map(habit => {
+                  const details = getHabitDetails(habit.name);
+                  const activityData = generateActivityData(habit.name);
+                  const todayString = format(new Date(), 'yyyy-MM-dd');
+                  const isCompletedToday = allActivities.some(a => a.habitName === habit.name && a.date === todayString && a.status === 'completed');
+
+                  return (
+                      <HabitCard 
+                          key={habit.id}
+                          habit={habit}
+                          activityData={activityData}
+                          color={details.color}
+                          icon={details.icon}
+                          isCompletedToday={isCompletedToday}
+                          onUpdate={refreshActivities}
+                      />
+                  )
+              })}
+            </div>
+          )}
         </div>
       </main>
+
+      <DailySummaryModal
+        date={summaryDate}
+        isOpen={showDailySummary}
+        onClose={() => setShowDailySummary(false)}
+      />
       
       <Footer />
     </div>
