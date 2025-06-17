@@ -11,8 +11,6 @@ import { Button } from "@/components/ui/button";
 
 const CalendarPage = () => {
   const [allActivities, setAllActivities] = useState<HabitActivity[]>([]);
-  const [currentView, setCurrentView] = useState("calendar");
-  const [activeTab, setActiveTab] = useState("current");
   const [timePeriod, setTimePeriod] = useState("current");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [showDailySummary, setShowDailySummary] = useState(false);
@@ -46,11 +44,11 @@ const CalendarPage = () => {
 
         <CalendarHeader
           title="Calendar & Habits"
-          activeTab={activeTab}
-          currentView={currentView}
+          activeTab=""
+          currentView=""
           timePeriod={timePeriod}
-          setActiveTab={setActiveTab}
-          setCurrentView={setCurrentView}
+          setActiveTab={() => {}}
+          setCurrentView={() => {}}
           setTimePeriod={setTimePeriod}
         />
 
