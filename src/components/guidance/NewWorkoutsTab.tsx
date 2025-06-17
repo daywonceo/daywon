@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Clock, Target, TrendingUp, Plus } from "lucide-react";
+import { Dumbbell, Clock, Target, TrendingUp, Plus, AlertCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import WorkoutPlanSelector from "./WorkoutPlanSelector";
 import ActiveWorkoutView from "./ActiveWorkoutView";
 import WorkoutProgress from "./WorkoutProgress";
@@ -12,17 +13,36 @@ import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
   const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress'>('overview');
-  const { workoutPlans, isLoading: plansLoading } = useWorkoutPlans();
-  const { sessions } = useWorkoutSessions();
+  const { user } = useAuth();
+  const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
+  const { sessions, error: sessionsError } = useWorkoutSessions();
 
-  const activePlan = workoutPlans.find(plan => plan.is_active);
-  const recentSessions = sessions.slice(0, 3);
-  const completedThisWeek = sessions.filter(session => {
-    const sessionDate = new Date(session.workout_date);
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    return sessionDate >= weekAgo && session.is_completed;
-  }).length;
+  // Show error state if there are authentication or data issues
+  if (!user) {
+    return (
+      <Card className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+        <CardContent className="p-6 text-center">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-red-600" />
+          <p className="text-red-800 dark:text-red-400">
+            Authentication required to access workout features
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (plansError || sessionsError) {
+    return (
+      <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+        <CardContent className="p-6 text-center">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
+          <p className="text-yellow-800 dark:text-yellow-400">
+            Unable to load workout data. Please try refreshing the page.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (currentView === 'plan-selector') {
     return <WorkoutPlanSelector onBack={() => setCurrentView('overview')} />;
@@ -36,8 +56,39 @@ const NewWorkoutsTab = () => {
     return <WorkoutProgress onBack={() => setCurrentView('overview')} />;
   }
 
+  const activePlan = workoutPlans.find(plan => plan.is_active);
+  const recentSessions = sessions.slice(0, 3);
+  const completedThisWeek = sessions.filter(session => {
+    const sessionDate = new Date(session.workout_date);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return sessionDate >= weekAgo && session.is_completed;
+  }).length;
+
   return (
     <div className="animate-fade-in space-y-6">
+      {/* Welcome Message for First-time Users */}
+      {!plansLoading && workoutPlans.length === 0 && (
+        <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800">
+          <CardContent className="p-6 text-center">
+            <Dumbbell className="w-12 h-12 mx-auto mb-4 text-green-600" />
+            <h3 className="text-lg font-semibold text-green-800 dark:text-green-400 mb-2">
+              Welcome to Your Fitness Journey!
+            </h3>
+            <p className="text-green-600 dark:text-green-300 mb-4">
+              Create your first workout plan to start tracking your progress and achieving your fitness goals.
+            </p>
+            <Button 
+              onClick={() => setCurrentView('plan-selector')}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Your First Plan
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
@@ -110,7 +161,7 @@ const NewWorkoutsTab = () => {
             </div>
           </CardContent>
         </Card>
-      ) : (
+      ) : !plansLoading && workoutPlans.length > 0 ? (
         <Card className="bg-white dark:bg-gray-800">
           <CardContent className="p-8 text-center">
             <Dumbbell className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -118,18 +169,18 @@ const NewWorkoutsTab = () => {
               No Active Workout Plan
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Create a structured workout plan to get started with your fitness journey
+              You have workout plans but none are currently active. Select one to get started.
             </p>
             <Button 
               onClick={() => setCurrentView('plan-selector')}
               className="bg-green-600 hover:bg-green-700"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Workout Plan
+              <Target className="w-4 h-4 mr-2" />
+              Manage Plans
             </Button>
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {/* Recent Workouts */}
       {recentSessions.length > 0 && (
@@ -172,13 +223,14 @@ const NewWorkoutsTab = () => {
           className="h-16 flex flex-col items-center gap-1"
         >
           <Target className="w-5 h-5" />
-          <span className="text-xs">New Plan</span>
+          <span className="text-xs">{workoutPlans.length > 0 ? 'Manage Plans' : 'Create Plan'}</span>
         </Button>
         
         <Button 
           variant="outline" 
           onClick={() => setCurrentView('progress')}
           className="h-16 flex flex-col items-center gap-1"
+          disabled={sessions.length === 0}
         >
           <TrendingUp className="w-5 h-5" />
           <span className="text-xs">Progress</span>

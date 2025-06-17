@@ -21,6 +21,18 @@ serve(async (req) => {
   try {
     const { muscle, difficulty, type, name } = await req.json() as ExerciseRequest;
     
+    const apiKey = Deno.env.get('API_NINJAS_KEY');
+    if (!apiKey) {
+      console.error('API_NINJAS_KEY not configured');
+      return new Response(
+        JSON.stringify({ error: 'API key not configured' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        },
+      )
+    }
+    
     let url = 'https://api.api-ninjas.com/v1/exercises';
     const params = new URLSearchParams();
     
@@ -37,12 +49,13 @@ serve(async (req) => {
 
     const response = await fetch(url, {
       headers: {
-        'X-Api-Key': Deno.env.get('API_NINJAS_KEY') || '',
+        'X-Api-Key': apiKey,
         'Content-Type': 'application/json'
       }
     });
 
     if (!response.ok) {
+      console.error(`API request failed: ${response.status} ${response.statusText}`);
       throw new Error(`API request failed: ${response.status}`);
     }
 

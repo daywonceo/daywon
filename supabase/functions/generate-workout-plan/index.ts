@@ -41,6 +41,18 @@ serve(async (req) => {
     
     console.log('Generating workout plan for:', planType, difficulty);
     
+    const apiKey = Deno.env.get('API_NINJAS_KEY');
+    if (!apiKey) {
+      console.error('API_NINJAS_KEY not configured');
+      return new Response(
+        JSON.stringify({ error: 'API key not configured' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        },
+      )
+    }
+    
     const split = workoutSplits[planType as keyof typeof workoutSplits];
     if (!split) {
       throw new Error('Invalid workout plan type');
@@ -55,7 +67,7 @@ serve(async (req) => {
         try {
           const response = await fetch(`https://api.api-ninjas.com/v1/exercises?muscle=${muscle}&difficulty=${difficulty}`, {
             headers: {
-              'X-Api-Key': Deno.env.get('API_NINJAS_KEY') || '',
+              'X-Api-Key': apiKey,
               'Content-Type': 'application/json'
             }
           });
@@ -64,6 +76,8 @@ serve(async (req) => {
             const muscleExercises = await response.json();
             // Take 1-2 exercises per muscle group
             exercises.push(...muscleExercises.slice(0, 2));
+          } else {
+            console.error(`Failed to fetch exercises for ${muscle}: ${response.status}`);
           }
         } catch (error) {
           console.error(`Error fetching exercises for ${muscle}:`, error);

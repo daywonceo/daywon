@@ -20,12 +20,17 @@ export const useWorkoutPlans = () => {
   const { user } = useAuth();
 
   const fetchWorkoutPlans = async () => {
-    if (!user) return;
+    if (!user) {
+      setWorkoutPlans([]);
+      return;
+    }
     
     setIsLoading(true);
     setError('');
     
     try {
+      console.log('Fetching workout plans for user:', user.id);
+      
       const { data, error: fetchError } = await supabase
         .from('workout_plans')
         .select('*')
@@ -33,9 +38,11 @@ export const useWorkoutPlans = () => {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
+        console.error('Supabase error:', fetchError);
         throw fetchError;
       }
 
+      console.log('Workout plans fetched:', data?.length || 0);
       setWorkoutPlans(data || []);
     } catch (err) {
       console.error('Error fetching workout plans:', err);
@@ -46,9 +53,17 @@ export const useWorkoutPlans = () => {
   };
 
   const createWorkoutPlan = async (planType: string, name: string) => {
-    if (!user) return null;
+    if (!user) {
+      setError('User not authenticated');
+      return null;
+    }
+
+    setIsLoading(true);
+    setError('');
 
     try {
+      console.log('Creating workout plan:', { planType, name, userId: user.id });
+      
       // Set all existing plans to inactive
       await supabase
         .from('workout_plans')
@@ -67,22 +82,34 @@ export const useWorkoutPlans = () => {
         .single();
 
       if (createError) {
+        console.error('Create error:', createError);
         throw createError;
       }
 
+      console.log('Workout plan created:', data);
       await fetchWorkoutPlans();
       return data;
     } catch (err) {
       console.error('Error creating workout plan:', err);
       setError('Failed to create workout plan');
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const setActivePlan = async (planId: string) => {
-    if (!user) return;
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
 
     try {
+      console.log('Setting active plan:', planId);
+      
       // Set all plans to inactive
       await supabase
         .from('workout_plans')
@@ -100,6 +127,8 @@ export const useWorkoutPlans = () => {
     } catch (err) {
       console.error('Error setting active plan:', err);
       setError('Failed to set active plan');
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -38,12 +38,17 @@ export const useWorkoutSessions = () => {
   const { user } = useAuth();
 
   const fetchSessions = async () => {
-    if (!user) return;
+    if (!user) {
+      setSessions([]);
+      return;
+    }
     
     setIsLoading(true);
     setError('');
     
     try {
+      console.log('Fetching workout sessions for user:', user.id);
+      
       const { data, error: fetchError } = await supabase
         .from('workout_sessions')
         .select('*')
@@ -51,9 +56,11 @@ export const useWorkoutSessions = () => {
         .order('workout_date', { ascending: false });
 
       if (fetchError) {
+        console.error('Supabase error:', fetchError);
         throw fetchError;
       }
 
+      console.log('Workout sessions fetched:', data?.length || 0);
       setSessions(data || []);
     } catch (err) {
       console.error('Error fetching workout sessions:', err);
@@ -69,9 +76,17 @@ export const useWorkoutSessions = () => {
     workout_type: string;
     notes?: string;
   }) => {
-    if (!user) return null;
+    if (!user) {
+      setError('User not authenticated');
+      return null;
+    }
+
+    setIsLoading(true);
+    setError('');
 
     try {
+      console.log('Creating workout session:', { ...workoutData, userId: user.id });
+      
       const { data, error: createError } = await supabase
         .from('workout_sessions')
         .insert({
@@ -82,22 +97,34 @@ export const useWorkoutSessions = () => {
         .single();
 
       if (createError) {
+        console.error('Create session error:', createError);
         throw createError;
       }
 
+      console.log('Workout session created:', data);
       await fetchSessions();
       return data;
     } catch (err) {
       console.error('Error creating workout session:', err);
       setError('Failed to create workout session');
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const completeSession = async (sessionId: string, durationMinutes: number) => {
-    if (!user) return;
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
 
     try {
+      console.log('Completing workout session:', sessionId, durationMinutes);
+      
       await supabase
         .from('workout_sessions')
         .update({ 
@@ -111,6 +138,8 @@ export const useWorkoutSessions = () => {
     } catch (err) {
       console.error('Error completing workout session:', err);
       setError('Failed to complete workout session');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,9 +153,17 @@ export const useWorkoutSessions = () => {
     difficulty?: string;
     exercise_instructions?: string;
   }) => {
-    if (!user) return null;
+    if (!user) {
+      setError('User not authenticated');
+      return null;
+    }
+
+    setIsLoading(true);
+    setError('');
 
     try {
+      console.log('Logging exercise:', { ...exerciseData, sessionId, userId: user.id });
+      
       const { data, error: logError } = await supabase
         .from('exercise_logs')
         .insert({
@@ -138,14 +175,18 @@ export const useWorkoutSessions = () => {
         .single();
 
       if (logError) {
+        console.error('Log exercise error:', logError);
         throw logError;
       }
 
+      console.log('Exercise logged:', data);
       return data;
     } catch (err) {
       console.error('Error logging exercise:', err);
       setError('Failed to log exercise');
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
