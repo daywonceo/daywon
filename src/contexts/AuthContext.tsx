@@ -104,8 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error('Spotify OAuth error details:', {
           message: error.message,
-          status: error.status,
-          statusText: error.statusText
+          status: error.status
         });
       }
       
