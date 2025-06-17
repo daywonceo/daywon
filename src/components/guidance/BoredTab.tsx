@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import ActivityTypeSelector from "./ActivityTypeSelector";
 import ActivityDisplay from "./ActivityDisplay";
 import ActivityActions from "./ActivityActions";
@@ -28,15 +29,19 @@ const BoredTab = ({ searchQuery }: BoredTabProps) => {
   const fetchActivity = async () => {
     setIsLoading(true);
     try {
-      const url = selectedType && selectedType !== "any"
-        ? `https://www.boredapi.com/api/activity?type=${selectedType}`
-        : 'https://www.boredapi.com/api/activity';
-      
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data.activity) {
+      const { data, error } = await supabase.functions.invoke('get-bored-activity', {
+        body: JSON.stringify({ type: selectedType !== "any" ? selectedType : undefined })
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (data?.activity) {
         setActivity(data);
+      } else if (data?.error) {
+        throw new Error(data.error);
       } else {
         toast({
           title: "No activities found",
