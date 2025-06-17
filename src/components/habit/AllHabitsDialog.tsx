@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useHabits, Habit } from "@/hooks/useHabits";
@@ -23,9 +23,16 @@ type AllHabitsDialogProps = {
 };
 
 const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange }) => {
-  const { habits, isLoading, updateHabit, deleteHabit } = useHabits();
+  const { habits, isLoading, updateHabit, deleteHabit, ensureTrackedHabitsVisible } = useHabits();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
+
+  // Ensure tracked habits are visible when dialog opens
+  useEffect(() => {
+    if (open && ensureTrackedHabitsVisible) {
+      ensureTrackedHabitsVisible();
+    }
+  }, [open, ensureTrackedHabitsVisible]);
 
   const { activeHabits, archivedHabits } = useMemo(() => {
     const active = habits?.filter(h => h.status === 'active') ?? [];
@@ -102,7 +109,7 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
         <DialogContent className="max-w-2xl h-[90vh] sm:h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-2xl">Manage Your Habits</DialogTitle>
-            <DialogDescription>View, create, and organize all of your habits.</DialogDescription>
+            <DialogDescription>View, create, and organize all of your habits. Habits you track will automatically appear here as active.</DialogDescription>
           </DialogHeader>
           <div className="flex-grow overflow-y-auto pr-2 -mr-4 space-y-6">
             <div className="flex justify-end sticky top-0 bg-white dark:bg-gray-900 z-10 py-2">
@@ -123,7 +130,7 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
                     <CardTitle>Active Habits ({activeHabits.length})</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {activeHabits.length > 0 ? activeHabits.map(h => <HabitItem key={h.id} habit={h} />) : <p className="text-sm text-gray-500">No active habits. Add one to get started!</p>}
+                    {activeHabits.length > 0 ? activeHabits.map(h => <HabitItem key={h.id} habit={h} />) : <p className="text-sm text-gray-500">No active habits. Add one or start tracking habits to see them here!</p>}
                   </CardContent>
                 </Card>
                 {archivedHabits.length > 0 && (

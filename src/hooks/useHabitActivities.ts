@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { recordHabitActivity, getHabitActivities } from "@/utils/habitActivity";
+import { recordHabitActivity, getHabitActivities, autoActivateRecentHabits } from "@/utils/habitActivity";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 
@@ -28,6 +28,9 @@ export const useHabitActivities = (habitList?: string[]) => {
 
   const loadActivities = useCallback(() => {
     try {
+      // Auto-activate habits that have been completed recently
+      autoActivateRecentHabits();
+      
       // Get recent dates (past 3 days including today)
       const today = new Date();
       const dates = [0, 1, 2].map(daysAgo => {
@@ -91,7 +94,7 @@ export const useHabitActivities = (habitList?: string[]) => {
     loadActivities();
   }, [loadActivities]);
 
-  const toggleStatus = (dayIndex: number, category: string) => {
+  const toggleStatus = async (dayIndex: number, category: string) => {
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       const currentStatus = newActivities[dayIndex].statuses[category];
@@ -125,7 +128,7 @@ export const useHabitActivities = (habitList?: string[]) => {
       const date = new Date(today);
       date.setDate(today.getDate() - dayIndex);
       
-      // Record the habit status change
+      // Record the habit status change (now async to handle database updates)
       recordHabitActivity(category, newStatus, date);
       
       // Provide haptic feedback on status change
