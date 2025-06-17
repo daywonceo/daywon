@@ -17,7 +17,6 @@ const JournalingPrompt = ({ quote, onClose }: JournalingPromptProps) => {
 
   const handleSave = () => {
     if (reflection.trim()) {
-      // Here you could integrate with your backend to save the reflection
       localStorage.setItem(`reflection_${Date.now()}`, JSON.stringify({
         quote: quote?.q,
         author: quote?.a,
@@ -36,26 +35,26 @@ const JournalingPrompt = ({ quote, onClose }: JournalingPromptProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="space-y-4 px-2">
+      <div className="flex items-center gap-3 mb-4">
         <Button
           onClick={onClose}
           variant="ghost"
           size="sm"
-          className="text-green-700 hover:text-green-800 hover:bg-green-50"
+          className="text-green-700 hover:text-green-800 hover:bg-green-50 text-sm"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Back
         </Button>
-        <h2 className="text-xl font-semibold text-green-800 dark:text-green-400">
+        <h2 className="text-lg font-semibold text-green-800 dark:text-green-400">
           Journal Your Reflection
         </h2>
       </div>
 
       {quote && (
-        <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
-          <CardContent className="p-4">
-            <blockquote className="text-sm font-light text-gray-700 dark:text-gray-300 leading-relaxed italic text-center">
+        <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 mx-2">
+          <CardContent className="p-3 sm:p-4">
+            <blockquote className="text-xs sm:text-sm font-light text-gray-700 dark:text-gray-300 leading-relaxed italic text-center">
               "{quote.q}"
             </blockquote>
             {quote.a && quote.a !== 'zenquotes.io' && (
@@ -67,16 +66,16 @@ const JournalingPrompt = ({ quote, onClose }: JournalingPromptProps) => {
         </Card>
       )}
 
-      <Card className="border-green-200 dark:border-green-800">
-        <CardHeader>
-          <CardTitle className="text-lg text-green-800 dark:text-green-400">
+      <Card className="border-green-200 dark:border-green-800 mx-2">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg text-green-800 dark:text-green-400">
             What does this mean to you?
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+        <CardContent className="space-y-4 pt-0">
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 space-y-2">
             <p>Take a moment to reflect on this quote. Consider:</p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
+            <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
               <li>How does this resonate with your current situation?</li>
               <li>What emotions or memories does it bring up?</li>
               <li>How might you apply this wisdom to your daily life?</li>
@@ -87,7 +86,7 @@ const JournalingPrompt = ({ quote, onClose }: JournalingPromptProps) => {
             value={reflection}
             onChange={(e) => setReflection(e.target.value)}
             placeholder="Write your thoughts and reflections here..."
-            className="min-h-[200px] border-green-200 dark:border-green-800 focus:border-green-400 resize-none"
+            className="min-h-[150px] sm:min-h-[200px] border-green-200 dark:border-green-800 focus:border-green-400 resize-none text-sm"
             maxLength={1000}
           />
           
@@ -98,7 +97,7 @@ const JournalingPrompt = ({ quote, onClose }: JournalingPromptProps) => {
             <Button
               onClick={handleSave}
               disabled={!reflection.trim()}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 text-sm"
             >
               <Save className="w-4 h-4" />
               Save Reflection
