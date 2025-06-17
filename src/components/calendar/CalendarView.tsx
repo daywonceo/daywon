@@ -54,28 +54,30 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
           mode="single"
           selected={date}
           onSelect={handleDayClick}
-          className="rounded-md border border-green-200 dark:border-green-800 p-0"
+          className="rounded-xl border-0 p-0"
           classNames={{
             months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
             month: "space-y-4 w-full",
-            caption: "flex justify-center pt-2 relative items-center text-green-800 dark:text-green-200",
-            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-green-800 dark:text-green-200",
-            day_selected: "bg-green-600 text-primary-foreground hover:bg-green-600/90 focus:bg-green-600",
-            day_today: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200",
-            day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 border-r border-b border-gray-100 dark:border-gray-700",
-            head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] border-r border-b border-gray-100 dark:border-gray-700",
-            table: "w-full border-collapse border border-gray-200 dark:border-gray-700 rounded-md",
+            caption: "flex justify-center pt-2 relative items-center text-gray-800 font-semibold text-lg",
+            nav_button: "h-8 w-8 bg-gradient-to-r from-green-100 to-emerald-100 hover:from-green-200 hover:to-emerald-200 p-0 rounded-lg text-green-700 transition-all duration-200 shadow-sm",
+            day_selected: "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 focus:from-green-600 focus:to-emerald-600 rounded-lg shadow-md",
+            day_today: "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 font-semibold rounded-lg",
+            day: "h-10 w-10 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-150 rounded-lg transition-all duration-200 border border-transparent hover:border-gray-200",
+            head_cell: "text-gray-600 rounded-md w-10 font-semibold text-sm uppercase tracking-wide",
+            table: "w-full border-collapse space-y-1",
+            head_row: "flex mb-2",
+            row: "flex w-full mt-1",
           }}
           components={{
             Day: ({ date: dayDate, ...props }) => {
               const hasActivityToday = hasActivity(dayDate);
               return (
-                <div className="relative h-9 w-9 flex items-center justify-center border-r border-b border-gray-100 dark:border-gray-700">
+                <div className="relative h-10 w-10 flex items-center justify-center">
                   <button {...props}>
                     {dayDate.getDate()}
                   </button>
                   {hasActivityToday && (
-                    <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <div className="absolute bottom-1 right-1 w-2 h-2 bg-gradient-to-r from-orange-400 to-red-400 rounded-full shadow-sm"></div>
                   )}
                 </div>
               );
@@ -89,10 +91,10 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
   // Multi-month view for 6months and year
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 max-h-96 overflow-y-auto">
+      <div className="grid gap-6 max-h-96 overflow-y-auto">
         {months.map((month, index) => (
-          <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-2">
-            <h3 className="text-sm font-semibold text-center mb-2 text-green-800 dark:text-green-200">
+          <div key={index} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 shadow-sm border border-gray-200">
+            <h3 className="text-base font-bold text-center mb-3 text-gray-700 bg-white rounded-lg py-2 shadow-sm">
               {format(month, "MMMM yyyy")}
             </h3>
             <Calendar
@@ -106,22 +108,24 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                 month: "space-y-2 w-full",
                 caption: "hidden", // Hide caption since we have our own header
                 nav: "hidden", // Hide navigation for individual months
-                day_selected: "bg-green-600 text-primary-foreground hover:bg-green-600/90 focus:bg-green-600",
-                day_today: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200",
-                day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 relative cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 border-r border-b border-gray-100 dark:border-gray-700 text-xs",
-                head_cell: "text-muted-foreground w-8 font-normal text-[0.7rem] border-r border-b border-gray-100 dark:border-gray-700",
-                table: "w-full border-collapse border border-gray-200 dark:border-gray-700 rounded",
+                day_selected: "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 focus:from-green-600 focus:to-emerald-600 rounded-md",
+                day_today: "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 font-semibold rounded-md",
+                day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 relative cursor-pointer hover:bg-white rounded-md transition-all duration-200 text-xs",
+                head_cell: "text-gray-600 w-8 font-semibold text-[0.7rem] uppercase tracking-wide",
+                table: "w-full border-collapse space-y-1",
+                head_row: "flex mb-1",
+                row: "flex w-full mt-0.5",
               }}
               components={{
                 Day: ({ date: dayDate, ...props }) => {
                   const hasActivityToday = hasActivity(dayDate);
                   return (
-                    <div className="relative h-8 w-8 flex items-center justify-center border-r border-b border-gray-100 dark:border-gray-700">
-                      <button {...props} className="text-xs">
+                    <div className="relative h-8 w-8 flex items-center justify-center">
+                      <button {...props} className="text-xs w-full h-full flex items-center justify-center">
                         {dayDate.getDate()}
                       </button>
                       {hasActivityToday && (
-                        <div className="absolute bottom-0.5 right-0.5 w-1 h-1 bg-green-500 rounded-full"></div>
+                        <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 bg-gradient-to-r from-orange-400 to-red-400 rounded-full"></div>
                       )}
                     </div>
                   );
