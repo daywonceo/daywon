@@ -23,14 +23,23 @@ const WelcomeScreen = ({ onNext, onSkip }: WelcomeScreenProps) => {
 
   const handleConnectSpotify = async () => {
     setIsConnectingSpotify(true);
-    const { error } = await signInWithSpotify();
-    if (error) {
-      console.error("Spotify connection error:", error);
-      toast.error("Failed to connect Spotify: " + error.message);
-    } else {
-      toast.success("Spotify connected successfully!");
+    console.log('WelcomeScreen: Connecting to Spotify...');
+    
+    try {
+      const { error } = await signInWithSpotify();
+      if (error) {
+        console.error("WelcomeScreen: Spotify connection error:", error);
+        toast.error("Failed to connect Spotify: " + (error.message || 'Unknown error'));
+      } else {
+        console.log("WelcomeScreen: Spotify connection initiated successfully");
+        toast.success("Redirecting to Spotify...");
+      }
+    } catch (err) {
+      console.error("WelcomeScreen: Spotify connection catch error:", err);
+      toast.error("Failed to connect Spotify");
+    } finally {
+      setIsConnectingSpotify(false);
     }
-    setIsConnectingSpotify(false);
   };
 
   return (

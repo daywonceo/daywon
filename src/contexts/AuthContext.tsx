@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -87,14 +88,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithSpotify = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'spotify',
-      options: {
-        redirectTo: `${window.location.origin}/spotify-success`,
-        scopes: 'user-read-email user-read-private streaming playlist-modify-public playlist-modify-private'
+    console.log('Attempting Spotify OAuth with redirect to:', `${window.location.origin}/spotify-success`);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'spotify',
+        options: {
+          redirectTo: `${window.location.origin}/spotify-success`,
+          scopes: 'user-read-email user-read-private streaming playlist-modify-public playlist-modify-private'
+        }
+      });
+      
+      console.log('Spotify OAuth response:', { data, error });
+      
+      if (error) {
+        console.error('Spotify OAuth error details:', {
+          message: error.message,
+          status: error.status,
+          statusText: error.statusText
+        });
       }
-    });
-    return { error };
+      
+      return { error };
+    } catch (err) {
+      console.error('Spotify OAuth catch block error:', err);
+      return { error: err };
+    }
   };
 
   const resetPassword = async (email: string) => {
