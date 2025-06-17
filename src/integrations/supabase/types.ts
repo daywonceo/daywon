@@ -9,6 +9,59 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      exercise_logs: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          equipment: string | null
+          exercise_instructions: string | null
+          exercise_name: string
+          id: string
+          muscle_group: string | null
+          reps: number
+          sets: number
+          user_id: string
+          weight_lbs: number | null
+          workout_session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          equipment?: string | null
+          exercise_instructions?: string | null
+          exercise_name: string
+          id?: string
+          muscle_group?: string | null
+          reps: number
+          sets: number
+          user_id: string
+          weight_lbs?: number | null
+          workout_session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          equipment?: string | null
+          exercise_instructions?: string | null
+          exercise_name?: string
+          id?: string
+          muscle_group?: string | null
+          reps?: number
+          sets?: number
+          user_id?: string
+          weight_lbs?: number | null
+          workout_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercise_logs_workout_session_id_fkey"
+            columns: ["workout_session_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       habit_photos: {
         Row: {
           activity_date: string
@@ -138,6 +191,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_progress: {
+        Row: {
+          created_at: string
+          current_weight_lbs: number | null
+          exercise_name: string
+          id: string
+          last_increase_date: string | null
+          previous_weight_lbs: number | null
+          total_sessions: number | null
+          updated_at: string
+          user_id: string
+          weight_increase_percent: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_weight_lbs?: number | null
+          exercise_name: string
+          id?: string
+          last_increase_date?: string | null
+          previous_weight_lbs?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id: string
+          weight_increase_percent?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_weight_lbs?: number | null
+          exercise_name?: string
+          id?: string
+          last_increase_date?: string | null
+          previous_weight_lbs?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id?: string
+          weight_increase_percent?: number | null
+        }
+        Relationships: []
+      }
       user_top_habits: {
         Row: {
           created_at: string
@@ -164,6 +256,83 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      workout_plans: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          plan_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          plan_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          plan_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workout_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          is_completed: boolean | null
+          notes: string | null
+          updated_at: string
+          user_id: string
+          workout_date: string
+          workout_plan_id: string | null
+          workout_type: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          is_completed?: boolean | null
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          workout_date: string
+          workout_plan_id?: string | null
+          workout_type: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          is_completed?: boolean | null
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          workout_date?: string
+          workout_plan_id?: string | null
+          workout_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_sessions_workout_plan_id_fkey"
+            columns: ["workout_plan_id"]
+            isOneToOne: false
+            referencedRelation: "workout_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
