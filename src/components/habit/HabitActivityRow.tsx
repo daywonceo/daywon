@@ -1,9 +1,9 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Edit, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DayActivity } from "@/hooks/useHabitActivities";
+import { calculateStreakForDate } from "@/utils/habitTracking";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -28,6 +28,16 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   toggleEditMode,
   updateActivityText,
 }) => {
+  // Calculate the date for this activity row
+  const getDateForActivity = (dayIndex: number) => {
+    const today = new Date();
+    const date = new Date(today);
+    date.setDate(today.getDate() - dayIndex);
+    return date;
+  };
+
+  const activityDate = getDateForActivity(activityIndex);
+
   return (
     <>
       {/* Day number */}
@@ -36,6 +46,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           {activity.day}
         </div>
       </div>
+      
       {/* Activity description */}
       <div className="flex items-center justify-center text-center">
         {activity.isEditing ? (
@@ -70,32 +81,48 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           </div>
         )}
       </div>
+      
       {/* Habit status boxes */}
-      {activity.categories.map((category) => (
-        <div
-          key={`${activityIndex}-${category}`}
-          className={cn(
-            "aspect-square w-full border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors",
-            activeHabit === category && activityIndex === 0
-              ? "ring-2 ring-blue-500 ring-offset-2"
-              : ""
-          )}
-          onClick={() => toggleStatus(activityIndex, category)}
-        >
-          {activity.statuses[category] === "completed" && (
-            <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark">
-              <Check size={20} className="sm:hidden text-white" />
-              <Check size={24} className="hidden sm:block text-white" />
-            </div>
-          )}
-          {activity.statuses[category] === "failed" && (
-            <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
-              <X size={20} className="sm:hidden text-red-500" />
-              <X size={24} className="hidden sm:block text-red-500" />
-            </div>
-          )}
-        </div>
-      ))}
+      {activity.categories.map((category) => {
+        const streak = activity.statuses[category] === "completed" 
+          ? calculateStreakForDate(category, activityDate) 
+          : 0;
+        const showStreak = streak >= 3;
+
+        return (
+          <div
+            key={`${activityIndex}-${category}`}
+            className={cn(
+              "aspect-square w-full border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
+              activeHabit === category && activityIndex === 0
+                ? "ring-2 ring-blue-500 ring-offset-2"
+                : ""
+            )}
+            onClick={() => toggleStatus(activityIndex, category)}
+          >
+            {activity.statuses[category] === "completed" && (
+              <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
+                {showStreak ? (
+                  <span className="text-white font-bold text-xs sm:text-sm">
+                    {streak}
+                  </span>
+                ) : (
+                  <>
+                    <Check size={20} className="sm:hidden text-white" />
+                    <Check size={24} className="hidden sm:block text-white" />
+                  </>
+                )}
+              </div>
+            )}
+            {activity.statuses[category] === "failed" && (
+              <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
+                <X size={20} className="sm:hidden text-red-500" />
+                <X size={24} className="hidden sm:block text-red-500" />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 };
