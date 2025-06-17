@@ -13,6 +13,8 @@ const Guidance = () => {
   const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("workouts");
 
+  const showSearchBar = activeTab === "workouts";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
       <Header />
@@ -29,13 +31,12 @@ const Guidance = () => {
           </div>
         </div>
 
-        {/* Only show SearchBar on workouts tab */}
-        <div className="workouts-only-search">
+        {showSearchBar && (
           <SearchBar 
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
           />
-        </div>
+        )}
 
         <GuidanceTabs
           searchQuery={searchQuery}
@@ -49,15 +50,6 @@ const Guidance = () => {
           onTranslationClick={() => setTranslationDialogOpen(true)}
           onTranslationDialogOpenChange={setTranslationDialogOpen}
         />
-
-        <style jsx>{`
-          .workouts-only-search {
-            display: none;
-          }
-          [data-state="active"][data-value="workouts"] ~ * .workouts-only-search {
-            display: block;
-          }
-        `}</style>
       </main>
       
       <Footer />

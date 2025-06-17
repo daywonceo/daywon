@@ -1,147 +1,150 @@
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshCw, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import ActivityTypeSelector from "./ActivityTypeSelector";
-import ActivityDisplay from "./ActivityDisplay";
-import ActivityActions from "./ActivityActions";
 
-interface BoredTabProps {
-  searchQuery: string;
-}
-
-interface BoredActivity {
+interface Activity {
   activity: string;
   type: string;
   participants: number;
   price: number;
-  link: string;
+  link?: string;
   key: string;
   accessibility: number;
-  _fallback?: boolean;
-  _message?: string;
 }
 
-const BoredTab = ({ searchQuery }: BoredTabProps) => {
-  const [activity, setActivity] = useState<BoredActivity | null>(null);
+const BoredTab = () => {
+  const [activity, setActivity] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState("any");
+  const [error, setError] = useState<string | null>(null);
 
   const fetchActivity = async () => {
     setIsLoading(true);
+    setError(null);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('get-bored-activity', {
-        body: JSON.stringify({ type: selectedType !== "any" ? selectedType : undefined })
-      });
+      console.log('Fetching random activity...');
+      
+      const { data, error } = await supabase.functions.invoke('get-bored-activity');
 
       if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
+        console.error('Error fetching activity:', error);
+        setError('Failed to fetch activity');
+        return;
       }
 
-      if (data?.activity) {
+      if (data) {
         setActivity(data);
-        
-        // Show a toast if we're using fallback activities
-        if (data._fallback) {
-          toast({
-            title: "Offline Mode",
-            description: data._message || "Using offline suggestions while the activity service is unavailable",
-            variant: "default"
-          });
-        }
-      } else if (data?.error) {
-        throw new Error(data.error);
+        console.log('Successfully loaded activity:', data);
       } else {
-        toast({
-          title: "No activities found",
-          description: "Try a different category or try again",
-          variant: "destructive"
-        });
+        setError('No activity data received');
+        console.log('No activity data received');
       }
-    } catch (error) {
-      console.error('Error fetching activity:', error);
-      toast({
-        title: "Service temporarily unavailable",
-        description: "The activity service is having issues. Please try again in a few minutes.",
-        variant: "destructive"
-      });
+    } catch (err) {
+      console.error('Error calling bored activity function:', err);
+      setError('Failed to fetch activity');
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
+  // Fetch initial activity on component mount
+  React.useEffect(() => {
     fetchActivity();
   }, []);
 
-  // Fetch new activity when type changes
-  useEffect(() => {
-    if (selectedType) {
-      fetchActivity();
-    }
-  }, [selectedType]);
-
-  const handleTryThis = () => {
-    if (activity) {
-      // Log activity to localStorage for now (could be enhanced to use actual habit tracking)
-      const recentActivities = JSON.parse(localStorage.getItem('recent-bored-activities') || '[]');
-      const newActivity = {
-        ...activity,
-        completedAt: new Date().toISOString()
-      };
-      
-      recentActivities.unshift(newActivity);
-      // Keep only last 10 activities
-      localStorage.setItem('recent-bored-activities', JSON.stringify(recentActivities.slice(0, 10)));
-      
-      toast({
-        title: "Activity logged!",
-        description: "Added to your recent activities"
-      });
-    }
+  const getPriceDescription = (price: number) => {
+    if (price === 0) return "Free";
+    if (price <= 0.3) return "Low cost";
+    if (price <= 0.6) return "Medium cost";
+    return "High cost";
   };
 
-  const handleSuggestAnother = () => {
-    fetchActivity();
+  const getAccessibilityDescription = (accessibility: number) => {
+    if (accessibility <= 0.3) return "Very accessible";
+    if (accessibility <= 0.6) return "Moderately accessible";
+    return "Requires some effort";
   };
 
   return (
-    <div className="animate-fade-in max-w-2xl mx-auto">
-      <div className="text-center mb-6">
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          Get personalized activity suggestions to beat boredom
-        </p>
-        
-        <ActivityTypeSelector 
-          selectedType={selectedType}
-          onTypeChange={setSelectedType}
-        />
+    <div className="animate-fade-in">
+      <div className="mb-6 flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Beat the Boredom</h3>
+        <Button
+          onClick={fetchActivity}
+          disabled={isLoading}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Get New Activity
+        </Button>
       </div>
 
-      <ActivityDisplay 
-        activity={activity}
-        isLoading={isLoading}
-      />
-
-      <ActivityActions
-        activity={activity}
-        isLoading={isLoading}
-        onTryThis={handleTryThis}
-        onSuggestAnother={handleSuggestAnother}
-      />
-
-      {/* No Results Message for Search */}
-      {searchQuery && (
-        <Card className="bg-white dark:bg-gray-800 shadow-sm mt-6">
-          <CardContent className="p-6">
-            <p className="text-center text-gray-600 dark:text-gray-300">
-              Search is not available with live suggestions. Use the type filter above to narrow down activities.
-            </p>
+      {error && (
+        <Card className="mb-6 border-red-200 dark:border-red-800">
+          <CardContent className="p-4">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
           </CardContent>
         </Card>
       )}
+
+      {isLoading ? (
+        <Card className="bg-white dark:bg-gray-800 shadow-sm">
+          <CardHeader>
+            <Skeleton className="h-6 w-32" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-20 w-full" />
+            <div className="flex gap-4">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </CardContent>
+        </Card>
+      ) : activity ? (
+        <Card className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-green-800 dark:text-green-400 capitalize">
+              {activity.type} Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
+              {activity.activity}
+            </p>
+            
+            <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <span className="flex items-center gap-1">
+                👥 {activity.participants} participant{activity.participants !== 1 ? 's' : ''}
+              </span>
+              <span className="flex items-center gap-1">
+                💰 {getPriceDescription(activity.price)}
+              </span>
+              <span className="flex items-center gap-1">
+                ♿ {getAccessibilityDescription(activity.accessibility)}
+              </span>
+            </div>
+
+            {activity.link && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-4"
+                onClick={() => window.open(activity.link, '_blank')}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Learn More
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 };

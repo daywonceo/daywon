@@ -14,7 +14,6 @@ interface DevotionsTabProps {
   selectedTranslation: string;
   selectedCategory: string;
   translationDialogOpen: boolean;
-  searchQuery: string;
   onTranslationChange: (translation: string) => void;
   onCategoryChange: (category: string) => void;
   onTranslationClick: () => void;
@@ -25,7 +24,6 @@ const DevotionsTab = ({
   selectedTranslation,
   selectedCategory,
   translationDialogOpen,
-  searchQuery,
   onTranslationChange,
   onCategoryChange,
   onTranslationClick,
@@ -37,13 +35,6 @@ const DevotionsTab = ({
     versesError,
     fetchBibleVerses
   } = useBibleVerses(selectedTranslation, selectedCategory);
-
-  const filteredVerses = bibleVerses.filter(verse => 
-    searchQuery === "" || 
-    verse.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    verse.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    verse.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const handleTranslationChange = (translation: string) => {
     onTranslationChange(translation);
@@ -108,7 +99,7 @@ const DevotionsTab = ({
             </Card>
           ))
         ) : (
-          filteredVerses.map((verse, index) => (
+          bibleVerses.map((verse, index) => (
             <VerseCard 
               key={index} 
               verse={verse} 
