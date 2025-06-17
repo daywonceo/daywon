@@ -1,37 +1,32 @@
+
 import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Trophy } from 'lucide-react';
-import { useHabitActivities } from '@/hooks/useHabitActivities';
-import { calculateStreakForDate } from '@/utils/habitStreaks';
+import { useHabitStats } from '@/hooks/useHabitStats';
 
 const MilestoneTracker: React.FC = () => {
-  const { userHabits } = useHabitActivities();
+  const { streakStats } = useHabitStats();
 
   const milestoneData = useMemo(() => {
-    const today = new Date();
     const milestones = [3, 7, 10, 21, 30, 50, 100];
-    
-    // Get the highest streak across all habits
-    const maxStreak = Math.max(
-      ...userHabits.map(habit => calculateStreakForDate(habit, today)),
-      0
-    );
+    const currentBestStreak = streakStats.bestStreak;
     
     // Find the next milestone
-    const nextMilestone = milestones.find(milestone => milestone > maxStreak);
-    const daysUntilMilestone = nextMilestone ? nextMilestone - maxStreak : 0;
+    const nextMilestone = milestones.find(milestone => milestone > currentBestStreak);
+    const daysUntilMilestone = nextMilestone ? nextMilestone - currentBestStreak : 0;
     
     // Check if we just achieved a milestone
-    const justAchieved = milestones.includes(maxStreak) && maxStreak > 0;
+    const justAchieved = milestones.includes(currentBestStreak) && currentBestStreak > 0;
     
     return {
-      currentStreak: maxStreak,
+      currentBestStreak,
+      bestStreakHabit: streakStats.bestStreakHabit,
       nextMilestone,
       daysUntilMilestone,
       justAchieved
     };
-  }, [userHabits]);
+  }, [streakStats]);
 
   if (milestoneData.justAchieved) {
     return (
@@ -40,15 +35,20 @@ const MilestoneTracker: React.FC = () => {
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="h-5 w-5 text-yellow-500 animate-pulse" />
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Milestone Achieved!
+              Best Streak Milestone Achieved!
             </h3>
           </div>
           
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Badge variant="default" className="bg-yellow-500 text-white">
-                {milestoneData.currentStreak}-Day Streak
+                {milestoneData.currentBestStreak}-Day Streak
               </Badge>
+              {milestoneData.bestStreakHabit && (
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {milestoneData.bestStreakHabit}
+                </span>
+              )}
             </div>
             
             <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -72,7 +72,7 @@ const MilestoneTracker: React.FC = () => {
         <div className="flex items-center gap-2 mb-3">
           <Target className="h-5 w-5 text-blue-500" />
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Next Milestone
+            Best Streak Progress
           </h3>
         </div>
         
@@ -89,8 +89,13 @@ const MilestoneTracker: React.FC = () => {
               
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
-                  Current: {milestoneData.currentStreak} days
+                  Current best: {milestoneData.currentBestStreak} days
                 </Badge>
+                {milestoneData.bestStreakHabit && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    ({milestoneData.bestStreakHabit})
+                  </span>
+                )}
               </div>
             </>
           ) : (
@@ -101,6 +106,16 @@ const MilestoneTracker: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 You've reached all milestones. Keep going!
               </p>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant="outline" className="text-xs">
+                  Best streak: {milestoneData.currentBestStreak} days
+                </Badge>
+                {milestoneData.bestStreakHabit && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    ({milestoneData.bestStreakHabit})
+                  </span>
+                )}
+              </div>
             </>
           )}
         </div>

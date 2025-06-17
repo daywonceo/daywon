@@ -19,6 +19,7 @@ const DEFAULT_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 export const useHabitActivities = (habitList?: string[]) => {
   const [activities, setActivities] = useState<DayActivity[]>([]);
   const [activeHabit, setActiveHabit] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const userHabits =
     habitList && habitList.length === 3
@@ -84,7 +85,7 @@ export const useHabitActivities = (habitList?: string[]) => {
         variant: "destructive"
       });
     }
-  }, [userHabits.join(',')]);
+  }, [userHabits.join(','), refreshTrigger]);
 
   useEffect(() => {
     loadActivities();
@@ -129,6 +130,9 @@ export const useHabitActivities = (habitList?: string[]) => {
       
       // Provide haptic feedback on status change
       hapticSuccess();
+      
+      // Trigger refresh of stats when habits are updated
+      setRefreshTrigger(prev => prev + 1);
       
       return newActivities;
     });

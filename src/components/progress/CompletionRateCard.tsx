@@ -1,45 +1,12 @@
-import React, { useMemo } from 'react';
+
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle } from 'lucide-react';
-import { useHabitActivities } from '@/hooks/useHabitActivities';
-import { getHabitActivities } from '@/utils/habitActivity';
+import { useHabitStats } from '@/hooks/useHabitStats';
 
 const CompletionRateCard: React.FC = () => {
-  const { userHabits } = useHabitActivities();
-
-  const weeklyStats = useMemo(() => {
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
-    
-    const activities = getHabitActivities();
-    
-    // Count completed habits for the current week
-    let completedCount = 0;
-    let totalPossible = 0;
-    
-    // Check each day of the current week
-    for (let dayOffset = 0; dayOffset <= now.getDay(); dayOffset++) {
-      const checkDate = new Date(startOfWeek);
-      checkDate.setDate(startOfWeek.getDate() + dayOffset);
-      const dateStr = checkDate.toISOString().split('T')[0];
-      
-      userHabits.forEach(habit => {
-        totalPossible++;
-        const activity = activities.find(
-          a => a.habitName === habit && a.date === dateStr && a.status === 'completed'
-        );
-        if (activity) {
-          completedCount++;
-        }
-      });
-    }
-    
-    const percentage = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
-    
-    return { completedCount, totalPossible, percentage };
-  }, [userHabits]);
+  const { weeklyStats } = useHabitStats();
 
   return (
     <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-green-500 shadow-md">
