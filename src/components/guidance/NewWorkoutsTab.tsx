@@ -3,19 +3,29 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Clock, Target, TrendingUp, Plus, AlertCircle } from "lucide-react";
+import { Dumbbell, Clock, Target, TrendingUp, Plus, AlertCircle, Calendar } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import WorkoutPlanSelector from "./WorkoutPlanSelector";
 import ActiveWorkoutView from "./ActiveWorkoutView";
 import WorkoutProgress from "./WorkoutProgress";
+import WeekViewCalendar from "./WeekViewCalendar";
+import PlannedWorkoutForm from "./PlannedWorkoutForm";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'week-view' | 'schedule-workout'>('overview');
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start from Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+    return startOfWeek;
+  });
+
   const { user } = useAuth();
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
-  const { sessions, error: sessionsError } = useWorkoutSessions();
+  const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
 
   // Show error state if there are authentication or data issues
   if (!user) {
@@ -56,6 +66,54 @@ const NewWorkoutsTab = () => {
     return <WorkoutProgress onBack={() => setCurrentView('overview')} />;
   }
 
+  if (currentView === 'week-view') {
+    const plannedWorkouts = getPlannedWorkoutsForWeek(currentWeekStart);
+    
+    const handleWeekChange = (direction: 'prev' | 'next') => {
+      const newWeekStart = new Date(currentWeekStart);
+      newWeekStart.setDate(currentWeekStart.getDate() + (direction === 'next' ? 7 : -7));
+      setCurrentWeekStart(newWeekStart);
+    };
+
+    return (
+      <div className="animate-fade-in space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <Button variant="ghost" size="sm" onClick={() => setCurrentView('overview')}>
+            ← Back to Overview
+          </Button>
+          <Button
+            onClick={() => setCurrentView('schedule-workout')}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Schedule Workout
+          </Button>
+        </div>
+        
+        <WeekViewCalendar
+          plannedWorkouts={plannedWorkouts}
+          currentWeekStart={currentWeekStart}
+          onWeekChange={handleWeekChange}
+          onWorkoutClick={(workout) => {
+            console.log('Workout clicked:', workout);
+            // Future: Navigate to workout details
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (currentView === 'schedule-workout') {
+    return (
+      <div className="animate-fade-in">
+        <PlannedWorkoutForm
+          onClose={() => setCurrentView('week-view')}
+          onSuccess={() => setCurrentView('week-view')}
+        />
+      </div>
+    );
+  }
+
   const activePlan = workoutPlans.find(plan => plan.is_active);
   const recentSessions = sessions.slice(0, 3);
   const completedThisWeek = sessions.filter(session => {
@@ -64,6 +122,15 @@ const NewWorkoutsTab = () => {
     weekAgo.setDate(weekAgo.getDate() - 7);
     return sessionDate >= weekAgo && session.is_completed;
   }).length;
+
+  // Get current week planned workouts for dashboard highlight
+  const currentWeekPlanned = getCurrentWeekPlannedWorkouts();
+  const upcomingPlannedWorkouts = currentWeekPlanned.filter(workout => {
+    const workoutDate = new Date(workout.workout_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return workoutDate >= today && !workout.is_completed;
+  });
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -121,6 +188,44 @@ const NewWorkoutsTab = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Upcoming Planned Workouts */}
+      {upcomingPlannedWorkouts.length > 0 && (
+        <Card className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border-orange-200 dark:border-orange-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-orange-800 dark:text-orange-400 flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Upcoming This Week
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {upcomingPlannedWorkouts.slice(0, 3).map((workout) => (
+              <div key={workout.id} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-800 dark:text-gray-200">
+                    {workout.workout_type.replace(/_/g, ' ').toUpperCase()}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {new Date(workout.workout_date).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-orange-600 border-orange-300">
+                  Planned
+                </Badge>
+              </div>
+            ))}
+            {upcomingPlannedWorkouts.length > 3 && (
+              <p className="text-sm text-gray-500 text-center">
+                +{upcomingPlannedWorkouts.length - 3} more planned...
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Active Plan */}
       {activePlan ? (
@@ -228,12 +333,11 @@ const NewWorkoutsTab = () => {
         
         <Button 
           variant="outline" 
-          onClick={() => setCurrentView('progress')}
+          onClick={() => setCurrentView('week-view')}
           className="h-16 flex flex-col items-center gap-1"
-          disabled={sessions.length === 0}
         >
-          <TrendingUp className="w-5 h-5" />
-          <span className="text-xs">Progress</span>
+          <Calendar className="w-5 h-5" />
+          <span className="text-xs">Week Schedule</span>
         </Button>
       </div>
     </div>

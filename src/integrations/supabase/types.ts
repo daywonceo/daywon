@@ -294,6 +294,7 @@ export type Database = {
           id: string
           is_completed: boolean | null
           notes: string | null
+          planned_day_of_week: number | null
           updated_at: string
           user_id: string
           workout_date: string
@@ -306,6 +307,7 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           notes?: string | null
+          planned_day_of_week?: number | null
           updated_at?: string
           user_id: string
           workout_date: string
@@ -318,6 +320,7 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           notes?: string | null
+          planned_day_of_week?: number | null
           updated_at?: string
           user_id?: string
           workout_date?: string

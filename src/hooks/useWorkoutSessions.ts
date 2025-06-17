@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +11,7 @@ export interface WorkoutSession {
   duration_minutes: number | null;
   is_completed: boolean;
   notes: string | null;
+  planned_day_of_week: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -75,6 +75,7 @@ export const useWorkoutSessions = () => {
     workout_date: string;
     workout_type: string;
     notes?: string;
+    planned_day_of_week?: number;
   }) => {
     if (!user) {
       setError('User not authenticated');
@@ -190,6 +191,27 @@ export const useWorkoutSessions = () => {
     }
   };
 
+  const getPlannedWorkoutsForWeek = (startOfWeek: Date): WorkoutSession[] => {
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    return sessions.filter(session => {
+      if (session.planned_day_of_week === null) return false;
+      
+      const sessionDate = new Date(session.workout_date);
+      return sessionDate >= startOfWeek && sessionDate <= endOfWeek;
+    });
+  };
+
+  const getCurrentWeekPlannedWorkouts = (): WorkoutSession[] => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start from Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    return getPlannedWorkoutsForWeek(startOfWeek);
+  };
+
   useEffect(() => {
     fetchSessions();
   }, [user]);
@@ -201,6 +223,8 @@ export const useWorkoutSessions = () => {
     createSession,
     completeSession,
     logExercise,
-    refetch: fetchSessions
+    refetch: fetchSessions,
+    getPlannedWorkoutsForWeek,
+    getCurrentWeekPlannedWorkouts
   };
 };
