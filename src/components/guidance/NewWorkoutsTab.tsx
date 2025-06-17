@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
@@ -75,6 +74,16 @@ const NewWorkoutsTab = () => {
       </Card>
     );
   }
+
+  const handleWorkoutClick = (session: any) => {
+    // If the workout is not completed (in progress), go to active workout view
+    if (!session.is_completed) {
+      setCurrentView('active-workout');
+    }
+    // If completed, we could show workout details in the future
+    // For now, just navigate to active workout for any clicked workout
+    setCurrentView('active-workout');
+  };
 
   if (currentView === 'plan-selector') {
     return <WorkoutPlanSelector onBack={() => setCurrentView('overview')} />;
@@ -195,7 +204,10 @@ const NewWorkoutsTab = () => {
         hasInactivePlans={!plansLoading && workoutPlans.length > 0}
       />
 
-      <RecentWorkoutsCard recentSessions={recentSessions} />
+      <RecentWorkoutsCard 
+        recentSessions={recentSessions} 
+        onWorkoutClick={handleWorkoutClick}
+      />
 
       <QuickActionsGrid
         workoutPlansCount={workoutPlans.length}

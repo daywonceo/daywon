@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 
 interface RecentWorkoutsCardProps {
   recentSessions: any[];
+  onWorkoutClick: (session: any) => void;
 }
 
-const RecentWorkoutsCard = ({ recentSessions }: RecentWorkoutsCardProps) => {
+const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCardProps) => {
   if (recentSessions.length === 0) return null;
 
   return (
@@ -17,7 +18,11 @@ const RecentWorkoutsCard = ({ recentSessions }: RecentWorkoutsCardProps) => {
       </CardHeader>
       <CardContent className="space-y-3">
         {recentSessions.map((session) => (
-          <div key={session.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div 
+            key={session.id} 
+            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+            onClick={() => onWorkoutClick(session)}
+          >
             <div>
               <div className="font-medium text-gray-800 dark:text-gray-200">
                 {session.workout_type.replace(/_/g, ' ').toUpperCase()}
