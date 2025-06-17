@@ -38,9 +38,17 @@ const DailyEncouragementCard: React.FC = () => {
       const quotes = await response.json();
       
       if (quotes && quotes.length > 0) {
+        // Filter quotes to prioritize those with known authors
+        const quotesWithAuthors = quotes.filter(q => 
+          q.author && q.author !== "null" && !q.author.includes("Unknown")
+        );
+        
+        // Use quotes with authors if available, otherwise use all quotes
+        const quotesSource = quotesWithAuthors.length > 0 ? quotesWithAuthors : quotes;
+        
         // Use date as seed for consistent daily quote
         const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-        const selectedQuote = quotes[dayOfYear % quotes.length];
+        const selectedQuote = quotesSource[dayOfYear % quotesSource.length];
         
         const formattedQuote = {
           text: selectedQuote.text || selectedQuote.quote || "Every day is a new opportunity to grow.",
