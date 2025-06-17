@@ -1,38 +1,28 @@
 
 import React from "react";
-import { getHabitStreakInfo } from "@/utils/habitTracking";
-import StreakDisplay from "./StreakDisplay";
 
 interface HabitGridHeaderProps {
   habits: string[];
 }
 
-const HabitGridHeader = ({ habits }: HabitGridHeaderProps) => {
-  return (
-    <>
-      {/* Empty cell for day column */}
-      <div></div>
-      
-      {/* Empty cell for activity text column */}
-      <div></div>
-      
-      {/* Habit headers with streaks */}
-      {habits.map((habit) => {
-        const streakInfo = getHabitStreakInfo(habit);
-        return (
-          <div key={`header-${habit}`} className="text-center">
-            <div className="font-bold text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-1">
-              {habit}
-            </div>
-            <StreakDisplay 
-              currentStreak={streakInfo.current}
-              className="text-xs"
-            />
-          </div>
-        );
-      })}
-    </>
-  );
-};
+const HabitGridHeader: React.FC<HabitGridHeaderProps> = ({ habits }) => (
+  <>
+    {/* Empty grid cell for day number */}
+    <div />
+    {/* Empty grid cell for activity description */}
+    <div />
+    {/* Habit headers, aligned with habit columns */}
+    {habits.map((habit) => (
+      <div key={habit} className="text-center">
+        <span
+          className="truncate text-xs sm:text-sm px-0.5 leading-snug font-semibold text-green-800/90"
+          title={habit}
+        >
+          {habit}
+        </span>
+      </div>
+    ))}
+  </>
+);
 
 export default HabitGridHeader;
