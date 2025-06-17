@@ -16,6 +16,7 @@ import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SavedQuotes from "./pages/SavedQuotes";
+import SpotifySuccess from "./pages/SpotifySuccess";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
