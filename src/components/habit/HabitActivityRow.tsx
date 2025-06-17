@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Edit, Check, X } from "lucide-react";
@@ -6,6 +7,7 @@ import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
 import { shouldShowRecoveryDialog, hasRecentRecovery } from "@/utils/streakRecovery";
 import StreakRecoveryDialog from "./StreakRecoveryDialog";
+import PhotoUploadButton from "./PhotoUploadButton";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -114,17 +116,34 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
             className="text-green-800 text-sm sm:text-lg font-semibold py-1"
           />
         ) : (
-          <div className="flex items-center justify-center group">
-            <p className="text-sm sm:text-base font-semibold text-green-800/90 tracking-wide">
-              {activity.text}
-            </p>
-            <button
-              onClick={() => toggleEditMode(activityIndex)}
-              className="ml-2 text-green-700 hover:text-green-900 transition-colors opacity-0 group-hover:opacity-100"
-            >
-              <Edit size={12} className="sm:hidden" />
-              <Edit size={14} className="hidden sm:block" />
-            </button>
+          <div className="flex flex-col items-center justify-center group space-y-2">
+            <div className="flex items-center">
+              <p className="text-sm sm:text-base font-semibold text-green-800/90 tracking-wide">
+                {activity.text}
+              </p>
+              <button
+                onClick={() => toggleEditMode(activityIndex)}
+                className="ml-2 text-green-700 hover:text-green-900 transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <Edit size={12} className="sm:hidden" />
+                <Edit size={14} className="hidden sm:block" />
+              </button>
+            </div>
+            
+            {/* Show photo upload button for completed habits on today */}
+            {activityIndex === 0 && (
+              <div className="flex gap-2 flex-wrap justify-center">
+                {activity.categories.map(category => 
+                  activity.statuses[category] === "completed" && (
+                    <PhotoUploadButton
+                      key={category}
+                      habitName={category}
+                      activityDate={activityDate}
+                    />
+                  )
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -15,11 +15,12 @@ import { initializeDefaultHabits } from "@/utils/habitTracking";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Target, Calendar, TrendingUp, BookOpen } from "lucide-react";
+import { Plus, Target, Calendar, TrendingUp, BookOpen, Camera } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
 import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
 import AllHabitsDialog from "@/components/habit/AllHabitsDialog";
+import HabitGallery from "@/components/habit/HabitGallery";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +29,7 @@ const Index = () => {
   const [totalHabits, setTotalHabits] = useState(5);
   const [showHabitsModal, setShowHabitsModal] = useState(false);
   const [showAllHabits, setShowAllHabits] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
 
   const isMobile = useIsMobile();
 
@@ -140,13 +142,20 @@ const Index = () => {
           />
 
           <AllHabitsDialog open={showAllHabits} onOpenChange={setShowAllHabits} />
+          <HabitGallery open={showGallery} onOpenChange={setShowGallery} />
 
           <div className="flex justify-between items-center mb-4 sm:mb-6">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
-            <Button variant="outline" onClick={() => setShowAllHabits(true)}>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowGallery(true)}>
+                <Camera className="mr-2 h-4 w-4" />
+                Gallery
+              </Button>
+              <Button variant="outline" onClick={() => setShowAllHabits(true)}>
                 <BookOpen className="mr-2 h-4 w-4" />
                 All Habits
-            </Button>
+              </Button>
+            </div>
           </div>
 
           <RecentActivities habitList={activityHabits} />
