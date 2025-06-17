@@ -108,35 +108,37 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
             <DialogDescription>View, create, and organize all of your habits. Habits you track will automatically appear here as active.</DialogDescription>
           </DialogHeader>
           <div className="flex-grow overflow-y-auto pr-2 -mr-4 space-y-6">
-            <div className="flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900 z-10 py-2">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={handleRefresh}
-                    disabled={isRefreshing}
-                    className="flex items-center gap-2"
-                  >
-                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    Refresh
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sticky top-0 bg-white dark:bg-gray-900 z-10 py-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="flex items-center gap-1 text-xs sm:text-sm w-full sm:w-auto"
+                >
+                  <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAllTimeHabits(true)}
+                  className="flex items-center gap-1 text-xs sm:text-sm w-full sm:w-auto"
+                >
+                  <History className="h-3 w-3 sm:h-4 sm:w-4" />
+                  All-Time
+                </Button>
+              </div>
+              <HabitAddSheet
+                trigger={
+                  <Button size="sm" className="flex items-center gap-1 text-xs sm:text-sm w-full sm:w-auto">
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                    Add Habit
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowAllTimeHabits(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    All-Time Habits
-                  </Button>
-                </div>
-                <HabitAddSheet
-                  trigger={
-                    <Button className="flex items-center gap-2">
-                      <Plus className="h-4 w-4" />
-                      Add New Habit
-                    </Button>
-                  }
-                  onHabitSelected={handleHabitSelected}
-                />
+                }
+                onHabitSelected={handleHabitSelected}
+              />
             </div>
             {isLoading ? (
               <div className="space-y-2">
