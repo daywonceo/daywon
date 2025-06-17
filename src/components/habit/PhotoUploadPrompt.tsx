@@ -53,28 +53,28 @@ const PhotoUploadPrompt: React.FC<PhotoUploadPromptProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md mx-4">
-        <div className="text-center space-y-6 p-2">
-          <h3 className="text-lg font-semibold text-gray-800">
+      <DialogContent className="sm:max-w-sm max-w-[90vw] mx-auto">
+        <div className="text-center space-y-4 p-2">
+          <h3 className="text-base font-semibold text-gray-800">
             Want to add a photo?
           </h3>
           
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <Button
               onClick={handleUploadClick}
-              className="bg-green-600 hover:bg-green-700 text-white gap-2 py-3"
+              className="bg-green-600 hover:bg-green-700 text-white gap-2 py-2 text-sm"
             >
-              <Camera size={20} />
-              📸 Upload Photo
+              <Camera size={16} />
+              Upload Photo
             </Button>
             
             <Button
               onClick={handleSkip}
               variant="outline"
-              className="gap-2 py-3"
+              className="gap-2 py-2 text-sm"
             >
-              <X size={16} />
-              ❌ Skip
+              <X size={14} />
+              Skip
             </Button>
           </div>
 
@@ -86,7 +86,7 @@ const PhotoUploadPrompt: React.FC<PhotoUploadPromptProps> = ({
             />
             <label
               htmlFor="dont-show"
-              className="text-sm text-gray-500 cursor-pointer"
+              className="text-xs text-gray-500 cursor-pointer"
             >
               Don't show this again
             </label>
