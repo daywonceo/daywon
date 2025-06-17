@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -22,12 +23,12 @@ interface BoredActivity {
 const BoredTab = ({ searchQuery }: BoredTabProps) => {
   const [activity, setActivity] = useState<BoredActivity | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState("");
+  const [selectedType, setSelectedType] = useState("any");
 
   const fetchActivity = async () => {
     setIsLoading(true);
     try {
-      const url = selectedType 
+      const url = selectedType && selectedType !== "any"
         ? `https://www.boredapi.com/api/activity?type=${selectedType}`
         : 'https://www.boredapi.com/api/activity';
       

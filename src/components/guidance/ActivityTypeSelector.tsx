@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 
 const activityTypes = [
-  { value: "", label: "Any Type" },
+  { value: "any", label: "Any Type" },
   { value: "education", label: "Education" },
   { value: "recreational", label: "Recreational" },
   { value: "social", label: "Social" },
