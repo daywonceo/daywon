@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Bell, BellOff, ChevronRight, ArrowLeft, Skip } from "lucide-react";
+import { Bell, BellOff, ChevronRight, ArrowLeft, SkipForward } from "lucide-react";
 import TrackCard, { HabitTrack } from "./TrackCard";
 import { HABIT_TRACKS } from "@/data/habitTracks";
 
@@ -156,7 +155,7 @@ const NotificationScreen = ({
                 onClick={onSkip}
                 className="flex items-center gap-2 flex-1"
               >
-                <Skip className="w-4 h-4" />
+                <SkipForward className="w-4 h-4" />
                 Skip
               </Button>
               
