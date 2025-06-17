@@ -22,10 +22,39 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [exerciseLogs, setExerciseLogs] = useState<any[]>([]);
   
   const { workoutPlans } = useWorkoutPlans();
-  const { createSession, completeSession, logExercise } = useWorkoutSessions();
+  const { sessions, createSession, completeSession, logExercise } = useWorkoutSessions();
   const { generateWorkoutPlan, isLoading } = useExercises();
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
+
+  // Check for existing active session on component mount
+  useEffect(() => {
+    const activeSession = sessions.find(session => {
+      const sessionDate = new Date(session.workout_date);
+      const today = new Date();
+      const isToday = sessionDate.toDateString() === today.toDateString();
+      return !session.is_completed && isToday;
+    });
+
+    if (activeSession) {
+      console.log('Found existing active session:', activeSession);
+      setCurrentSession(activeSession);
+      setSelectedWorkoutType(activeSession.workout_type);
+      
+      // Set start time to creation time if we're resuming
+      const sessionCreatedAt = new Date(activeSession.created_at);
+      setStartTime(sessionCreatedAt);
+      
+      // Generate workout plan for the existing session
+      if (activePlan) {
+        generateWorkoutPlan(activePlan.plan_type, 'beginner').then(plan => {
+          if (plan && plan[activeSession.workout_type]) {
+            setWorkoutPlan(plan[activeSession.workout_type]);
+          }
+        });
+      }
+    }
+  }, [sessions, activePlan, generateWorkoutPlan]);
 
   // Timer effect
   useEffect(() => {

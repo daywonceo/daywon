@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Clock, Target, TrendingUp, Plus, AlertCircle, Calendar } from "lucide-react";
+import { Dumbbell, Clock, Target, TrendingUp, Plus, AlertCircle, Calendar, Play, Timer } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import WorkoutPlanSelector from "./WorkoutPlanSelector";
 import ActiveWorkoutView from "./ActiveWorkoutView";
@@ -26,6 +26,14 @@ const NewWorkoutsTab = () => {
   const { user } = useAuth();
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
   const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
+
+  // Find active workout session (not completed and from today)
+  const activeWorkoutSession = sessions.find(session => {
+    const sessionDate = new Date(session.workout_date);
+    const today = new Date();
+    const isToday = sessionDate.toDateString() === today.toDateString();
+    return !session.is_completed && isToday;
+  });
 
   // Show error state if there are authentication or data issues
   if (!user) {
@@ -134,6 +142,38 @@ const NewWorkoutsTab = () => {
 
   return (
     <div className="animate-fade-in space-y-6">
+      {/* Active Workout Alert */}
+      {activeWorkoutSession && (
+        <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Timer className="w-6 h-6 text-orange-600" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-orange-800 dark:text-orange-400">
+                    Workout In Progress
+                  </h3>
+                  <p className="text-sm text-orange-600 dark:text-orange-300">
+                    {activeWorkoutSession.workout_type.replace(/_/g, ' ').toUpperCase()} • Started today
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => setCurrentView('active-workout')}
+                size="sm"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Resume
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Welcome Message for First-time Users */}
       {!plansLoading && workoutPlans.length === 0 && (
         <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800">
@@ -252,9 +292,10 @@ const NewWorkoutsTab = () => {
               <Button 
                 onClick={() => setCurrentView('active-workout')}
                 className="flex-1 bg-green-600 hover:bg-green-700"
+                disabled={!!activeWorkoutSession}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Start Workout
+                {activeWorkoutSession ? 'Workout In Progress' : 'Start Workout'}
               </Button>
               <Button 
                 variant="outline" 
