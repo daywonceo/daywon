@@ -2,11 +2,8 @@
 import { useMemo } from 'react';
 import { getHabitActivities } from '@/utils/habitActivity';
 import { calculateStreakForDate } from '@/utils/habitStreaks';
-import { useHabitActivities } from './useHabitActivities';
 
-export const useHabitStats = () => {
-  const { userHabits } = useHabitActivities();
-
+export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
   const stats = useMemo(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -72,7 +69,7 @@ export const useHabitStats = () => {
         totalHabits: userHabits.length
       }
     };
-  }, [userHabits]);
+  }, [userHabits.join(',')]);
 
   return stats;
 };

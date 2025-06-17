@@ -5,8 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Target, Trophy } from 'lucide-react';
 import { useHabitStats } from '@/hooks/useHabitStats';
 
-const MilestoneTracker: React.FC = () => {
-  const { streakStats } = useHabitStats();
+interface MilestoneTrackerProps {
+  userHabits?: string[];
+}
+
+const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
+  const { streakStats } = useHabitStats(userHabits);
 
   const milestoneData = useMemo(() => {
     const milestones = [3, 7, 10, 21, 30, 50, 100];

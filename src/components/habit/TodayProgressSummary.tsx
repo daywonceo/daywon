@@ -5,8 +5,12 @@ import { Progress } from '@/components/ui/progress';
 import { Calendar, CheckCircle } from 'lucide-react';
 import { useHabitStats } from '@/hooks/useHabitStats';
 
-const TodayProgressSummary: React.FC = () => {
-  const { todayStats, streakStats } = useHabitStats();
+interface TodayProgressSummaryProps {
+  userHabits?: string[];
+}
+
+const TodayProgressSummary: React.FC<TodayProgressSummaryProps> = ({ userHabits }) => {
+  const { todayStats, streakStats } = useHabitStats(userHabits);
   
   const todayPercentage = todayStats.totalHabits > 0 
     ? Math.round((todayStats.completedCount / todayStats.totalHabits) * 100) 

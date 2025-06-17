@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
@@ -104,8 +103,8 @@ const Index = () => {
 
           {/* New Progress Components */}
           <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-8 sm:mb-12">
-            <CompletionRateCard />
-            <MilestoneTracker />
+            <CompletionRateCard userHabits={activityHabits} />
+            <MilestoneTracker userHabits={activityHabits} />
             <DailyEncouragementCard />
           </div>
 

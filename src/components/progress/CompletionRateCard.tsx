@@ -5,8 +5,12 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle } from 'lucide-react';
 import { useHabitStats } from '@/hooks/useHabitStats';
 
-const CompletionRateCard: React.FC = () => {
-  const { weeklyStats } = useHabitStats();
+interface CompletionRateCardProps {
+  userHabits?: string[];
+}
+
+const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) => {
+  const { weeklyStats } = useHabitStats(userHabits);
 
   return (
     <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-green-500 shadow-md">
