@@ -35,26 +35,26 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-14 p-1">
-        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
-          <Dumbbell className="w-3 h-3 mb-1" />
-          <span className="leading-tight">WORKOUTS</span>
+      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-16 p-1 gap-1">
+        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
+          <Dumbbell className="w-3 h-3 mb-0.5" />
+          <span className="leading-none font-medium">WORKOUTS</span>
         </TabsTrigger>
-        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
-          <Utensils className="w-3 h-3 mb-1" />
-          <span className="leading-tight">NUTRITION</span>
+        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
+          <Utensils className="w-3 h-3 mb-0.5" />
+          <span className="leading-none font-medium">NUTRITION</span>
         </TabsTrigger>
-        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
-          <Book className="w-3 h-3 mb-1" />
-          <span className="leading-tight">DEVOTIONS</span>
+        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
+          <Book className="w-3 h-3 mb-0.5" />
+          <span className="leading-none font-medium">DEVOTIONS</span>
         </TabsTrigger>
-        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
-          <Heart className="w-3 h-3 mb-1" />
-          <span className="leading-tight">MINDFUL</span>
+        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
+          <Heart className="w-3 h-3 mb-0.5" />
+          <span className="leading-none font-medium">MINDFUL</span>
         </TabsTrigger>
-        <TabsTrigger value="bored" className="flex flex-col items-center justify-center py-2 px-1 text-xs h-full">
-          <Zap className="w-3 h-3 mb-1" />
-          <span className="leading-tight">BORED</span>
+        <TabsTrigger value="bored" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
+          <Zap className="w-3 h-3 mb-0.5" />
+          <span className="leading-none font-medium">BORED</span>
         </TabsTrigger>
       </TabsList>
       
