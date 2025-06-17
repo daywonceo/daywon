@@ -37,16 +37,26 @@ const MindfulReflectionTab = () => {
   const fetchQuote = async () => {
     setLoading(true);
     try {
-      // Try to fetch from ZenQuotes API
-      const response = await fetch('https://zenquotes.io/api/random');
+      // Using Quotable API which supports CORS
+      const response = await fetch('https://api.quotable.io/random?tags=wisdom,motivational,inspirational&minLength=50');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      if (data && data[0]) {
-        setQuote(data[0]);
+      
+      if (data && data.content && data.author) {
+        setQuote({
+          q: data.content,
+          a: data.author
+        });
+        console.log('Successfully fetched quote from Quotable API:', data);
       } else {
-        throw new Error('No quote data received');
+        throw new Error('Invalid quote data received');
       }
     } catch (error) {
-      console.log('API unavailable, using fallback quote:', error);
+      console.log('Quotable API unavailable, using fallback quote:', error);
       // Use fallback quote instead of showing error
       setQuote(getRandomFallbackQuote());
     } finally {
@@ -89,7 +99,7 @@ const MindfulReflectionTab = () => {
               <blockquote className="text-sm sm:text-base font-light text-gray-800 dark:text-gray-200 leading-relaxed italic px-2">
                 "{quote.q}"
               </blockquote>
-              {quote.a && quote.a !== 'zenquotes.io' && (
+              {quote.a && (
                 <cite className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 block">
                   — {quote.a}
                 </cite>
