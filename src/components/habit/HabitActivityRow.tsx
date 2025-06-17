@@ -1,14 +1,12 @@
-
 import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Edit, Check, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
-import { shouldShowRecoveryDialog, hasRecentRecovery } from "@/utils/streakRecovery";
+import { shouldShowRecoveryDialog } from "@/utils/streakRecovery";
 import StreakRecoveryDialog from "./StreakRecoveryDialog";
 import PhotoUploadPrompt from "./PhotoUploadPrompt";
 import ClickableDate from "./ClickableDate";
+import HabitStatusBox from "./HabitStatusBox";
+import ActivityTextDisplay from "./ActivityTextDisplay";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -121,93 +119,28 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       
       {/* Activity description */}
       <div className="flex items-center justify-center text-center">
-        {activity.isEditing ? (
-          <Input
-            value={activity.text.replace('\n', ' ')}
-            onChange={(e) => {
-              const newActivities = [...activities];
-              newActivities[activityIndex].text = e.target.value;
-              setActivities(newActivities);
-            }}
-            onBlur={() => toggleEditMode(activityIndex)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                updateActivityText(activityIndex, activity.text);
-              }
-            }}
-            autoFocus
-            className="text-green-800 text-sm sm:text-lg font-semibold py-1"
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center group space-y-2">
-            <div className="flex items-center">
-              <p className="text-sm sm:text-base font-semibold text-green-800/90 tracking-wide">
-                {activity.text}
-              </p>
-              <button
-                onClick={() => toggleEditMode(activityIndex)}
-                className="ml-2 text-green-700 hover:text-green-900 transition-colors opacity-0 group-hover:opacity-100"
-              >
-                <Edit size={12} className="sm:hidden" />
-                <Edit size={14} className="hidden sm:block" />
-              </button>
-            </div>
-          </div>
-        )}
+        <ActivityTextDisplay
+          activity={activity}
+          activityIndex={activityIndex}
+          activities={activities}
+          setActivities={setActivities}
+          onToggleEditMode={toggleEditMode}
+          onUpdateActivityText={updateActivityText}
+        />
       </div>
       
       {/* Habit status boxes */}
-      {activity.categories.map((category) => {
-        let streak = activity.statuses[category] === "completed" 
-          ? calculateStreakForDate(category, activityDate) 
-          : 0;
-
-        // Check for recovery that might restore the streak
-        if (activity.statuses[category] === "completed" && hasRecentRecovery(category, activityDate)) {
-          const previousDayDate = new Date(activityDate);
-          previousDayDate.setDate(previousDayDate.getDate() - 1);
-          const previousStreak = calculateStreakForDate(category, previousDayDate);
-          if (previousStreak > streak) {
-            streak = previousStreak + 1; // Restore the streak
-          }
-        }
-
-        const showStreak = streak >= 3;
-
-        return (
-          <div
-            key={`${activityIndex}-${category}`}
-            className={cn(
-              "aspect-square w-full border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
-              activeHabit === category && activityIndex === 0
-                ? "ring-2 ring-blue-500 ring-offset-2"
-                : ""
-            )}
-            onClick={() => handleStatusToggle(activityIndex, category)}
-          >
-            {activity.statuses[category] === "completed" && (
-              <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
-                {showStreak ? (
-                  <span className="text-white font-bold text-xs sm:text-sm">
-                    {streak}
-                  </span>
-                ) : (
-                  <>
-                    <Check size={20} className="sm:hidden text-white" />
-                    <Check size={24} className="hidden sm:block text-white" />
-                  </>
-                )}
-              </div>
-            )}
-            {activity.statuses[category] === "failed" && (
-              <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
-                <X size={20} className="sm:hidden text-red-500" />
-                <X size={24} className="hidden sm:block text-red-500" />
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {activity.categories.map((category) => (
+        <HabitStatusBox
+          key={`${activityIndex}-${category}`}
+          category={category}
+          status={activity.statuses[category]}
+          activityIndex={activityIndex}
+          activityDate={activityDate}
+          activeHabit={activeHabit}
+          onStatusToggle={handleStatusToggle}
+        />
+      ))}
 
       {/* Photo Upload Prompt */}
       <PhotoUploadPrompt
