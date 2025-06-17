@@ -1,11 +1,11 @@
-import { Plus, Search, Menu } from "lucide-react";
+
+import { Plus, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ThemeToggle from "./ThemeToggle";
 import HapticButton from "./HapticButton";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "@/contexts/SettingsContext";
-import BottomSheet from "./BottomSheet";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 
 const Header = () => {
@@ -26,25 +26,7 @@ const Header = () => {
         className={`py-4 sm:py-6 px-4 sm:px-5 flex items-center justify-between max-w-3xl mx-auto w-full border-b border-green-100 dark:border-green-800 sticky bg-white dark:bg-gray-900 z-10 transition-all duration-300 ${show ? 'top-0' : '-top-24'}`}
       >
         <div className="flex-1 flex items-center">
-          {isMobile ? (
-            <BottomSheet 
-              trigger={
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="mr-2 text-green-800 dark:text-green-200"
-                >
-                  <Menu size={20} />
-                </Button>
-              }
-              title="Menu"
-            >
-              <div className="flex flex-col gap-3 py-4">
-                {/* Menu items would go here */}
-                <div className="p-2 border-b border-gray-200 dark:border-gray-700"></div>
-              </div>
-            </BottomSheet>
-          ) : (
+          {!isMobile && (
             <div className="relative w-full max-w-[180px]">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input 
