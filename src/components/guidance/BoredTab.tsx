@@ -19,6 +19,8 @@ interface BoredActivity {
   link: string;
   key: string;
   accessibility: number;
+  _fallback?: boolean;
+  _message?: string;
 }
 
 const BoredTab = ({ searchQuery }: BoredTabProps) => {
@@ -40,6 +42,15 @@ const BoredTab = ({ searchQuery }: BoredTabProps) => {
 
       if (data?.activity) {
         setActivity(data);
+        
+        // Show a toast if we're using fallback activities
+        if (data._fallback) {
+          toast({
+            title: "Offline Mode",
+            description: data._message || "Using offline suggestions while the activity service is unavailable",
+            variant: "default"
+          });
+        }
       } else if (data?.error) {
         throw new Error(data.error);
       } else {
@@ -52,8 +63,8 @@ const BoredTab = ({ searchQuery }: BoredTabProps) => {
     } catch (error) {
       console.error('Error fetching activity:', error);
       toast({
-        title: "Failed to fetch activity",
-        description: "Please check your internet connection and try again",
+        title: "Service temporarily unavailable",
+        description: "The activity service is having issues. Please try again in a few minutes.",
         variant: "destructive"
       });
     } finally {
