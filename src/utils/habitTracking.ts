@@ -1,4 +1,3 @@
-
 import { saveOfflineData, getOfflineData } from "./offlineStorage";
 
 export interface HabitActivity {
@@ -15,6 +14,8 @@ export interface HabitStats {
   empty: number;
   total: number;
   percentage: number;
+  currentStreak: number;
+  longestStreak: number;
 }
 
 // Record a habit activity
@@ -54,6 +55,97 @@ export const recordHabitActivity = (habitName: string, status: "completed" | "fa
     console.log(`Recorded habit: ${habitName} as ${status} on ${dateStr}`);
   } catch (error) {
     console.error("Failed to record habit activity:", error);
+  }
+};
+
+// Calculate current streak for a habit
+export const calculateCurrentStreak = (habitName: string): number => {
+  try {
+    const activities = getHabitActivities();
+    const habitActivities = activities
+      .filter(activity => activity.habitName === habitName)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by date descending
+    
+    if (habitActivities.length === 0) return 0;
+    
+    let currentStreak = 0;
+    const today = new Date();
+    
+    // Start from today and work backwards
+    for (let i = 0; i < 365; i++) { // Check up to a year back
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() - i);
+      const dateStr = checkDate.toISOString().split('T')[0];
+      
+      const dayActivity = habitActivities.find(activity => activity.date === dateStr);
+      
+      if (dayActivity && dayActivity.status === "completed") {
+        currentStreak++;
+      } else if (dayActivity && dayActivity.status === "failed") {
+        // Failed day breaks the streak
+        break;
+      } else if (i === 0) {
+        // If today has no activity yet, don't break streak
+        continue;
+      } else {
+        // Missing day breaks the streak
+        break;
+      }
+    }
+    
+    return currentStreak;
+  } catch (error) {
+    console.error("Error calculating current streak:", error);
+    return 0;
+  }
+};
+
+// Calculate longest streak for a habit
+export const calculateLongestStreak = (habitName: string): number => {
+  try {
+    const activities = getHabitActivities();
+    const habitActivities = activities
+      .filter(activity => activity.habitName === habitName)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // Sort by date ascending
+    
+    if (habitActivities.length === 0) return 0;
+    
+    let longestStreak = 0;
+    let currentStreak = 0;
+    let lastDate: Date | null = null;
+    
+    for (const activity of habitActivities) {
+      const activityDate = new Date(activity.date);
+      
+      if (activity.status === "completed") {
+        if (lastDate) {
+          const dayDifference = Math.floor((activityDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (dayDifference === 1) {
+            // Consecutive day
+            currentStreak++;
+          } else if (dayDifference > 1) {
+            // Gap in days, reset streak
+            currentStreak = 1;
+          }
+        } else {
+          // First activity
+          currentStreak = 1;
+        }
+        
+        longestStreak = Math.max(longestStreak, currentStreak);
+        lastDate = activityDate;
+      } else if (activity.status === "failed") {
+        // Failed day resets streak
+        currentStreak = 0;
+        lastDate = activityDate;
+      }
+    }
+    
+    return longestStreak;
+  } catch (error) {
+    console.error("Error calculating longest streak:", error);
+    return 0;
   }
 };
 
@@ -109,6 +201,8 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       const empty = habitActivities.filter(a => a.status === "empty").length;
       const total = habitActivities.length;
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+      const currentStreak = calculateCurrentStreak(habitName);
+      const longestStreak = calculateLongestStreak(habitName);
       
       return {
         habitName,
@@ -116,7 +210,9 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
         failed,
         empty,
         total,
-        percentage
+        percentage,
+        currentStreak,
+        longestStreak
       };
     });
     
@@ -132,6 +228,14 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
     console.error("Error calculating habit stats:", error);
     return { goodHabits: [], badHabits: [] };
   }
+};
+
+// Get streak information for a specific habit
+export const getHabitStreakInfo = (habitName: string): { current: number; longest: number } => {
+  return {
+    current: calculateCurrentStreak(habitName),
+    longest: calculateLongestStreak(habitName)
+  };
 };
 
 // Initialize specific habit categories

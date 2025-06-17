@@ -1,9 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Edit, Check, X } from "lucide-react";
+import { Edit2, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DayActivity } from "@/hooks/useHabitActivities";
+import { DayActivity, ActivityStatus } from "@/hooks/useHabitActivities";
+import { getHabitStreakInfo } from "@/utils/habitTracking";
+import StreakDisplay from "./StreakDisplay";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -11,13 +14,13 @@ interface HabitActivityRowProps {
   activities: DayActivity[];
   setActivities: React.Dispatch<React.SetStateAction<DayActivity[]>>;
   activeHabit: string | null;
-  setActiveHabit: (habit: string | null) => void;
+  setActiveHabit: React.Dispatch<React.SetStateAction<string | null>>;
   toggleStatus: (dayIndex: number, category: string) => void;
   toggleEditMode: (dayIndex: number) => void;
   updateActivityText: (dayIndex: number, newText: string) => void;
 }
 
-const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
+const HabitActivityRow = ({
   activity,
   activityIndex,
   activities,
@@ -27,74 +30,131 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   toggleStatus,
   toggleEditMode,
   updateActivityText,
-}) => {
+}: HabitActivityRowProps) => {
+  const [editText, setEditText] = useState(activity.text);
+
+  const handleSaveEdit = () => {
+    updateActivityText(activityIndex, editText);
+  };
+
+  const handleCancelEdit = () => {
+    setEditText(activity.text);
+    toggleEditMode(activityIndex);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSaveEdit();
+    } else if (e.key === "Escape") {
+      handleCancelEdit();
+    }
+  };
+
+  const getStatusButtonClass = (status: ActivityStatus) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-500 text-white";
+      case "failed":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300";
+    }
+  };
+
+  const getStatusSymbol = (status: ActivityStatus) => {
+    switch (status) {
+      case "completed":
+        return "✓";
+      case "failed":
+        return "✗";
+      default:
+        return "";
+    }
+  };
+
   return (
     <>
       {/* Day number */}
-      <div className="flex items-center justify-center">
-        <div className="text-center text-3xl sm:text-4xl font-bold text-green-800">
-          {activity.day}
-        </div>
+      <div className="text-center font-bold text-gray-700 dark:text-gray-300 text-xs sm:text-sm">
+        {activity.day}
       </div>
-      {/* Activity description */}
-      <div className="flex items-center justify-center text-center">
+
+      {/* Activity text and streak */}
+      <div className="flex flex-col space-y-1">
         {activity.isEditing ? (
-          <Input
-            value={activity.text.replace('\n', ' ')}
-            onChange={(e) => {
-              const newActivities = [...activities];
-              newActivities[activityIndex].text = e.target.value;
-              setActivities(newActivities);
-            }}
-            onBlur={() => toggleEditMode(activityIndex)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                updateActivityText(activityIndex, activity.text);
-              }
-            }}
-            autoFocus
-            className="text-green-800 text-sm sm:text-lg font-semibold py-1"
-          />
-        ) : (
-          <div className="flex items-center justify-center group">
-            <p className="text-sm sm:text-base font-semibold text-green-800/90 tracking-wide">
-              {activity.text}
-            </p>
-            <button
-              onClick={() => toggleEditMode(activityIndex)}
-              className="ml-2 text-green-700 hover:text-green-900 transition-colors opacity-0 group-hover:opacity-100"
+          <div className="flex items-center space-x-1">
+            <Input
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={handleKeyPress}
+              className="text-xs sm:text-sm h-6 sm:h-8"
+              autoFocus
+            />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleSaveEdit}
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0"
             >
-              <Edit size={12} className="sm:hidden" />
-              <Edit size={14} className="hidden sm:block" />
-            </button>
+              <Check className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancelEdit}
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+            >
+              <X className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-1 group">
+            <span className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 flex-1">
+              {activity.text}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => toggleEditMode(activityIndex)}
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+        )}
+        
+        {/* Show streak for today's activity */}
+        {activityIndex === 0 && (
+          <div className="flex flex-wrap gap-1">
+            {activity.categories.map(category => {
+              const streakInfo = getHabitStreakInfo(category);
+              return (
+                <StreakDisplay 
+                  key={`${category}-streak`}
+                  currentStreak={streakInfo.current}
+                  className="text-xs"
+                />
+              );
+            })}
           </div>
         )}
       </div>
-      {/* Habit status boxes */}
+
+      {/* Habit status buttons */}
       {activity.categories.map((category) => (
-        <div
+        <Button
           key={`${activityIndex}-${category}`}
+          onClick={() => toggleStatus(activityIndex, category)}
           className={cn(
-            "aspect-square w-full border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors",
+            "h-8 w-8 sm:h-12 sm:w-12 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 hover:scale-105",
+            getStatusButtonClass(activity.statuses[category]),
             activeHabit === category && activityIndex === 0
-              ? "ring-2 ring-blue-500 ring-offset-2"
+              ? "ring-2 ring-blue-400 ring-offset-2"
               : ""
           )}
-          onClick={() => toggleStatus(activityIndex, category)}
         >
-          {activity.statuses[category] === "completed" && (
-            <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark">
-              <Check size={20} className="sm:hidden text-white" />
-              <Check size={24} className="hidden sm:block text-white" />
-            </div>
-          )}
-          {activity.statuses[category] === "failed" && (
-            <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
-              <X size={20} className="sm:hidden text-red-500" />
-              <X size={24} className="hidden sm:block text-red-500" />
-            </div>
-          )}
-        </div>
+          {getStatusSymbol(activity.statuses[category])}
+        </Button>
       ))}
     </>
   );
