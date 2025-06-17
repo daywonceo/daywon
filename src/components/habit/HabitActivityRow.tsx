@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Edit, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
+import { shouldShowRecoveryDialog, hasRecentRecovery } from "@/utils/streakRecovery";
+import StreakRecoveryDialog from "./StreakRecoveryDialog";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -28,6 +30,16 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   toggleEditMode,
   updateActivityText,
 }) => {
+  const [recoveryDialog, setRecoveryDialog] = useState<{
+    isOpen: boolean;
+    habitName: string;
+    streakCount: number;
+  }>({
+    isOpen: false,
+    habitName: "",
+    streakCount: 0
+  });
+
   // Calculate the date for this activity row
   const getDateForActivity = (dayIndex: number) => {
     const today = new Date();
@@ -37,6 +49,41 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   };
 
   const activityDate = getDateForActivity(activityIndex);
+
+  const handleStatusToggle = (dayIndex: number, category: string) => {
+    const currentStatus = activities[dayIndex].statuses[category];
+    
+    // If changing from completed to failed and it's today, check for recovery
+    if (currentStatus === "completed" && dayIndex === 0) {
+      const currentStreak = calculateStreakForDate(category, activityDate);
+      
+      if (shouldShowRecoveryDialog(category, currentStreak)) {
+        setRecoveryDialog({
+          isOpen: true,
+          habitName: category,
+          streakCount: currentStreak
+        });
+        return; // Don't toggle status yet
+      }
+    }
+    
+    toggleStatus(dayIndex, category);
+  };
+
+  const handleRecoveryComplete = () => {
+    // Keep the status as completed since streak was recovered
+    // The recovery system will handle maintaining the streak
+  };
+
+  const closeRecoveryDialog = () => {
+    setRecoveryDialog({
+      isOpen: false,
+      habitName: "",
+      streakCount: 0
+    });
+    // If user closes dialog without recovery, proceed with status change
+    toggleStatus(0, recoveryDialog.habitName);
+  };
 
   return (
     <>
@@ -84,9 +131,20 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       
       {/* Habit status boxes */}
       {activity.categories.map((category) => {
-        const streak = activity.statuses[category] === "completed" 
+        let streak = activity.statuses[category] === "completed" 
           ? calculateStreakForDate(category, activityDate) 
           : 0;
+
+        // Check for recovery that might restore the streak
+        if (activity.statuses[category] === "completed" && hasRecentRecovery(category, activityDate)) {
+          const previousDayDate = new Date(activityDate);
+          previousDayDate.setDate(previousDayDate.getDate() - 1);
+          const previousStreak = calculateStreakForDate(category, previousDayDate);
+          if (previousStreak > streak) {
+            streak = previousStreak + 1; // Restore the streak
+          }
+        }
+
         const showStreak = streak >= 3;
 
         return (
@@ -98,7 +156,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
                 ? "ring-2 ring-blue-500 ring-offset-2"
                 : ""
             )}
-            onClick={() => toggleStatus(activityIndex, category)}
+            onClick={() => handleStatusToggle(activityIndex, category)}
           >
             {activity.statuses[category] === "completed" && (
               <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
@@ -123,6 +181,15 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           </div>
         );
       })}
+
+      {/* Streak Recovery Dialog */}
+      <StreakRecoveryDialog
+        isOpen={recoveryDialog.isOpen}
+        onClose={closeRecoveryDialog}
+        habitName={recoveryDialog.habitName}
+        streakCount={recoveryDialog.streakCount}
+        onRecoveryComplete={handleRecoveryComplete}
+      />
     </>
   );
 };

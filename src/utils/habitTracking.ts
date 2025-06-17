@@ -1,4 +1,5 @@
 import { saveOfflineData, getOfflineData } from "./offlineStorage";
+import { hasRecentRecovery } from "./streakRecovery";
 
 export interface HabitActivity {
   id: string;
@@ -163,7 +164,13 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
         // Move to previous day
         currentDate.setDate(currentDate.getDate() - 1);
       } else if (activity && activity.status === 'failed') {
-        // Failed day breaks the streak
+        // Check if there's a recovery for this failed day that should continue the streak
+        if (hasRecentRecovery(habitName, currentDate)) {
+          streak++;
+          currentDate.setDate(currentDate.getDate() - 1);
+          continue;
+        }
+        // Failed day breaks the streak (unless recovered)
         break;
       } else {
         // No activity recorded (empty) - could be before tracking started
