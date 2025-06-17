@@ -72,7 +72,7 @@ const HabitAddSheet = ({ trigger, onHabitSelected }: HabitAddSheetProps) => {
               {SUGGESTED_HABITS.map(habit => (
                 <Button
                   key={habit}
-                  className="w-full bg-green-50 text-green-800 hover:bg-green-100"
+                  className="w-full bg-green-50 text-green-800 hover:bg-green-100 text-xs px-2 py-2 h-auto min-h-[2.5rem] leading-tight"
                   variant="outline"
                   onClick={() => handleSelect(habit, close)}
                   tabIndex={0}
