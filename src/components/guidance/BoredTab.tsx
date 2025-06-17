@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Check } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import ActivityTypeSelector from "./ActivityTypeSelector";
+import ActivityDisplay from "./ActivityDisplay";
+import ActivityActions from "./ActivityActions";
 
 interface BoredTabProps {
   searchQuery: string;
@@ -24,19 +18,6 @@ interface BoredActivity {
   key: string;
   accessibility: number;
 }
-
-const activityTypes = [
-  { value: "", label: "Any Type" },
-  { value: "education", label: "Education" },
-  { value: "recreational", label: "Recreational" },
-  { value: "social", label: "Social" },
-  { value: "diy", label: "DIY" },
-  { value: "charity", label: "Charity" },
-  { value: "cooking", label: "Cooking" },
-  { value: "relaxation", label: "Relaxation" },
-  { value: "music", label: "Music" },
-  { value: "busywork", label: "Busywork" }
-];
 
 const BoredTab = ({ searchQuery }: BoredTabProps) => {
   const [activity, setActivity] = useState<BoredActivity | null>(null);
@@ -102,10 +83,6 @@ const BoredTab = ({ searchQuery }: BoredTabProps) => {
     fetchActivity();
   };
 
-  const formatType = (type: string) => {
-    return type.charAt(0).toUpperCase() + type.slice(1);
-  };
-
   return (
     <div className="animate-fade-in max-w-2xl mx-auto">
       <div className="text-center mb-6">
@@ -113,74 +90,23 @@ const BoredTab = ({ searchQuery }: BoredTabProps) => {
           Get personalized activity suggestions to beat boredom
         </p>
         
-        <div className="mb-4">
-          <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="w-48 mx-auto">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              {activityTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <ActivityTypeSelector 
+          selectedType={selectedType}
+          onTypeChange={setSelectedType}
+        />
       </div>
 
-      {/* Main Activity Card */}
-      <Card className="bg-white dark:bg-gray-800 shadow-lg border-2 mb-6">
-        <CardContent className="p-8 text-center">
-          {isLoading ? (
-            <div className="space-y-4">
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/3 mx-auto"></div>
-            </div>
-          ) : activity ? (
-            <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                {activity.activity}
-              </h2>
-              <div className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full text-sm font-medium">
-                {formatType(activity.type)}
-              </div>
-              
-              {activity.participants > 1 && (
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Best with {activity.participants} people
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="text-gray-500 dark:text-gray-400">
-              No activity loaded
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <ActivityDisplay 
+        activity={activity}
+        isLoading={isLoading}
+      />
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Button 
-          onClick={handleTryThis}
-          disabled={!activity || isLoading}
-          className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
-        >
-          <Check className="w-4 h-4" />
-          Try This
-        </Button>
-        
-        <Button 
-          onClick={handleSuggestAnother}
-          disabled={isLoading}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Suggest Another
-        </Button>
-      </div>
+      <ActivityActions
+        activity={activity}
+        isLoading={isLoading}
+        onTryThis={handleTryThis}
+        onSuggestAnother={handleSuggestAnother}
+      />
 
       {/* No Results Message for Search */}
       {searchQuery && (
