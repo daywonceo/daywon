@@ -1,4 +1,3 @@
-
 import { saveOfflineData, getOfflineData } from "./offlineStorage";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -98,6 +97,11 @@ export const recordHabitActivity = async (habitName: string, status: "completed"
     saveOfflineData({
       habitActivities
     });
+    
+    // Dispatch custom event to trigger progress updates
+    window.dispatchEvent(new CustomEvent('habitUpdated', { 
+      detail: { habitName, status, date: dateStr } 
+    }));
     
     console.log(`Recorded habit: ${habitName} as ${status} on ${dateStr}`);
   } catch (error) {

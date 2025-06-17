@@ -149,7 +149,7 @@ const Index = () => {
 
           <RecentActivities habitList={activityHabits} />
           <HabitStats />
-          <Progress />
+          <Progress userHabits={activityHabits} />
         </main>
       </PullToRefresh>
       <Footer />
