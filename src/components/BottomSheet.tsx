@@ -1,6 +1,5 @@
 
 import { ReactNode, useState } from "react";
-import { ChevronDown } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -30,8 +29,7 @@ const BottomSheet = ({ trigger, title, children }: BottomSheetProps) => {
       <DrawerContent className="max-h-[85vh]">
         <div className="mx-auto w-full max-w-md">
           <DrawerHeader>
-            <DrawerTitle className="flex items-center justify-center relative">
-              <ChevronDown className="absolute left-0" size={20} />
+            <DrawerTitle className="flex items-center justify-center">
               <span>{title}</span>
             </DrawerTitle>
           </DrawerHeader>
