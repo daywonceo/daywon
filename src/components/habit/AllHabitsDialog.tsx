@@ -40,7 +40,7 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
     setIsRefreshing(true);
     try {
       await refreshHabits();
-      toast({ title: "Habits refreshed!" });
+      // Removed the toast notification here
     } catch (error) {
       console.error('Error refreshing habits:', error);
       toast({ title: "Error refreshing habits", variant: "destructive" });
