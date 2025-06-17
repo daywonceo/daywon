@@ -27,8 +27,8 @@ interface CustomWorkoutBuilderProps {
 
 const CustomWorkoutBuilder = ({ exercises, onExercisesChange }: CustomWorkoutBuilderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMuscle, setSelectedMuscle] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('');
+  const [selectedMuscle, setSelectedMuscle] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [showExerciseSearch, setShowExerciseSearch] = useState(false);
   
   const { exercises: availableExercises, fetchExercises, isLoading } = useExercises();
@@ -43,8 +43,8 @@ const CustomWorkoutBuilder = ({ exercises, onExercisesChange }: CustomWorkoutBui
   const handleSearch = async () => {
     const params: any = {};
     if (searchQuery.trim()) params.name = searchQuery.trim();
-    if (selectedMuscle) params.muscle = selectedMuscle;
-    if (selectedDifficulty) params.difficulty = selectedDifficulty;
+    if (selectedMuscle && selectedMuscle !== 'all') params.muscle = selectedMuscle;
+    if (selectedDifficulty && selectedDifficulty !== 'all') params.difficulty = selectedDifficulty;
     
     await fetchExercises(params);
   };
@@ -136,7 +136,7 @@ const CustomWorkoutBuilder = ({ exercises, onExercisesChange }: CustomWorkoutBui
                     <SelectValue placeholder="Any muscle" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any muscle</SelectItem>
+                    <SelectItem value="all">Any muscle</SelectItem>
                     {muscleGroups.map(muscle => (
                       <SelectItem key={muscle} value={muscle}>
                         {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
@@ -152,7 +152,7 @@ const CustomWorkoutBuilder = ({ exercises, onExercisesChange }: CustomWorkoutBui
                     <SelectValue placeholder="Any difficulty" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any difficulty</SelectItem>
+                    <SelectItem value="all">Any difficulty</SelectItem>
                     {difficulties.map(diff => (
                       <SelectItem key={diff} value={diff}>
                         {diff.charAt(0).toUpperCase() + diff.slice(1)}
