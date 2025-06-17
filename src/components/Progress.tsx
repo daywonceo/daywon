@@ -1,11 +1,13 @@
 
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp, Download } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress as ProgressBar } from "@/components/ui/progress";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useHabitProgress } from "@/hooks/useHabitProgress";
 import { useEffect, useState } from "react";
+import { generateHabitReport } from "@/utils/habitReportGenerator";
+import { toast } from "@/hooks/use-toast";
 
 interface ProgressProps {
   userHabits?: string[];
@@ -42,6 +44,23 @@ const Progress = ({ userHabits }: ProgressProps) => {
     setRefreshTrigger(prev => prev + 1);
   }, [userHabits?.join(',')]);
 
+  const handleDownloadReport = async () => {
+    try {
+      await generateHabitReport(userHabits || ["WORKOUT", "DEVOTIONS", "READ"]);
+      toast({
+        title: "Report Downloaded",
+        description: "Your habit progress report has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Failed to generate report:", error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error generating your report. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="mb-24 border-green-200 shadow-md">
       <CardHeader className="pb-2 px-3 sm:px-6">
@@ -51,11 +70,9 @@ const Progress = ({ userHabits }: ProgressProps) => {
             variant="outline" 
             size="sm" 
             className="text-xs sm:text-sm border-green-200 w-full sm:w-auto"
-            onClick={() => {
-              // Future: Add download report functionality
-              console.log('Download report clicked');
-            }}
+            onClick={handleDownloadReport}
           >
+            <Download className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
             Download Report
           </Button>
         </div>
@@ -66,9 +83,6 @@ const Progress = ({ userHabits }: ProgressProps) => {
           {progressData.map((item) => {
             const currentCompletion = item.totalPossible > 0 
               ? Math.round((item.completedCount / item.totalPossible) * 100) 
-              : 0;
-            const previousCompletion = item.previousTotalPossible > 0 
-              ? Math.round((item.previousCompletedCount / item.previousTotalPossible) * 100) 
               : 0;
 
             return (
@@ -102,10 +116,6 @@ const Progress = ({ userHabits }: ProgressProps) => {
                     className="h-2 bg-gray-200"
                     useGradient={true}
                   />
-                </div>
-                
-                <div className="text-xs text-gray-500">
-                  Previous: {item.previousCompletedCount}/{item.previousTotalPossible} ({previousCompletion}%)
                 </div>
               </div>
             );
