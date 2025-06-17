@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "./HabitFormDialog";
+import HabitAddSheet from "./HabitAddSheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +24,7 @@ type AllHabitsDialogProps = {
 };
 
 const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange }) => {
-  const { habits, isLoading, updateHabit, deleteHabit, refreshHabits } = useHabits();
+  const { habits, isLoading, updateHabit, deleteHabit, refreshHabits, addHabit } = useHabits();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -78,9 +79,31 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
     setShowHabitForm(true);
   };
 
-  const openAddForm = () => {
-    setHabitToEdit(null);
-    setShowHabitForm(true);
+  const handleHabitSelected = async (habitName: string) => {
+    try {
+      await addHabit({
+        name: habitName,
+        status: "active",
+        category: getHabitCategory(habitName)
+      });
+      toast({ title: `${habitName} added!` });
+    } catch (error) {
+      console.error('Error adding habit:', error);
+      toast({ title: "Error adding habit", variant: "destructive" });
+    }
+  };
+
+  // Get category for default habits
+  const getHabitCategory = (habitName: string): string => {
+    const categoryMap: Record<string, string> = {
+      'Workout': 'Health & Fitness',
+      'Devotion': 'Spiritual',
+      'Read': 'Personal Development',
+      'Sleep 8 Hours': 'Health & Fitness',
+      'Drink Water': 'Health & Fitness',
+      'Meditate': 'Mindfulness'
+    };
+    return categoryMap[habitName] || 'Personal';
   };
 
   const HabitItem = ({ habit }: { habit: Habit }) => (
@@ -136,9 +159,15 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
                   <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
-                <Button onClick={openAddForm}>
-                    <Plus className="mr-2 h-4 w-4" /> Add New Habit
-                </Button>
+                <HabitAddSheet
+                  trigger={
+                    <Button className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add New Habit
+                    </Button>
+                  }
+                  onHabitSelected={handleHabitSelected}
+                />
             </div>
             {isLoading ? (
               <div className="space-y-2">
