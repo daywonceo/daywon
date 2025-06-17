@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Play, Pause, CheckCircle, Plus, Timer } from "lucide-react";
+import { ArrowLeft, Play, Pause, CheckCircle, Plus, Timer, AlertTriangle } from "lucide-react";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 import { useExercises } from "@/hooks/useExercises";
+import { toast } from "@/components/ui/sonner";
 
 interface ActiveWorkoutViewProps {
   onBack: () => void;
@@ -19,6 +20,8 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [exerciseLogs, setExerciseLogs] = useState<any[]>([]);
+  const [showLongRunningAlert, setShowLongRunningAlert] = useState(false);
+  const [manualDuration, setManualDuration] = useState<string>('');
   
   const { workoutPlans } = useWorkoutPlans();
   const { sessions, createSession, completeSession, logExercise } = useWorkoutSessions();
@@ -26,13 +29,13 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
 
-  // Check for existing active session on component mount - only from today
+  // Check for existing active session on component mount - only from today or earlier
   useEffect(() => {
     const activeSession = sessions.find(session => {
       const sessionDate = new Date(session.workout_date);
       const today = new Date();
-      const isToday = sessionDate.toDateString() === today.toDateString();
-      return !session.is_completed && isToday;
+      today.setHours(23, 59, 59, 999); // End of today
+      return sessionDate <= today && !session.is_completed;
     });
 
     if (activeSession) {
@@ -55,15 +58,21 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     }
   }, [sessions, activePlan, generateWorkoutPlan]);
 
-  // Timer effect
+  // Timer effect with long-running workout check
   useEffect(() => {
     if (startTime) {
       const interval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime.getTime()) / 1000));
+        const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
+        setElapsedTime(elapsed);
+        
+        // Check if workout has been running for more than 2 hours (7200 seconds)
+        if (elapsed > 7200 && !showLongRunningAlert) {
+          setShowLongRunningAlert(true);
+        }
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [startTime]);
+  }, [startTime, showLongRunningAlert]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -116,13 +125,90 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     }
   };
 
-  const handleCompleteWorkout = async () => {
+  const handleCompleteWorkout = async (customDuration?: number) => {
     if (!currentSession || !startTime) return;
 
-    const durationMinutes = Math.floor(elapsedTime / 60);
+    const durationMinutes = customDuration || Math.floor(elapsedTime / 60);
     await completeSession(currentSession.id, durationMinutes);
+    toast.success(`Workout completed! Duration: ${durationMinutes} minutes`);
     onBack();
   };
+
+  const handleForgotToStop = () => {
+    const duration = parseInt(manualDuration);
+    if (duration && duration > 0) {
+      handleCompleteWorkout(duration);
+    } else {
+      toast.error("Please enter a valid duration");
+    }
+  };
+
+  const dismissLongRunningAlert = () => {
+    setShowLongRunningAlert(false);
+    toast.info("Timer will continue running");
+  };
+
+  // Long-running workout alert
+  if (showLongRunningAlert) {
+    return (
+      <div className="animate-fade-in space-y-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <h2 className="text-xl font-bold text-orange-800 dark:text-orange-400">
+            Long Running Workout Detected
+          </h2>
+        </div>
+
+        <Card className="bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
+          <CardHeader>
+            <CardTitle className="text-orange-800 dark:text-orange-400 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Workout Running for {formatTime(elapsedTime)}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-orange-700 dark:text-orange-300">
+              It looks like this workout has been running for a while. Did you forget to stop the timer?
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-orange-800 dark:text-orange-300 mb-2">
+                  How long did your workout actually take? (minutes)
+                </label>
+                <Input
+                  type="number"
+                  value={manualDuration}
+                  onChange={(e) => setManualDuration(e.target.value)}
+                  placeholder="e.g., 60"
+                  className="bg-white dark:bg-gray-800"
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleForgotToStop}
+                  className="bg-orange-600 hover:bg-orange-700"
+                  disabled={!manualDuration}
+                >
+                  Yes - I forgot to stop it
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={dismissLongRunningAlert}
+                  className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                >
+                  No - Keep running
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Workout type selection (only show if no active session and we have an active plan)
   if (!currentSession && activePlan) {
@@ -233,7 +319,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
               You've been working out for {formatTime(elapsedTime)}
             </p>
             <Button
-              onClick={handleCompleteWorkout}
+              onClick={() => handleCompleteWorkout()}
               className="bg-green-600 hover:bg-green-700"
             >
               <CheckCircle className="w-4 h-4 mr-2" />

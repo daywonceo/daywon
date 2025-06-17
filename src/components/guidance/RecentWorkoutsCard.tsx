@@ -2,6 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Timer } from "lucide-react";
 
 interface RecentWorkoutsCardProps {
   recentSessions: any[];
@@ -20,14 +21,21 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
         {recentSessions.map((session) => (
           <div 
             key={session.id} 
-            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+              !session.is_completed 
+                ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30' 
+                : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
+            }`}
             onClick={() => onWorkoutClick(session)}
           >
             <div>
-              <div className="font-medium text-gray-800 dark:text-gray-200">
+              <div className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
                 {session.workout_type.replace(/_/g, ' ').toUpperCase()}
                 {!session.workout_plan_id && (
                   <Badge variant="outline" className="ml-2 text-xs">Manual</Badge>
+                )}
+                {!session.is_completed && (
+                  <Timer className="w-4 h-4 text-orange-600" />
                 )}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -40,7 +48,8 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
                   {session.duration_minutes}min
                 </div>
               )}
-              <Badge variant={session.is_completed ? "default" : "secondary"}>
+              <Badge variant={session.is_completed ? "default" : "secondary"} 
+                     className={!session.is_completed ? "bg-orange-600 text-white" : ""}>
                 {session.is_completed ? "Completed" : "In Progress"}
               </Badge>
             </div>

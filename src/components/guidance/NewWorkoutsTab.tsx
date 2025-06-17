@@ -32,7 +32,7 @@ const NewWorkoutsTab = () => {
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
   const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
 
-  // Filter sessions to only include today or earlier dates, and ensure future workouts aren't marked as in progress
+  // Filter sessions to only include today or earlier dates
   const filteredSessions = sessions.filter(session => {
     const sessionDate = new Date(session.workout_date);
     const today = new Date();
@@ -40,13 +40,8 @@ const NewWorkoutsTab = () => {
     return sessionDate <= today;
   });
 
-  // Find active workout session (not completed and from today only)
-  const activeWorkoutSession = filteredSessions.find(session => {
-    const sessionDate = new Date(session.workout_date);
-    const today = new Date();
-    const isToday = sessionDate.toDateString() === today.toDateString();
-    return !session.is_completed && isToday;
-  });
+  // Find active workout session - any incomplete workout from today or earlier
+  const activeWorkoutSession = filteredSessions.find(session => !session.is_completed);
 
   // Show error state if there are authentication or data issues
   if (!user) {
@@ -76,12 +71,8 @@ const NewWorkoutsTab = () => {
   }
 
   const handleWorkoutClick = (session: any) => {
-    // If the workout is not completed (in progress), go to active workout view
-    if (!session.is_completed) {
-      setCurrentView('active-workout');
-    }
-    // If completed, we could show workout details in the future
-    // For now, just navigate to active workout for any clicked workout
+    // Always go to active workout view when clicking a workout
+    // This allows users to complete or view any workout session
     setCurrentView('active-workout');
   };
 
@@ -152,7 +143,10 @@ const NewWorkoutsTab = () => {
   }
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
-  const recentSessions = filteredSessions.slice(0, 3);
+  
+  // Show recent sessions (including incomplete ones) for visibility
+  const recentSessions = filteredSessions.slice(0, 5); // Show more recent sessions
+  
   const completedThisWeek = filteredSessions.filter(session => {
     const sessionDate = new Date(session.workout_date);
     const weekAgo = new Date();
