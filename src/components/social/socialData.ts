@@ -1,103 +1,100 @@
 
-// Data for social page components
+// Sample social data for the habit tracker app
 export const friends = [
-  { id: 1, name: "NATE RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 2, name: "DREW RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 3, name: "JOSH RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 4, name: "ANDY RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 5, name: "PAULA RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 6, name: "PAIGE RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 7, name: "LIONEL MESSI", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 8, name: "STEVIE WONDER", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 9, name: "CLAIRO", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" },
-  { id: 10, name: "CHRISTIAN PULISIC", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png" }
+  { id: 1, name: "Sarah Chen", avatar: "/placeholder.svg", status: "online", mutualHabits: 3 },
+  { id: 2, name: "Mike Johnson", avatar: "/placeholder.svg", status: "online", mutualHabits: 5 },
+  { id: 3, name: "Alex Rivera", avatar: "/placeholder.svg", status: "away", mutualHabits: 2 },
+  { id: 4, name: "Emma Davis", avatar: "/placeholder.svg", status: "offline", mutualHabits: 4 },
+  { id: 5, name: "Chris Lee", avatar: "/placeholder.svg", status: "online", mutualHabits: 1 },
 ];
 
 export const leaderboardData = [
-  { rank: 1, name: "NATE RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 91, percentage: 91 },
-  { rank: 2, name: "DREW RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 87, percentage: 87 },
-  { rank: 3, name: "JOSH RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 84, percentage: 84 },
-  { rank: 4, name: "ANDY RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 82, percentage: 82 },
-  { rank: 5, name: "PAULA RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 80, percentage: 80 },
-  { rank: 6, name: "PAIGE RODGERS", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 79, percentage: 79 },
-  { rank: 7, name: "LIONEL MESSI", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 75, percentage: 75 },
-  { rank: 8, name: "STEVIE WONDER", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 74, percentage: 74 },
-  { rank: 9, name: "CLAIRO", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 71, percentage: 71 },
-  { rank: 10, name: "CHRISTIAN PULISIC", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", score: 70, percentage: 70 }
+  { 
+    id: 1, 
+    name: "Sarah Chen", 
+    avatar: "/placeholder.svg", 
+    points: 2847, 
+    position: 1, 
+    streak: 15,
+    badges: ["🔥", "💪", "📚"]
+  },
+  { 
+    id: 2, 
+    name: "Mike Johnson", 
+    avatar: "/placeholder.svg", 
+    points: 2593, 
+    position: 2, 
+    streak: 12,
+    badges: ["📚", "🧘‍♂️", "🏃‍♂️"]
+  },
+  { 
+    id: 3, 
+    name: "You", 
+    avatar: "/placeholder.svg", 
+    points: 2441, 
+    position: 3, 
+    streak: 8,
+    badges: ["💪", "🎯"]
+  },
+  { 
+    id: 4, 
+    name: "Alex Rivera", 
+    avatar: "/placeholder.svg", 
+    points: 2205, 
+    position: 4, 
+    streak: 6,
+    badges: ["✨", "🧘‍♂️"]
+  },
+  { 
+    id: 5, 
+    name: "Emma Davis", 
+    avatar: "/placeholder.svg", 
+    points: 1998, 
+    position: 5, 
+    streak: 10,
+    badges: ["🏃‍♀️", "💧"]
+  },
 ];
 
 export const feedPosts = [
   {
     id: 1,
-    user: "NATE",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "READ 7 DAYS IN A ROW!",
-    timeAgo: "45 MINS AGO",
-    reactions: ["✅", "❗"],
-    comments: 0
+    user: "Emma Davis",
+    avatar: "/placeholder.svg",
+    content: "just hit a 30-day meditation streak! 🧘‍♀️",
+    timeAgo: "3 hours ago",
+    reactions: ["🎉", "✨", "👏"],
+    comments: 7,
+    caption: "This practice has transformed my mornings. Feeling more centered than ever!",
   },
   {
     id: 2,
-    user: "DREW",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "JUST REACHED TOP 3 IN HIS LEADERBOARD!",
-    timeAgo: "1 HOUR AGO",
-    reactions: ["🔥", "🤩", "❗"],
-    comments: 6
+    user: "Chris Lee",
+    avatar: "/placeholder.svg",
+    content: "completed first 5K run! 🏃‍♂️",
+    timeAgo: "5 hours ago",
+    reactions: ["🔥", "🏃‍♂️", "💪"],
+    comments: 12,
+    caption: "From couch to 5K in 8 weeks. Never thought I'd actually enjoy running!",
   },
   {
     id: 3,
-    user: "JOSH",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "SHARED HIS DAILY RECAP!",
-    caption: "'I DROVE BACK TO VT'",
-    timeAgo: "3 HOURS AGO",
-    reactions: [],
-    comments: 4
+    user: "Taylor Swift",
+    avatar: "/placeholder.svg",
+    content: "read 50 pages today - book club here I come! 📖",
+    timeAgo: "8 hours ago",
+    reactions: ["📚", "🤓", "❤️"],
+    comments: 4,
+    caption: "Getting lost in 'The Seven Husbands of Evelyn Hugo' - can't put it down!",
   },
   {
     id: 4,
-    user: "ANDY",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "JUST HIT A PR AT THE GYM!",
-    timeAgo: "8 HOURS AGO",
-    reactions: ["🔥", "✅", "😀"],
-    comments: 2
-  },
-  {
-    id: 5,
-    user: "PAULA",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "HAS A NEW LONGEST STREAK FOR DEVOTIONAL!",
-    timeAgo: "12 HOURS AGO",
-    reactions: ["🙏", "😊", "✅"],
-    comments: 4
-  },
-  {
-    id: 6,
-    user: "PAIGE",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "STARTED TRACKING A NEW HABIT:MEDITATION!",
-    timeAgo: "18 HOURS AGO",
-    reactions: ["✅", "❗"],
-    comments: 2
-  },
-  {
-    id: 7,
-    user: "NATE",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "TRACKED HIS FIRST PERFECT WEEK!",
-    timeAgo: "18 HOURS AGO",
-    reactions: ["✅", "🔥", "❗"],
-    comments: 4
-  },
-  {
-    id: 8,
-    user: "ANDY",
-    avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
-    content: "JUST TRACKED HIS 10TH HABIT!",
-    timeAgo: "22 HOURS AGO",
-    reactions: ["✅", "😀", "❗"],
-    comments: 2
+    user: "Jordan Kim",
+    avatar: "/placeholder.svg",
+    content: "meal prepped for the entire week! 🥗",
+    timeAgo: "1 day ago",
+    reactions: ["🥗", "👨‍🍳", "💚"],
+    comments: 9,
+    caption: "Sunday meal prep session complete! Feeling prepared and excited for healthy choices all week.",
   }
 ];
