@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
@@ -40,8 +41,21 @@ const NewWorkoutsTab = () => {
     return sessionDate <= today;
   });
 
-  // Find active workout session - any incomplete workout from today or earlier
-  const activeWorkoutSession = filteredSessions.find(session => !session.is_completed);
+  // Find active workout session - only show if there's a truly active workout
+  const activeWorkoutSession = filteredSessions.find(session => {
+    if (session.is_completed) return false;
+    
+    // Check if workout has actually started (has duration or was created today and has activity)
+    const sessionDate = new Date(session.workout_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Only consider it active if:
+    // 1. It has duration (timer was started), OR
+    // 2. It was created today and is not completed
+    return (session.duration_minutes && session.duration_minutes > 0) || 
+           (sessionDate >= today && !session.is_completed);
+  });
 
   // Show error state if there are authentication or data issues
   if (!user) {
