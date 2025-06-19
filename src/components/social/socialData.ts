@@ -10,47 +10,47 @@ export const friends = [
 
 export const leaderboardData = [
   { 
-    id: 1, 
+    rank: 1, 
     name: "Sarah Chen", 
     avatar: "/placeholder.svg", 
-    points: 2847, 
-    position: 1, 
+    score: 2847, 
+    percentage: 95,
     streak: 15,
     badges: ["🔥", "💪", "📚"]
   },
   { 
-    id: 2, 
+    rank: 2, 
     name: "Mike Johnson", 
     avatar: "/placeholder.svg", 
-    points: 2593, 
-    position: 2, 
+    score: 2593, 
+    percentage: 91,
     streak: 12,
     badges: ["📚", "🧘‍♂️", "🏃‍♂️"]
   },
   { 
-    id: 3, 
+    rank: 3, 
     name: "You", 
     avatar: "/placeholder.svg", 
-    points: 2441, 
-    position: 3, 
+    score: 2441, 
+    percentage: 86,
     streak: 8,
     badges: ["💪", "🎯"]
   },
   { 
-    id: 4, 
+    rank: 4, 
     name: "Alex Rivera", 
     avatar: "/placeholder.svg", 
-    points: 2205, 
-    position: 4, 
+    score: 2205, 
+    percentage: 78,
     streak: 6,
     badges: ["✨", "🧘‍♂️"]
   },
   { 
-    id: 5, 
+    rank: 5, 
     name: "Emma Davis", 
     avatar: "/placeholder.svg", 
-    points: 1998, 
-    position: 5, 
+    score: 1998, 
+    percentage: 70,
     streak: 10,
     badges: ["🏃‍♀️", "💧"]
   },
