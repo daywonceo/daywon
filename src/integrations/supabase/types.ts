@@ -62,6 +62,30 @@ export type Database = {
           },
         ]
       }
+      habit_difficulty: {
+        Row: {
+          created_at: string
+          difficulty_level: string
+          habit_name: string
+          id: string
+          multiplier: number
+        }
+        Insert: {
+          created_at?: string
+          difficulty_level: string
+          habit_name: string
+          id?: string
+          multiplier: number
+        }
+        Update: {
+          created_at?: string
+          difficulty_level?: string
+          habit_name?: string
+          id?: string
+          multiplier?: number
+        }
+        Relationships: []
+      }
       habit_photos: {
         Row: {
           activity_date: string
@@ -188,6 +212,54 @@ export type Database = {
           recipe_title?: string
           saved_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_habit_scores: {
+        Row: {
+          consistency_rate: number | null
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          rank_position: number | null
+          recency_score: number | null
+          score_period: string
+          streak_score: number | null
+          total_score: number | null
+          updated_at: string
+          user_id: string
+          variety_score: number | null
+        }
+        Insert: {
+          consistency_rate?: number | null
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          rank_position?: number | null
+          recency_score?: number | null
+          score_period: string
+          streak_score?: number | null
+          total_score?: number | null
+          updated_at?: string
+          user_id: string
+          variety_score?: number | null
+        }
+        Update: {
+          consistency_rate?: number | null
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          rank_position?: number | null
+          recency_score?: number | null
+          score_period?: string
+          streak_score?: number | null
+          total_score?: number | null
+          updated_at?: string
+          user_id?: string
+          variety_score?: number | null
         }
         Relationships: []
       }
