@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [showTimerFailPrompt, setShowTimerFailPrompt] = useState(false);
   const [manualMinutes, setManualMinutes] = useState<string>('');
   const [viewState, setViewState] = useState<'selection' | 'workout'>('selection');
+  const [planGenerationFailed, setPlanGenerationFailed] = useState(false);
   
   const { workoutPlans } = useWorkoutPlans();
   const { sessions, createSession, completeSession, logExercise, refetch } = useWorkoutSessions();
@@ -59,15 +61,25 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         setElapsedTime(activeSession.duration_minutes * 60);
       }
       
-      // Always generate workout plan for active sessions that have a plan_id
+      // Try to generate workout plan for active sessions that have a plan_id
       if (activeSession.workout_plan_id && activePlan) {
         console.log('Generating workout plan for existing session');
-        generateWorkoutPlan(activePlan.plan_type, 'beginner').then(plan => {
-          console.log('Generated plan:', plan);
-          if (plan && plan[activeSession.workout_type]) {
-            setWorkoutPlan(plan[activeSession.workout_type]);
-          }
-        });
+        generateWorkoutPlan(activePlan.plan_type, 'beginner')
+          .then(plan => {
+            console.log('Generated plan:', plan);
+            if (plan && plan[activeSession.workout_type]) {
+              setWorkoutPlan(plan[activeSession.workout_type]);
+              setPlanGenerationFailed(false);
+            } else {
+              console.log('Plan generation returned empty result');
+              setPlanGenerationFailed(true);
+            }
+          })
+          .catch(error => {
+            console.error('Failed to generate workout plan:', error);
+            setPlanGenerationFailed(true);
+            toast.error('Unable to load exercises. You can still track your workout manually.');
+          });
       }
     }
   }, [sessions, activePlan, generateWorkoutPlan]);
@@ -105,11 +117,14 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       console.log('Generated workout plan:', plan);
       
       if (!plan || !plan[workoutType]) {
-        toast.error('Failed to generate workout plan');
-        return;
+        toast.error('Failed to generate workout plan. You can still track your workout manually.');
+        setPlanGenerationFailed(true);
+      } else {
+        setWorkoutPlan(plan[workoutType]);
+        setPlanGenerationFailed(false);
       }
 
-      // Create session
+      // Create session regardless of plan generation success
       const session = await createSession({
         workout_plan_id: activePlan.id,
         workout_date: new Date().toISOString().split('T')[0],
@@ -118,10 +133,9 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
       if (session) {
         setCurrentSession(session);
-        setWorkoutPlan(plan[workoutType]);
         setSelectedWorkoutType(workoutType);
         setViewState('workout');
-        console.log('Workout session created with plan:', plan[workoutType]);
+        console.log('Workout session created');
       }
     } catch (error) {
       console.error('Error creating workout session:', error);
@@ -266,13 +280,50 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           onStopWorkout={handleStopWorkout}
         />
 
-        {/* Always show exercises for plan-based workouts */}
+        {/* Show exercises for plan-based workouts, with fallback if generation failed */}
         {currentSession.workout_plan_id && (
-          <ExerciseList
-            workoutPlan={workoutPlan}
-            exerciseLogs={exerciseLogs}
-            onLogExercise={handleLogExercise}
-          />
+          <>
+            {planGenerationFailed ? (
+              <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+                <CardContent className="p-6 text-center">
+                  <h3 className="font-semibold text-yellow-800 dark:text-yellow-400 mb-2">
+                    Exercise List Unavailable
+                  </h3>
+                  <p className="text-yellow-700 dark:text-yellow-300 text-sm mb-4">
+                    We couldn't load your exercise list, but you can still track your workout time and log exercises manually.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (activePlan) {
+                        generateWorkoutPlan(activePlan.plan_type, 'beginner')
+                          .then(plan => {
+                            if (plan && plan[selectedWorkoutType]) {
+                              setWorkoutPlan(plan[selectedWorkoutType]);
+                              setPlanGenerationFailed(false);
+                              toast.success('Exercises loaded successfully!');
+                            }
+                          })
+                          .catch(() => {
+                            toast.error('Still unable to load exercises');
+                          });
+                      }
+                    }}
+                    className="border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+                  >
+                    Try Loading Exercises Again
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <ExerciseList
+                workoutPlan={workoutPlan}
+                exerciseLogs={exerciseLogs}
+                onLogExercise={handleLogExercise}
+              />
+            )}
+          </>
         )}
 
         {workoutStarted && elapsedTime > 0 && (

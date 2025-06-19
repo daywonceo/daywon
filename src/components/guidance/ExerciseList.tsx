@@ -12,8 +12,8 @@ const ExerciseList = ({ workoutPlan, exerciseLogs, onLogExercise }: ExerciseList
   console.log('ExerciseList - workoutPlan:', workoutPlan);
   console.log('ExerciseList - exerciseLogs:', exerciseLogs);
   
-  if (!workoutPlan || !workoutPlan.exercises) {
-    console.log('ExerciseList - No workout plan or exercises found');
+  if (!workoutPlan) {
+    console.log('ExerciseList - No workout plan found');
     return (
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200">
@@ -21,6 +21,20 @@ const ExerciseList = ({ workoutPlan, exerciseLogs, onLogExercise }: ExerciseList
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Generating your workout plan, please wait...
+        </p>
+      </div>
+    );
+  }
+
+  if (!workoutPlan.exercises || workoutPlan.exercises.length === 0) {
+    console.log('ExerciseList - No exercises in workout plan');
+    return (
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+          No Exercises Available
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Your workout plan doesn't contain any exercises yet.
         </p>
       </div>
     );
