@@ -3,13 +3,12 @@ import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProfileSettings from "@/components/ProfileSettings";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Trophy, Users, Flame, Calendar, Settings, Share2, LogOut, Music, Link } from "lucide-react";
+import ProfileHeader from "@/components/profile/ProfileHeader";
+import PersonalBests from "@/components/profile/PersonalBests";
+import BestFriends from "@/components/profile/BestFriends";
+import MembershipMilestone from "@/components/profile/MembershipMilestone";
+import ConnectedApps from "@/components/profile/ConnectedApps";
+import ProfileActions from "@/components/profile/ProfileActions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -45,18 +44,6 @@ const Profile = () => {
     weeklyGoalCompletion: 89
   };
 
-  const handleFriendTap = (friendName: string) => {
-    toast.info(`Opening ${friendName}'s profile`);
-  };
-
-  const handleConnectSpotify = () => {
-    toast.info("Connecting to Spotify...");
-  };
-
-  const handleDisconnectSpotify = () => {
-    toast.info("Disconnecting from Spotify...");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
@@ -69,197 +56,23 @@ const Profile = () => {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Track your progress and achievements</p>
         </div>
         
-        {/* Profile Summary (Header Card) */}
-        <Card className="mb-6 border-green-200 dark:border-green-800 shadow-lg">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative mb-4">
-                <div className="w-24 h-24">
-                  <AspectRatio ratio={1/1}>
-                    <Avatar className="w-full h-full border-4 border-green-200 dark:border-green-800">
-                      <AvatarImage src={profile.avatar} alt={profile.name} className="object-cover" />
-                      <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </AspectRatio>
-                </div>
-              </div>
-              
-              <h2 className="text-xl font-bold mb-4">{profile.name}</h2>
-              
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-4 w-full max-w-sm">
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <Users className="w-5 h-5 text-green-600" />
-                  </div>
-                  <p className="text-lg font-bold text-green-600">{profile.friendCount}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Friends</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <p className="text-lg font-bold text-blue-600">{profile.daysActive}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Days Active</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <Trophy className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <p className="text-lg font-bold text-purple-600">{profile.totalHabitsCompleted}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Completed</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <ProfileHeader profile={profile} />
         
-        {/* Personal Bests (Highlights Card) */}
-        <div className="mb-6">
-          <div className="flex items-center mb-4">
-            <Trophy className="w-5 h-5 text-yellow-600 mr-2" />
-            <h3 className="text-lg font-bold">Personal Bests</h3>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="border-orange-200 dark:border-orange-800 shadow-sm">
-              <CardContent className="p-4 text-center">
-                <Flame className="w-8 h-8 mx-auto mb-2 text-orange-500" />
-                <h4 className="text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">LONGEST STREAK</h4>
-                <p className="text-2xl font-bold text-orange-600">{profile.longestStreak.days}</p>
-                <p className="text-xs text-gray-500">DAYS</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-blue-200 dark:border-blue-800 shadow-sm">
-              <CardContent className="p-4 text-center">
-                <Trophy className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                <h4 className="text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">TOP HABIT</h4>
-                <p className="text-lg font-bold text-blue-600">{profile.mostConsistentHabit}</p>
-                <p className="text-xs text-gray-500">MOST CONSISTENT</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        <PersonalBests 
+          longestStreak={profile.longestStreak}
+          mostConsistentHabit={profile.mostConsistentHabit}
+        />
         
-        {/* Best Friends Section */}
-        <div className="mb-6">
-          <div className="flex items-center mb-4">
-            <Users className="w-5 h-5 text-blue-600 mr-2" />
-            <h3 className="text-lg font-bold">Best Friends</h3>
-          </div>
-          
-          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex justify-between space-x-4">
-                {profile.bestFriends.map((friend, index) => (
-                  <div 
-                    key={index} 
-                    className="flex flex-col items-center flex-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 rounded-lg p-2 transition-colors"
-                    onClick={() => handleFriendTap(friend.name)}
-                  >
-                    <Avatar className="w-16 h-16 mb-2 border-2 border-green-200 dark:border-green-800">
-                      <AvatarImage src={friend.avatar} alt={friend.name} />
-                      <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <p className="text-sm font-semibold text-center mb-1">{friend.name.split(' ')[0]}</p>
-                    <Badge variant="secondary" className="text-xs">{friend.topHabit}</Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <BestFriends bestFriends={profile.bestFriends} />
         
-        {/* Connected Apps Section */}
-        <div className="mb-6">
-          <div className="flex items-center mb-4">
-            <Link className="w-5 h-5 text-green-600 mr-2" />
-            <h3 className="text-lg font-bold">Connected Apps</h3>
-          </div>
-          
-          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-[#1DB954] rounded-full flex items-center justify-center">
-                    <Music className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Spotify</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {session?.provider_token ? "Connected" : "Not connected"}
-                    </p>
-                  </div>
-                </div>
-                {session?.provider_token ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDisconnectSpotify}
-                    className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    Disconnect
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleConnectSpotify}
-                    className="text-green-600 border-green-200 hover:bg-green-50 dark:hover:bg-green-900/20"
-                  >
-                    Connect
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <ConnectedApps isSpotifyConnected={!!session?.provider_token} />
         
-        {/* Membership Milestone */}
-        <div className="mb-6">
-          <div className="flex items-center mb-4">
-            <Calendar className="w-5 h-5 text-purple-600 mr-2" />
-            <h3 className="text-lg font-bold">Membership</h3>
-          </div>
-          
-          <div className="bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/30 dark:to-blue-900/30 rounded-lg p-6 text-center border border-green-200 dark:border-green-800">
-            <h3 className="font-bold mb-2 text-gray-700 dark:text-gray-300">Member Since Day One</h3>
-            <p className="text-2xl font-bold tracking-wider mb-2 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              {profile.daysActive} DAYS STRONG!
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Keep up the amazing consistency!
-            </p>
-          </div>
-        </div>
+        <MembershipMilestone daysActive={profile.daysActive} />
         
-        {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-3">
-          <Button 
-            variant="outline" 
-            className="border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900/20"
-            onClick={() => setSettingsOpen(true)}
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            Share
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-red-200 dark:border-red-800 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-            onClick={handleSignOut}
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
+        <ProfileActions 
+          onOpenSettings={() => setSettingsOpen(true)}
+          onSignOut={handleSignOut}
+        />
       </main>
       
       <Footer />
