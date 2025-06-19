@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Play, Pause, CheckCircle, Plus, Timer, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Play, Pause, CheckCircle, Plus, Timer, AlertTriangle, RotateCcw } from "lucide-react";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 import { useExercises } from "@/hooks/useExercises";
@@ -22,32 +22,54 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [exerciseLogs, setExerciseLogs] = useState<any[]>([]);
   const [showLongRunningAlert, setShowLongRunningAlert] = useState(false);
   const [manualDuration, setManualDuration] = useState<string>('');
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
+  const [workoutStarted, setWorkoutStarted] = useState(false);
   
   const { workoutPlans } = useWorkoutPlans();
-  const { sessions, createSession, completeSession, logExercise } = useWorkoutSessions();
+  const { sessions, createSession, completeSession, logExercise, refetch } = useWorkoutSessions();
   const { generateWorkoutPlan, isLoading } = useExercises();
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
 
-  // Check for existing active session on component mount - only from today or earlier
+  // Check for existing active session and validate its state
   useEffect(() => {
     const activeSession = sessions.find(session => {
       const sessionDate = new Date(session.workout_date);
       const today = new Date();
-      today.setHours(23, 59, 59, 999); // End of today
+      today.setHours(23, 59, 59, 999);
       return sessionDate <= today && !session.is_completed;
     });
 
     if (activeSession) {
       console.log('Found existing active session:', activeSession);
+      
+      // Fallback check: if workout is "In Progress" but has no valid start time or duration
+      const sessionCreatedAt = new Date(activeSession.created_at);
+      const timeSinceCreation = Date.now() - sessionCreatedAt.getTime();
+      
+      // If session was created more than 5 minutes ago but has no duration and no exercises logged
+      if (timeSinceCreation > 5 * 60 * 1000 && !activeSession.duration_minutes) {
+        console.log('Detected potentially stuck workout, checking for activity...');
+        
+        // Check if any exercises were logged for this session
+        // For now, we'll assume if no start time is properly set, it needs to be reset
+        if (!startTime && elapsedTime === 0) {
+          console.log('Resetting stuck workout session');
+          setCurrentSession(activeSession);
+          setSelectedWorkoutType(activeSession.workout_type);
+          setWorkoutStarted(false); // Mark as not started to show proper buttons
+          return;
+        }
+      }
+      
       setCurrentSession(activeSession);
       setSelectedWorkoutType(activeSession.workout_type);
+      setWorkoutStarted(true);
       
       // Set start time to creation time if we're resuming
-      const sessionCreatedAt = new Date(activeSession.created_at);
       setStartTime(sessionCreatedAt);
       
-      // Only generate workout plan if this session has a workout plan
+      // Generate workout plan if needed
       if (activeSession.workout_plan_id && activePlan) {
         generateWorkoutPlan(activePlan.plan_type, 'beginner').then(plan => {
           if (plan && plan[activeSession.workout_type]) {
@@ -56,23 +78,23 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         });
       }
     }
-  }, [sessions, activePlan, generateWorkoutPlan]);
+  }, [sessions, activePlan, generateWorkoutPlan, startTime, elapsedTime]);
 
   // Timer effect with long-running workout check
   useEffect(() => {
-    if (startTime) {
+    if (startTime && workoutStarted && !isTimerPaused) {
       const interval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
         setElapsedTime(elapsed);
         
-        // Check if workout has been running for more than 2 hours (7200 seconds)
+        // Check if workout has been running for more than 2 hours
         if (elapsed > 7200 && !showLongRunningAlert) {
           setShowLongRunningAlert(true);
         }
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [startTime, showLongRunningAlert]);
+  }, [startTime, workoutStarted, isTimerPaused, showLongRunningAlert]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -98,12 +120,52 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       if (session) {
         setCurrentSession(session);
         setWorkoutPlan(plan[workoutType]);
-        setStartTime(new Date());
         setSelectedWorkoutType(workoutType);
+        // Don't start timer yet - wait for user to explicitly start
+        setWorkoutStarted(false);
       }
     } catch (error) {
       console.error('Error starting workout:', error);
     }
+  };
+
+  const handleStartTimer = () => {
+    setStartTime(new Date());
+    setWorkoutStarted(true);
+    setIsTimerPaused(false);
+    toast.success("Workout timer started!");
+  };
+
+  const handlePauseTimer = () => {
+    setIsTimerPaused(true);
+    toast.info("Workout timer paused");
+  };
+
+  const handleResumeTimer = () => {
+    // Adjust start time to account for paused duration
+    const pausedDuration = elapsedTime * 1000; // Convert to milliseconds
+    setStartTime(new Date(Date.now() - pausedDuration));
+    setIsTimerPaused(false);
+    toast.success("Workout timer resumed!");
+  };
+
+  const handleResetWorkout = async () => {
+    if (!currentSession) return;
+    
+    // Reset the session by completing it with 0 duration, then create a new one
+    await completeSession(currentSession.id, 0);
+    
+    // Reset all states
+    setStartTime(null);
+    setElapsedTime(0);
+    setWorkoutStarted(false);
+    setIsTimerPaused(false);
+    setExerciseLogs([]);
+    
+    // Refetch sessions to get updated state
+    await refetch();
+    
+    toast.success("Workout reset successfully");
   };
 
   const handleLogExercise = async (exercise: any, sets: number, reps: number, weight?: number) => {
@@ -126,7 +188,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   };
 
   const handleCompleteWorkout = async (customDuration?: number) => {
-    if (!currentSession || !startTime) return;
+    if (!currentSession || (!startTime && !customDuration)) return;
 
     const durationMinutes = customDuration || Math.floor(elapsedTime / 60);
     await completeSession(currentSession.id, durationMinutes);
@@ -259,7 +321,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     );
   }
 
-  // Active workout view - show even for manual workouts without a plan
+  // Active workout view
   if (currentSession) {
     return (
       <div className="animate-fade-in space-y-6">
@@ -275,11 +337,73 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
               )}
             </h2>
           </div>
-          <div className="flex items-center gap-2 text-green-600">
-            <Timer className="w-4 h-4" />
-            <span className="font-mono text-lg">{formatTime(elapsedTime)}</span>
+          
+          {/* Timer and Controls */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-green-600">
+              <Timer className="w-4 h-4" />
+              <span className="font-mono text-lg">{formatTime(elapsedTime)}</span>
+              {isTimerPaused && <span className="text-xs text-orange-500">(Paused)</span>}
+            </div>
           </div>
         </div>
+
+        {/* Timer Control Buttons */}
+        <Card className="bg-gray-50 dark:bg-gray-700">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Workout Controls
+              </div>
+              <div className="flex gap-2">
+                {!workoutStarted && elapsedTime === 0 && (
+                  <Button
+                    onClick={handleStartTimer}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Timer
+                  </Button>
+                )}
+                
+                {workoutStarted && !isTimerPaused && (
+                  <Button
+                    onClick={handlePauseTimer}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Pause className="w-4 h-4 mr-2" />
+                    Pause
+                  </Button>
+                )}
+                
+                {isTimerPaused && (
+                  <Button
+                    onClick={handleResumeTimer}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume
+                  </Button>
+                )}
+                
+                {elapsedTime === 0 && (
+                  <Button
+                    onClick={handleResetWorkout}
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Show exercises if we have a workout plan */}
         {workoutPlan && workoutPlan.exercises && (
@@ -303,30 +427,32 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
                 Manual Workout in Progress
               </h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                This is a manual workout. You can complete it at any time.
+                This is a manual workout. Start the timer when you begin exercising.
               </p>
             </CardContent>
           </Card>
         )}
 
-        {/* Complete Workout - always show regardless of workout type */}
-        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-          <CardContent className="p-6 text-center">
-            <h3 className="font-semibold text-green-800 dark:text-green-400 mb-2">
-              Ready to finish?
-            </h3>
-            <p className="text-green-600 dark:text-green-300 text-sm mb-4">
-              You've been working out for {formatTime(elapsedTime)}
-            </p>
-            <Button
-              onClick={() => handleCompleteWorkout()}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Complete Workout
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Complete Workout - only show if timer has been started */}
+        {(workoutStarted || elapsedTime > 0) && (
+          <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+            <CardContent className="p-6 text-center">
+              <h3 className="font-semibold text-green-800 dark:text-green-400 mb-2">
+                Ready to finish?
+              </h3>
+              <p className="text-green-600 dark:text-green-300 text-sm mb-4">
+                You've been working out for {formatTime(elapsedTime)}
+              </p>
+              <Button
+                onClick={() => handleCompleteWorkout()}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Complete Workout
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }
