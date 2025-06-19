@@ -9,13 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Trophy, Users, Flame, Calendar, Settings, Share2, LogOut } from "lucide-react";
+import { Trophy, Users, Flame, Calendar, Settings, Share2, LogOut, Music, Link } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const Profile = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { signOut } = useAuth();
+  const { signOut, session } = useAuth();
   
   const handleSignOut = async () => {
     try {
@@ -49,6 +49,14 @@ const Profile = () => {
     toast.info(`Opening ${friendName}'s profile`);
   };
 
+  const handleConnectSpotify = () => {
+    toast.info("Connecting to Spotify...");
+  };
+
+  const handleDisconnectSpotify = () => {
+    toast.info("Disconnecting from Spotify...");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
@@ -61,7 +69,7 @@ const Profile = () => {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Track your progress and achievements</p>
         </div>
         
-        {/* 🔝 Profile Summary (Header Card) */}
+        {/* Profile Summary (Header Card) */}
         <Card className="mb-6 border-green-200 dark:border-green-800 shadow-lg">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
@@ -106,10 +114,10 @@ const Profile = () => {
           </CardContent>
         </Card>
         
-        {/* 🏅 Personal Bests (Highlights Card) */}
+        {/* Personal Bests (Highlights Card) */}
         <div className="mb-6">
           <div className="flex items-center mb-4">
-            <span className="text-lg mr-2">🏅</span>
+            <Trophy className="w-5 h-5 text-yellow-600 mr-2" />
             <h3 className="text-lg font-bold">Personal Bests</h3>
           </div>
           
@@ -134,10 +142,10 @@ const Profile = () => {
           </div>
         </div>
         
-        {/* 👯 Best Friends Section */}
+        {/* Best Friends Section */}
         <div className="mb-6">
           <div className="flex items-center mb-4">
-            <span className="text-lg mr-2">👯‍♂️</span>
+            <Users className="w-5 h-5 text-blue-600 mr-2" />
             <h3 className="text-lg font-bold">Best Friends</h3>
           </div>
           
@@ -163,15 +171,60 @@ const Profile = () => {
           </Card>
         </div>
         
-        {/* 📆 Membership Milestone */}
+        {/* Connected Apps Section */}
         <div className="mb-6">
           <div className="flex items-center mb-4">
-            <span className="text-lg mr-2">📆</span>
+            <Link className="w-5 h-5 text-green-600 mr-2" />
+            <h3 className="text-lg font-bold">Connected Apps</h3>
+          </div>
+          
+          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-[#1DB954] rounded-full flex items-center justify-center">
+                    <Music className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Spotify</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {session?.provider_token ? "Connected" : "Not connected"}
+                    </p>
+                  </div>
+                </div>
+                {session?.provider_token ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDisconnectSpotify}
+                    className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleConnectSpotify}
+                    className="text-green-600 border-green-200 hover:bg-green-50 dark:hover:bg-green-900/20"
+                  >
+                    Connect
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Membership Milestone */}
+        <div className="mb-6">
+          <div className="flex items-center mb-4">
+            <Calendar className="w-5 h-5 text-purple-600 mr-2" />
             <h3 className="text-lg font-bold">Membership</h3>
           </div>
           
           <div className="bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/30 dark:to-blue-900/30 rounded-lg p-6 text-center border border-green-200 dark:border-green-800">
-            <h3 className="font-bold mb-2 text-gray-700 dark:text-gray-300">🎉 Member Since Day One</h3>
+            <h3 className="font-bold mb-2 text-gray-700 dark:text-gray-300">Member Since Day One</h3>
             <p className="text-2xl font-bold tracking-wider mb-2 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               {profile.daysActive} DAYS STRONG!
             </p>
@@ -181,7 +234,7 @@ const Profile = () => {
           </div>
         </div>
         
-        {/* ⚙️ Action Buttons */}
+        {/* Action Buttons */}
         <div className="grid grid-cols-3 gap-3">
           <Button 
             variant="outline" 
