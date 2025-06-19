@@ -9,7 +9,22 @@ interface ExerciseListProps {
 }
 
 const ExerciseList = ({ workoutPlan, exerciseLogs, onLogExercise }: ExerciseListProps) => {
-  if (!workoutPlan || !workoutPlan.exercises) return null;
+  console.log('ExerciseList - workoutPlan:', workoutPlan);
+  console.log('ExerciseList - exerciseLogs:', exerciseLogs);
+  
+  if (!workoutPlan || !workoutPlan.exercises) {
+    console.log('ExerciseList - No workout plan or exercises found');
+    return (
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+          Loading Exercises...
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Generating your workout plan, please wait...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

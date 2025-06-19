@@ -46,7 +46,7 @@ const WorkoutPlanSelector = ({ onBack }: WorkoutPlanSelectorProps) => {
     },
     {
       id: 'chest_back_shoulders_arms_legs',
-      name: 'Body Part Split',
+      name: 'Arnold Split',
       description: '3-day split targeting specific muscle groups',
       days: ['Chest & Back', 'Shoulders & Arms', 'Legs'],
       duration: '40-55 min per workout'

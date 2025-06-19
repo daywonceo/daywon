@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,9 +59,11 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         setElapsedTime(activeSession.duration_minutes * 60);
       }
       
-      // Generate workout plan if needed
+      // Always generate workout plan for active sessions that have a plan_id
       if (activeSession.workout_plan_id && activePlan) {
+        console.log('Generating workout plan for existing session');
         generateWorkoutPlan(activePlan.plan_type, 'beginner').then(plan => {
+          console.log('Generated plan:', plan);
           if (plan && plan[activeSession.workout_type]) {
             setWorkoutPlan(plan[activeSession.workout_type]);
           }
@@ -98,9 +99,15 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     if (!activePlan) return;
 
     try {
-      // Generate workout plan
+      console.log('Generating workout plan for type:', workoutType);
+      // Generate workout plan first
       const plan = await generateWorkoutPlan(activePlan.plan_type, 'beginner');
-      if (!plan || !plan[workoutType]) return;
+      console.log('Generated workout plan:', plan);
+      
+      if (!plan || !plan[workoutType]) {
+        toast.error('Failed to generate workout plan');
+        return;
+      }
 
       // Create session
       const session = await createSession({
@@ -114,7 +121,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         setWorkoutPlan(plan[workoutType]);
         setSelectedWorkoutType(workoutType);
         setViewState('workout');
-        console.log('Workout session created, ready to start timer');
+        console.log('Workout session created with plan:', plan[workoutType]);
       }
     } catch (error) {
       console.error('Error creating workout session:', error);
@@ -259,11 +266,14 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           onStopWorkout={handleStopWorkout}
         />
 
-        <ExerciseList
-          workoutPlan={workoutPlan}
-          exerciseLogs={exerciseLogs}
-          onLogExercise={handleLogExercise}
-        />
+        {/* Always show exercises for plan-based workouts */}
+        {currentSession.workout_plan_id && (
+          <ExerciseList
+            workoutPlan={workoutPlan}
+            exerciseLogs={exerciseLogs}
+            onLogExercise={handleLogExercise}
+          />
+        )}
 
         {workoutStarted && elapsedTime > 0 && (
           <WorkoutCompletion
