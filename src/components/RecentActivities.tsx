@@ -1,9 +1,7 @@
 
 import React from "react";
-import { cn } from "@/lib/utils";
+import SocialActivityFeed from "./social/SocialActivityFeed";
 import PlaylistRecommendations from "./habit/PlaylistRecommendations";
-import HabitGridHeader from "./habit/HabitGridHeader";
-import HabitActivityRow from "./habit/HabitActivityRow";
 import { useHabitActivities } from "@/hooks/useHabitActivities";
 
 type RecentActivitiesProps = {
@@ -24,41 +22,18 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
 
   return (
     <div className="mb-6 sm:mb-16">
-      <div className="flex flex-col overflow-hidden">
-        <div
-          className={cn(
-            "grid",
-            // Mobile-first: fixed day, flexible text, fixed habits
-            "grid-cols-[30px_1fr_repeat(3,48px)]",
-            // Desktop: larger fixed sizes
-            "sm:grid-cols-[50px_1fr_repeat(3,64px)]",
-            "gap-x-2 sm:gap-x-4 items-center"
-          )}
-        >
-          {/* Grid Header */}
-          <HabitGridHeader habits={userHabits} />
-
-          {/* Activity rows */}
-          {activities.map((activity, activityIndex) => (
-            <React.Fragment key={`activity-${activityIndex}`}>
-              <HabitActivityRow
-                activity={activity}
-                activityIndex={activityIndex}
-                activities={activities}
-                setActivities={setActivities}
-                activeHabit={activeHabit}
-                setActiveHabit={setActiveHabit}
-                toggleStatus={toggleStatus}
-                toggleEditMode={toggleEditMode}
-                updateActivityText={updateActivityText}
-              />
-              {activityIndex < activities.length - 1 && (
-                <div className="col-span-full h-px bg-green-200/70 dark:bg-gray-700 my-3"></div>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+      {/* Social Activity Feed */}
+      <SocialActivityFeed 
+        activities={activities}
+        setActivities={setActivities}
+        activeHabit={activeHabit}
+        setActiveHabit={setActiveHabit}
+        userHabits={userHabits}
+        toggleStatus={toggleStatus}
+        toggleEditMode={toggleEditMode}
+        updateActivityText={updateActivityText}
+      />
+      
       {/* Show playlist recommendations when a habit is active */}
       {activeHabit && (
         <PlaylistRecommendations
