@@ -4,19 +4,18 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainFeed from "@/components/social/MainFeed";
-import Leaderboard from "@/components/social/Leaderboard";
 import HabitLeaderboard from "@/components/social/HabitLeaderboard";
 import ScoreCalculationInfo from "@/components/social/ScoreCalculationInfo";
 import FriendList from "@/components/social/FriendList";
 import Groups from "@/components/social/Groups";
-import { friends, leaderboardData, feedPosts } from "@/components/social/socialData";
+import { friends, feedPosts } from "@/components/social/socialData";
 
 const Social = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-3 sm:px-4 pb-20 pt-4 max-w-md sm:max-w-2xl mx-auto w-full">
+      <main className="flex-grow px-3 sm:px-4 pb-20 pt-4 max-w-md sm:max-2xl mx-auto w-full">
         {/* Hero Section */}
         <div className="text-center mb-6 px-2">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
@@ -30,16 +29,13 @@ const Social = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="habit-ranks" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 h-11">
-            <TabsTrigger value="habit-ranks" className="text-xs sm:text-sm font-medium px-1">
-              RANKS
-            </TabsTrigger>
+        <Tabs defaultValue="feed" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 h-11">
             <TabsTrigger value="feed" className="text-xs sm:text-sm font-medium px-1">
               FEED
             </TabsTrigger>
-            <TabsTrigger value="old-ranks" className="text-xs sm:text-sm font-medium px-1">
-              OLD
+            <TabsTrigger value="ranks" className="text-xs sm:text-sm font-medium px-1">
+              RANKS
             </TabsTrigger>
             <TabsTrigger value="groups" className="text-xs sm:text-sm font-medium px-1">
               GROUPS
@@ -49,16 +45,12 @@ const Social = () => {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="habit-ranks" className="animate-fade-in">
-            <HabitLeaderboard />
-          </TabsContent>
-          
           <TabsContent value="feed" className="animate-fade-in">
             <MainFeed feedPosts={feedPosts} />
           </TabsContent>
           
-          <TabsContent value="old-ranks" className="animate-fade-in">
-            <Leaderboard leaderboardData={leaderboardData} />
+          <TabsContent value="ranks" className="animate-fade-in">
+            <HabitLeaderboard />
           </TabsContent>
           
           <TabsContent value="groups" className="animate-fade-in">

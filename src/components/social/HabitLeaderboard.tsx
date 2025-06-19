@@ -6,28 +6,35 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Award, Crown, TrendingUp, Target, Zap, Clock } from "lucide-react";
-import { useLeaderboard } from "@/hooks/useLeaderboard";
-import { useHabitScoring } from "@/hooks/useHabitScoring";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { mockUsers } from "@/components/social/mockSocialData";
 
 type TimePeriod = "weekly" | "monthly" | "yearly";
 
+// Generate mock leaderboard data based on mockUsers
+const generateMockLeaderboard = (period: TimePeriod) => {
+  return mockUsers
+    .map((user, index) => ({
+      userId: user.userId,
+      email: user.name.toLowerCase().replace(' ', '') + '@example.com',
+      name: user.name,
+      avatar: user.profileImage,
+      totalScore: Math.max(45, 95 - (index * 8) + Math.random() * 10),
+      consistencyRate: Math.max(40, 90 - (index * 7) + Math.random() * 15),
+      streakScore: Math.max(5, 25 - (index * 2) + Math.random() * 8),
+      varietyScore: Math.max(8, 20 - (index * 1.5) + Math.random() * 6),
+      recencyScore: Math.random() > 0.3 ? 10 : Math.random() * 5,
+      rankPosition: index + 1,
+      periodStart: new Date().toISOString().split('T')[0],
+      periodEnd: new Date().toISOString().split('T')[0]
+    }))
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .map((entry, index) => ({ ...entry, rankPosition: index + 1 }));
+};
+
 const HabitLeaderboard = () => {
   const [period, setPeriod] = useState<TimePeriod>("monthly");
-  const { leaderboard, userRank, isLoading, refetch } = useLeaderboard(period);
-  const { calculateAndSaveAllScores, isLoading: isCalculating } = useHabitScoring();
-
-  const handleRecalculateScores = async () => {
-    try {
-      await calculateAndSaveAllScores();
-      await refetch();
-      toast.success("Habit scores updated successfully!");
-    } catch (error) {
-      toast.error("Failed to update habit scores");
-      console.error("Error updating scores:", error);
-    }
-  };
+  const leaderboard = generateMockLeaderboard(period);
+  const userRank = leaderboard.find(entry => entry.name === "Sarah Chen"); // Mock current user
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Crown className="text-yellow-500" size={18} />;
@@ -54,21 +61,6 @@ const HabitLeaderboard = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -81,28 +73,16 @@ const HabitLeaderboard = () => {
           Rankings based on consistency, streaks, variety, and recency
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
-          <ToggleGroup 
-            type="single" 
-            value={period} 
-            onValueChange={(value) => value && setPeriod(value as TimePeriod)} 
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-1 rounded-lg border border-gray-200 dark:border-gray-700"
-          >
-            <ToggleGroupItem value="weekly" className="text-xs font-medium px-3 py-1.5">Week</ToggleGroupItem>
-            <ToggleGroupItem value="monthly" className="text-xs font-medium px-3 py-1.5">Month</ToggleGroupItem>
-            <ToggleGroupItem value="yearly" className="text-xs font-medium px-3 py-1.5">Year</ToggleGroupItem>
-          </ToggleGroup>
-          
-          <Button 
-            onClick={handleRecalculateScores}
-            disabled={isCalculating}
-            size="sm"
-            variant="outline"
-            className="text-xs"
-          >
-            {isCalculating ? "Updating..." : "Update Scores"}
-          </Button>
-        </div>
+        <ToggleGroup 
+          type="single" 
+          value={period} 
+          onValueChange={(value) => value && setPeriod(value as TimePeriod)} 
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-1 rounded-lg border border-gray-200 dark:border-gray-700"
+        >
+          <ToggleGroupItem value="weekly" className="text-xs font-medium px-3 py-1.5">Week</ToggleGroupItem>
+          <ToggleGroupItem value="monthly" className="text-xs font-medium px-3 py-1.5">Month</ToggleGroupItem>
+          <ToggleGroupItem value="yearly" className="text-xs font-medium px-3 py-1.5">Year</ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
       {/* User's Current Rank */}
@@ -169,75 +149,65 @@ const HabitLeaderboard = () => {
           All Rankings - {getPeriodLabel(period)}
         </h3>
         
-        {leaderboard.length === 0 ? (
-          <Card className="text-center py-8">
-            <CardContent>
-              <div className="text-gray-400 mb-2">📊</div>
-              <p className="text-sm text-gray-500">No rankings available yet</p>
-              <p className="text-xs text-gray-400 mt-1">Complete some habits to see your score!</p>
-            </CardContent>
-          </Card>
-        ) : (
-          leaderboard.map((entry, index) => (
-            <Card 
-              key={entry.userId} 
-              className={`transition-all duration-200 hover:shadow-md ${
-                index < 3 
-                  ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10 border-yellow-200 dark:border-yellow-800/50' 
-                  : entry.userId === userRank?.userId
-                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 border-blue-200 dark:border-blue-800/50'
-                  : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700'
-              }`}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    {/* Rank Icon */}
-                    <div className="flex-shrink-0">
-                      {getRankIcon(entry.rankPosition)}
-                    </div>
-                    
-                    {/* Avatar */}
-                    <Avatar className="h-10 w-10 ring-2 ring-gray-100 dark:ring-gray-800/50 flex-shrink-0">
-                      <AvatarImage src="" alt={entry.email} />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-800 dark:to-purple-800 text-blue-800 dark:text-blue-200 text-sm font-semibold">
-                        {entry.email?.charAt(0).toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-gray-900 dark:text-white truncate">
-                        {entry.email?.split('@')[0] || 'Unknown User'}
-                      </p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Badge variant="secondary" className="text-xs px-2 py-0">
-                          C: {entry.consistencyRate.toFixed(0)}
-                        </Badge>
-                        <Badge variant="secondary" className="text-xs px-2 py-0">
-                          S: {entry.streakScore.toFixed(0)}
-                        </Badge>
-                      </div>
-                    </div>
+        {leaderboard.map((entry, index) => (
+          <Card 
+            key={entry.userId} 
+            className={`transition-all duration-200 hover:shadow-md ${
+              index < 3 
+                ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10 border-yellow-200 dark:border-yellow-800/50' 
+                : entry.name === userRank?.name
+                ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 border-blue-200 dark:border-blue-800/50'
+                : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700'
+            }`}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  {/* Rank Icon */}
+                  <div className="flex-shrink-0">
+                    {getRankIcon(entry.rankPosition)}
                   </div>
                   
-                  {/* Score */}
-                  <div className="text-right flex-shrink-0 ml-3">
-                    <p className={`text-xl font-bold ${getScoreColor(entry.totalScore)}`}>
-                      {entry.totalScore.toFixed(1)}
+                  {/* Avatar */}
+                  <Avatar className="h-10 w-10 ring-2 ring-gray-100 dark:ring-gray-800/50 flex-shrink-0">
+                    <AvatarImage src={entry.avatar} alt={entry.name} />
+                    <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-800 dark:to-purple-800 text-blue-800 dark:text-blue-200 text-sm font-semibold">
+                      {entry.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {/* User Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-gray-900 dark:text-white truncate">
+                      {entry.name}
                     </p>
-                    <div className="w-16">
-                      <Progress 
-                        value={entry.totalScore} 
-                        className="h-1.5 bg-gray-200 dark:bg-gray-600" 
-                      />
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Badge variant="secondary" className="text-xs px-2 py-0">
+                        C: {entry.consistencyRate.toFixed(0)}
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs px-2 py-0">
+                        S: {entry.streakScore.toFixed(0)}
+                      </Badge>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
+                
+                {/* Score */}
+                <div className="text-right flex-shrink-0 ml-3">
+                  <p className={`text-xl font-bold ${getScoreColor(entry.totalScore)}`}>
+                    {entry.totalScore.toFixed(1)}
+                  </p>
+                  <div className="w-16">
+                    <Progress 
+                      value={entry.totalScore} 
+                      className="h-1.5 bg-gray-200 dark:bg-gray-600" 
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
