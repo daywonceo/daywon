@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserPlus, MessageCircle, Search, Users } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { isPreviewMode, mockFriendsData } from "./mockSocialData";
 
 interface Friend {
   id: number;
   name: string;
   avatar: string;
+  status?: string;
+  mutualHabits?: number;
 }
 
 interface FriendListProps {
@@ -19,9 +22,38 @@ interface FriendListProps {
 const FriendList = ({ friends }: FriendListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   
-  const filteredFriends = friends.filter(friend => 
+  // Use mock data if in preview mode, otherwise use provided friends
+  const displayFriends = isPreviewMode ? mockFriendsData : friends;
+  
+  const filteredFriends = displayFriends.filter(friend => 
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getStatusColor = (status?: string) => {
+    switch (status) {
+      case 'online':
+        return 'bg-green-400';
+      case 'away':
+        return 'bg-yellow-400';
+      case 'offline':
+        return 'bg-gray-400';
+      default:
+        return 'bg-gray-400';
+    }
+  };
+
+  const getStatusText = (status?: string) => {
+    switch (status) {
+      case 'online':
+        return 'Active now';
+      case 'away':
+        return 'Away';
+      case 'offline':
+        return 'Last seen recently';
+      default:
+        return 'Active today';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -32,6 +64,11 @@ const FriendList = ({ friends }: FriendListProps) => {
         </div>
         <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Your Friends</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">Connect and motivate each other</p>
+        {isPreviewMode && (
+          <div className="mt-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full inline-block">
+            Preview Mode - Mock Data
+          </div>
+        )}
       </div>
 
       {/* Add Friend Button */}
@@ -57,15 +94,23 @@ const FriendList = ({ friends }: FriendListProps) => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10 ring-2 ring-green-100 dark:ring-green-800/50">
-                    <AvatarImage src={friend.avatar} alt={friend.name} />
-                    <AvatarFallback className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-sm font-semibold">
-                      {friend.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="h-10 w-10 ring-2 ring-green-100 dark:ring-green-800/50">
+                      <AvatarImage src={friend.avatar} alt={friend.name} />
+                      <AvatarFallback className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-sm font-semibold">
+                        {friend.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    {friend.status && (
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${getStatusColor(friend.status)} border-2 border-white dark:border-gray-800 rounded-full`}></div>
+                    )}
+                  </div>
                   <div>
                     <p className="font-bold text-sm text-gray-900 dark:text-white">{friend.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Active today</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {getStatusText(friend.status)}
+                      {friend.mutualHabits && ` • ${friend.mutualHabits} mutual habits`}
+                    </p>
                   </div>
                 </div>
                 <Button 
@@ -90,7 +135,7 @@ const FriendList = ({ friends }: FriendListProps) => {
       )}
 
       {/* Empty State */}
-      {friends.length === 0 && (
+      {displayFriends.length === 0 && !isPreviewMode && (
         <div className="text-center py-8">
           <div className="text-gray-400 mb-2">👥</div>
           <p className="text-sm text-gray-500">You haven't added any friends yet</p>

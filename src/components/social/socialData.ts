@@ -1,4 +1,3 @@
-
 // Sample social data for the habit tracker app
 export const friends = [
   { id: 1, name: "Sarah Chen", avatar: "/placeholder.svg", status: "online", mutualHabits: 3 },
@@ -98,3 +97,18 @@ export const feedPosts = [
     caption: "Sunday meal prep session complete! Feeling prepared and excited for healthy choices all week.",
   }
 ];
+
+// Import preview mode setting
+import { isPreviewMode, mockFriendsData, formatActivityPosts } from "./mockSocialData";
+
+// Export original data but allow override with mock data
+export const getActiveFriends = () => {
+  return isPreviewMode ? mockFriendsData : friends;
+};
+
+export const getActiveFeedPosts = () => {
+  return isPreviewMode ? formatActivityPosts() : feedPosts;
+};
+
+// Re-export preview mode for other components
+export { isPreviewMode };

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThumbsUp, MessageSquare, Share2, Filter, Heart, Flame, PartyPopper, Smile } from "lucide-react";
+import { isPreviewMode, formatActivityPosts } from "./mockSocialData";
 
 interface FeedPost {
   id: number;
@@ -22,55 +23,13 @@ interface MainFeedProps {
   feedPosts: FeedPost[];
 }
 
-const habitPosts = [
-  {
-    id: 101,
-    user: "Sarah Chen",
-    avatar: "/placeholder.svg",
-    content: "completed a 45-minute workout! 💪",
-    timeAgo: "12 minutes ago",
-    reactions: ["💪", "🔥", "👏"],
-    comments: 3,
-    caption: "Crushed that morning routine! Feeling unstoppable today.",
-    habitType: 'workout' as const,
-    streakCount: 7
-  },
-  {
-    id: 102,
-    user: "Mike Johnson",
-    avatar: "/placeholder.svg",
-    content: "read for 30 minutes - 14 days in a row! 📚",
-    timeAgo: "1 hour ago",
-    reactions: ["🔥", "📚", "🎉"],
-    comments: 5,
-    caption: "Just finished 'Atomic Habits' - game changer!",
-    habitType: 'reading' as const,
-    streakCount: 14
-  },
-  {
-    id: 103,
-    user: "Alex Rivera",
-    avatar: "/placeholder.svg",
-    content: "meditated for 20 minutes ✨",
-    timeAgo: "2 hours ago",
-    reactions: ["✨", "🧘‍♀️", "❤️"],
-    comments: 2,
-    caption: "Found some peace in the chaos today. Grateful for this practice.",
-    habitType: 'meditation' as const,
-    streakCount: 3
-  }
-];
-
 const MainFeed = ({ feedPosts }: MainFeedProps) => {
   const [selectedReaction, setSelectedReaction] = useState<{[key: number]: string | null}>({});
   const [showComments, setShowComments] = useState<{[key: number]: boolean}>({});
   const [newComment, setNewComment] = useState<{[key: number]: string}>({});
 
-  const allPosts = [...habitPosts, ...feedPosts].sort((a, b) => {
-    const timeA = new Date().getTime() - parseInt(a.timeAgo.split(' ')[0]) * 60000;
-    const timeB = new Date().getTime() - parseInt(b.timeAgo.split(' ')[0]) * 60000;
-    return timeB - timeA;
-  });
+  // Use mock data if in preview mode, otherwise use provided feedPosts
+  const displayPosts = isPreviewMode ? formatActivityPosts() : feedPosts;
 
   const reactionOptions = ["❤️", "🔥", "🎉", "💪", "👏", "✨", "🚀", "🙌"];
 
@@ -90,7 +49,6 @@ const MainFeed = ({ feedPosts }: MainFeedProps) => {
 
   const handleComment = (postId: number) => {
     if (newComment[postId]?.trim()) {
-      // Here you would typically save the comment
       console.log(`Comment on post ${postId}:`, newComment[postId]);
       setNewComment(prev => ({ ...prev, [postId]: '' }));
     }
@@ -104,7 +62,18 @@ const MainFeed = ({ feedPosts }: MainFeedProps) => {
       reading: { emoji: "📚", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
       meditation: { emoji: "✨", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
       nutrition: { emoji: "🥗", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
-      sleep: { emoji: "😴", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" }
+      sleep: { emoji: "😴", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" },
+      fitness: { emoji: "🏃‍♂️", color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300" },
+      health: { emoji: "💧", color: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300" },
+      creativity: { emoji: "🎨", color: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300" },
+      education: { emoji: "🌍", color: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300" },
+      wellness: { emoji: "🧊", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
+      mindfulness: { emoji: "📱", color: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300" },
+      exercise: { emoji: "🚶‍♂️", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
+      selfcare: { emoji: "✨", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
+      music: { emoji: "🎸", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" },
+      professional: { emoji: "💻", color: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300" },
+      hobby: { emoji: "📸", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300" }
     };
     
     const badge = badges[habitType as keyof typeof badges];
@@ -126,6 +95,11 @@ const MainFeed = ({ feedPosts }: MainFeedProps) => {
         </div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Recent Activity</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">Celebrate wins with your community!</p>
+        {isPreviewMode && (
+          <div className="mt-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full inline-block">
+            Preview Mode - Mock Data
+          </div>
+        )}
       </div>
       
       {/* Filter Button */}
@@ -137,7 +111,7 @@ const MainFeed = ({ feedPosts }: MainFeedProps) => {
       </div>
       
       {/* Posts */}
-      {allPosts.map((post) => (
+      {displayPosts.map((post) => (
         <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
           <CardContent className="p-4">
             <div className="flex items-start space-x-3">
