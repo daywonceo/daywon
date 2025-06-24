@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainFeed from "@/components/social/MainFeed";
 import HabitLeaderboard from "@/components/social/HabitLeaderboard";
-import ScoreCalculationInfo from "@/components/social/ScoreCalculationInfo";
 import FriendList from "@/components/social/FriendList";
 import Groups from "@/components/social/Groups";
 import { friends, feedPosts } from "@/components/social/socialData";
@@ -61,11 +60,6 @@ const Social = () => {
             <FriendList friends={friends} />
           </TabsContent>
         </Tabs>
-
-        {/* Score Info Section - Always visible at bottom */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <ScoreCalculationInfo />
-        </div>
       </main>
       
       <Footer />
