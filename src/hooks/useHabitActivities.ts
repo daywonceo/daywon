@@ -94,7 +94,7 @@ export const useHabitActivities = (habitList?: string[]) => {
     loadActivities();
   }, [loadActivities]);
 
-  const toggleStatus = async (dayIndex: number, category: string) => {
+  const toggleStatus = useCallback(async (dayIndex: number, category: string) => {
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       const currentStatus = newActivities[dayIndex].statuses[category];
@@ -128,18 +128,21 @@ export const useHabitActivities = (habitList?: string[]) => {
       const date = new Date(today);
       date.setDate(today.getDate() - dayIndex);
       
-      // Record the habit status change (now async to handle database updates)
-      recordHabitActivity(category, newStatus, date);
-      
-      // Provide haptic feedback on status change
-      hapticSuccess();
-      
-      // Trigger refresh of stats when habits are updated
-      setRefreshTrigger(prev => prev + 1);
+      // Use setTimeout to ensure the state update completes before calling external functions
+      setTimeout(() => {
+        // Record the habit status change
+        recordHabitActivity(category, newStatus, date);
+        
+        // Provide haptic feedback on status change
+        hapticSuccess();
+        
+        // Trigger refresh of stats when habits are updated
+        setRefreshTrigger(prev => prev + 1);
+      }, 0);
       
       return newActivities;
     });
-  };
+  }, [activeHabit]);
 
   const toggleEditMode = (dayIndex: number) => {
     setActivities(prevActivities => {
