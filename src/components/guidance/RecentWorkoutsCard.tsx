@@ -10,7 +10,12 @@ interface RecentWorkoutsCardProps {
 }
 
 const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCardProps) => {
-  if (recentSessions.length === 0) return null;
+  // Filter to only show completed workouts and take the 3 most recent
+  const recentCompletedWorkouts = recentSessions
+    .filter(session => session.is_completed)
+    .slice(0, 3);
+
+  if (recentCompletedWorkouts.length === 0) return null;
 
   const getWorkoutStatus = (session: any) => {
     if (session.is_completed) {
@@ -40,7 +45,7 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
         <CardTitle className="text-gray-800 dark:text-gray-200">Recent Workouts</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {recentSessions.map((session) => {
+        {recentCompletedWorkouts.map((session) => {
           const { status, color, icon: StatusIcon } = getWorkoutStatus(session);
           
           return (

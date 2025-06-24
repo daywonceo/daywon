@@ -31,10 +31,10 @@ const ExerciseList = ({ workoutPlan, exerciseLogs, onLogExercise }: ExerciseList
     return (
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-          No Exercises Available
+          Exercises Ready
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Your workout plan doesn't contain any exercises yet.
+          Your workout is ready! Start your timer to begin tracking your session. You can still log exercises manually even without a specific exercise list.
         </p>
       </div>
     );

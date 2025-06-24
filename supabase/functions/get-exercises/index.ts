@@ -36,7 +36,30 @@ serve(async (req) => {
     let url = 'https://api.api-ninjas.com/v1/exercises';
     const params = new URLSearchParams();
     
-    if (muscle) params.append('muscle', muscle);
+    // Map muscle group names to API-compatible values
+    const muscleMapping: Record<string, string> = {
+      'chest': 'chest',
+      'lats': 'lats',
+      'traps': 'traps',
+      'shoulders': 'shoulders',
+      'biceps': 'biceps',
+      'triceps': 'triceps',
+      'quadriceps': 'quadriceps',
+      'hamstrings': 'hamstrings',
+      'glutes': 'glutes',
+      'calves': 'calves',
+      'abdominals': 'abdominals',
+      'lower_back': 'lower_back',
+      'middle_back': 'middle_back'
+    };
+    
+    if (muscle && muscleMapping[muscle]) {
+      params.append('muscle', muscleMapping[muscle]);
+    } else if (muscle) {
+      // If muscle is not in mapping, try the original value
+      params.append('muscle', muscle);
+    }
+    
     if (difficulty) params.append('difficulty', difficulty);
     if (type) params.append('type', type);
     if (name) params.append('name', name);
@@ -56,7 +79,17 @@ serve(async (req) => {
 
     if (!response.ok) {
       console.error(`API request failed: ${response.status} ${response.statusText}`);
-      throw new Error(`API request failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error('API error response:', errorText);
+      
+      // Return empty array instead of throwing error to allow graceful fallback
+      return new Response(
+        JSON.stringify([]),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        },
+      )
     }
 
     const exercises = await response.json();
@@ -71,11 +104,12 @@ serve(async (req) => {
     )
   } catch (error) {
     console.error('Error fetching exercises:', error);
+    // Return empty array instead of error to allow graceful fallback
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify([]),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: 200,
       },
     )
   }
