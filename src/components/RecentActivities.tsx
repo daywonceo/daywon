@@ -21,11 +21,15 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
     updateActivityText,
   } = useHabitActivities(habitList);
 
-  // Simple wrapper function that calls onHabitUpdate after toggle
-  const handleToggleStatus = (dayIndex: number, category: string) => {
-    toggleStatus(dayIndex, category);
-    onHabitUpdate?.();
-  };
+  // Listen for habit changes to trigger parent updates
+  React.useEffect(() => {
+    const handleHabitChange = () => {
+      onHabitUpdate?.();
+    };
+
+    window.addEventListener('habitStatusChanged', handleHabitChange);
+    return () => window.removeEventListener('habitStatusChanged', handleHabitChange);
+  }, [onHabitUpdate]);
 
   return (
     <Card className="mb-8 sm:mb-12 border-green-200 shadow-md">
@@ -60,7 +64,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
               setActivities={setActivities}
               activeHabit={activeHabit}
               setActiveHabit={setActiveHabit}
-              toggleStatus={handleToggleStatus}
+              toggleStatus={toggleStatus}
               toggleEditMode={toggleEditMode}
               updateActivityText={updateActivityText}
             />

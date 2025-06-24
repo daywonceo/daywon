@@ -19,7 +19,6 @@ const DEFAULT_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 export const useHabitActivities = (habitList?: string[]) => {
   const [activities, setActivities] = useState<DayActivity[]>([]);
   const [activeHabit, setActiveHabit] = useState<string | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const userHabits =
     habitList && habitList.length === 3
@@ -88,10 +87,11 @@ export const useHabitActivities = (habitList?: string[]) => {
         variant: "destructive"
       });
     }
-  }, [userHabits.join(','), refreshTrigger]);
+  }, [userHabits.join(',')]);
 
   const toggleStatus = useCallback((dayIndex: number, category: string) => {
-    // Update local state immediately for instant UI feedback
+    console.log(`Toggle status called: ${category} at day ${dayIndex}`);
+    
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       const currentStatus = newActivities[dayIndex].statuses[category];
@@ -118,19 +118,24 @@ export const useHabitActivities = (habitList?: string[]) => {
         }
       }
       
-      // Update the status immediately
+      // Update the status immediately - this is the ONLY state change
       newActivities[dayIndex].statuses[category] = newStatus;
       
-      // Get the date for this activity
+      console.log(`Status updated: ${category} -> ${newStatus}`);
+      
+      // Handle background operations asynchronously without affecting UI
       const today = new Date();
       const date = new Date(today);
       date.setDate(today.getDate() - dayIndex);
       
-      // Record the habit status change in background
-      requestAnimationFrame(() => {
+      // Fire and forget - don't wait for this
+      Promise.resolve().then(() => {
         recordHabitActivity(category, newStatus, date);
         hapticSuccess();
-        setRefreshTrigger(prev => prev + 1);
+        // Dispatch custom event for other components that need to know
+        window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+          detail: { category, status: newStatus, date: date.toISOString().split('T')[0] } 
+        }));
       });
       
       return newActivities;
@@ -154,6 +159,7 @@ export const useHabitActivities = (habitList?: string[]) => {
     });
   }, []);
 
+  // Load activities only on mount and when user habits change
   useEffect(() => {
     loadActivities();
   }, [loadActivities]);

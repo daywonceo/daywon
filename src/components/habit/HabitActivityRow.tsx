@@ -63,40 +63,39 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   const handleStatusToggle = useCallback((dayIndex: number, category: string) => {
     const currentStatus = activities[dayIndex].statuses[category];
     
-    // ALWAYS toggle status first - no exceptions
+    console.log(`HabitActivityRow: Handling toggle for ${category}, current status: ${currentStatus}`);
+    
+    // ALWAYS call toggleStatus first - this updates the UI immediately
     toggleStatus(dayIndex, category);
     
-    // Only handle dialogs for today's activities
+    // Handle dialogs only for today's activities and only after UI update
     if (dayIndex === 0) {
-      // Handle recovery dialog for completed -> failed transition
-      if (currentStatus === "completed") {
-        const currentStreak = calculateStreakForDate(category, activityDate);
-        
-        if (shouldShowRecoveryDialog(category, currentStreak)) {
-          // Use requestAnimationFrame to ensure DOM update happens first
-          requestAnimationFrame(() => {
+      // Use setTimeout to ensure the UI update completes first
+      setTimeout(() => {
+        // Handle recovery dialog for completed -> failed transition
+        if (currentStatus === "completed") {
+          const currentStreak = calculateStreakForDate(category, activityDate);
+          
+          if (shouldShowRecoveryDialog(category, currentStreak)) {
             setRecoveryDialog({
               isOpen: true,
               habitName: category,
               streakCount: currentStreak
             });
-          });
+          }
         }
-      }
-      
-      // Handle photo prompt for empty -> completed transition
-      if (currentStatus === "empty") {
-        const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
-        if (!hidePrompt) {
-          // Use requestAnimationFrame to ensure DOM update happens first
-          requestAnimationFrame(() => {
+        
+        // Handle photo prompt for empty -> completed transition
+        if (currentStatus === "empty") {
+          const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
+          if (!hidePrompt) {
             setPhotoPrompt({
               isOpen: true,
               habitName: category
             });
-          });
+          }
         }
-      }
+      }, 50);
     }
   }, [activities, activityIndex, activityDate, toggleStatus]);
 
@@ -118,9 +117,9 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     
     // If user closes without recovery, toggle status back to failed
     if (habitName) {
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         toggleStatus(0, habitName);
-      });
+      }, 50);
     }
   }, [recoveryDialog.habitName, toggleStatus]);
 
