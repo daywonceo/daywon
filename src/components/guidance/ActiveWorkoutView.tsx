@@ -82,6 +82,9 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
             toast.error('Unable to load exercises. You can still track your workout manually.');
           });
       }
+    } else {
+      // No active session found, show selection screen
+      setViewState('selection');
     }
   }, [sessions, activePlan, generateWorkoutPlan]);
 
@@ -252,7 +255,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     );
   }
 
-  // Workout selection screen
+  // Workout selection screen - Show this when viewState is 'selection' AND we have an active plan
   if (viewState === 'selection' && activePlan) {
     const workoutOptions = getWorkoutOptions(activePlan.plan_type, sessions);
     
@@ -273,7 +276,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0">
+            <Button variant="ghost" size="sm" onClick={() => setViewState('selection')} className="flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="min-w-0">

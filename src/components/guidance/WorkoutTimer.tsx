@@ -50,7 +50,7 @@ const WorkoutTimer = ({
               className="bg-green-600 hover:bg-green-700"
             >
               <Play className="w-4 h-4 mr-2" />
-              Start Timer
+              Start Workout
             </Button>
           ) : (
             <>
