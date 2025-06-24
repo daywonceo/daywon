@@ -173,6 +173,36 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_devotions: {
+        Row: {
+          category: string | null
+          content: string
+          id: string
+          saved_at: string
+          title: string
+          user_id: string
+          verse_reference: string | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          id?: string
+          saved_at?: string
+          title: string
+          user_id: string
+          verse_reference?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          id?: string
+          saved_at?: string
+          title?: string
+          user_id?: string
+          verse_reference?: string | null
+        }
+        Relationships: []
+      }
       saved_recipes: {
         Row: {
           id: string
@@ -211,6 +241,69 @@ export type Database = {
           recipe_servings?: number | null
           recipe_title?: string
           saved_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_sermons: {
+        Row: {
+          author: string | null
+          category: string | null
+          description: string | null
+          id: string
+          saved_at: string
+          title: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          author?: string | null
+          category?: string | null
+          description?: string | null
+          id?: string
+          saved_at?: string
+          title: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          author?: string | null
+          category?: string | null
+          description?: string | null
+          id?: string
+          saved_at?: string
+          title?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_verses: {
+        Row: {
+          category: string | null
+          id: string
+          reference: string
+          saved_at: string
+          text: string
+          translation_name: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          id?: string
+          reference: string
+          saved_at?: string
+          text: string
+          translation_name: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          id?: string
+          reference?: string
+          saved_at?: string
+          text?: string
+          translation_name?: string
           user_id?: string
         }
         Relationships: []
@@ -299,6 +392,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           weight_increase_percent?: number | null
+        }
+        Relationships: []
+      }
+      user_reflections: {
+        Row: {
+          created_at: string
+          devotion_title: string | null
+          id: string
+          reflection_text: string
+          sermon_title: string | null
+          updated_at: string
+          user_id: string
+          verse_reference: string | null
+        }
+        Insert: {
+          created_at?: string
+          devotion_title?: string | null
+          id?: string
+          reflection_text: string
+          sermon_title?: string | null
+          updated_at?: string
+          user_id: string
+          verse_reference?: string | null
+        }
+        Update: {
+          created_at?: string
+          devotion_title?: string | null
+          id?: string
+          reflection_text?: string
+          sermon_title?: string | null
+          updated_at?: string
+          user_id?: string
+          verse_reference?: string | null
         }
         Relationships: []
       }
