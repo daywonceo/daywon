@@ -39,32 +39,28 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
 
-  // Check for existing active session on mount
+  // Check for existing active session that has been started (has timer running)
   useEffect(() => {
     const activeSession = sessions.find(session => {
       const sessionDate = new Date(session.workout_date);
       const today = new Date();
       today.setHours(23, 59, 59, 999);
-      return sessionDate <= today && !session.is_completed;
+      return sessionDate <= today && !session.is_completed && session.duration_minutes && session.duration_minutes > 0;
     });
 
     if (activeSession) {
-      console.log('Found existing active session:', activeSession);
+      console.log('Found existing STARTED session:', activeSession);
       setCurrentSession(activeSession);
       setSelectedWorkoutType(activeSession.workout_type);
       setViewState('workout');
-      
-      // Check if workout has been started (has duration > 0)
-      if (activeSession.duration_minutes && activeSession.duration_minutes > 0) {
-        setWorkoutStarted(true);
-        setStartTime(new Date(activeSession.created_at));
-        setElapsedTime(activeSession.duration_minutes * 60);
-      }
+      setWorkoutStarted(true);
+      setStartTime(new Date(activeSession.created_at));
+      setElapsedTime(activeSession.duration_minutes * 60);
     } else {
-      // No active session found, show selection screen
+      // Always show selection screen for new workouts or inactive sessions
       setViewState('selection');
     }
-  }, [sessions, activePlan, generateWorkoutPlan]);
+  }, [sessions]);
 
   // Timer effect
   useEffect(() => {
@@ -95,20 +91,31 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     try {
       console.log('Creating session for workout type:', workoutType);
       
-      // Create session first, before generating plan
-      const session = await createSession({
-        workout_plan_id: activePlan.id,
-        workout_date: new Date().toISOString().split('T')[0],
-        workout_type: workoutType
+      // Check if there's already an inactive session for today
+      let session = sessions.find(s => {
+        const sessionDate = new Date(s.workout_date);
+        const today = new Date();
+        return sessionDate.toDateString() === today.toDateString() && 
+               !s.is_completed && 
+               (!s.duration_minutes || s.duration_minutes === 0);
       });
+
+      // If no existing session, create a new one
+      if (!session) {
+        session = await createSession({
+          workout_plan_id: activePlan.id,
+          workout_date: new Date().toISOString().split('T')[0],
+          workout_type: workoutType
+        });
+      }
 
       if (session) {
         setCurrentSession(session);
         setSelectedWorkoutType(workoutType);
         setViewState('workout');
-        console.log('Workout session created, now generating plan...');
+        console.log('Workout session ready, now generating plan...');
 
-        // Generate workout plan after session is created
+        // Generate workout plan after session is created and workout type is selected
         try {
           const plan = await generateWorkoutPlan(activePlan.plan_type, 'beginner');
           console.log('Generated workout plan:', plan);
