@@ -170,55 +170,6 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
       />
     </>
   );
-
-  // Format score string (e.g., "21/30")
-  function formatScore(completed: number, total: number) {
-    return `${completed}/${total}`;
-  }
-
-  function handleHabitClick(habit: HabitStatsType) {
-    setSelectedHabit(habit);
-    setIsModalOpen(true);
-  }
-
-  function renderHabitSection(habits: HabitStatsType[], title: string, emoji: string, colorClass: string) {
-    if (habits.length === 0) {
-      return (
-        <div className="text-center text-gray-500 italic py-4">
-          No {title.toLowerCase()} found for this period
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-3 sm:space-y-4">
-        {habits.map((habit) => (
-          <div 
-            key={habit.habitName} 
-            className="space-y-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 rounded-lg p-2 transition-colors"
-            onClick={() => handleHabitClick(habit)}
-          >
-            <div className="flex justify-between items-center">
-              <span className={`font-medium text-sm sm:text-base ${colorClass}`}>
-                {habit.habitName}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm sm:text-base ${colorClass.replace('800', '600')}`}>
-                  {formatScore(habit.completed, habit.total)}
-                </span>
-                <span className="text-xs text-gray-400">tap for details</span>
-              </div>
-            </div>
-            <Progress 
-              value={habit.percentage} 
-              className="h-2" 
-              useGradient={habit.category === 'good'}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
 };
 
 export default HabitStats;
