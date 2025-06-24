@@ -21,13 +21,10 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
     updateActivityText,
   } = useHabitActivities(habitList);
 
-  // Wrapper function to call onHabitUpdate after status toggle completes
+  // Simple wrapper function that calls onHabitUpdate after toggle
   const handleToggleStatus = (dayIndex: number, category: string) => {
     toggleStatus(dayIndex, category);
-    // Use setTimeout to ensure the toggle completes before calling onHabitUpdate
-    setTimeout(() => {
-      onHabitUpdate?.();
-    }, 10);
+    onHabitUpdate?.();
   };
 
   return (

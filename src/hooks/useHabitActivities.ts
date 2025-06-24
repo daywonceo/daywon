@@ -90,11 +90,7 @@ export const useHabitActivities = (habitList?: string[]) => {
     }
   }, [userHabits.join(','), refreshTrigger]);
 
-  useEffect(() => {
-    loadActivities();
-  }, [loadActivities]);
-
-  const toggleStatus = useCallback(async (dayIndex: number, category: string) => {
+  const toggleStatus = useCallback((dayIndex: number, category: string) => {
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       const currentStatus = newActivities[dayIndex].statuses[category];
@@ -128,38 +124,39 @@ export const useHabitActivities = (habitList?: string[]) => {
       const date = new Date(today);
       date.setDate(today.getDate() - dayIndex);
       
-      // Use setTimeout to ensure the state update completes before calling external functions
-      setTimeout(() => {
-        // Record the habit status change
-        recordHabitActivity(category, newStatus, date);
-        
-        // Provide haptic feedback on status change
-        hapticSuccess();
-        
-        // Trigger refresh of stats when habits are updated
-        setRefreshTrigger(prev => prev + 1);
-      }, 0);
+      // Record the habit status change immediately
+      recordHabitActivity(category, newStatus, date);
+      
+      // Provide haptic feedback on status change
+      hapticSuccess();
+      
+      // Trigger refresh of stats when habits are updated
+      setRefreshTrigger(prev => prev + 1);
       
       return newActivities;
     });
   }, [activeHabit]);
 
-  const toggleEditMode = (dayIndex: number) => {
+  const toggleEditMode = useCallback((dayIndex: number) => {
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       newActivities[dayIndex].isEditing = !newActivities[dayIndex].isEditing;
       return newActivities;
     });
-  };
+  }, []);
 
-  const updateActivityText = (dayIndex: number, newText: string) => {
+  const updateActivityText = useCallback((dayIndex: number, newText: string) => {
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       newActivities[dayIndex].text = newText;
       newActivities[dayIndex].isEditing = false;
       return newActivities;
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    loadActivities();
+  }, [loadActivities]);
 
   return {
     activities,
