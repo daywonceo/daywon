@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useReflections } from "@/hooks/useReflections";
 import { useToast } from "@/hooks/use-toast";
 
@@ -55,16 +55,14 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
           <Button
             variant="ghost"
             onClick={() => setIsExpanded(true)}
-            className="w-full text-left flex items-start gap-2 sm:gap-3 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-2 sm:p-3 text-xs sm:text-sm min-h-0 h-auto"
+            className="w-full text-left flex items-center justify-center text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-3 sm:p-4 text-sm min-h-0 h-auto"
           >
-            <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5" />
-            <span className="flex-1 leading-relaxed break-words hyphens-auto">
+            <span className="text-center leading-relaxed">
               {devotionTitle 
                 ? "What did this devotion mean to you today?" 
                 : "What is God teaching me through this today?"
               }
             </span>
-            <Heart className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5" />
           </Button>
         </CardContent>
       </Card>
@@ -76,7 +74,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
       <CardContent className="p-2 sm:p-3 md:p-4 space-y-3 sm:space-y-4">
         <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
           <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-          <span className="font-medium text-xs sm:text-sm break-words">Faith Journal Reflection</span>
+          <span className="font-medium text-xs sm:text-sm">Faith Journal Reflection</span>
         </div>
         
         <Textarea
