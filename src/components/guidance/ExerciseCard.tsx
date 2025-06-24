@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Plus } from "lucide-react";
+import { CheckCircle, Plus, TrendingUp } from "lucide-react";
 import CollapsibleDescription from "./CollapsibleDescription";
+import { useExerciseSuggestions } from "@/hooks/useExerciseSuggestions";
 
 interface ExerciseCardProps {
   exercise: any;
@@ -18,10 +19,45 @@ const ExerciseCard = ({ exercise, onLog, isLogged }: ExerciseCardProps) => {
   const [reps, setReps] = useState<number>(10);
   const [weight, setWeight] = useState<number | undefined>();
   const [showForm, setShowForm] = useState(false);
+  const [progressionNote, setProgressionNote] = useState<string>('');
+  
+  const { getSuggestionForExercise, getProgressionNote, isLoading } = useExerciseSuggestions();
+
+  // Load suggestions when form is opened
+  useEffect(() => {
+    if (showForm && !isLogged) {
+      loadSuggestions();
+    }
+  }, [showForm, isLogged]);
+
+  const loadSuggestions = async () => {
+    try {
+      const suggestion = await getSuggestionForExercise(exercise.name);
+      const currentWeight = weight;
+      
+      setSets(suggestion.sets);
+      setReps(suggestion.reps);
+      
+      if (suggestion.weight !== undefined) {
+        setWeight(suggestion.weight);
+      }
+      
+      // Set progression note
+      if (suggestion.isProgression) {
+        const note = getProgressionNote(suggestion, currentWeight);
+        setProgressionNote(note);
+      } else {
+        setProgressionNote('');
+      }
+    } catch (error) {
+      console.error('Error loading exercise suggestions:', error);
+    }
+  };
 
   const handleLog = () => {
     onLog(exercise, sets, reps, weight);
     setShowForm(false);
+    setProgressionNote('');
   };
 
   return (
@@ -48,6 +84,7 @@ const ExerciseCard = ({ exercise, onLog, isLogged }: ExerciseCardProps) => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowForm(!showForm)}
+                disabled={isLoading}
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -67,6 +104,15 @@ const ExerciseCard = ({ exercise, onLog, isLogged }: ExerciseCardProps) => {
 
       {showForm && !isLogged && (
         <CardContent className="pt-0">
+          {progressionNote && (
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+                <TrendingUp className="w-4 h-4" />
+                <span>{progressionNote}</span>
+              </div>
+            </div>
+          )}
+          
           <div className="grid grid-cols-3 gap-3 mb-4">
             <div>
               <label className="text-xs text-gray-500 block mb-1">Sets</label>
