@@ -62,7 +62,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         setElapsedTime(activeSession.duration_minutes * 60);
       }
       
-      // Try to generate workout plan for active sessions that have a plan_id
+      // Only generate workout plan for active sessions that already have one
       if (activeSession.workout_plan_id && activePlan) {
         console.log('Generating workout plan for existing session');
         generateWorkoutPlan(activePlan.plan_type, 'beginner')
@@ -78,7 +78,6 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           })
           .catch(error => {
             console.error('Failed to generate workout plan:', error);
-            // Only set failed to true if it's a real failure, not a network issue
             if (error.message && error.message.includes('Failed to send a request')) {
               console.log('Network error detected, but workout plan might still be generated');
               setPlanGenerationFailed(false);
@@ -122,22 +121,9 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     if (!activePlan) return;
 
     try {
-      console.log('Generating workout plan for type:', workoutType);
-      // Generate workout plan first
-      const plan = await generateWorkoutPlan(activePlan.plan_type, 'beginner');
-      console.log('Generated workout plan:', plan);
+      console.log('Creating session for workout type:', workoutType);
       
-      if (!plan || !plan[workoutType]) {
-        // Check if this is a network error vs actual generation failure
-        console.log('No plan data received, but proceeding with session creation');
-        setPlanGenerationFailed(true);
-        toast.info('Exercises unavailable due to API limits, but you can still track your workout manually.');
-      } else {
-        setWorkoutPlan(plan[workoutType]);
-        setPlanGenerationFailed(false);
-      }
-
-      // Create session regardless of plan generation success
+      // Create session first, before generating plan
       const session = await createSession({
         workout_plan_id: activePlan.id,
         workout_date: new Date().toISOString().split('T')[0],
@@ -148,7 +134,21 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         setCurrentSession(session);
         setSelectedWorkoutType(workoutType);
         setViewState('workout');
-        console.log('Workout session created');
+        console.log('Workout session created, now generating plan...');
+
+        // Generate workout plan after session is created
+        const plan = await generateWorkoutPlan(activePlan.plan_type, 'beginner');
+        console.log('Generated workout plan:', plan);
+        
+        if (!plan || !plan[workoutType]) {
+          console.log('No plan data received');
+          setPlanGenerationFailed(true);
+          toast.info('Exercises unavailable due to API limits, but you can still track your workout manually.');
+        } else {
+          setWorkoutPlan(plan[workoutType]);
+          setPlanGenerationFailed(false);
+          toast.success('Workout plan loaded successfully!');
+        }
       }
     } catch (error) {
       console.error('Error creating workout session:', error);
