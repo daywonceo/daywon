@@ -96,21 +96,21 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
         <CardHeader className="pb-2 px-3 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h2 className="text-xl sm:text-2xl font-bold text-green-800">HABIT PERFORMANCE</h2>
-            <div className="flex bg-green-50 rounded-md p-1 text-xs sm:text-sm overflow-hidden">
+            <div className="flex bg-green-50 rounded-md p-1 text-sm sm:text-base overflow-hidden">
               <button 
-                className={`px-2 py-1 rounded-md ${timeframe === 'week' ? 'bg-white shadow-sm' : ''}`}
+                className={`px-3 py-2 rounded-md flex-1 ${timeframe === 'week' ? 'bg-white shadow-sm' : ''}`}
                 onClick={() => setTimeframe('week')}
               >
                 Week
               </button>
               <button 
-                className={`px-2 py-1 rounded-md ${timeframe === 'month' ? 'bg-white shadow-sm' : ''}`}
+                className={`px-3 py-2 rounded-md flex-1 ${timeframe === 'month' ? 'bg-white shadow-sm' : ''}`}
                 onClick={() => setTimeframe('month')}
               >
                 Month
               </button>
               <button 
-                className={`px-2 py-1 rounded-md ${timeframe === 'year' ? 'bg-white shadow-sm' : ''}`}
+                className={`px-3 py-2 rounded-md flex-1 ${timeframe === 'year' ? 'bg-white shadow-sm' : ''}`}
                 onClick={() => setTimeframe('year')}
               >
                 Year
@@ -122,40 +122,22 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
         <CardContent className="px-3 sm:px-6">
           <div className="space-y-6 sm:space-y-8">
             {/* Good Habits - 70%+ completion */}
-            <div>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
-                  ☺
-                </div>
-                <h3 className="font-bold text-base sm:text-lg text-green-700 mb-1">Good Habits</h3>
-                <p className="text-xs text-gray-500">70%+ completion rate</p>
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
+                ☺
               </div>
+              <h3 className="font-bold text-base sm:text-lg text-green-700 mb-1">Good Habits</h3>
+              <p className="text-xs text-gray-500 mb-4">70%+ completion rate</p>
               {renderHabitSection(goodHabits, "Good Habits", "☺", "text-green-800")}
             </div>
             
-            {/* In Progress Habits - 40-70% completion */}
-            {inProgressHabits.length > 0 && (
-              <div>
-                <div className="text-center mb-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
-                    🔄
-                  </div>
-                  <h3 className="font-bold text-base sm:text-lg text-yellow-700 mb-1">In Progress</h3>
-                  <p className="text-xs text-gray-500">40-70% completion rate</p>
-                </div>
-                {renderHabitSection(inProgressHabits, "In Progress Habits", "🔄", "text-yellow-800")}
-              </div>
-            )}
-            
             {/* Bad Habits - Below 40% completion */}
-            <div>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-red-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
-                  ☹
-                </div>
-                <h3 className="font-bold text-base sm:text-lg text-red-700 mb-1">Needs Attention</h3>
-                <p className="text-xs text-gray-500">Below 40% completion rate</p>
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-red-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
+                ☹
               </div>
+              <h3 className="font-bold text-base sm:text-lg text-red-700 mb-1">Needs Attention</h3>
+              <p className="text-xs text-gray-500 mb-4">Below 40% completion rate</p>
               {renderHabitSection(badHabits, "Bad Habits", "☹", "text-red-800")}
             </div>
           </div>
