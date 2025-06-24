@@ -73,7 +73,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           habitName: category,
           streakCount: currentStreak
         });
-        return; // Don't toggle status yet
+        return; // Don't toggle status yet, wait for recovery dialog
       }
     }
     
