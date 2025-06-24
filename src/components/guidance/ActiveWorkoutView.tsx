@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [exerciseLogs, setExerciseLogs] = useState<any[]>([]);
+  const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set());
   const [isTimerPaused, setIsTimerPaused] = useState(false);
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [showTimerFailPrompt, setShowTimerFailPrompt] = useState(false);
@@ -143,6 +143,20 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     }
   };
 
+  const handleToggleExerciseComplete = (exerciseName: string, completed: boolean) => {
+    setCompletedExercises(prev => {
+      const newSet = new Set(prev);
+      if (completed) {
+        newSet.add(exerciseName);
+        toast.success(`${exerciseName} marked as complete!`);
+      } else {
+        newSet.delete(exerciseName);
+        toast.info(`${exerciseName} unmarked`);
+      }
+      return newSet;
+    });
+  };
+
   const handleStartTimer = () => {
     const now = new Date();
     setStartTime(now);
@@ -255,18 +269,20 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   // Active workout screen
   if (viewState === 'workout' && currentSession) {
     return (
-      <div className="animate-fade-in space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={onBack}>
+      <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h2 className="text-xl font-bold text-green-800 dark:text-green-400">
-              {selectedWorkoutType.replace(/_/g, ' ').toUpperCase()}
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-400 truncate">
+                {selectedWorkoutType.replace(/_/g, ' ').toUpperCase()}
+              </h2>
               {!currentSession.workout_plan_id && (
-                <Badge variant="outline" className="ml-2">Manual</Badge>
+                <Badge variant="outline" className="text-xs mt-1">Manual</Badge>
               )}
-            </h2>
+            </div>
           </div>
         </div>
 
@@ -285,7 +301,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           <>
             {planGenerationFailed ? (
               <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 sm:p-6 text-center">
                   <h3 className="font-semibold text-yellow-800 dark:text-yellow-400 mb-2">
                     Exercise List Unavailable
                   </h3>
@@ -320,7 +336,9 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
               <ExerciseList
                 workoutPlan={workoutPlan}
                 exerciseLogs={exerciseLogs}
+                completedExercises={completedExercises}
                 onLogExercise={handleLogExercise}
+                onToggleExerciseComplete={handleToggleExerciseComplete}
               />
             )}
           </>
@@ -338,7 +356,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
   // No active plan fallback
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="animate-fade-in space-y-6 px-2 sm:px-0">
       <div className="flex items-center gap-3 mb-6">
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="w-4 h-4" />
@@ -349,7 +367,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       </div>
 
       <Card className="bg-white dark:bg-gray-800">
-        <CardContent className="p-8 text-center">
+        <CardContent className="p-6 sm:p-8 text-center">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
             No Active Workout Plan
           </h3>
