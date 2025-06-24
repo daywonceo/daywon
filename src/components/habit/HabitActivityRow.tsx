@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
@@ -107,8 +108,8 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
 
   return (
     <>
-      {/* Day number - now clickable for photo upload */}
-      <div className="flex items-center justify-center">
+      {/* Day number - now clickable for photo upload with better spacing */}
+      <div className="flex items-center justify-center w-full">
         <ClickableDate
           day={activity.day}
           date={activityDate}
@@ -118,7 +119,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       </div>
       
       {/* Activity description */}
-      <div className="flex items-center justify-center text-center">
+      <div className="flex items-center justify-center text-center min-w-0">
         <ActivityTextDisplay
           activity={activity}
           activityIndex={activityIndex}
