@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Heart, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import { useSavedVerses } from "@/hooks/useSavedVerses";
 import { useToast } from "@/hooks/use-toast";
 import ReflectionPrompt from "./ReflectionPrompt";
@@ -22,6 +23,7 @@ interface VerseCardProps {
 }
 
 const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCardProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const { saveVerse } = useSavedVerses();
   const { toast } = useToast();
 
@@ -69,6 +71,16 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
     }
   };
 
+  // For full passages, we'll show a preview and make it collapsible
+  const getPreviewText = (text: string) => {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    if (sentences.length <= 2) return text;
+    return sentences.slice(0, 2).join('. ') + '...';
+  };
+
+  const shouldShowCollapsible = isFullPassage && verse.text.length > 200;
+  const previewText = shouldShowCollapsible ? getPreviewText(verse.text) : verse.text;
+
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow w-full overflow-hidden">
       <CardContent className="p-4 sm:p-6">
@@ -104,10 +116,33 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
           </div>
         </div>
         
-        {/* Verse text - responsive and properly contained */}
-        <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4 text-sm sm:text-base break-words overflow-hidden">
-          "{verse.text}"
-        </blockquote>
+        {/* Verse text - with collapsible functionality for full passages */}
+        {shouldShowCollapsible ? (
+          <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+            <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4 text-sm sm:text-base break-words overflow-hidden">
+              "{isExpanded ? verse.text : previewText}"
+            </blockquote>
+            <CollapsibleTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 mb-4 p-2 h-auto"
+              >
+                <span className="text-xs sm:text-sm mr-2">
+                  {isExpanded ? "Show less" : "Read full passage"}
+                </span>
+                {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              {/* Content is already shown above when expanded */}
+            </CollapsibleContent>
+          </Collapsible>
+        ) : (
+          <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4 text-sm sm:text-base break-words overflow-hidden">
+            "{verse.text}"
+          </blockquote>
+        )}
         
         {/* Footer with translation info */}
         <div className="flex items-center justify-between mb-4 text-xs sm:text-sm">

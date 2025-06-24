@@ -55,16 +55,16 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
           <Button
             variant="ghost"
             onClick={() => setIsExpanded(true)}
-            className="w-full text-left flex items-center gap-2 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-2 sm:p-3 text-sm sm:text-base"
+            className="w-full text-left flex items-start gap-3 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-3 text-sm sm:text-base min-h-0 h-auto"
           >
-            <MessageCircle className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1 min-w-0">
+            <MessageCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span className="flex-1 leading-relaxed break-words">
               {devotionTitle 
                 ? "What did this devotion mean to you today?" 
                 : "What is God teaching me through this today?"
               }
             </span>
-            <Heart className="w-4 h-4 flex-shrink-0" />
+            <Heart className="w-4 h-4 flex-shrink-0 mt-0.5" />
           </Button>
         </CardContent>
       </Card>
@@ -75,7 +75,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
     <Card className="mt-4 border-green-200 dark:border-green-800">
       <CardContent className="p-3 sm:p-4 space-y-4">
         <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="w-4 h-4 flex-shrink-0" />
           <span className="font-medium text-sm sm:text-base">Faith Journal Reflection</span>
         </div>
         
@@ -86,7 +86,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
             ? "What did this devotion mean to you today? How can you apply these insights to your life?"
             : "What is God teaching me through this today? How can I apply this to my life?"
           }
-          className="min-h-[100px] border-green-200 dark:border-green-800 focus:ring-green-500 text-sm sm:text-base"
+          className="min-h-[100px] border-green-200 dark:border-green-800 focus:ring-green-500 text-sm sm:text-base resize-none"
         />
         
         <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
