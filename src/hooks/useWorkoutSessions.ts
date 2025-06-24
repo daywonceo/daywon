@@ -56,15 +56,17 @@ export const useWorkoutSessions = () => {
         .order('workout_date', { ascending: false });
 
       if (fetchError) {
-        console.error('Supabase error:', fetchError);
-        throw fetchError;
+        console.error('Supabase error details:', fetchError);
+        throw new Error(`Database error: ${fetchError.message}`);
       }
 
-      console.log('Workout sessions fetched:', data?.length || 0);
+      console.log('Workout sessions fetched successfully:', data?.length || 0);
       setSessions(data || []);
-    } catch (err) {
+      setError(''); // Clear any previous errors
+    } catch (err: any) {
       console.error('Error fetching workout sessions:', err);
-      setError('Failed to fetch workout sessions');
+      const errorMessage = err.message || 'Failed to fetch workout sessions';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -99,15 +101,15 @@ export const useWorkoutSessions = () => {
 
       if (createError) {
         console.error('Create session error:', createError);
-        throw createError;
+        throw new Error(`Failed to create session: ${createError.message}`);
       }
 
       console.log('Workout session created:', data);
       await fetchSessions();
       return data;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating workout session:', err);
-      setError('Failed to create workout session');
+      setError(err.message || 'Failed to create workout session');
       return null;
     } finally {
       setIsLoading(false);
@@ -126,7 +128,7 @@ export const useWorkoutSessions = () => {
     try {
       console.log('Completing workout session:', sessionId, durationMinutes);
       
-      await supabase
+      const { error: updateError } = await supabase
         .from('workout_sessions')
         .update({ 
           is_completed: true,
@@ -135,10 +137,15 @@ export const useWorkoutSessions = () => {
         .eq('id', sessionId)
         .eq('user_id', user.id);
 
+      if (updateError) {
+        console.error('Complete session error:', updateError);
+        throw new Error(`Failed to complete session: ${updateError.message}`);
+      }
+
       await fetchSessions();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error completing workout session:', err);
-      setError('Failed to complete workout session');
+      setError(err.message || 'Failed to complete workout session');
     } finally {
       setIsLoading(false);
     }
@@ -177,14 +184,14 @@ export const useWorkoutSessions = () => {
 
       if (logError) {
         console.error('Log exercise error:', logError);
-        throw logError;
+        throw new Error(`Failed to log exercise: ${logError.message}`);
       }
 
       console.log('Exercise logged:', data);
       return data;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error logging exercise:', err);
-      setError('Failed to log exercise');
+      setError(err.message || 'Failed to log exercise');
       return null;
     } finally {
       setIsLoading(false);

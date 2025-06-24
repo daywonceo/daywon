@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
@@ -32,6 +31,13 @@ const NewWorkoutsTab = () => {
   const { user } = useAuth();
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
   const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
+
+  console.log('NewWorkoutsTab - Auth user:', user?.id);
+  console.log('NewWorkoutsTab - Plans loading:', plansLoading);
+  console.log('NewWorkoutsTab - Plans error:', plansError);
+  console.log('NewWorkoutsTab - Sessions error:', sessionsError);
+  console.log('NewWorkoutsTab - Workout plans:', workoutPlans?.length);
+  console.log('NewWorkoutsTab - Sessions:', sessions?.length);
 
   // Filter sessions to only include today or earlier dates
   const filteredSessions = sessions.filter(session => {
@@ -71,13 +77,44 @@ const NewWorkoutsTab = () => {
     );
   }
 
+  // Provide more specific error messages
   if (plansError || sessionsError) {
+    console.error('Workout data errors:', { plansError, sessionsError });
     return (
       <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
         <CardContent className="p-6 text-center">
           <AlertCircle className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
-          <p className="text-yellow-800 dark:text-yellow-400">
-            Unable to load workout data. Please try refreshing the page.
+          <div className="space-y-2">
+            <p className="text-yellow-800 dark:text-yellow-400 font-medium">
+              Unable to load workout data
+            </p>
+            {plansError && (
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                Plans error: {plansError}
+              </p>
+            )}
+            {sessionsError && (
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                Sessions error: {sessionsError}
+              </p>
+            )}
+            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              Please try refreshing the page or check your internet connection.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show loading state
+  if (plansLoading) {
+    return (
+      <Card className="bg-white dark:bg-gray-800">
+        <CardContent className="p-6 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-2"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading workout data...
           </p>
         </CardContent>
       </Card>

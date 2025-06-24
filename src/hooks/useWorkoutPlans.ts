@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,15 +37,17 @@ export const useWorkoutPlans = () => {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('Supabase error:', fetchError);
-        throw fetchError;
+        console.error('Supabase error details:', fetchError);
+        throw new Error(`Database error: ${fetchError.message}`);
       }
 
-      console.log('Workout plans fetched:', data?.length || 0);
+      console.log('Workout plans fetched successfully:', data?.length || 0);
       setWorkoutPlans(data || []);
-    } catch (err) {
+      setError(''); // Clear any previous errors
+    } catch (err: any) {
       console.error('Error fetching workout plans:', err);
-      setError('Failed to fetch workout plans');
+      const errorMessage = err.message || 'Failed to fetch workout plans';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -83,15 +84,15 @@ export const useWorkoutPlans = () => {
 
       if (createError) {
         console.error('Create error:', createError);
-        throw createError;
+        throw new Error(`Failed to create plan: ${createError.message}`);
       }
 
       console.log('Workout plan created:', data);
       await fetchWorkoutPlans();
       return data;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating workout plan:', err);
-      setError('Failed to create workout plan');
+      setError(err.message || 'Failed to create workout plan');
       return null;
     } finally {
       setIsLoading(false);
@@ -117,16 +118,21 @@ export const useWorkoutPlans = () => {
         .eq('user_id', user.id);
 
       // Set selected plan to active
-      await supabase
+      const { error: updateError } = await supabase
         .from('workout_plans')
         .update({ is_active: true })
         .eq('id', planId)
         .eq('user_id', user.id);
 
+      if (updateError) {
+        console.error('Set active plan error:', updateError);
+        throw new Error(`Failed to set active plan: ${updateError.message}`);
+      }
+
       await fetchWorkoutPlans();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error setting active plan:', err);
-      setError('Failed to set active plan');
+      setError(err.message || 'Failed to set active plan');
     } finally {
       setIsLoading(false);
     }
