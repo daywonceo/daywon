@@ -30,7 +30,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [showTimerFailPrompt, setShowTimerFailPrompt] = useState(false);
   const [manualMinutes, setManualMinutes] = useState<string>('');
-  const [viewState, setViewState] = useState<'selection' | 'workout'>('selection');
+  const [showWorkoutSelection, setShowWorkoutSelection] = useState(true);
   const [planGenerationFailed, setPlanGenerationFailed] = useState(false);
   
   const { workoutPlans } = useWorkoutPlans();
@@ -52,13 +52,10 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       console.log('Found existing STARTED session:', activeSession);
       setCurrentSession(activeSession);
       setSelectedWorkoutType(activeSession.workout_type);
-      setViewState('workout');
+      setShowWorkoutSelection(false);
       setWorkoutStarted(true);
       setStartTime(new Date(activeSession.created_at));
       setElapsedTime(activeSession.duration_minutes * 60);
-    } else {
-      // Always show selection screen for new workouts or inactive sessions
-      setViewState('selection');
     }
   }, [sessions]);
 
@@ -73,14 +70,14 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     }
   }, [startTime, workoutStarted, isTimerPaused]);
 
-  // Timer fail check - if user tries to start but timer doesn't increment after 10 seconds
+  // Timer fail check
   useEffect(() => {
     if (workoutStarted && startTime && elapsedTime === 0) {
       const timeoutId = setTimeout(() => {
         if (elapsedTime === 0) {
           setShowTimerFailPrompt(true);
         }
-      }, 10000); // 10 seconds
+      }, 10000);
       return () => clearTimeout(timeoutId);
     }
   }, [workoutStarted, startTime, elapsedTime]);
@@ -112,7 +109,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       if (session) {
         setCurrentSession(session);
         setSelectedWorkoutType(workoutType);
-        setViewState('workout');
+        setShowWorkoutSelection(false);
         console.log('Workout session ready, now generating plan...');
 
         // Generate workout plan after session is created and workout type is selected
@@ -139,6 +136,18 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       console.error('Error creating workout session:', error);
       toast.error('Failed to create workout session');
     }
+  };
+
+  const handleBackToSelection = () => {
+    setShowWorkoutSelection(true);
+    setSelectedWorkoutType('');
+    setCurrentSession(null);
+    setWorkoutPlan(null);
+    setStartTime(null);
+    setElapsedTime(0);
+    setWorkoutStarted(false);
+    setIsTimerPaused(false);
+    setPlanGenerationFailed(false);
   };
 
   const handleToggleExerciseComplete = (exerciseName: string, completed: boolean) => {
@@ -249,8 +258,8 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     );
   }
 
-  // Workout selection screen - Show this when viewState is 'selection' AND we have an active plan
-  if (viewState === 'selection' && activePlan) {
+  // Show workout selection screen
+  if (showWorkoutSelection && activePlan) {
     const workoutOptions = getWorkoutOptions(activePlan.plan_type, sessions);
     
     return (
@@ -265,12 +274,12 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   }
 
   // Active workout screen
-  if (viewState === 'workout' && currentSession) {
+  if (!showWorkoutSelection && currentSession && selectedWorkoutType) {
     return (
       <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Button variant="ghost" size="sm" onClick={() => setViewState('selection')} className="flex-shrink-0">
+            <Button variant="ghost" size="sm" onClick={handleBackToSelection} className="flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="min-w-0">
