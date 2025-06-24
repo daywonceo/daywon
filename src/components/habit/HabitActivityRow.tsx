@@ -77,7 +77,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       }
     }
     
-    // Always toggle the status first
+    // Toggle the status
     toggleStatus(dayIndex, category);
 
     // Show photo prompt for newly completed habits (today only) AFTER status change
