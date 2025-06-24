@@ -63,34 +63,37 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   const handleStatusToggle = useCallback((dayIndex: number, category: string) => {
     const currentStatus = activities[dayIndex].statuses[category];
     
-    // If changing from completed to failed and it's today, check for recovery
+    // Always toggle status immediately for responsive UI
+    toggleStatus(dayIndex, category);
+
+    // Handle additional logic after the state update
     if (currentStatus === "completed" && dayIndex === 0) {
+      // Check for recovery dialog only after status change
       const currentStreak = calculateStreakForDate(category, activityDate);
       
       if (shouldShowRecoveryDialog(category, currentStreak)) {
-        setRecoveryDialog({
-          isOpen: true,
-          habitName: category,
-          streakCount: currentStreak
-        });
-        return; // Don't toggle status yet, wait for recovery dialog
+        // Delay the recovery dialog to not interfere with UI update
+        setTimeout(() => {
+          setRecoveryDialog({
+            isOpen: true,
+            habitName: category,
+            streakCount: currentStreak
+          });
+        }, 100);
       }
     }
     
-    // For all other cases, toggle the status immediately
-    toggleStatus(dayIndex, category);
-
     // Show photo prompt for newly completed habits (today only)
     if (currentStatus === "empty" && dayIndex === 0) {
       const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
       if (!hidePrompt) {
-        // Small delay to ensure status change is rendered
+        // Delay to ensure status change is rendered first
         setTimeout(() => {
           setPhotoPrompt({
             isOpen: true,
             habitName: category
           });
-        }, 100);
+        }, 200);
       }
     }
   }, [activities, activityIndex, activityDate, toggleStatus]);
@@ -111,9 +114,11 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       habitName: "",
       streakCount: 0
     });
-    // If user closes dialog without recovery, proceed with status change
+    // If user closes dialog without recovery, change back to failed
     if (habitName) {
-      toggleStatus(0, habitName);
+      setTimeout(() => {
+        toggleStatus(0, habitName);
+      }, 50);
     }
   }, [recoveryDialog.habitName, toggleStatus]);
 
