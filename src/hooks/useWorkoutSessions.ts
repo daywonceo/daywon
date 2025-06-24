@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { recordHabitActivity } from '@/utils/habitActivity';
 
 export interface WorkoutSession {
   id: string;
@@ -140,6 +141,13 @@ export const useWorkoutSessions = () => {
       if (updateError) {
         console.error('Complete session error:', updateError);
         throw new Error(`Failed to complete session: ${updateError.message}`);
+      }
+
+      // Auto-mark WORKOUT habit as completed if duration is 30+ minutes
+      if (durationMinutes >= 30) {
+        console.log('Workout duration is 30+ minutes, marking WORKOUT habit as completed');
+        await recordHabitActivity('WORKOUT', 'completed', new Date());
+        console.log('WORKOUT habit marked as completed for today');
       }
 
       await fetchSessions();
