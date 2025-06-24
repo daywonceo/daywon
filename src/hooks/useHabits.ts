@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { getHabitActivities, isHabitRecentlyActive } from "@/utils/habitActivity";
+import { findDuplicateHabit } from "@/utils/habitDeduplication";
 
 export type Habit = Tables<'habits'>;
 export type NewHabit = Omit<Habit, 'id' | 'created_at' | 'user_id'>;
@@ -19,7 +20,13 @@ async function fetchHabits(userId: string) {
   return data;
 }
 
-async function addHabit(habit: NewHabit, userId: string) {
+async function addHabit(habit: NewHabit, userId: string, existingHabits: Habit[]) {
+  // Check for duplicates before adding
+  const duplicate = findDuplicateHabit(habit.name, existingHabits);
+  if (duplicate) {
+    throw new Error(`Habit "${duplicate.name}" already exists. Try editing the existing one instead.`);
+  }
+
   const { data, error } = await supabase
     .from("habits")
     .insert([{ ...habit, user_id: userId }])
@@ -69,10 +76,12 @@ async function ensureTrackedHabitsVisible(userId: string) {
     console.log('Existing habits in database:', existingHabits);
     const existingHabitNames = existingHabits?.map(h => h.name) || [];
     
-    // Find habits that need to be created
-    const habitsToCreate = trackedHabits.filter(habitName => 
-      !existingHabitNames.includes(habitName)
-    );
+    // Find habits that need to be created (check for duplicates)
+    const habitsToCreate = trackedHabits.filter(habitName => {
+      // Check if a similar habit already exists
+      const duplicate = findDuplicateHabit(habitName, existingHabits || []);
+      return !duplicate;
+    });
     
     console.log('Habits to create:', habitsToCreate);
     
@@ -153,7 +162,7 @@ export function useHabits() {
   });
 
   const addMutation = useMutation({
-    mutationFn: (newHabit: NewHabit) => addHabit(newHabit, user!.id),
+    mutationFn: (newHabit: NewHabit) => addHabit(newHabit, user!.id, habits || []),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },

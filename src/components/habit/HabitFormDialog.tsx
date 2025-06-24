@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useHabits, Habit } from "@/hooks/useHabits";
+import { useHabitDeduplication } from "@/hooks/useHabitDeduplication";
 import { toast } from "@/hooks/use-toast";
 
 type HabitFormDialogProps = {
@@ -20,6 +21,7 @@ const HabitFormDialog: React.FC<HabitFormDialogProps> = ({ open, onOpenChange, h
   const [category, setCategory] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const { addHabit, updateHabit } = useHabits();
+  const { checkForDuplicate } = useHabitDeduplication();
 
   useEffect(() => {
     if (habitToEdit) {
@@ -39,19 +41,32 @@ const HabitFormDialog: React.FC<HabitFormDialogProps> = ({ open, onOpenChange, h
       return;
     }
 
+    // Check for duplicates only when creating new habits (not editing)
+    if (!habitToEdit) {
+      const duplicate = checkForDuplicate(name.trim());
+      if (duplicate) {
+        toast({ 
+          title: "That habit already exists — try editing the existing one!",
+          description: `Found existing habit: "${duplicate.name}"`,
+          variant: "destructive" 
+        });
+        return;
+      }
+    }
+
     setIsSaving(true);
     try {
       if (habitToEdit) {
         await updateHabit({
           id: habitToEdit.id,
-          name,
+          name: name.trim(),
           description,
           category,
         });
         toast({ title: "Habit updated!" });
       } else {
         await addHabit({
-          name,
+          name: name.trim(),
           description,
           category,
           status: "active",

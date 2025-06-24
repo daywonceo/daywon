@@ -3,8 +3,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useHabits, Habit } from "@/hooks/useHabits";
+import { useHabitDeduplication } from "@/hooks/useHabitDeduplication";
 import { toast } from "@/hooks/use-toast";
-import { Plus, RefreshCw, History } from "lucide-react";
+import { Plus, RefreshCw, History, Merge } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "./HabitFormDialog";
 import HabitAddSheet from "./HabitAddSheet";
@@ -18,10 +19,12 @@ type AllHabitsDialogProps = {
 
 const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange }) => {
   const { habits, isLoading, updateHabit, deleteHabit, refreshHabits, addHabit } = useHabits();
+  const { duplicateGroups, mergeDuplicateHabits, checkForDuplicate } = useHabitDeduplication();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
   const [showAllTimeHabits, setShowAllTimeHabits] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isMerging, setIsMerging] = useState(false);
 
   // Refresh habits when dialog opens
   useEffect(() => {
@@ -38,6 +41,23 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
       console.error('Error refreshing habits:', error);
     } finally {
       setIsRefreshing(false);
+    }
+  };
+
+  const handleMergeDuplicates = async () => {
+    setIsMerging(true);
+    try {
+      const result = await mergeDuplicateHabits();
+      if (result.success) {
+        toast({ title: result.message });
+        await refreshHabits();
+      } else {
+        toast({ title: result.error, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error merging duplicates", variant: "destructive" });
+    } finally {
+      setIsMerging(false);
     }
   };
 
@@ -72,6 +92,17 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
   };
 
   const handleHabitSelected = async (habitName: string) => {
+    // Check for duplicates before adding
+    const duplicate = checkForDuplicate(habitName);
+    if (duplicate) {
+      toast({ 
+        title: "That habit already exists — try editing the existing one!",
+        description: `Found existing habit: "${duplicate.name}"`,
+        variant: "destructive" 
+      });
+      return;
+    }
+
     try {
       await addHabit({
         name: habitName,
@@ -120,6 +151,18 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
                   <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
+                {duplicateGroups.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleMergeDuplicates}
+                    disabled={isMerging}
+                    className="flex items-center gap-1 text-xs sm:text-sm w-full sm:w-auto bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
+                  >
+                    <Merge className={`h-3 w-3 sm:h-4 sm:w-4 ${isMerging ? 'animate-spin' : ''}`} />
+                    Merge {duplicateGroups.length} Duplicates
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -140,6 +183,27 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
                 onHabitSelected={handleHabitSelected}
               />
             </div>
+            
+            {duplicateGroups.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-yellow-800 mb-2">
+                  🔍 Duplicate Habits Found
+                </h3>
+                <p className="text-xs text-yellow-700 mb-3">
+                  Found {duplicateGroups.length} groups of similar habits that can be merged:
+                </p>
+                <div className="space-y-2">
+                  {duplicateGroups.map((group, index) => (
+                    <div key={index} className="text-xs text-yellow-700">
+                      <span className="font-medium">→ </span>
+                      {group.habits.map(h => h.name).join(', ')} 
+                      <span className="text-yellow-600"> → will become: "{group.preferredName}"</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {isLoading ? (
               <div className="space-y-2">
                 <Skeleton className="h-16 w-full" />
