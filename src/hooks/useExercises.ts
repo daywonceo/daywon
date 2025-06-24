@@ -58,6 +58,13 @@ export const useExercises = () => {
       });
 
       if (generateError) {
+        // Check if it's a network error
+        if (generateError.message && generateError.message.includes('Failed to send a request')) {
+          console.log('Network error detected, but plan might still be generated on server');
+          // Don't throw here, let the calling code handle it
+          setError('Network connection issue');
+          return null;
+        }
         throw generateError;
       }
 
@@ -66,7 +73,7 @@ export const useExercises = () => {
     } catch (err) {
       console.error('Error generating workout plan:', err);
       setError('Failed to generate workout plan');
-      return null;
+      throw err; // Re-throw so calling code can handle appropriately
     } finally {
       setIsLoading(false);
     }

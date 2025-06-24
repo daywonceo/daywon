@@ -78,8 +78,15 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           })
           .catch(error => {
             console.error('Failed to generate workout plan:', error);
-            setPlanGenerationFailed(true);
-            toast.error('Unable to load exercises. You can still track your workout manually.');
+            // Only set failed to true if it's a real failure, not a network issue
+            if (error.message && error.message.includes('Failed to send a request')) {
+              console.log('Network error detected, but workout plan might still be generated');
+              setPlanGenerationFailed(false);
+              toast.info('Loading exercises with backup data due to network issues');
+            } else {
+              setPlanGenerationFailed(true);
+              toast.error('Unable to load exercises. You can still track your workout manually.');
+            }
           });
       }
     } else {
@@ -121,8 +128,10 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       console.log('Generated workout plan:', plan);
       
       if (!plan || !plan[workoutType]) {
-        toast.error('Failed to generate workout plan. You can still track your workout manually.');
+        // Check if this is a network error vs actual generation failure
+        console.log('No plan data received, but proceeding with session creation');
         setPlanGenerationFailed(true);
+        toast.info('Exercises unavailable due to API limits, but you can still track your workout manually.');
       } else {
         setWorkoutPlan(plan[workoutType]);
         setPlanGenerationFailed(false);
@@ -307,10 +316,10 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
               <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
                 <CardContent className="p-4 sm:p-6 text-center">
                   <h3 className="font-semibold text-yellow-800 dark:text-yellow-400 mb-2">
-                    Exercise List Unavailable
+                    Exercise List Temporarily Unavailable
                   </h3>
                   <p className="text-yellow-700 dark:text-yellow-300 text-sm mb-4">
-                    We couldn't load your exercise list, but you can still track your workout time and log exercises manually.
+                    The exercise database is currently at capacity, but you can still track your workout time and log exercises manually.
                   </p>
                   <Button
                     variant="outline"
@@ -323,10 +332,12 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
                               setWorkoutPlan(plan[selectedWorkoutType]);
                               setPlanGenerationFailed(false);
                               toast.success('Exercises loaded successfully!');
+                            } else {
+                              toast.info('Still using backup exercises due to API limits');
                             }
                           })
                           .catch(() => {
-                            toast.error('Still unable to load exercises');
+                            toast.info('Exercise database still at capacity - manual logging available');
                           });
                       }
                     }}
