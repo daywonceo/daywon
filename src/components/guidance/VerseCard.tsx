@@ -69,27 +69,13 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
     }
   };
 
-  // Handle text display based on full passage mode
-  const getDisplayText = () => {
-    if (isFullPassage) {
-      return verse.text;
-    }
-    // For quick read mode, show limited text
-    return verse.text.length > 300 
-      ? verse.text.substring(0, 300) + "..." 
-      : verse.text;
-  };
-
-  const displayText = getDisplayText();
-  const isTruncated = !isFullPassage && verse.text.length > 300;
-
   return (
-    <Card className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow w-full overflow-hidden">
       <CardContent className="p-4 sm:p-6">
         {/* Header with reference and actions */}
         <div className="flex items-start justify-between mb-4 gap-3">
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-green-800 dark:text-green-400 mb-2 text-sm sm:text-base">
+            <h4 className="font-semibold text-green-800 dark:text-green-400 mb-2 text-sm sm:text-base break-words">
               {verse.reference}
             </h4>
             <span className="inline-block px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
@@ -101,7 +87,7 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
               variant="ghost"
               size="sm"
               onClick={handleSaveVerse}
-              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2"
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 h-8 w-8 sm:h-10 sm:w-10"
               aria-label="Save verse"
             >
               <Heart className="w-4 h-4" />
@@ -110,7 +96,7 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
               variant="ghost"
               size="sm"
               onClick={handleShare}
-              className="text-gray-500 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20 p-2"
+              className="text-gray-500 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20 p-2 h-8 w-8 sm:h-10 sm:w-10"
               aria-label="Share verse"
             >
               <Share2 className="w-4 h-4" />
@@ -118,25 +104,24 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
           </div>
         </div>
         
-        {/* Verse text */}
-        <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4 text-sm sm:text-base">
-          "{displayText}"
+        {/* Verse text - responsive and properly contained */}
+        <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4 text-sm sm:text-base break-words overflow-hidden">
+          "{verse.text}"
         </blockquote>
         
-        {/* Footer with translation and read mode info */}
+        {/* Footer with translation info */}
         <div className="flex items-center justify-between mb-4 text-xs sm:text-sm">
           <button 
             onClick={onTranslationClick}
-            className="text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+            className="text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors truncate max-w-[200px] sm:max-w-none"
+            title={verse.translation_name}
           >
             {verse.translation_name}
           </button>
           
-          {isTruncated && (
-            <span className="text-gray-400 text-xs">
-              Toggle "Full" to read more
-            </span>
-          )}
+          <span className="text-gray-400 text-xs ml-2 flex-shrink-0">
+            {isFullPassage ? "Full Passage" : "Quick Read"}
+          </span>
         </div>
 
         {/* Reflection prompt */}
