@@ -31,7 +31,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   toggleEditMode,
   updateActivityText,
 }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
   const [recoveryDialog, setRecoveryDialog] = useState<{
     isOpen: boolean;
     habitName: string;
@@ -61,63 +60,47 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   const activityDate = getDateForActivity(activityIndex);
 
   const handleStatusToggle = useCallback((dayIndex: number, category: string) => {
-    // Prevent double-clicks and multiple simultaneous processing
-    if (isProcessing) {
-      return;
-    }
-
-    setIsProcessing(true);
+    const currentStatus = activities[dayIndex].statuses[category];
     
-    try {
-      const currentStatus = activities[dayIndex].statuses[category];
+    // If changing from completed to failed and it's today, check for recovery
+    if (currentStatus === "completed" && dayIndex === 0) {
+      const currentStreak = calculateStreakForDate(category, activityDate);
       
-      // If changing from completed to failed and it's today, check for recovery
-      if (currentStatus === "completed" && dayIndex === 0) {
-        const currentStreak = calculateStreakForDate(category, activityDate);
-        
-        if (shouldShowRecoveryDialog(category, currentStreak)) {
-          setRecoveryDialog({
-            isOpen: true,
-            habitName: category,
-            streakCount: currentStreak
-          });
-          return; // Don't toggle status yet, wait for recovery dialog
-        }
+      if (shouldShowRecoveryDialog(category, currentStreak)) {
+        setRecoveryDialog({
+          isOpen: true,
+          habitName: category,
+          streakCount: currentStreak
+        });
+        return; // Don't toggle status yet, wait for recovery dialog
       }
-      
-      // Toggle the status
-      toggleStatus(dayIndex, category);
-
-      // Show photo prompt for newly completed habits (today only) AFTER status change
-      if (currentStatus === "empty" && dayIndex === 0) {
-        const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
-        if (!hidePrompt) {
-          // Use a longer timeout to ensure the status change is fully processed
-          setTimeout(() => {
-            setPhotoPrompt({
-              isOpen: true,
-              habitName: category
-            });
-          }, 200);
-        }
-      }
-    } finally {
-      // Reset processing state after a short delay
-      setTimeout(() => {
-        setIsProcessing(false);
-      }, 300);
     }
-  }, [isProcessing, activities, activityIndex, activityDate, toggleStatus]);
+    
+    // Toggle the status immediately
+    toggleStatus(dayIndex, category);
+
+    // Show photo prompt for newly completed habits (today only)
+    if (currentStatus === "empty" && dayIndex === 0) {
+      const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
+      if (!hidePrompt) {
+        // Small delay to ensure status change is rendered
+        setTimeout(() => {
+          setPhotoPrompt({
+            isOpen: true,
+            habitName: category
+          });
+        }, 100);
+      }
+    }
+  }, [activities, activityIndex, activityDate, toggleStatus]);
 
   const handleRecoveryComplete = useCallback(() => {
     // Keep the status as completed since streak was recovered
-    // The recovery system will handle maintaining the streak
     setRecoveryDialog({
       isOpen: false,
       habitName: "",
       streakCount: 0
     });
-    setIsProcessing(false);
   }, []);
 
   const closeRecoveryDialog = useCallback(() => {
@@ -131,7 +114,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     if (habitName) {
       toggleStatus(0, habitName);
     }
-    setIsProcessing(false);
   }, [recoveryDialog.habitName, toggleStatus]);
 
   const closePhotoPrompt = useCallback(() => {
