@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,7 +39,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
   const activePlan = workoutPlans.find(plan => plan.is_active);
 
-  // Check for existing active session
+  // Check for existing active session on mount
   useEffect(() => {
     const activeSession = sessions.find(session => {
       const sessionDate = new Date(session.workout_date);
@@ -60,33 +59,6 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         setWorkoutStarted(true);
         setStartTime(new Date(activeSession.created_at));
         setElapsedTime(activeSession.duration_minutes * 60);
-      }
-      
-      // Only generate workout plan for active sessions that already have one
-      if (activeSession.workout_plan_id && activePlan) {
-        console.log('Generating workout plan for existing session');
-        generateWorkoutPlan(activePlan.plan_type, 'beginner')
-          .then(plan => {
-            console.log('Generated plan:', plan);
-            if (plan && plan[activeSession.workout_type]) {
-              setWorkoutPlan(plan[activeSession.workout_type]);
-              setPlanGenerationFailed(false);
-            } else {
-              console.log('Plan generation returned empty result');
-              setPlanGenerationFailed(true);
-            }
-          })
-          .catch(error => {
-            console.error('Failed to generate workout plan:', error);
-            if (error.message && error.message.includes('Failed to send a request')) {
-              console.log('Network error detected, but workout plan might still be generated');
-              setPlanGenerationFailed(false);
-              toast.info('Loading exercises with backup data due to network issues');
-            } else {
-              setPlanGenerationFailed(true);
-              toast.error('Unable to load exercises. You can still track your workout manually.');
-            }
-          });
       }
     } else {
       // No active session found, show selection screen
@@ -137,17 +109,23 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         console.log('Workout session created, now generating plan...');
 
         // Generate workout plan after session is created
-        const plan = await generateWorkoutPlan(activePlan.plan_type, 'beginner');
-        console.log('Generated workout plan:', plan);
-        
-        if (!plan || !plan[workoutType]) {
-          console.log('No plan data received');
+        try {
+          const plan = await generateWorkoutPlan(activePlan.plan_type, 'beginner');
+          console.log('Generated workout plan:', plan);
+          
+          if (!plan || !plan[workoutType]) {
+            console.log('No plan data received');
+            setPlanGenerationFailed(true);
+            toast.info('Exercises unavailable due to API limits, but you can still track your workout manually.');
+          } else {
+            setWorkoutPlan(plan[workoutType]);
+            setPlanGenerationFailed(false);
+            toast.success('Workout plan loaded successfully!');
+          }
+        } catch (error) {
+          console.error('Error generating workout plan:', error);
           setPlanGenerationFailed(true);
-          toast.info('Exercises unavailable due to API limits, but you can still track your workout manually.');
-        } else {
-          setWorkoutPlan(plan[workoutType]);
-          setPlanGenerationFailed(false);
-          toast.success('Workout plan loaded successfully!');
+          toast.info('Exercise database temporarily unavailable. You can still track your workout time manually.');
         }
       }
     } catch (error) {
