@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from "react";
 import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
@@ -76,7 +77,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       }
     }
     
-    // Toggle the status immediately
+    // For all other cases, toggle the status immediately
     toggleStatus(dayIndex, category);
 
     // Show photo prompt for newly completed habits (today only)
