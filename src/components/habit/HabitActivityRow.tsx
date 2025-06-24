@@ -77,16 +77,20 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       }
     }
     
+    // Always toggle the status first
     toggleStatus(dayIndex, category);
 
-    // Show photo prompt for newly completed habits (today only)
+    // Show photo prompt for newly completed habits (today only) AFTER status change
     if (currentStatus === "empty" && dayIndex === 0) {
       const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
       if (!hidePrompt) {
-        setPhotoPrompt({
-          isOpen: true,
-          habitName: category
-        });
+        // Use setTimeout to ensure the status change is processed first
+        setTimeout(() => {
+          setPhotoPrompt({
+            isOpen: true,
+            habitName: category
+          });
+        }, 100);
       }
     }
   };
