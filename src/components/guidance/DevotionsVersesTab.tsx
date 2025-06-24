@@ -104,68 +104,75 @@ const DevotionsVersesTab = ({
         </div>
       ) : (
         <div>
-          <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+          <div className="mb-6 flex flex-col gap-4">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Curated Daily Verses</h3>
-            <div className="flex flex-wrap gap-4 items-center">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Quick Read</span>
+            
+            {/* Mobile-optimized controls */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
+              {/* Full Passage Toggle */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Quick</span>
                 <button
                   onClick={() => setIsFullPassage(!isFullPassage)}
-                  className="text-green-600 hover:text-green-700"
+                  className="text-green-600 hover:text-green-700 transition-colors"
+                  aria-label={isFullPassage ? "Switch to quick read" : "Switch to full passage"}
                 >
                   {isFullPassage ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
                 </button>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Full Passage</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Full</span>
               </div>
-              
-              <CategorySelector 
-                currentCategory={selectedCategory}
-                onCategoryChange={onCategoryChange}
-              />
-              
-              <Dialog open={translationDialogOpen} onOpenChange={onTranslationDialogOpenChange}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    Translation: {selectedTranslation.toUpperCase()}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Select Bible Translation</DialogTitle>
-                  </DialogHeader>
-                  <TranslationSelector 
-                    currentTranslation={selectedTranslation}
-                    onTranslationChange={handleTranslationChange}
-                  />
-                </DialogContent>
-              </Dialog>
-              
-              <Button
-                onClick={fetchBibleVerses}
-                disabled={isLoadingVerses}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className={`w-4 h-4 ${isLoadingVerses ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
+
+              {/* Category and Translation controls - responsive */}
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                <CategorySelector 
+                  currentCategory={selectedCategory}
+                  onCategoryChange={onCategoryChange}
+                />
+                
+                <Dialog open={translationDialogOpen} onOpenChange={onTranslationDialogOpenChange}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                      {selectedTranslation.toUpperCase()}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="w-[95vw] max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Select Bible Translation</DialogTitle>
+                    </DialogHeader>
+                    <TranslationSelector 
+                      currentTranslation={selectedTranslation}
+                      onTranslationChange={handleTranslationChange}
+                    />
+                  </DialogContent>
+                </Dialog>
+                
+                <Button
+                  onClick={fetchBibleVerses}
+                  disabled={isLoadingVerses}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoadingVerses ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
+              </div>
             </div>
           </div>
 
           {versesError && (
             <Card className="mb-6 border-red-200 dark:border-red-800">
               <CardContent className="p-4">
-                <p className="text-red-600 dark:text-red-400">{versesError}</p>
+                <p className="text-red-600 dark:text-red-400 text-sm">{versesError}</p>
               </CardContent>
             </Card>
           )}
 
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {isLoadingVerses ? (
               Array.from({ length: 4 }).map((_, index) => (
                 <Card key={index} className="bg-white dark:bg-gray-800 shadow-sm">
-                  <CardContent className="p-6 space-y-4">
+                  <CardContent className="p-4 sm:p-6 space-y-4">
                     <Skeleton className="h-6 w-32" />
                     <Skeleton className="h-20 w-full" />
                     <Skeleton className="h-4 w-24" />

@@ -69,31 +69,40 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
     }
   };
 
-  // Truncate text if not full passage mode
-  const displayText = isFullPassage 
-    ? verse.text 
-    : verse.text.length > 300 
+  // Handle text display based on full passage mode
+  const getDisplayText = () => {
+    if (isFullPassage) {
+      return verse.text;
+    }
+    // For quick read mode, show limited text
+    return verse.text.length > 300 
       ? verse.text.substring(0, 300) + "..." 
       : verse.text;
+  };
+
+  const displayText = getDisplayText();
+  const isTruncated = !isFullPassage && verse.text.length > 300;
 
   return (
     <Card className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h4 className="font-semibold text-green-800 dark:text-green-400 mb-2">
+      <CardContent className="p-4 sm:p-6">
+        {/* Header with reference and actions */}
+        <div className="flex items-start justify-between mb-4 gap-3">
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-green-800 dark:text-green-400 mb-2 text-sm sm:text-base">
               {verse.reference}
             </h4>
             <span className="inline-block px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
               {verse.category}
             </span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSaveVerse}
-              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2"
+              aria-label="Save verse"
             >
               <Heart className="w-4 h-4" />
             </Button>
@@ -101,32 +110,36 @@ const VerseCard = ({ verse, isFullPassage = false, onTranslationClick }: VerseCa
               variant="ghost"
               size="sm"
               onClick={handleShare}
-              className="text-gray-500 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20"
+              className="text-gray-500 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20 p-2"
+              aria-label="Share verse"
             >
               <Share2 className="w-4 h-4" />
             </Button>
           </div>
         </div>
         
-        <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4">
+        {/* Verse text */}
+        <blockquote className="text-gray-700 dark:text-gray-300 italic leading-relaxed mb-4 border-l-4 border-green-200 dark:border-green-800 pl-4 text-sm sm:text-base">
           "{displayText}"
         </blockquote>
         
-        <div className="flex items-center justify-between">
+        {/* Footer with translation and read mode info */}
+        <div className="flex items-center justify-between mb-4 text-xs sm:text-sm">
           <button 
             onClick={onTranslationClick}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+            className="text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
           >
             {verse.translation_name}
           </button>
           
-          {!isFullPassage && verse.text.length > 300 && (
-            <span className="text-xs text-gray-400">
-              Toggle "Full Passage" to read more
+          {isTruncated && (
+            <span className="text-gray-400 text-xs">
+              Toggle "Full" to read more
             </span>
           )}
         </div>
 
+        {/* Reflection prompt */}
         <ReflectionPrompt verseReference={verse.reference} />
       </CardContent>
     </Card>

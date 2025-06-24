@@ -51,15 +51,20 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
   if (!isExpanded) {
     return (
       <Card className="mt-4 border-green-200 dark:border-green-800">
-        <CardContent className="p-4">
+        <CardContent className="p-3 sm:p-4">
           <Button
             variant="ghost"
             onClick={() => setIsExpanded(true)}
-            className="w-full text-left flex items-center gap-2 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
+            className="w-full text-left flex items-center gap-2 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-2 sm:p-3 text-sm sm:text-base"
           >
-            <MessageCircle className="w-4 h-4" />
-            <span className="flex-1">What is God teaching me through this today?</span>
-            <Heart className="w-4 h-4" />
+            <MessageCircle className="w-4 h-4 flex-shrink-0" />
+            <span className="flex-1 min-w-0">
+              {devotionTitle 
+                ? "What did this devotion mean to you today?" 
+                : "What is God teaching me through this today?"
+              }
+            </span>
+            <Heart className="w-4 h-4 flex-shrink-0" />
           </Button>
         </CardContent>
       </Card>
@@ -68,20 +73,23 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
 
   return (
     <Card className="mt-4 border-green-200 dark:border-green-800">
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="p-3 sm:p-4 space-y-4">
         <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
           <MessageCircle className="w-4 h-4" />
-          <span className="font-medium">Faith Journal Reflection</span>
+          <span className="font-medium text-sm sm:text-base">Faith Journal Reflection</span>
         </div>
         
         <Textarea
           value={reflection}
           onChange={(e) => setReflection(e.target.value)}
-          placeholder="What is God teaching me through this today? How can I apply this to my life?"
-          className="min-h-[100px] border-green-200 dark:border-green-800 focus:ring-green-500"
+          placeholder={devotionTitle 
+            ? "What did this devotion mean to you today? How can you apply these insights to your life?"
+            : "What is God teaching me through this today? How can I apply this to my life?"
+          }
+          className="min-h-[100px] border-green-200 dark:border-green-800 focus:ring-green-500 text-sm sm:text-base"
         />
         
-        <div className="flex gap-2 justify-end">
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
           <Button
             variant="outline"
             size="sm"
@@ -89,6 +97,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
               setIsExpanded(false);
               setReflection("");
             }}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -96,7 +105,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
             size="sm"
             onClick={handleSaveReflection}
             disabled={!reflection.trim() || isSaving}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
           >
             {isSaving ? "Saving..." : "Save Reflection"}
           </Button>
