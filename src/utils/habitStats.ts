@@ -8,10 +8,11 @@ export interface HabitStats {
   empty: number;
   total: number;
   percentage: number;
+  category: 'good' | 'bad' | 'in-progress';
 }
 
-// Calculate habit statistics for the specified timeframe
-export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goodHabits: HabitStats[], badHabits: HabitStats[] } => {
+// Calculate habit statistics for the specified timeframe with automatic categorization
+export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] } => {
   try {
     const activities = getHabitActivities();
     const now = new Date();
@@ -48,7 +49,7 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       return acc;
     }, {});
     
-    // Calculate statistics for each habit
+    // Calculate statistics for each habit with automatic categorization
     const allHabitStats: HabitStats[] = Object.keys(habitGroups).map(habitName => {
       const habitActivities = habitGroups[habitName];
       const completed = habitActivities.filter(a => a.status === "completed").length;
@@ -57,26 +58,47 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       const total = habitActivities.length;
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
+      // Automatic categorization based on completion percentage
+      let category: 'good' | 'bad' | 'in-progress';
+      if (percentage >= 70) {
+        category = 'good';
+      } else if (percentage < 40) {
+        category = 'bad';
+      } else {
+        category = 'in-progress';
+      }
+      
       return {
         habitName,
         completed,
         failed,
         empty,
         total,
-        percentage
+        percentage,
+        category
       };
     });
     
-    // Sort by percentage and split into good and bad habits
-    const sortedStats = [...allHabitStats].sort((a, b) => b.percentage - a.percentage);
-    const halfIndex = Math.ceil(sortedStats.length / 2);
+    // Separate habits by category and sort by percentage
+    const goodHabits = allHabitStats
+      .filter(habit => habit.category === 'good')
+      .sort((a, b) => b.percentage - a.percentage);
+    
+    const badHabits = allHabitStats
+      .filter(habit => habit.category === 'bad')
+      .sort((a, b) => a.percentage - b.percentage);
+    
+    const inProgressHabits = allHabitStats
+      .filter(habit => habit.category === 'in-progress')
+      .sort((a, b) => b.percentage - a.percentage);
     
     return {
-      goodHabits: sortedStats.slice(0, halfIndex),
-      badHabits: sortedStats.slice(halfIndex).reverse() // Reverse to show worst first
+      goodHabits,
+      badHabits,
+      inProgressHabits
     };
   } catch (error) {
     console.error("Error calculating habit stats:", error);
-    return { goodHabits: [], badHabits: [] };
+    return { goodHabits: [], badHabits: [], inProgressHabits: [] };
   }
 };
