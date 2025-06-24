@@ -50,14 +50,14 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
 
   if (!isExpanded) {
     return (
-      <Card className="mt-3 sm:mt-4 border-green-200 dark:border-green-800">
-        <CardContent className="p-2 sm:p-3">
+      <Card className="mt-3 border-green-200 dark:border-green-800">
+        <CardContent className="p-2">
           <Button
             variant="ghost"
             onClick={() => setIsExpanded(true)}
-            className="w-full text-left flex items-center justify-center text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-3 sm:p-4 text-sm min-h-0 h-auto"
+            className="w-full text-center text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 p-3 text-sm h-auto min-h-[44px]"
           >
-            <span className="text-center leading-relaxed">
+            <span className="leading-tight">
               {devotionTitle 
                 ? "What did this devotion mean to you today?" 
                 : "What is God teaching me through this today?"
@@ -70,11 +70,11 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
   }
 
   return (
-    <Card className="mt-3 sm:mt-4 border-green-200 dark:border-green-800">
-      <CardContent className="p-2 sm:p-3 md:p-4 space-y-3 sm:space-y-4">
+    <Card className="mt-3 border-green-200 dark:border-green-800">
+      <CardContent className="p-3 space-y-3">
         <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-          <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-          <span className="font-medium text-xs sm:text-sm">Faith Journal Reflection</span>
+          <MessageCircle className="w-4 h-4" />
+          <span className="font-medium text-sm">Faith Journal Reflection</span>
         </div>
         
         <Textarea
@@ -84,7 +84,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
             ? "What did this devotion mean to you today? How can you apply these insights to your life?"
             : "What is God teaching me through this today? How can I apply this to my life?"
           }
-          className="min-h-[80px] sm:min-h-[100px] border-green-200 dark:border-green-800 focus:ring-green-500 text-xs sm:text-sm resize-none"
+          className="min-h-[100px] border-green-200 dark:border-green-800 focus:ring-green-500 text-sm resize-none"
         />
         
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
@@ -95,7 +95,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
               setIsExpanded(false);
               setReflection("");
             }}
-            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+            className="w-full sm:w-auto text-sm h-9"
           >
             Cancel
           </Button>
@@ -103,7 +103,7 @@ const ReflectionPrompt = ({ verseReference, devotionTitle, sermonTitle }: Reflec
             size="sm"
             onClick={handleSaveReflection}
             disabled={!reflection.trim() || isSaving}
-            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto text-sm h-9"
           >
             {isSaving ? "Saving..." : "Save Reflection"}
           </Button>
