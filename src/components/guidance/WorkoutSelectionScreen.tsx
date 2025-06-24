@@ -1,0 +1,130 @@
+
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Play, Clock, CheckCircle } from "lucide-react";
+import { format } from "date-fns";
+
+interface WorkoutOption {
+  type: string;
+  displayName: string;
+  lastCompleted?: Date;
+  isRecommended?: boolean;
+}
+
+interface WorkoutSelectionScreenProps {
+  activePlan: any;
+  workoutOptions: WorkoutOption[];
+  onWorkoutSelect: (workoutType: string) => void;
+  onBack: () => void;
+  isLoading: boolean;
+}
+
+const WorkoutSelectionScreen = ({
+  activePlan,
+  workoutOptions,
+  onWorkoutSelect,
+  onBack,
+  isLoading
+}: WorkoutSelectionScreenProps) => {
+  const formatLastCompleted = (date: Date) => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return format(date, "MMM d");
+    }
+  };
+
+  return (
+    <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
+      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+        <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0">
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        <div className="min-w-0">
+          <h2 className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-400 truncate">
+            Choose Your Workout
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            From your {activePlan.name} plan
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {workoutOptions.map((workout) => (
+          <Card 
+            key={workout.type}
+            className={`transition-all duration-200 hover:shadow-md ${
+              workout.isRecommended 
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' 
+                : 'bg-white dark:bg-gray-800'
+            }`}
+          >
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 truncate">
+                      {workout.displayName}
+                    </h3>
+                    {workout.isRecommended && (
+                      <Badge variant="default" className="bg-green-600 text-xs flex-shrink-0">
+                        Recommended
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {workout.lastCompleted ? (
+                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                      <CheckCircle className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">
+                        Last completed: {formatLastCompleted(workout.lastCompleted)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                      <Clock className="w-3 h-3 flex-shrink-0" />
+                      <span>Not completed yet</span>
+                    </div>
+                  )}
+                </div>
+                
+                <Button
+                  onClick={() => onWorkoutSelect(workout.type)}
+                  disabled={isLoading}
+                  size="sm"
+                  className={`flex-shrink-0 h-10 px-4 ${
+                    workout.isRecommended
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : 'bg-gray-600 hover:bg-gray-700'
+                  }`}
+                >
+                  <Play className="w-4 h-4 mr-1" />
+                  Start
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
+        <CardContent className="p-4 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            💡 Tip: Follow the recommended workout order for optimal results, but feel free to choose based on your preference.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default WorkoutSelectionScreen;

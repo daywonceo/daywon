@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,9 @@ import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions, WorkoutSession } from "@/hooks/useWorkoutSessions";
 import { useExercises } from "@/hooks/useExercises";
 import { toast } from "@/components/ui/sonner";
-import { getWorkoutTypesForPlan } from "@/utils/workoutHelpers";
+import { getWorkoutOptions } from "@/utils/workoutRotation";
 import TimerFailPrompt from "./TimerFailPrompt";
-import WorkoutTypeSelection from "./WorkoutTypeSelection";
+import WorkoutSelectionScreen from "./WorkoutSelectionScreen";
 import WorkoutTimer from "./WorkoutTimer";
 import ExerciseList from "./ExerciseList";
 import WorkoutCompletion from "./WorkoutCompletion";
@@ -251,16 +252,16 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     );
   }
 
-  // Workout type selection screen
+  // Workout selection screen
   if (viewState === 'selection' && activePlan) {
-    const workoutTypes = getWorkoutTypesForPlan(activePlan.plan_type);
+    const workoutOptions = getWorkoutOptions(activePlan.plan_type, sessions);
     
     return (
-      <WorkoutTypeSelection
+      <WorkoutSelectionScreen
         activePlan={activePlan}
-        workoutTypes={workoutTypes}
+        workoutOptions={workoutOptions}
         isLoading={isLoading}
-        onWorkoutTypeSelect={handleWorkoutTypeSelection}
+        onWorkoutSelect={handleWorkoutTypeSelection}
         onBack={onBack}
       />
     );
