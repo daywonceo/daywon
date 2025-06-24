@@ -1,36 +1,15 @@
+
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { recordHabitActivity } from '@/utils/habitActivity';
-
-export interface WorkoutSession {
-  id: string;
-  user_id: string;
-  workout_plan_id: string | null;
-  workout_date: string;
-  workout_type: string;
-  duration_minutes: number | null;
-  is_completed: boolean;
-  notes: string | null;
-  planned_day_of_week: number | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ExerciseLog {
-  id: string;
-  user_id: string;
-  workout_session_id: string;
-  exercise_name: string;
-  muscle_group: string | null;
-  equipment: string | null;
-  sets: number;
-  reps: number;
-  weight_lbs: number | null;
-  difficulty: string | null;
-  exercise_instructions: string | null;
-  created_at: string;
-}
+import { WorkoutSession, ExerciseLog } from '@/types/workout';
+import { 
+  fetchWorkoutSessions, 
+  createWorkoutSession, 
+  completeWorkoutSession 
+} from '@/services/workoutSessionService';
+import { logExercise } from '@/services/exerciseLogService';
+import { getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } from '@/utils/workoutUtils';
 
 export const useWorkoutSessions = () => {
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
@@ -48,22 +27,9 @@ export const useWorkoutSessions = () => {
     setError('');
     
     try {
-      console.log('Fetching workout sessions for user:', user.id);
-      
-      const { data, error: fetchError } = await supabase
-        .from('workout_sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('workout_date', { ascending: false });
-
-      if (fetchError) {
-        console.error('Supabase error details:', fetchError);
-        throw new Error(`Database error: ${fetchError.message}`);
-      }
-
-      console.log('Workout sessions fetched successfully:', data?.length || 0);
-      setSessions(data || []);
-      setError(''); // Clear any previous errors
+      const data = await fetchWorkoutSessions(user.id);
+      setSessions(data);
+      setError('');
     } catch (err: any) {
       console.error('Error fetching workout sessions:', err);
       const errorMessage = err.message || 'Failed to fetch workout sessions';
@@ -89,23 +55,7 @@ export const useWorkoutSessions = () => {
     setError('');
 
     try {
-      console.log('Creating workout session:', { ...workoutData, userId: user.id });
-      
-      const { data, error: createError } = await supabase
-        .from('workout_sessions')
-        .insert({
-          user_id: user.id,
-          ...workoutData
-        })
-        .select()
-        .single();
-
-      if (createError) {
-        console.error('Create session error:', createError);
-        throw new Error(`Failed to create session: ${createError.message}`);
-      }
-
-      console.log('Workout session created:', data);
+      const data = await createWorkoutSession(user.id, workoutData);
       await fetchSessions();
       return data;
     } catch (err: any) {
@@ -127,21 +77,7 @@ export const useWorkoutSessions = () => {
     setError('');
 
     try {
-      console.log('Completing workout session:', sessionId, durationMinutes);
-      
-      const { error: updateError } = await supabase
-        .from('workout_sessions')
-        .update({ 
-          is_completed: true,
-          duration_minutes: durationMinutes
-        })
-        .eq('id', sessionId)
-        .eq('user_id', user.id);
-
-      if (updateError) {
-        console.error('Complete session error:', updateError);
-        throw new Error(`Failed to complete session: ${updateError.message}`);
-      }
+      await completeWorkoutSession(user.id, sessionId, durationMinutes);
 
       // Auto-mark WORKOUT habit as completed if duration is 30+ minutes
       if (durationMinutes >= 30) {
@@ -159,7 +95,7 @@ export const useWorkoutSessions = () => {
     }
   };
 
-  const logExercise = async (sessionId: string, exerciseData: {
+  const logExerciseForSession = async (sessionId: string, exerciseData: {
     exercise_name: string;
     muscle_group?: string;
     equipment?: string;
@@ -178,24 +114,7 @@ export const useWorkoutSessions = () => {
     setError('');
 
     try {
-      console.log('Logging exercise:', { ...exerciseData, sessionId, userId: user.id });
-      
-      const { data, error: logError } = await supabase
-        .from('exercise_logs')
-        .insert({
-          user_id: user.id,
-          workout_session_id: sessionId,
-          ...exerciseData
-        })
-        .select()
-        .single();
-
-      if (logError) {
-        console.error('Log exercise error:', logError);
-        throw new Error(`Failed to log exercise: ${logError.message}`);
-      }
-
-      console.log('Exercise logged:', data);
+      const data = await logExercise(user.id, sessionId, exerciseData);
       return data;
     } catch (err: any) {
       console.error('Error logging exercise:', err);
@@ -204,27 +123,6 @@ export const useWorkoutSessions = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getPlannedWorkoutsForWeek = (startOfWeek: Date): WorkoutSession[] => {
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-    return sessions.filter(session => {
-      if (session.planned_day_of_week === null) return false;
-      
-      const sessionDate = new Date(session.workout_date);
-      return sessionDate >= startOfWeek && sessionDate <= endOfWeek;
-    });
-  };
-
-  const getCurrentWeekPlannedWorkouts = (): WorkoutSession[] => {
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay()); // Start from Sunday
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    return getPlannedWorkoutsForWeek(startOfWeek);
   };
 
   useEffect(() => {
@@ -237,9 +135,11 @@ export const useWorkoutSessions = () => {
     error,
     createSession,
     completeSession,
-    logExercise,
+    logExercise: logExerciseForSession,
     refetch: fetchSessions,
-    getPlannedWorkoutsForWeek,
-    getCurrentWeekPlannedWorkouts
+    getPlannedWorkoutsForWeek: (startOfWeek: Date) => getPlannedWorkoutsForWeek(sessions, startOfWeek),
+    getCurrentWeekPlannedWorkouts: () => getCurrentWeekPlannedWorkouts(sessions)
   };
 };
+
+export type { WorkoutSession, ExerciseLog };
