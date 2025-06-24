@@ -1,16 +1,15 @@
 
 import React from "react";
-import { cn } from "@/lib/utils";
-import PlaylistRecommendations from "./habit/PlaylistRecommendations";
-import HabitGridHeader from "./habit/HabitGridHeader";
-import HabitActivityRow from "./habit/HabitActivityRow";
+import { Card, CardContent } from "@/components/ui/card";
 import { useHabitActivities } from "@/hooks/useHabitActivities";
+import HabitActivityRow from "@/components/habit/HabitActivityRow";
 
-type RecentActivitiesProps = {
-  habitList?: string[]; // array of 3 habits to show for this user
-};
+interface RecentActivitiesProps {
+  habitList?: string[];
+  onHabitUpdate?: () => void;
+}
 
-const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
+const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) => {
   const {
     activities,
     setActivities,
@@ -22,51 +21,53 @@ const RecentActivities = ({ habitList }: RecentActivitiesProps) => {
     updateActivityText,
   } = useHabitActivities(habitList);
 
+  // Wrapper function to call onHabitUpdate after status toggle
+  const handleToggleStatus = (dayIndex: number, category: string) => {
+    toggleStatus(dayIndex, category);
+    onHabitUpdate?.();
+  };
+
   return (
-    <div className="mb-6 sm:mb-16">
-      <div className="flex flex-col overflow-hidden">
-        <div
-          className={cn(
-            "grid",
-            // Mobile-first: wider day column, flexible text, fixed habits
-            "grid-cols-[44px_1fr_repeat(3,48px)]",
-            // Desktop: larger fixed sizes with more space for day column
-            "sm:grid-cols-[64px_1fr_repeat(3,64px)]",
-            "gap-x-2 sm:gap-x-4 items-center"
-          )}
-        >
-          {/* Grid Header */}
-          <HabitGridHeader habits={userHabits} />
+    <Card className="mb-8 sm:mb-12 border-green-200 shadow-md">
+      <CardContent className="p-3 sm:p-6">
+        <div className="grid grid-cols-[auto_1fr_repeat(3,1fr)] gap-2 sm:gap-4 items-center">
+          {/* Header row */}
+          <div className="text-center">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 block">
+              Day
+            </span>
+          </div>
+          <div className="text-center min-w-0">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 block truncate">
+              Activity
+            </span>
+          </div>
+          {userHabits.map((habit) => (
+            <div key={habit} className="text-center min-w-0">
+              <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 block truncate">
+                {habit}
+              </span>
+            </div>
+          ))}
 
           {/* Activity rows */}
           {activities.map((activity, activityIndex) => (
-            <React.Fragment key={`activity-${activityIndex}`}>
-              <HabitActivityRow
-                activity={activity}
-                activityIndex={activityIndex}
-                activities={activities}
-                setActivities={setActivities}
-                activeHabit={activeHabit}
-                setActiveHabit={setActiveHabit}
-                toggleStatus={toggleStatus}
-                toggleEditMode={toggleEditMode}
-                updateActivityText={updateActivityText}
-              />
-              {activityIndex < activities.length - 1 && (
-                <div className="col-span-full h-px bg-green-200/70 dark:bg-gray-700 my-3"></div>
-              )}
-            </React.Fragment>
+            <HabitActivityRow
+              key={activityIndex}
+              activity={activity}
+              activityIndex={activityIndex}
+              activities={activities}
+              setActivities={setActivities}
+              activeHabit={activeHabit}
+              setActiveHabit={setActiveHabit}
+              toggleStatus={handleToggleStatus}
+              toggleEditMode={toggleEditMode}
+              updateActivityText={updateActivityText}
+            />
           ))}
         </div>
-      </div>
-      {/* Show playlist recommendations when a habit is active */}
-      {activeHabit && (
-        <PlaylistRecommendations
-          habitName={activeHabit}
-          isHabitActive={true}
-        />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

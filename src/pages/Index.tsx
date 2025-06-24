@@ -27,6 +27,7 @@ const Index = () => {
   const [showHabitsModal, setShowHabitsModal] = useState(false);
   const [showAllHabits, setShowAllHabits] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const isMobile = useIsMobile();
 
@@ -81,6 +82,11 @@ const Index = () => {
   // Handle new habit selected from quick add
   const handleHabitSelected = (habit: string) => {
     // Optionally: toast({ title: habit + " added!" });
+  };
+
+  // Function to trigger refresh when habits are updated
+  const handleHabitUpdate = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Pass selected top 3 habits to RecentActivities.
@@ -147,8 +153,8 @@ const Index = () => {
             </div>
           </div>
 
-          <RecentActivities habitList={activityHabits} />
-          <HabitStats />
+          <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />
+          <HabitStats refreshTrigger={refreshTrigger} />
           <Progress userHabits={activityHabits} />
         </main>
       </PullToRefresh>
