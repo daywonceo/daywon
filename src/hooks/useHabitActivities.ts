@@ -91,6 +91,7 @@ export const useHabitActivities = (habitList?: string[]) => {
   }, [userHabits.join(','), refreshTrigger]);
 
   const toggleStatus = useCallback((dayIndex: number, category: string) => {
+    // Update local state immediately for instant UI feedback
     setActivities(prevActivities => {
       const newActivities = [...prevActivities];
       const currentStatus = newActivities[dayIndex].statuses[category];
@@ -117,6 +118,7 @@ export const useHabitActivities = (habitList?: string[]) => {
         }
       }
       
+      // Update the status immediately
       newActivities[dayIndex].statuses[category] = newStatus;
       
       // Get the date for this activity
@@ -124,14 +126,12 @@ export const useHabitActivities = (habitList?: string[]) => {
       const date = new Date(today);
       date.setDate(today.getDate() - dayIndex);
       
-      // Record the habit status change immediately
-      recordHabitActivity(category, newStatus, date);
-      
-      // Provide haptic feedback on status change
-      hapticSuccess();
-      
-      // Trigger refresh of stats when habits are updated
-      setRefreshTrigger(prev => prev + 1);
+      // Record the habit status change in background
+      requestAnimationFrame(() => {
+        recordHabitActivity(category, newStatus, date);
+        hapticSuccess();
+        setRefreshTrigger(prev => prev + 1);
+      });
       
       return newActivities;
     });

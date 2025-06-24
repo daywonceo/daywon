@@ -63,43 +63,44 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   const handleStatusToggle = useCallback((dayIndex: number, category: string) => {
     const currentStatus = activities[dayIndex].statuses[category];
     
-    // Always toggle status immediately for responsive UI
+    // ALWAYS toggle status first - no exceptions
     toggleStatus(dayIndex, category);
-
-    // Handle additional logic after the state update
-    if (currentStatus === "completed" && dayIndex === 0) {
-      // Check for recovery dialog only after status change
-      const currentStreak = calculateStreakForDate(category, activityDate);
-      
-      if (shouldShowRecoveryDialog(category, currentStreak)) {
-        // Delay the recovery dialog to not interfere with UI update
-        setTimeout(() => {
-          setRecoveryDialog({
-            isOpen: true,
-            habitName: category,
-            streakCount: currentStreak
-          });
-        }, 100);
-      }
-    }
     
-    // Show photo prompt for newly completed habits (today only)
-    if (currentStatus === "empty" && dayIndex === 0) {
-      const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
-      if (!hidePrompt) {
-        // Delay to ensure status change is rendered first
-        setTimeout(() => {
-          setPhotoPrompt({
-            isOpen: true,
-            habitName: category
+    // Only handle dialogs for today's activities
+    if (dayIndex === 0) {
+      // Handle recovery dialog for completed -> failed transition
+      if (currentStatus === "completed") {
+        const currentStreak = calculateStreakForDate(category, activityDate);
+        
+        if (shouldShowRecoveryDialog(category, currentStreak)) {
+          // Use requestAnimationFrame to ensure DOM update happens first
+          requestAnimationFrame(() => {
+            setRecoveryDialog({
+              isOpen: true,
+              habitName: category,
+              streakCount: currentStreak
+            });
           });
-        }, 200);
+        }
+      }
+      
+      // Handle photo prompt for empty -> completed transition
+      if (currentStatus === "empty") {
+        const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
+        if (!hidePrompt) {
+          // Use requestAnimationFrame to ensure DOM update happens first
+          requestAnimationFrame(() => {
+            setPhotoPrompt({
+              isOpen: true,
+              habitName: category
+            });
+          });
+        }
       }
     }
   }, [activities, activityIndex, activityDate, toggleStatus]);
 
   const handleRecoveryComplete = useCallback(() => {
-    // Keep the status as completed since streak was recovered
     setRecoveryDialog({
       isOpen: false,
       habitName: "",
@@ -114,11 +115,12 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       habitName: "",
       streakCount: 0
     });
-    // If user closes dialog without recovery, change back to failed
+    
+    // If user closes without recovery, toggle status back to failed
     if (habitName) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         toggleStatus(0, habitName);
-      }, 50);
+      });
     }
   }, [recoveryDialog.habitName, toggleStatus]);
 
