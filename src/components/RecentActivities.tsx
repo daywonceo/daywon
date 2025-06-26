@@ -1,5 +1,5 @@
 
-import React, { useEffect, useCallback } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useHabitActivities } from "@/hooks/useHabitActivities";
 import HabitActivityRow from "@/components/habit/HabitActivityRow";
@@ -19,49 +19,17 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
     toggleStatus,
     toggleEditMode,
     updateActivityText,
-    loadActivities,
   } = useHabitActivities(habitList);
 
-  // Refresh data when component mounts or when user returns to app
-  const refreshData = useCallback(() => {
-    console.log('Refreshing habit data...');
-    loadActivities();
-    onHabitUpdate?.();
-  }, [loadActivities, onHabitUpdate]);
-
   // Listen for habit changes to trigger parent updates
-  useEffect(() => {
+  React.useEffect(() => {
     const handleHabitChange = () => {
       onHabitUpdate?.();
     };
 
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // User returned to app, refresh data
-        refreshData();
-      }
-    };
-
-    const handleFocus = () => {
-      // App gained focus, refresh data
-      refreshData();
-    };
-
     window.addEventListener('habitStatusChanged', handleHabitChange);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-    
-    return () => {
-      window.removeEventListener('habitStatusChanged', handleHabitChange);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [onHabitUpdate, refreshData]);
-
-  // Initial data refresh on mount
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+    return () => window.removeEventListener('habitStatusChanged', handleHabitChange);
+  }, [onHabitUpdate]);
 
   return (
     <Card className="mb-8 sm:mb-12 border-green-200 shadow-md">

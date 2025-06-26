@@ -53,29 +53,6 @@ const Index = () => {
     }
   }, [topHabits, topHabitsLoading]);
 
-  // Auto-refresh data when user returns to app
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        console.log('App became visible, refreshing data...');
-        setRefreshTrigger(prev => prev + 1);
-      }
-    };
-
-    const handleFocus = () => {
-      console.log('App gained focus, refreshing data...');
-      setRefreshTrigger(prev => prev + 1);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []);
-
   // Simulate data loading
   const handleRefresh = async () => {
     setIsLoading(true);
