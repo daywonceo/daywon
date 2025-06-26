@@ -4,7 +4,6 @@ import { DayActivity } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate } from "@/utils/habitTracking";
 import { shouldShowRecoveryDialog } from "@/utils/streakRecovery";
 import StreakRecoveryDialog from "./StreakRecoveryDialog";
-import PhotoUploadPrompt from "./PhotoUploadPrompt";
 import ClickableDate from "./ClickableDate";
 import HabitStatusBox from "./HabitStatusBox";
 import ActivityTextDisplay from "./ActivityTextDisplay";
@@ -42,14 +41,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     streakCount: 0
   });
 
-  const [photoPrompt, setPhotoPrompt] = useState<{
-    isOpen: boolean;
-    habitName: string;
-  }>({
-    isOpen: false,
-    habitName: ""
-  });
-
   // Calculate the date for this activity row
   const getDateForActivity = (dayIndex: number) => {
     const today = new Date();
@@ -68,7 +59,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     // ALWAYS call toggleStatus first - this updates the UI immediately
     toggleStatus(dayIndex, category);
     
-    // Handle dialogs only for today's activities and only after UI update
+    // Handle recovery dialog only for today's activities and only after UI update
     if (dayIndex === 0) {
       // Use setTimeout to ensure the UI update completes first
       setTimeout(() => {
@@ -81,17 +72,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
               isOpen: true,
               habitName: category,
               streakCount: currentStreak
-            });
-          }
-        }
-        
-        // Handle photo prompt for empty -> completed transition
-        if (currentStatus === "empty") {
-          const hidePrompt = localStorage.getItem('hidePhotoPrompt') === 'true';
-          if (!hidePrompt) {
-            setPhotoPrompt({
-              isOpen: true,
-              habitName: category
             });
           }
         }
@@ -123,19 +103,13 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
     }
   }, [recoveryDialog.habitName, toggleStatus]);
 
-  const closePhotoPrompt = useCallback(() => {
-    setPhotoPrompt({ isOpen: false, habitName: "" });
-  }, []);
-
   return (
     <>
-      {/* Day number - now clickable for photo upload with better spacing */}
+      {/* Day number - simplified without photo upload capability */}
       <div className="flex items-center justify-center w-full">
         <ClickableDate
           day={activity.day}
           date={activityDate}
-          habitName={activity.categories[0]} // Use first habit for simplicity
-          onPhotoUpdate={() => {}} // Could trigger refresh if needed
         />
       </div>
       
@@ -163,14 +137,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
           onStatusToggle={handleStatusToggle}
         />
       ))}
-
-      {/* Photo Upload Prompt */}
-      <PhotoUploadPrompt
-        isOpen={photoPrompt.isOpen}
-        onClose={closePhotoPrompt}
-        habitName={photoPrompt.habitName}
-        activityDate={activityDate}
-      />
 
       {/* Streak Recovery Dialog */}
       <StreakRecoveryDialog
