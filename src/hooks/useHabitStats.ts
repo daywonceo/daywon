@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { getHabitActivities } from '@/utils/habitActivity';
-import { calculateStreakForDate } from '@/utils/habitStreaks';
+import { calculateStreakForDate, calculateOverallLongestStreak } from '@/utils/habitStreaks';
 
 export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
   const stats = useMemo(() => {
@@ -44,6 +44,9 @@ export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "R
     const bestStreak = Math.max(...currentStreaks.map(s => s.streak), 0);
     const bestStreakHabit = currentStreaks.find(s => s.streak === bestStreak)?.habit || '';
     
+    // Calculate overall longest streak ever achieved
+    const { streak: longestStreak, habitName: longestStreakHabit } = calculateOverallLongestStreak();
+    
     // Calculate total completed habits for today
     const todayStr = now.toISOString().split('T')[0];
     const todayCompletedCount = userHabits.filter(habit => {
@@ -62,7 +65,9 @@ export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "R
       streakStats: {
         bestStreak,
         bestStreakHabit,
-        currentStreaks
+        currentStreaks,
+        longestStreak,
+        longestStreakHabit
       },
       todayStats: {
         completedCount: todayCompletedCount,

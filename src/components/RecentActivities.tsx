@@ -19,6 +19,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
     toggleStatus,
     toggleEditMode,
     updateActivityText,
+    refreshActivities,
   } = useHabitActivities(habitList);
 
   // Listen for habit changes to trigger parent updates
@@ -27,9 +28,30 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
       onHabitUpdate?.();
     };
 
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // User returned to the app, refresh streak data
+        refreshActivities();
+        onHabitUpdate?.();
+      }
+    };
+
+    const handleFocus = () => {
+      // App gained focus, refresh data
+      refreshActivities();
+      onHabitUpdate?.();
+    };
+
     window.addEventListener('habitStatusChanged', handleHabitChange);
-    return () => window.removeEventListener('habitStatusChanged', handleHabitChange);
-  }, [onHabitUpdate]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('habitStatusChanged', handleHabitChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [onHabitUpdate, refreshActivities]);
 
   return (
     <Card className="mb-8 sm:mb-12 border-green-200 shadow-md">

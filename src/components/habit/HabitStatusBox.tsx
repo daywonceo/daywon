@@ -3,7 +3,7 @@ import React from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActivityStatus } from "@/hooks/useHabitActivities";
-import { calculateStreakForDate } from "@/utils/habitStreaks";
+import { calculateStreakForDate, formatStreakNumber } from "@/utils/habitStreaks";
 import { hasRecentRecovery } from "@/utils/streakRecovery";
 
 interface HabitStatusBoxProps {
@@ -38,6 +38,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   }
 
   const showStreak = streak >= 3;
+  const formattedStreak = formatStreakNumber(streak);
 
   return (
     <div
@@ -52,8 +53,8 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
       {status === "completed" && (
         <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
           {showStreak ? (
-            <span className="text-white font-bold text-xs sm:text-sm">
-              {streak}
+            <span className="text-white font-bold text-xs sm:text-sm leading-none">
+              {formattedStreak}
             </span>
           ) : (
             <>

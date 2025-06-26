@@ -89,6 +89,11 @@ export const useHabitActivities = (habitList?: string[]) => {
     }
   }, [userHabits.join(',')]);
 
+  const refreshActivities = useCallback(() => {
+    console.log('Refreshing activities and streak data...');
+    loadActivities();
+  }, [loadActivities]);
+
   const toggleStatus = useCallback((dayIndex: number, category: string) => {
     console.log(`Toggle status called: ${category} at day ${dayIndex}`);
     
@@ -173,5 +178,6 @@ export const useHabitActivities = (habitList?: string[]) => {
     toggleStatus,
     toggleEditMode,
     updateActivityText,
+    refreshActivities,
   };
 };

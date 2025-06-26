@@ -41,6 +41,29 @@ const Index = () => {
   // get top 3 habits and mutation
   const { topHabits, isLoading: topHabitsLoading, saveTopHabits, refetch } = useTopHabits();
 
+  // Auto-refresh data when app becomes visible or gains focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('App became visible, refreshing data...');
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+
+    const handleFocus = () => {
+      console.log('App gained focus, refreshing data...');
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   // Prompt user at the start of a new month (or if not set)
   useEffect(() => {
     const offlineData = getOfflineData();
