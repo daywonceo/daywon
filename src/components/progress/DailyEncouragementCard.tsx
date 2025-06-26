@@ -20,15 +20,32 @@ const DailyEncouragementCard: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
+  // Function to get the current "day" based on 3 AM EST cutoff
+  const getCurrentDay = () => {
+    const now = new Date();
+    
+    // Convert to EST (UTC-5) or EDT (UTC-4) - using a simple approach
+    // This accounts for daylight saving time roughly
+    const estOffset = -5; // EST is UTC-5
+    const estTime = new Date(now.getTime() + (estOffset * 60 * 60 * 1000));
+    
+    // If it's before 3 AM EST, use the previous day
+    if (estTime.getUTCHours() < 3) {
+      estTime.setUTCDate(estTime.getUTCDate() - 1);
+    }
+    
+    return estTime.toDateString();
+  };
+
   const dailyQuote = useMemo(async () => {
     try {
-      // Check if we have a cached quote for today
-      const today = new Date().toDateString();
+      // Check if we have a cached quote for today (based on 3 AM EST cutoff)
+      const currentDay = getCurrentDay();
       const cachedData = localStorage.getItem('dailyQuote');
       
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
-        if (parsed.date === today && parsed.quote) {
+        if (parsed.date === currentDay && parsed.quote) {
           return parsed.quote;
         }
       }
@@ -46,9 +63,9 @@ const DailyEncouragementCard: React.FC = () => {
         // Use quotes with authors if available, otherwise use all quotes
         const quotesSource = quotesWithAuthors.length > 0 ? quotesWithAuthors : quotes;
         
-        // Use date as seed for consistent daily quote
-        const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-        const selectedQuote = quotesSource[dayOfYear % quotesSource.length];
+        // Use current day as seed for consistent daily quote
+        const daysSinceEpoch = Math.floor(new Date(currentDay).getTime() / (1000 * 60 * 60 * 24));
+        const selectedQuote = quotesSource[daysSinceEpoch % quotesSource.length];
         
         const formattedQuote = {
           text: selectedQuote.text || selectedQuote.quote || "Every day is a new opportunity to grow.",
@@ -57,7 +74,7 @@ const DailyEncouragementCard: React.FC = () => {
 
         // Cache the quote for today
         localStorage.setItem('dailyQuote', JSON.stringify({
-          date: today,
+          date: currentDay,
           quote: formattedQuote
         }));
 
@@ -87,6 +104,27 @@ const DailyEncouragementCard: React.FC = () => {
       setIsSaved(isQuoteSaved);
     });
   }, [dailyQuote]);
+
+  // Set up interval to check for day change at 3 AM EST
+  useEffect(() => {
+    const checkForNewDay = () => {
+      const currentDay = getCurrentDay();
+      const cachedData = localStorage.getItem('dailyQuote');
+      
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        if (parsed.date !== currentDay) {
+          // It's a new day, reload the component
+          window.location.reload();
+        }
+      }
+    };
+
+    // Check every minute for day change
+    const interval = setInterval(checkForNewDay, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSaveQuote = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
