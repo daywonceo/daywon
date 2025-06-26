@@ -6,6 +6,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { calculateHabitStats, HabitStats as HabitStatsType } from "@/utils/habitStats";
 import { toast } from "@/hooks/use-toast";
 import HabitDetailModal from "@/components/habit/HabitDetailModal";
+import { getHabitActivities } from "@/utils/habitActivity";
+import { format, subDays, subMonths, subYears } from "date-fns";
 
 interface HabitStatsProps {
   refreshTrigger?: number; // Add prop to force refresh when habits change
@@ -18,11 +20,13 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
   const [inProgressHabits, setInProgressHabits] = useState<HabitStatsType[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<HabitStatsType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [completedHabits, setCompletedHabits] = useState<string[]>([]);
   const isMobile = useIsMobile();
   
   // Load habit statistics when component mounts, timeframe changes, or refreshTrigger changes
   useEffect(() => {
     loadHabitStats();
+    loadCompletedHabits();
   }, [timeframe, refreshTrigger]);
   
   const loadHabitStats = () => {
@@ -41,6 +45,41 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
     }
   };
 
+  const loadCompletedHabits = () => {
+    try {
+      const activities = getHabitActivities();
+      const now = new Date();
+      
+      // Determine the start date based on timeframe
+      let startDate: Date;
+      switch (timeframe) {
+        case "week":
+          startDate = subDays(now, 7);
+          break;
+        case "month":
+          startDate = subMonths(now, 1);
+          break;
+        case "year":
+          startDate = subYears(now, 1);
+          break;
+      }
+      
+      const startDateStr = startDate.toISOString().split('T')[0];
+      
+      // Filter activities by date and get unique completed habits
+      const completed = activities
+        .filter(activity => 
+          activity.date >= startDateStr && 
+          activity.status === "completed"
+        )
+        .map(activity => activity.habitName);
+      
+      setCompletedHabits([...new Set(completed)]);
+    } catch (error) {
+      console.error("Failed to load completed habits:", error);
+    }
+  };
+
   // Format score string (e.g., "21/30")
   const formatScore = (completed: number, total: number) => {
     return `${completed}/${total}`;
@@ -49,6 +88,17 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
   const handleHabitClick = (habit: HabitStatsType) => {
     setSelectedHabit(habit);
     setIsModalOpen(true);
+  };
+
+  const getTimeframePeriodText = () => {
+    switch (timeframe) {
+      case "week":
+        return "last 7 days";
+      case "month":
+        return "last 30 days";
+      case "year":
+        return "last 365 days";
+    }
   };
 
   const renderHabitSection = (habits: HabitStatsType[], title: string, emoji: string, colorClass: string) => {
@@ -116,6 +166,34 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
                 Year
               </button>
             </div>
+          </div>
+          
+          {/* Completed Habits Indicator */}
+          <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-emerald-800">
+                Completed Habits ({getTimeframePeriodText()})
+              </h3>
+              <span className="text-xs text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
+                {completedHabits.length} habits
+              </span>
+            </div>
+            {completedHabits.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {completedHabits.map((habit, index) => (
+                  <span 
+                    key={index}
+                    className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full border border-emerald-200"
+                  >
+                    {habit}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-emerald-600">
+                No habits completed in the {getTimeframePeriodText()}
+              </p>
+            )}
           </div>
         </CardHeader>
         
