@@ -23,7 +23,7 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
         </div>
         
         <div className="space-y-3">
-          <p className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
+          <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">
             {weeklyStats.percentage}%
           </p>
           

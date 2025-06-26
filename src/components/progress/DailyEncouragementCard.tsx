@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageSquare, Heart } from 'lucide-react';
@@ -159,10 +158,10 @@ const DailyEncouragementCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-purple-500 shadow-md">
+      <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-teal-500 shadow-md">
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-3">
-            <Heart className="h-5 w-5 text-purple-500" />
+            <Heart className="h-5 w-5 text-teal-500" />
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Daily Encouragement
             </h3>
@@ -178,7 +177,7 @@ const DailyEncouragementCard: React.FC = () => {
 
   return (
     <Card 
-      className="bg-white dark:bg-gray-800/50 border-t-4 border-t-purple-500 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+      className="bg-white dark:bg-gray-800/50 border-t-4 border-t-teal-500 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
       onClick={handleCardClick}
     >
       <CardContent className="p-4 sm:p-6">
@@ -192,7 +191,7 @@ const DailyEncouragementCard: React.FC = () => {
               className={`h-5 w-5 transition-colors ${
                 isSaved 
                   ? 'fill-red-500 text-red-500' 
-                  : 'text-purple-500 hover:text-red-500'
+                  : 'text-teal-500 hover:text-red-500'
               }`}
             />
           </button>
