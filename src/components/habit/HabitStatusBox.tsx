@@ -3,7 +3,7 @@ import React from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActivityStatus } from "@/hooks/useHabitActivities";
-import { calculateStreakForDate } from "@/utils/habitStreaks";
+import { calculateCurrentStreak, calculateStreakForDate, formatStreakDisplay } from "@/utils/habitStreaks";
 import { hasRecentRecovery } from "@/utils/streakRecovery";
 
 interface HabitStatusBoxProps {
@@ -23,9 +23,19 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   activeHabit,
   onStatusToggle,
 }) => {
-  let streak = status === "completed" 
-    ? calculateStreakForDate(category, activityDate) 
-    : 0;
+  // For today's activities (index 0), show current streak
+  // For past activities, show streak as of that date
+  let streak = 0;
+  
+  if (status === "completed") {
+    if (activityIndex === 0) {
+      // Today - show current streak
+      streak = calculateCurrentStreak(category);
+    } else {
+      // Past date - show streak as of that date
+      streak = calculateStreakForDate(category, activityDate);
+    }
+  }
 
   // Check for recovery that might restore the streak
   if (status === "completed" && hasRecentRecovery(category, activityDate)) {
@@ -38,6 +48,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   }
 
   const showStreak = streak >= 3;
+  const formattedStreak = formatStreakDisplay(streak);
 
   return (
     <div
@@ -53,7 +64,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
         <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
           {showStreak ? (
             <span className="text-white font-bold text-xs sm:text-sm">
-              {streak}
+              {formattedStreak}
             </span>
           ) : (
             <>

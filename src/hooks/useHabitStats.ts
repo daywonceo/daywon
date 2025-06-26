@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { getHabitActivities } from '@/utils/habitActivity';
-import { calculateStreakForDate } from '@/utils/habitStreaks';
+import { calculateCurrentStreak, calculateBestStreak } from '@/utils/habitStreaks';
 
 export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
   const stats = useMemo(() => {
@@ -37,12 +37,17 @@ export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "R
     // Calculate current streaks for all habits
     const currentStreaks = userHabits.map(habit => ({
       habit,
-      streak: calculateStreakForDate(habit, now)
+      current: calculateCurrentStreak(habit),
+      best: calculateBestStreak(habit)
     }));
     
-    // Find the best (longest) current streak
-    const bestStreak = Math.max(...currentStreaks.map(s => s.streak), 0);
-    const bestStreakHabit = currentStreaks.find(s => s.streak === bestStreak)?.habit || '';
+    // Find the best current streak
+    const bestCurrentStreak = Math.max(...currentStreaks.map(s => s.current), 0);
+    const bestCurrentStreakHabit = currentStreaks.find(s => s.current === bestCurrentStreak)?.habit || '';
+    
+    // Find the best all-time streak
+    const bestAllTimeStreak = Math.max(...currentStreaks.map(s => s.best), 0);
+    const bestAllTimeStreakHabit = currentStreaks.find(s => s.best === bestAllTimeStreak)?.habit || '';
     
     // Calculate total completed habits for today
     const todayStr = now.toISOString().split('T')[0];
@@ -60,8 +65,10 @@ export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "R
         percentage: weeklyCompletionRate
       },
       streakStats: {
-        bestStreak,
-        bestStreakHabit,
+        bestStreak: bestCurrentStreak,
+        bestStreakHabit: bestCurrentStreakHabit,
+        bestAllTimeStreak,
+        bestAllTimeStreakHabit,
         currentStreaks
       },
       todayStats: {

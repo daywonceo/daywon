@@ -27,6 +27,7 @@ export const useHabitActivities = (habitList?: string[]) => {
 
   const loadActivities = useCallback(() => {
     try {
+      console.log('Loading activities...');
       // Auto-activate habits that have been completed recently
       autoActivateRecentHabits();
       
@@ -43,6 +44,7 @@ export const useHabitActivities = (habitList?: string[]) => {
       
       // Get all habit activities from storage
       const storedActivities = getHabitActivities();
+      console.log('Loaded stored activities:', storedActivities.length);
       
       // Create activities for the past 3 days
       const newActivities = dates.map((date, index) => {
@@ -79,6 +81,7 @@ export const useHabitActivities = (habitList?: string[]) => {
       });
       
       setActivities(newActivities);
+      console.log('Activities loaded successfully');
     } catch (error) {
       console.error("Failed to load activities:", error);
       toast({
@@ -173,5 +176,6 @@ export const useHabitActivities = (habitList?: string[]) => {
     toggleStatus,
     toggleEditMode,
     updateActivityText,
+    loadActivities, // Expose loadActivities for manual refresh
   };
 };
