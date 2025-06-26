@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Flame } from 'lucide-react';
+import { Calendar, CheckCircle } from 'lucide-react';
 import { useHabitStats } from '@/hooks/useHabitStats';
 
 interface TodayProgressSummaryProps {
@@ -31,15 +31,12 @@ const TodayProgressSummary: React.FC<TodayProgressSummaryProps> = ({ userHabits 
               </p>
               <p className="text-xs text-gray-500">habits</p>
             </div>
-            {streakStats.bestAllTimeStreak > 0 && (
+            {streakStats.bestStreak > 0 && (
               <div className="text-right border-l border-gray-200 dark:border-gray-600 pl-3">
-                <div className="flex items-center gap-1">
-                  <Flame className="h-3 w-3 text-orange-500" />
-                  <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                    {streakStats.bestAllTimeStreak}
-                  </p>
-                </div>
-                <p className="text-xs text-gray-500">longest streak</p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  {streakStats.bestStreak}
+                </p>
+                <p className="text-xs text-gray-500">best streak</p>
               </div>
             )}
           </div>
