@@ -6,6 +6,7 @@ import ListView from "@/components/calendar/ListView";
 import HistoryView from "@/components/calendar/HistoryView";
 import HabitCalendarView from "@/components/calendar/HabitCalendarView";
 import { useTopHabits } from "@/hooks/useTopHabits";
+import { useHabitActivities } from "@/hooks/useHabitActivities";
 
 const CalendarPage = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -15,6 +16,8 @@ const CalendarPage = () => {
   const userHabits = topHabits && topHabits.length === 3
     ? topHabits
     : ["WORKOUT", "DEVOTIONS", "READ"];
+
+  const { activities } = useHabitActivities(userHabits);
 
   const handleDateClick = (selectedDate: Date) => {
     console.log("Date clicked:", selectedDate);
@@ -54,7 +57,7 @@ const CalendarPage = () => {
           </TabsContent>
 
           <TabsContent value="list" className="space-y-6">
-            <ListView />
+            <ListView activities={activities} />
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6">
