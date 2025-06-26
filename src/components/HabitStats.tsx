@@ -51,6 +51,10 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
     setIsModalOpen(true);
   };
 
+  const handleTimeframeChange = (newTimeframe: "week" | "month" | "year") => {
+    setTimeframe(newTimeframe);
+  };
+
   const renderHabitSection = (habits: HabitStatsType[], title: string, emoji: string, colorClass: string) => {
     if (habits.length === 0) {
       return (
@@ -98,20 +102,32 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
             <h2 className="text-xl sm:text-2xl font-bold text-green-800">HABIT PERFORMANCE</h2>
             <div className="flex bg-green-50 rounded-md p-1 text-sm sm:text-base overflow-hidden">
               <button 
-                className={`px-3 py-2 rounded-md flex-1 ${timeframe === 'week' ? 'bg-white shadow-sm' : ''}`}
-                onClick={() => setTimeframe('week')}
+                className={`px-3 py-2 rounded-md flex-1 transition-all ${
+                  timeframe === 'week' 
+                    ? 'bg-white shadow-sm text-green-700 font-medium' 
+                    : 'text-gray-600 hover:text-green-600'
+                }`}
+                onClick={() => handleTimeframeChange('week')}
               >
                 Week
               </button>
               <button 
-                className={`px-3 py-2 rounded-md flex-1 ${timeframe === 'month' ? 'bg-white shadow-sm' : ''}`}
-                onClick={() => setTimeframe('month')}
+                className={`px-3 py-2 rounded-md flex-1 transition-all ${
+                  timeframe === 'month' 
+                    ? 'bg-white shadow-sm text-green-700 font-medium' 
+                    : 'text-gray-600 hover:text-green-600'
+                }`}
+                onClick={() => handleTimeframeChange('month')}
               >
                 Month
               </button>
               <button 
-                className={`px-3 py-2 rounded-md flex-1 ${timeframe === 'year' ? 'bg-white shadow-sm' : ''}`}
-                onClick={() => setTimeframe('year')}
+                className={`px-3 py-2 rounded-md flex-1 transition-all ${
+                  timeframe === 'year' 
+                    ? 'bg-white shadow-sm text-green-700 font-medium' 
+                    : 'text-gray-600 hover:text-green-600'
+                }`}
+                onClick={() => handleTimeframeChange('year')}
               >
                 Year
               </button>
