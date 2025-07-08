@@ -2,6 +2,7 @@
 import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { addMonths, subMonths, format, startOfMonth, endOfMonth } from "date-fns";
+import { getHabitActivities } from "@/utils/habitActivity";
 
 interface CalendarViewProps {
   date: Date | undefined;
@@ -18,12 +19,30 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
     }
   };
 
-  // Mock function to determine if a date has activity
-  const hasActivity = (date: Date) => {
-    // This would check your actual data sources
-    const today = new Date();
-    const daysDiff = Math.abs(today.getTime() - date.getTime()) / (1000 * 3600 * 24);
-    return daysDiff <= 7; // Show activity for last 7 days as example
+  // Get habit completion count for a specific date
+  const getHabitCompletionCount = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const habitActivities = getHabitActivities();
+    
+    return habitActivities.filter(activity => 
+      activity.date === dateStr && activity.status === 'completed'
+    ).length;
+  };
+
+  // Determine background color based on habit completion count
+  const getHabitBackgroundColor = (habitCount: number) => {
+    if (habitCount === 0) return '';
+    if (habitCount <= 2) return 'bg-green-100 dark:bg-green-900/20';
+    if (habitCount <= 4) return 'bg-green-200 dark:bg-green-900/40';
+    return 'bg-green-300 dark:bg-green-900/60';
+  };
+
+  // Get text color that contrasts well with the background
+  const getTextColor = (habitCount: number) => {
+    if (habitCount === 0) return '';
+    if (habitCount <= 2) return 'text-green-800 dark:text-green-200';
+    if (habitCount <= 4) return 'text-green-900 dark:text-green-100';
+    return 'text-green-950 dark:text-green-50';
   };
 
   const getCalendarMonths = () => {
@@ -70,8 +89,11 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
           }}
           components={{
             Day: ({ date: dayDate, ...props }) => {
-              const hasActivityToday = hasActivity(dayDate);
+              const habitCount = getHabitCompletionCount(dayDate);
               const isToday = dayDate.toDateString() === new Date().toDateString();
+              const backgroundColorClass = getHabitBackgroundColor(habitCount);
+              const textColorClass = getTextColor(habitCount);
+              
               return (
                 <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
                   <button 
@@ -80,12 +102,12 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                     className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
                       isToday 
                         ? 'bg-accent text-accent-foreground border-2 border-primary/50 shadow-sm' 
-                        : 'border-2 border-border hover:border-accent hover:bg-accent/50'
+                        : `${backgroundColorClass} ${textColorClass} border-2 border-border hover:border-accent hover:bg-accent/50`
                     }`}
                   >
                     {dayDate.getDate()}
                   </button>
-                  {hasActivityToday && (
+                  {habitCount > 0 && (
                     <div className="absolute bottom-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-primary rounded-full shadow-sm"></div>
                   )}
                 </div>
@@ -127,8 +149,11 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
               }}
               components={{
                 Day: ({ date: dayDate, ...props }) => {
-                  const hasActivityToday = hasActivity(dayDate);
+                  const habitCount = getHabitCompletionCount(dayDate);
                   const isToday = dayDate.toDateString() === new Date().toDateString();
+                  const backgroundColorClass = getHabitBackgroundColor(habitCount);
+                  const textColorClass = getTextColor(habitCount);
+                  
                   return (
                     <div className="relative h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center">
                       <button 
@@ -137,12 +162,12 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                         className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
                           isToday 
                             ? 'bg-accent text-accent-foreground border border-primary/50' 
-                            : 'border border-border hover:border-accent hover:bg-accent/50'
+                            : `${backgroundColorClass} ${textColorClass} border border-border hover:border-accent hover:bg-accent/50`
                         }`}
                       >
                         {dayDate.getDate()}
                       </button>
-                      {hasActivityToday && (
+                      {habitCount > 0 && (
                         <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 bg-primary rounded-full shadow-sm"></div>
                       )}
                     </div>
