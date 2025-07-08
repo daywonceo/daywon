@@ -162,8 +162,8 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
             </p>
           </div>
           
-          <div className="flex justify-between pt-4">
-            <Button variant="outline" onClick={onBack}>
+          <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+            <Button variant="outline" onClick={onBack} className="order-2 sm:order-1">
               <ChevronLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
@@ -171,11 +171,10 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
             <Button 
               onClick={handleComplete}
               disabled={isLoading}
-              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              size="lg"
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 order-1 sm:order-2"
             >
               {isLoading ? "Getting Started..." : "Start My Journey"}
-              <Sparkles className="w-5 h-5 ml-2" />
+              <Sparkles className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </CardContent>
