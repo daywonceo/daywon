@@ -23,6 +23,8 @@ import { OfflineIndicator } from "./utils/offlineStorage";
 import { useState, useEffect } from "react";
 import OnboardingFlow, { OnboardingData } from "./components/onboarding/OnboardingFlow";
 import { useAuth } from "./contexts/AuthContext";
+import { useAppTimeTracking } from "./hooks/useAppTimeTracking";
+import { useAppSessions } from "./hooks/useAppSessions";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,25 @@ const setupReducedMotion = () => {
     document.documentElement.classList.add('reduce-motion');
     localStorage.setItem('reducedMotion', 'true');
   }
+};
+
+// Component that handles time tracking integration
+const TimeTrackingWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { sessionTime, sectionTimes } = useAppTimeTracking();
+  const { saveSession } = useAppSessions();
+  
+  // Save to database periodically
+  useEffect(() => {
+    if (sessionTime > 0) {
+      const interval = setInterval(() => {
+        saveSession(sessionTime, sectionTimes);
+      }, 60000); // Save every minute
+      
+      return () => clearInterval(interval);
+    }
+  }, [sessionTime, sectionTimes, saveSession]);
+  
+  return <>{children}</>;
 };
 
 const AppContent: React.FC = () => {
@@ -86,20 +107,22 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/social" element={<Social />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/calendar" element={<CalendarPage />} />
-      <Route path="/guidance" element={<Guidance />} />
-      <Route path="/premium" element={<GoPremium />} />
-      <Route path="/onboarding" element={<GoOnboarding />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/saved-quotes" element={<SavedQuotes />} />
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <TimeTrackingWrapper>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/social" element={<Social />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/guidance" element={<Guidance />} />
+        <Route path="/premium" element={<GoPremium />} />
+        <Route path="/onboarding" element={<GoOnboarding />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/saved-quotes" element={<SavedQuotes />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </TimeTrackingWrapper>
   );
 };
 

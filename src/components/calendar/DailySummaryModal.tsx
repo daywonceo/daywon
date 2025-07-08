@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -35,8 +35,41 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
       streak: calculateStreakForDate(activity.habitName, date)
     }));
 
-  // Calculate estimated time spent (placeholder logic)
-  const timeSpentMinutes = completedHabits.length * 15; // Estimate 15 minutes per completed habit
+  // Get real time spent from app sessions
+  const [actualTimeSpent, setActualTimeSpent] = useState<number>(0);
+  const [sectionBreakdown, setSectionBreakdown] = useState<Record<string, number>>({});
+  
+  useEffect(() => {
+    const getSessionData = async () => {
+      if (!date) return;
+      
+      const dateStr = date.toISOString().split('T')[0];
+      const stored = localStorage.getItem('appTimeSession');
+      
+      // Check if it's today's data
+      const today = new Date().toISOString().split('T')[0];
+      if (dateStr === today && stored) {
+        try {
+          const data = JSON.parse(stored);
+          if (data.date === today) {
+            setActualTimeSpent(Math.round(data.totalTime || 0));
+            setSectionBreakdown(data.sections || {});
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing stored session data:', error);
+        }
+      }
+      
+      // For past dates, try to fetch from Supabase (when implemented)
+      // For now, fall back to estimation
+      const estimatedTime = completedHabits.length * 15;
+      setActualTimeSpent(estimatedTime);
+      setSectionBreakdown({});
+    };
+    
+    getSessionData();
+  }, [date, completedHabits.length]);
 
   // Mock guidance activities and saved resources - these would come from actual data sources
   const guidanceActivities = [
@@ -137,8 +170,33 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
               Estimated Time Spent
             </h3>
             <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-              <span className="text-sm font-medium">{timeSpentMinutes} minutes</span>
-              <p className="text-xs text-muted-foreground mt-1">Based on completed habits</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">{actualTimeSpent} minutes</span>
+                {actualTimeSpent > 0 && (
+                  <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                    {Math.round(actualTimeSpent / 60 * 10) / 10}h
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {Object.keys(sectionBreakdown).length > 0 ? 'Actual time tracked' : 'Estimated based on activity'}
+              </p>
+              
+              {/* Section breakdown */}
+              {Object.keys(sectionBreakdown).length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {Object.entries(sectionBreakdown)
+                    .filter(([_, time]) => time > 0)
+                    .sort(([_, a], [__, b]) => b - a)
+                    .slice(0, 3) // Show top 3 sections
+                    .map(([section, time]) => (
+                      <div key={section} className="flex justify-between text-xs text-muted-foreground">
+                        <span>{section}:</span>
+                        <span>{Math.round(time)}m</span>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
 

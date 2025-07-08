@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          section_breakdown: Json | null
+          session_date: string
+          total_time_minutes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          section_breakdown?: Json | null
+          session_date: string
+          total_time_minutes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          section_breakdown?: Json | null
+          session_date?: string
+          total_time_minutes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercise_logs: {
         Row: {
           created_at: string
