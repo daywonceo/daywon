@@ -75,7 +75,8 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
               return (
                 <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
                   <button 
-                    {...props} 
+                    {...props}
+                    onClick={() => handleDayClick(dayDate)}
                     className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
                       isToday 
                         ? 'bg-accent text-accent-foreground border-2 border-primary/50 shadow-sm' 
@@ -131,7 +132,8 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                   return (
                     <div className="relative h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center">
                       <button 
-                        {...props} 
+                        {...props}
+                        onClick={() => handleDayClick(dayDate)}
                         className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
                           isToday 
                             ? 'bg-accent text-accent-foreground border border-primary/50' 
