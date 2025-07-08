@@ -16,6 +16,7 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
     const targetDateStr = targetDate.toISOString().split('T')[0];
     
     console.log(`Calculating streak for ${habitName} on ${targetDateStr}`);
+    console.log(`All habit activities in storage:`, activities);
     
     // Filter activities for this habit, sorted by date (newest first)
     const habitActivities = activities
