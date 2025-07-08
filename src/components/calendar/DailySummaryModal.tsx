@@ -3,10 +3,12 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Clock, CheckCircle, Heart, BookOpen, ChefHat, Dumbbell, Calendar, Trophy, Target } from "lucide-react";
+import { Clock, CheckCircle, Heart, BookOpen, ChefHat, Dumbbell, Calendar, Trophy, Target, Scroll, Church, Play, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { getHabitActivities } from "@/utils/habitActivity";
 import { calculateStreakForDate } from "@/utils/habitStreaks";
+import { useGuidanceActivity } from "@/hooks/useGuidanceActivity";
+import { useAppSessions } from "@/hooks/useAppSessions";
 
 interface DailySummaryModalProps {
   date: Date | null;
@@ -35,7 +37,9 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
       streak: calculateStreakForDate(activity.habitName, date)
     }));
 
-  // Get real time spent from app sessions
+  // Get real time spent and guidance activities
+  const { getSessionForDate } = useAppSessions();
+  const { activities: guidanceActivities, loading: guidanceLoading } = useGuidanceActivity(dateStr);
   const [actualTimeSpent, setActualTimeSpent] = useState<number>(0);
   const [sectionBreakdown, setSectionBreakdown] = useState<Record<string, number>>({});
   
@@ -61,34 +65,39 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
         }
       }
       
-      // For past dates, try to fetch from Supabase (when implemented)
-      // For now, fall back to estimation
-      const estimatedTime = completedHabits.length * 15;
-      setActualTimeSpent(estimatedTime);
-      setSectionBreakdown({});
+      // For past dates, try to fetch from Supabase
+      try {
+        const sessionData = await getSessionForDate(dateStr);
+        if (sessionData) {
+          setActualTimeSpent(sessionData.total_time_minutes);
+          setSectionBreakdown(sessionData.section_breakdown as Record<string, number> || {});
+        } else {
+          // Fall back to estimation
+          const estimatedTime = completedHabits.length * 15;
+          setActualTimeSpent(estimatedTime);
+          setSectionBreakdown({});
+        }
+      } catch (error) {
+        console.error('Error fetching session data:', error);
+        // Fall back to estimation
+        const estimatedTime = completedHabits.length * 15;
+        setActualTimeSpent(estimatedTime);
+        setSectionBreakdown({});
+      }
     };
     
     getSessionData();
-  }, [date, completedHabits.length]);
-
-  // Mock guidance activities and saved resources - these would come from actual data sources
-  const guidanceActivities = [
-    "Completed daily devotion",
-    "Saved inspirational verse",
-    "Completed workout session"
-  ];
-
-  const savedResources = [
-    { type: "verse", title: "Daily Verse Reading" },
-    { type: "recipe", title: "Healthy Meal Recipe" },
-    { type: "workout", title: "Daily Workout" }
-  ];
+  }, [date, completedHabits.length, getSessionForDate]);
 
   const formatDate = (date: Date) => {
     return format(date, "EEEE, MMMM d, yyyy");
   };
 
-  const getResourceIcon = (type: string) => {
+  const formatTime = (timestamp: string) => {
+    return format(new Date(timestamp), "h:mm a");
+  };
+
+  const getActivityIcon = (type: string) => {
     switch (type) {
       case "verse":
         return <BookOpen className="h-4 w-4 text-purple-500" />;
@@ -96,8 +105,42 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
         return <ChefHat className="h-4 w-4 text-orange-500" />;
       case "workout":
         return <Dumbbell className="h-4 w-4 text-blue-500" />;
+      case "reflection":
+        return <MessageCircle className="h-4 w-4 text-teal-500" />;
+      case "devotion":
+        return <Church className="h-4 w-4 text-purple-600" />;
+      case "sermon":
+        return <Play className="h-4 w-4 text-indigo-500" />;
       default:
         return <Heart className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // Group activities by type
+  const groupedActivities = guidanceActivities.reduce((acc, activity) => {
+    if (!acc[activity.type]) {
+      acc[activity.type] = [];
+    }
+    acc[activity.type].push(activity);
+    return acc;
+  }, {} as Record<string, typeof guidanceActivities>);
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case "verse":
+        return "Bible Verses";
+      case "recipe":
+        return "Recipes";
+      case "workout":
+        return "Workouts";
+      case "reflection":
+        return "Reflections";
+      case "devotion":
+        return "Devotions";
+      case "sermon":
+        return "Sermons";
+      default:
+        return type;
     }
   };
 
@@ -167,7 +210,7 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
           <div>
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <Clock className="h-5 w-5 text-blue-500" />
-              Estimated Time Spent
+              Time Spent
             </h3>
             <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
@@ -208,37 +251,57 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
               <Heart className="h-5 w-5 text-purple-500" />
               Guidance Activities
             </h3>
-            {guidanceActivities.length > 0 ? (
-              <div className="space-y-2">
-                {guidanceActivities.map((activity, index) => (
-                  <div key={index} className="text-sm bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border border-purple-200 dark:border-purple-800">
-                    {activity}
+            {guidanceLoading ? (
+              <p className="text-sm text-muted-foreground">Loading activities...</p>
+            ) : guidanceActivities.length > 0 ? (
+              <div className="space-y-4">
+                {Object.entries(groupedActivities).map(([type, activities]) => (
+                  <div key={type} className="space-y-2">
+                    <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      {getActivityIcon(type)}
+                      {getTypeLabel(type)}
+                    </h4>
+                    <div className="space-y-2">
+                      {activities.map((activity) => (
+                        <div key={activity.id} className="bg-accent/30 p-3 rounded-lg border border-border">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-sm font-medium">{activity.title}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatTime(activity.timestamp)}
+                                </span>
+                              </div>
+                              {activity.reference && (
+                                <div className="text-xs text-muted-foreground mb-1">
+                                  {activity.reference}
+                                </div>
+                              )}
+                              {activity.details && (
+                                <div className="text-xs text-muted-foreground">
+                                  {activity.details}
+                                </div>
+                              )}
+                              {activity.duration && (
+                                <div className="text-xs text-muted-foreground">
+                                  Duration: {activity.duration} minutes
+                                </div>
+                              )}
+                            </div>
+                            {activity.category && (
+                              <Badge variant="outline" className="text-xs">
+                                {activity.category}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">No guidance activities this day</p>
-            )}
-          </div>
-
-          <Separator />
-
-          {/* Saved Resources */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-3">
-              Saved/Completed Resources
-            </h3>
-            {savedResources.length > 0 ? (
-              <div className="space-y-2">
-                {savedResources.map((resource, index) => (
-                  <div key={index} className="flex items-center gap-3 bg-accent/50 p-3 rounded-lg border border-border">
-                    {getResourceIcon(resource.type)}
-                    <span className="text-sm font-medium">{resource.title}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No resources saved this day</p>
             )}
           </div>
         </div>
