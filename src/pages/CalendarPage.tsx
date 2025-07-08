@@ -34,24 +34,24 @@ const CalendarPage = () => {
       <Header />
       
       {/* Hero Section - Mobile Optimized */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary-foreground to-primary text-white">
-        <div className="absolute inset-0 bg-black/5"></div>
+      <div className="relative overflow-hidden bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100">
+        <div className="absolute inset-0 bg-green-100/30 dark:bg-green-900/10"></div>
         
         {/* Decorative elements - minimalist */}
-        <div className="absolute top-4 right-8 w-20 h-20 bg-white/10 rounded-full hidden sm:block"></div>
-        <div className="absolute bottom-4 left-8 w-16 h-16 bg-white/10 rounded-full hidden sm:block"></div>
+        <div className="absolute top-4 right-8 w-20 h-20 bg-green-200/20 dark:bg-green-800/20 rounded-full hidden sm:block"></div>
+        <div className="absolute bottom-4 left-8 w-16 h-16 bg-green-200/20 dark:bg-green-800/20 rounded-full hidden sm:block"></div>
         
         <div className="relative px-4 sm:px-6 py-8 sm:py-12 max-w-4xl mx-auto w-full">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm border border-white/10">
-                <Calendar className="h-6 w-6 sm:h-7 sm:w-7" />
+              <div className="p-3 bg-green-200/30 dark:bg-green-800/30 rounded-lg backdrop-blur-sm border border-green-300/20 dark:border-green-700/20">
+                <Calendar className="h-6 w-6 sm:h-7 sm:w-7 text-green-700 dark:text-green-300" />
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
                 Calendar
               </h1>
             </div>
-            <p className="text-center text-white/90 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="text-center text-green-800/80 dark:text-green-200/80 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
               Track your journey and build lasting habits one day at a time
             </p>
           </div>
