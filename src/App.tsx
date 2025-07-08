@@ -42,12 +42,11 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     setupReducedMotion();
     
-    // Set onboarding as completed by default to skip it
+    // Check if onboarding should be shown
     if (user && !loading) {
       const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-      if (!onboardingCompleted) {
-        localStorage.setItem('onboardingCompleted', 'true');
-      }
+      const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
+      setShowOnboarding(shouldShowOnboarding);
     }
   }, [user, loading]);
 
