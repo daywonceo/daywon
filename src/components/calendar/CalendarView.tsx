@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { addMonths, subMonths, format, startOfMonth, endOfMonth } from "date-fns";
 import { getHabitActivities } from "@/utils/habitActivity";
@@ -13,6 +13,18 @@ interface CalendarViewProps {
 }
 
 const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewProps) => {
+  // Animation state management
+  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState<'left' | 'right' | null>(null);
+
+  // Update current month when date changes externally
+  useEffect(() => {
+    if (date) {
+      setCurrentMonth(startOfMonth(date));
+    }
+  }, [date]);
+
   const handleDayClick = (selectedDate: Date | undefined) => {
     if (selectedDate) {
       setDate(selectedDate);
@@ -46,6 +58,29 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
     return 'text-green-950 dark:text-green-50';
   };
 
+  // Custom month navigation with animation
+  const handleMonthNavigation = async (direction: 'prev' | 'next') => {
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setTransitionDirection(direction === 'prev' ? 'right' : 'left');
+    
+    // Wait for fade out animation
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
+    const newMonth = direction === 'prev' 
+      ? subMonths(currentMonth, 1)
+      : addMonths(currentMonth, 1);
+    
+    setCurrentMonth(newMonth);
+    
+    // Wait for fade in animation
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
+    setIsTransitioning(false);
+    setTransitionDirection(null);
+  };
+
   const getCalendarMonths = () => {
     const today = new Date();
     const currentMonth = startOfMonth(today);
@@ -67,60 +102,94 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
   const months = getCalendarMonths();
 
   if (timePeriod === "current") {
-    // Single month view for current month - Mobile Optimized
+    // Single month view with smooth animations
     return (
-      <div className="flex justify-center">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleDayClick}
-          className="rounded-xl border-0 p-0 w-full"
-          classNames={{
-            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
-            month: "space-y-4 w-full",
-            caption: "flex justify-center pt-2 sm:pt-3 relative items-center text-foreground font-semibold text-lg sm:text-xl mb-4",
-            nav_button: "h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border",
-            day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-lg shadow-md border-2 border-primary",
-            day_today: "bg-accent text-accent-foreground font-semibold rounded-lg border-2 border-primary/50 shadow-sm",
-            day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-green-700 dark:border-green-600 hover:border-green-500 text-sm sm:text-base",
-            head_cell: "text-muted-foreground rounded-md w-10 sm:w-12 font-semibold text-xs sm:text-sm uppercase tracking-wide py-2",
-            table: "w-full border-collapse space-y-2",
-            head_row: "flex mb-3 sm:mb-4",
-            row: "flex w-full mt-1 sm:mt-2 gap-1 sm:gap-2",
-          }}
-          components={{
-            Day: ({ date: dayDate, ...props }) => {
-              const habitCount = getHabitCompletionCount(dayDate);
-              const isToday = dayDate.toDateString() === new Date().toDateString();
-              const backgroundColorClass = getHabitBackgroundColor(habitCount);
-              const textColorClass = getTextColor(habitCount);
-              
-              return (
-                <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
-                  <button 
-                    {...props}
-                    onClick={() => handleDayClick(dayDate)}
-                    className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
-                      isToday 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 border-3 border-green-500 dark:border-green-400 shadow-lg font-bold ring-2 ring-green-200 dark:ring-green-800' 
-                        : `${backgroundColorClass} ${textColorClass} border-2 border-green-700 dark:border-green-600 hover:border-green-500 hover:bg-accent/50`
-                    }`}
+      <div className="flex justify-center overflow-hidden">
+        <div className="relative w-full">
+          {/* Custom animated calendar container */}
+          <div 
+            className={`transition-all duration-300 ease-in-out ${
+              isTransitioning 
+                ? `opacity-0 ${transitionDirection === 'left' ? '-translate-x-8' : 'translate-x-8'} scale-95` 
+                : 'opacity-100 translate-x-0 scale-100'
+            }`}
+          >
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleDayClick}
+              month={currentMonth}
+              className="rounded-xl border-0 p-0 w-full"
+              classNames={{
+                months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
+                month: "space-y-4 w-full",
+                caption: "flex justify-center pt-2 sm:pt-3 relative items-center text-foreground font-semibold text-lg sm:text-xl mb-4",
+                nav_button: "h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105",
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-lg shadow-md border-2 border-primary",
+                day_today: "bg-accent text-accent-foreground font-semibold rounded-lg border-2 border-primary/50 shadow-sm",
+                day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-green-700 dark:border-green-600 hover:border-green-500 text-sm sm:text-base",
+                head_cell: "text-muted-foreground rounded-md w-10 sm:w-12 font-semibold text-xs sm:text-sm uppercase tracking-wide py-2",
+                table: "w-full border-collapse space-y-2",
+                head_row: "flex mb-3 sm:mb-4",
+                row: "flex w-full mt-1 sm:mt-2 gap-1 sm:gap-2",
+              }}
+              components={{
+                IconLeft: () => (
+                  <button
+                    onClick={() => handleMonthNavigation('prev')}
+                    disabled={isTransitioning}
+                    className="h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    <div className="flex items-center justify-center relative">
-                      {dayDate.getDate()}
-                      {isToday && (
-                        <Leaf className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-600 dark:text-green-400" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                ),
+                IconRight: () => (
+                  <button
+                    onClick={() => handleMonthNavigation('next')}
+                    disabled={isTransitioning}
+                    className="h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                ),
+                Day: ({ date: dayDate, ...props }) => {
+                  const habitCount = getHabitCompletionCount(dayDate);
+                  const isToday = dayDate.toDateString() === new Date().toDateString();
+                  const backgroundColorClass = getHabitBackgroundColor(habitCount);
+                  const textColorClass = getTextColor(habitCount);
+                  
+                  return (
+                    <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
+                      <button 
+                        {...props}
+                        onClick={() => handleDayClick(dayDate)}
+                        className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
+                          isToday 
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 border-3 border-green-500 dark:border-green-400 shadow-lg font-bold ring-2 ring-green-200 dark:ring-green-800' 
+                            : `${backgroundColorClass} ${textColorClass} border-2 border-green-700 dark:border-green-600 hover:border-green-500 hover:bg-accent/50`
+                        }`}
+                      >
+                        <div className="flex items-center justify-center relative">
+                          {dayDate.getDate()}
+                          {isToday && (
+                            <Leaf className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-600 dark:text-green-400" />
+                          )}
+                        </div>
+                      </button>
+                      {habitCount > 0 && (
+                        <div className="absolute bottom-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-primary rounded-full shadow-sm animate-pulse"></div>
                       )}
                     </div>
-                  </button>
-                  {habitCount > 0 && (
-                    <div className="absolute bottom-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-primary rounded-full shadow-sm"></div>
-                  )}
-                </div>
-              );
-            },
-          }}
-        />
+                  );
+                },
+              }}
+            />
+          </div>
+        </div>
       </div>
     );
   }
