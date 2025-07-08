@@ -3,6 +3,7 @@ import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { addMonths, subMonths, format, startOfMonth, endOfMonth } from "date-fns";
 import { getHabitActivities } from "@/utils/habitActivity";
+import { Leaf } from "lucide-react";
 
 interface CalendarViewProps {
   date: Date | undefined;
@@ -101,11 +102,16 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                     onClick={() => handleDayClick(dayDate)}
                     className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
                       isToday 
-                        ? 'bg-accent text-accent-foreground border-2 border-primary/50 shadow-sm' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 border-3 border-green-500 dark:border-green-400 shadow-lg font-bold ring-2 ring-green-200 dark:ring-green-800' 
                         : `${backgroundColorClass} ${textColorClass} border-2 border-border hover:border-accent hover:bg-accent/50`
                     }`}
                   >
-                    {dayDate.getDate()}
+                    <div className="flex items-center justify-center relative">
+                      {dayDate.getDate()}
+                      {isToday && (
+                        <Leaf className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-600 dark:text-green-400" />
+                      )}
+                    </div>
                   </button>
                   {habitCount > 0 && (
                     <div className="absolute bottom-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-primary rounded-full shadow-sm"></div>
@@ -156,17 +162,22 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                   
                   return (
                     <div className="relative h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center">
-                      <button 
-                        {...props}
-                        onClick={() => handleDayClick(dayDate)}
-                        className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
-                          isToday 
-                            ? 'bg-accent text-accent-foreground border border-primary/50' 
-                            : `${backgroundColorClass} ${textColorClass} border border-border hover:border-accent hover:bg-accent/50`
-                        }`}
-                      >
-                        {dayDate.getDate()}
-                      </button>
+                       <button 
+                         {...props}
+                         onClick={() => handleDayClick(dayDate)}
+                         className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
+                           isToday 
+                             ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 border-2 border-green-500 dark:border-green-400 shadow-md font-bold ring-1 ring-green-200 dark:ring-green-800' 
+                             : `${backgroundColorClass} ${textColorClass} border border-border hover:border-accent hover:bg-accent/50`
+                         }`}
+                       >
+                         <div className="flex items-center justify-center relative">
+                           {dayDate.getDate()}
+                           {isToday && (
+                             <Leaf className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 text-green-600 dark:text-green-400" />
+                           )}
+                         </div>
+                       </button>
                       {habitCount > 0 && (
                         <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 bg-primary rounded-full shadow-sm"></div>
                       )}
