@@ -127,7 +127,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                 nav_button: "h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105",
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-lg shadow-md border-2 border-primary",
                 day_today: "bg-accent text-accent-foreground font-semibold rounded-lg border-2 border-primary/50 shadow-sm",
-                day: "h-12 w-10 sm:h-14 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-green-700 dark:border-green-600 hover:border-green-500 text-sm sm:text-base",
+                day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-green-700 dark:border-green-600 hover:border-green-500 text-sm sm:text-base",
                 head_cell: "text-muted-foreground rounded-md w-10 sm:w-12 font-semibold text-xs sm:text-sm uppercase tracking-wide py-2",
                 table: "w-full border-collapse space-y-2",
                 head_row: "flex mb-3 sm:mb-4",
@@ -163,7 +163,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                   const textColorClass = getTextColor(habitCount);
                   
                   return (
-                    <div className="relative h-12 w-10 sm:h-14 sm:w-12 flex items-center justify-center">
+                    <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
                       <button 
                         {...props}
                         onClick={() => handleDayClick(dayDate)}
@@ -197,7 +197,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
   // Multi-month view for 6months and year - Mobile Optimized
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="grid gap-4 sm:gap-6 max-h-80 sm:max-h-96 overflow-y-auto pb-4">
+      <div className="grid gap-4 sm:gap-6 max-h-none overflow-visible">
         {months.map((month, index) => (
           <div key={index} className="bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 pb-6 shadow-sm border border-border">
             <h3 className="text-sm sm:text-base font-semibold text-center mb-2 sm:mb-3 text-foreground bg-background rounded-lg py-1.5 sm:py-2 shadow-sm border border-border">
@@ -216,7 +216,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                 nav: "hidden", // Hide navigation for individual months
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md border border-primary",
                 day_today: "bg-accent text-accent-foreground font-semibold rounded-md border border-primary/50",
-                day: "h-7 w-7 sm:h-8 sm:w-8 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-md transition-all duration-200 text-xs sm:text-sm border border-green-700 dark:border-green-600 hover:border-green-500",
+                day: "h-8 w-7 sm:h-9 sm:w-8 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-md transition-all duration-200 text-xs sm:text-sm border border-green-700 dark:border-green-600 hover:border-green-500",
                 head_cell: "text-muted-foreground w-7 sm:w-8 font-semibold text-[0.6rem] sm:text-[0.7rem] uppercase tracking-wide py-1",
                 table: "w-full border-collapse space-y-1",
                 head_row: "flex mb-2",
@@ -230,7 +230,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                   const textColorClass = getTextColor(habitCount);
                   
                   return (
-                    <div className="relative h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center">
+                    <div className="relative h-8 w-7 sm:h-9 sm:w-8 flex items-center justify-center">
                        <button 
                          {...props}
                          onClick={() => handleDayClick(dayDate)}
