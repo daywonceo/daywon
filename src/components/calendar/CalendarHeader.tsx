@@ -21,31 +21,31 @@ const CalendarHeader = ({
   const isMobile = useIsMobile();
   
   return (
-    <div className="flex flex-col gap-3 sm:gap-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-100 to-green-100 rounded-lg">
-            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2 sm:p-3 bg-primary/10 rounded-lg">
+            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Time Period</h3>
-            <p className="text-xs sm:text-sm text-gray-500">Choose your view range</p>
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">Time Period</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">Choose your view range</p>
           </div>
         </div>
         
         <Select value={timePeriod} onValueChange={setTimePeriod}>
-          <SelectTrigger className="w-full sm:w-48 h-9 sm:h-10 bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 hover:from-gray-100 hover:to-gray-150 transition-all duration-200 rounded-lg text-sm">
+          <SelectTrigger className="w-full sm:w-48 h-10 sm:h-11 bg-background border-border hover:bg-accent/50 transition-all duration-200 rounded-lg text-sm font-medium">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-white border-gray-200 shadow-xl rounded-lg z-50">
-            <SelectItem value="current" className="hover:bg-emerald-50 focus:bg-emerald-50 text-sm">
+          <SelectContent className="bg-popover border-border shadow-lg rounded-lg">
+            <SelectItem value="current" className="hover:bg-accent focus:bg-accent text-sm">
               Current Month
             </SelectItem>
-            <SelectItem value="6months" className="hover:bg-emerald-50 focus:bg-emerald-50 text-sm">
+            <SelectItem value="6months" className="hover:bg-accent focus:bg-accent text-sm">
               Last 6 Months
             </SelectItem>
-            <SelectItem value="year" className="hover:bg-emerald-50 focus:bg-emerald-50 text-sm">
-              Last Year
+            <SelectItem value="year" className="hover:bg-accent focus:bg-accent text-sm">
+              Last 12 Months
             </SelectItem>
           </SelectContent>
         </Select>

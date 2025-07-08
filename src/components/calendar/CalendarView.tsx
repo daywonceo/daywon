@@ -58,26 +58,34 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
           classNames={{
             months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
             month: "space-y-4 w-full",
-            caption: "flex justify-center pt-1 sm:pt-2 relative items-center text-gray-800 font-semibold text-base sm:text-lg",
-            nav_button: "h-7 w-7 sm:h-8 sm:w-8 bg-gradient-to-r from-emerald-100 to-green-100 hover:from-emerald-200 hover:to-green-200 p-0 rounded-lg text-emerald-700 transition-all duration-200 shadow-sm",
-            day_selected: "bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:from-emerald-600 hover:to-green-600 focus:from-emerald-600 focus:to-green-600 rounded-lg shadow-md",
-            day_today: "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 font-semibold rounded-lg",
-            day: "h-8 w-8 sm:h-10 sm:w-10 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-150 rounded-lg transition-all duration-200 border border-transparent hover:border-gray-200 text-sm sm:text-base",
-            head_cell: "text-gray-600 rounded-md w-8 sm:w-10 font-semibold text-xs sm:text-sm uppercase tracking-wide",
-            table: "w-full border-collapse space-y-1",
-            head_row: "flex mb-1 sm:mb-2",
-            row: "flex w-full mt-0.5 sm:mt-1",
+            caption: "flex justify-center pt-2 sm:pt-3 relative items-center text-foreground font-semibold text-lg sm:text-xl mb-4",
+            nav_button: "h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border",
+            day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-lg shadow-md border-2 border-primary",
+            day_today: "bg-accent text-accent-foreground font-semibold rounded-lg border-2 border-primary/50 shadow-sm",
+            day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-border hover:border-accent text-sm sm:text-base",
+            head_cell: "text-muted-foreground rounded-md w-10 sm:w-12 font-semibold text-xs sm:text-sm uppercase tracking-wide py-2",
+            table: "w-full border-collapse space-y-2",
+            head_row: "flex mb-3 sm:mb-4",
+            row: "flex w-full mt-1 sm:mt-2 gap-1 sm:gap-2",
           }}
           components={{
             Day: ({ date: dayDate, ...props }) => {
               const hasActivityToday = hasActivity(dayDate);
+              const isToday = dayDate.toDateString() === new Date().toDateString();
               return (
-                <div className="relative h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center">
-                  <button {...props} className="w-full h-full flex items-center justify-center text-sm sm:text-base">
+                <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
+                  <button 
+                    {...props} 
+                    className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
+                      isToday 
+                        ? 'bg-accent text-accent-foreground border-2 border-primary/50 shadow-sm' 
+                        : 'border-2 border-border hover:border-accent hover:bg-accent/50'
+                    }`}
+                  >
                     {dayDate.getDate()}
                   </button>
                   {hasActivityToday && (
-                    <div className="absolute bottom-0.5 right-0.5 sm:bottom-1 sm:right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-orange-400 to-red-400 rounded-full shadow-sm"></div>
+                    <div className="absolute bottom-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-primary rounded-full shadow-sm"></div>
                   )}
                 </div>
               );
@@ -93,8 +101,8 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
     <div className="space-y-4 sm:space-y-6">
       <div className="grid gap-4 sm:gap-6 max-h-80 sm:max-h-96 overflow-y-auto">
         {months.map((month, index) => (
-          <div key={index} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200">
-            <h3 className="text-sm sm:text-base font-bold text-center mb-2 sm:mb-3 text-gray-700 bg-white rounded-lg py-1.5 sm:py-2 shadow-sm">
+          <div key={index} className="bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-border">
+            <h3 className="text-sm sm:text-base font-semibold text-center mb-2 sm:mb-3 text-foreground bg-background rounded-lg py-1.5 sm:py-2 shadow-sm border border-border">
               {format(month, "MMMM yyyy")}
             </h3>
             <Calendar
@@ -108,24 +116,32 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                 month: "space-y-2 w-full",
                 caption: "hidden", // Hide caption since we have our own header
                 nav: "hidden", // Hide navigation for individual months
-                day_selected: "bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:from-emerald-600 hover:to-green-600 focus:from-emerald-600 focus:to-green-600 rounded-md",
-                day_today: "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 font-semibold rounded-md",
-                day: "h-6 w-6 sm:h-8 sm:w-8 p-0 font-normal aria-selected:opacity-100 relative cursor-pointer hover:bg-white rounded-md transition-all duration-200 text-xs sm:text-xs",
-                head_cell: "text-gray-600 w-6 sm:w-8 font-semibold text-[0.6rem] sm:text-[0.7rem] uppercase tracking-wide",
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md border border-primary",
+                day_today: "bg-accent text-accent-foreground font-semibold rounded-md border border-primary/50",
+                day: "h-7 w-7 sm:h-8 sm:w-8 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-md transition-all duration-200 text-xs sm:text-sm border border-border hover:border-accent",
+                head_cell: "text-muted-foreground w-7 sm:w-8 font-semibold text-[0.6rem] sm:text-[0.7rem] uppercase tracking-wide py-1",
                 table: "w-full border-collapse space-y-1",
-                head_row: "flex mb-1",
-                row: "flex w-full mt-0.5",
+                head_row: "flex mb-2",
+                row: "flex w-full mt-0.5 gap-0.5",
               }}
               components={{
                 Day: ({ date: dayDate, ...props }) => {
                   const hasActivityToday = hasActivity(dayDate);
+                  const isToday = dayDate.toDateString() === new Date().toDateString();
                   return (
-                    <div className="relative h-6 w-6 sm:h-8 sm:w-8 flex items-center justify-center">
-                      <button {...props} className="text-xs w-full h-full flex items-center justify-center">
+                    <div className="relative h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center">
+                      <button 
+                        {...props} 
+                        className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
+                          isToday 
+                            ? 'bg-accent text-accent-foreground border border-primary/50' 
+                            : 'border border-border hover:border-accent hover:bg-accent/50'
+                        }`}
+                      >
                         {dayDate.getDate()}
                       </button>
                       {hasActivityToday && (
-                        <div className="absolute bottom-0 right-0 sm:bottom-0.5 sm:right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gradient-to-r from-orange-400 to-red-400 rounded-full"></div>
+                        <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 bg-primary rounded-full shadow-sm"></div>
                       )}
                     </div>
                   );
