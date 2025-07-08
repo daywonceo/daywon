@@ -82,7 +82,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
             nav_button: "h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border",
             day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-lg shadow-md border-2 border-primary",
             day_today: "bg-accent text-accent-foreground font-semibold rounded-lg border-2 border-primary/50 shadow-sm",
-            day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-border hover:border-accent text-sm sm:text-base",
+            day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-green-700 dark:border-green-600 hover:border-green-500 text-sm sm:text-base",
             head_cell: "text-muted-foreground rounded-md w-10 sm:w-12 font-semibold text-xs sm:text-sm uppercase tracking-wide py-2",
             table: "w-full border-collapse space-y-2",
             head_row: "flex mb-3 sm:mb-4",
@@ -103,7 +103,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                     className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
                       isToday 
                         ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 border-3 border-green-500 dark:border-green-400 shadow-lg font-bold ring-2 ring-green-200 dark:ring-green-800' 
-                        : `${backgroundColorClass} ${textColorClass} border-2 border-border hover:border-accent hover:bg-accent/50`
+                        : `${backgroundColorClass} ${textColorClass} border-2 border-green-700 dark:border-green-600 hover:border-green-500 hover:bg-accent/50`
                     }`}
                   >
                     <div className="flex items-center justify-center relative">
@@ -147,7 +147,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                 nav: "hidden", // Hide navigation for individual months
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md border border-primary",
                 day_today: "bg-accent text-accent-foreground font-semibold rounded-md border border-primary/50",
-                day: "h-7 w-7 sm:h-8 sm:w-8 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-md transition-all duration-200 text-xs sm:text-sm border border-border hover:border-accent",
+                day: "h-7 w-7 sm:h-8 sm:w-8 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-md transition-all duration-200 text-xs sm:text-sm border border-green-700 dark:border-green-600 hover:border-green-500",
                 head_cell: "text-muted-foreground w-7 sm:w-8 font-semibold text-[0.6rem] sm:text-[0.7rem] uppercase tracking-wide py-1",
                 table: "w-full border-collapse space-y-1",
                 head_row: "flex mb-2",
@@ -168,7 +168,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                          className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
                            isToday 
                              ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 border-2 border-green-500 dark:border-green-400 shadow-md font-bold ring-1 ring-green-200 dark:ring-green-800' 
-                             : `${backgroundColorClass} ${textColorClass} border border-border hover:border-accent hover:bg-accent/50`
+                             : `${backgroundColorClass} ${textColorClass} border border-green-700 dark:border-green-600 hover:border-green-500 hover:bg-accent/50`
                          }`}
                        >
                          <div className="flex items-center justify-center relative">
