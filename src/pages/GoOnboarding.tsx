@@ -21,7 +21,7 @@ const GoOnboarding = () => {
     {
       icon: <UserPlus className="w-6 h-6 text-blue-500" />,
       title: "Sign Up",
-      description: "Create your account to save your progress"
+      description: "Create your account with Google or Email/Password"
     },
     {
       icon: <Sparkles className="w-6 h-6 text-yellow-500" />,
@@ -30,37 +30,27 @@ const GoOnboarding = () => {
     },
     {
       icon: <Heart className="w-6 h-6 text-red-500" />,
-      title: "Our Mission",
-      description: "Learn about Life Canvas and habit-based personal growth"
-    },
-    {
-      icon: <Palette className="w-6 h-6 text-purple-500" />,
-      title: "Canvas Growth",
-      description: "See how your canvas will grow over time with habits"
+      title: "Our Mission & Canvas Growth",
+      description: "Learn about Life Canvas and how your canvas will grow"
     },
     {
       icon: <Target className="w-6 h-6 text-blue-500" />,
       title: "Pick Focus Areas",
-      description: "Choose what areas of life you want to improve"
-    },
-    {
-      icon: <Heart className="w-6 h-6 text-green-500" />,
-      title: "Choose Habits",
-      description: "Select specific habits to track based on your focus"
+      description: "Choose 3 areas of life you want to improve"
     },
     {
       icon: <Bell className="w-6 h-6 text-purple-500" />,
       title: "Notifications",
-      description: "Set up reminders to keep you on track"
+      description: "Set up habit reminders and default times"
     },
     {
       icon: <Heart className="w-6 h-6 text-pink-500" />,
       title: "Set Intent",
-      description: "Define your motivation and why you're starting"
+      description: "Define your primary goal and motivation"
     },
     {
       icon: <Sparkles className="w-6 h-6 text-gold-500" />,
-      title: "Final Setup",
+      title: "Summary & Launch",
       description: "Review your choices and start your journey"
     }
   ];
@@ -111,7 +101,7 @@ const GoOnboarding = () => {
                       </p>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      {index + 1}/9
+                      {index + 1}/7
                     </Badge>
                   </div>
                 ))}

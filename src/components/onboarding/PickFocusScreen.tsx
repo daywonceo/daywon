@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,9 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface PickFocusScreenProps {
   selectedAreas: string[];
@@ -38,11 +42,46 @@ const PickFocusScreen = ({
   onBack, 
   onSkip 
 }: PickFocusScreenProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+
   const toggleArea = (areaId: string) => {
     if (selectedAreas.includes(areaId)) {
       onSelectionChange(selectedAreas.filter(id => id !== areaId));
     } else {
       onSelectionChange([...selectedAreas, areaId]);
+    }
+  };
+
+  const handleContinue = async () => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          focus_areas: selectedAreas
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error saving focus areas:', error);
+        toast.error("Failed to save focus areas");
+        return;
+      }
+
+      toast.success("Focus areas saved!");
+      onNext();
+    } catch (error) {
+      console.error('Error saving focus areas:', error);
+      toast.error("Failed to save focus areas");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -117,11 +156,11 @@ const PickFocusScreen = ({
                 Skip
               </Button>
               <Button 
-                onClick={onNext} 
-                disabled={selectedAreas.length === 0}
+                onClick={handleContinue} 
+                disabled={selectedAreas.length === 0 || isLoading}
                 className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
               >
-                Continue
+                {isLoading ? "Saving..." : "Continue"}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

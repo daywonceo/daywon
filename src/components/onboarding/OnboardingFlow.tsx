@@ -5,38 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import SignUpScreen from "./SignUpScreen";
 import WelcomeScreen from "./WelcomeScreen";
-import MissionScreen from "./MissionScreen";
-import CanvasGrowthScreen from "./CanvasGrowthScreen";
+import MissionCanvasScreen from "./MissionCanvasScreen";
 import PickFocusScreen from "./PickFocusScreen";
-import ChooseHabitsScreen from "./ChooseHabitsScreen";
 import NotificationScreen from "./NotificationScreen";
 import IntentScreen from "./IntentScreen";
 import FinalScreen from "./FinalScreen";
 
 export interface OnboardingData {
   focusAreas: string[];
-  selectedHabits: Array<{
-    name: string;
-    category: string;
-    frequency: 'daily' | 'weekly' | 'custom';
-    timeOfDay: 'morning' | 'afternoon' | 'evening' | 'custom';
-    customDays?: string[];
-    customTime?: string;
-  }>;
   notifications: {
     enabled: boolean;
-    customized: boolean;
+    reminderTime: string;
   };
   intent: string;
-  selectedTrack?: {
-    id: string;
-    name: string;
-    emoji: string;
-    duration: number;
-    durationUnit: 'days' | 'weeks';
-    habits: string[];
-    description?: string;
-  };
 }
 
 interface OnboardingFlowProps {
@@ -47,13 +28,11 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     focusAreas: [],
-    selectedHabits: [],
-    notifications: { enabled: false, customized: false },
-    intent: "",
-    selectedTrack: undefined
+    notifications: { enabled: false, reminderTime: "09:00" },
+    intent: ""
   });
 
-  const totalSteps = 9; // Updated from 8 to 9 to include sign up
+  const totalSteps = 7;
 
   const updateData = (key: keyof OnboardingData, value: any) => {
     setOnboardingData(prev => ({ ...prev, [key]: value }));
@@ -87,21 +66,13 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         return <WelcomeScreen onNext={nextStep} onSkip={skipToEnd} />;
       case 2:
         return (
-          <MissionScreen
+          <MissionCanvasScreen
             onNext={nextStep}
             onBack={prevStep}
             onSkip={skipToEnd}
           />
         );
       case 3:
-        return (
-          <CanvasGrowthScreen
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 4:
         return (
           <PickFocusScreen
             selectedAreas={onboardingData.focusAreas}
@@ -111,18 +82,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 5:
-        return (
-          <ChooseHabitsScreen
-            focusAreas={onboardingData.focusAreas}
-            selectedHabits={onboardingData.selectedHabits}
-            onHabitsChange={(habits) => updateData('selectedHabits', habits)}
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 6:
+      case 4:
         return (
           <NotificationScreen
             preferences={onboardingData.notifications}
@@ -132,7 +92,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 7:
+      case 5:
         return (
           <IntentScreen
             intent={onboardingData.intent}
@@ -142,7 +102,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 8:
+      case 6:
         return (
           <FinalScreen
             onComplete={handleComplete}

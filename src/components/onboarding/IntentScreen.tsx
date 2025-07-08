@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Heart, Target, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface IntentScreenProps {
   intent: string;
@@ -34,6 +37,8 @@ const IntentScreen = ({
   const [customIntent, setCustomIntent] = useState(
     predefinedIntents.some(p => p.text === intent) ? "" : intent
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   const selectPredefinedIntent = (selectedIntent: string) => {
     onIntentChange(selectedIntent);
@@ -43,6 +48,38 @@ const IntentScreen = ({
   const handleCustomIntentChange = (value: string) => {
     setCustomIntent(value);
     onIntentChange(value);
+  };
+
+  const handleContinue = async () => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          user_intent: intent
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error saving intent:', error);
+        toast.error("Failed to save intent");
+        return;
+      }
+
+      toast.success("Intent saved!");
+      onNext();
+    } catch (error) {
+      console.error('Error saving intent:', error);
+      toast.error("Failed to save intent");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -127,10 +164,11 @@ const IntentScreen = ({
                 Skip
               </Button>
               <Button 
-                onClick={onNext}
+                onClick={handleContinue}
+                disabled={isLoading}
                 className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
               >
-                Continue
+                {isLoading ? "Saving..." : "Continue"}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

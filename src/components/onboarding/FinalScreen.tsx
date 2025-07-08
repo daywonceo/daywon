@@ -1,11 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Sparkles, Target, Calendar, TrendingUp } from "lucide-react";
+import { ChevronLeft, Sparkles, Target, Bell, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OnboardingData } from "./OnboardingFlow";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface FinalScreenProps {
   onComplete: () => void;
@@ -16,12 +18,46 @@ interface FinalScreenProps {
 const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     setIsVisible(true);
     const timer = setTimeout(() => setShowConfetti(true), 500);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleComplete = async () => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          onboarding_complete: true
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error completing onboarding:', error);
+        toast.error("Failed to complete onboarding");
+        return;
+      }
+
+      toast.success("Welcome to Life Canvas! 🎉");
+      onComplete();
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast.error("Failed to complete onboarding");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const confettiColors = ['🎉', '🌟', '✨', '🎊', '💫'];
 
@@ -91,16 +127,16 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
               </div>
             )}
             
-            {data.selectedHabits.length > 0 && (
+            {data.notifications.enabled && (
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-green-600" />
+                  <Bell className="w-4 h-4 text-green-600" />
                   <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                    {data.selectedHabits.length} Habits Ready to Track
+                    Notifications Enabled
                   </span>
                 </div>
                 <div className="text-xs text-green-600 dark:text-green-400">
-                  {data.selectedHabits.map(h => h.name).join(', ')}
+                  Daily reminders at {data.notifications.reminderTime}
                 </div>
               </div>
             )}
@@ -133,11 +169,12 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
             </Button>
             
             <Button 
-              onClick={onComplete}
+              onClick={handleComplete}
+              disabled={isLoading}
               className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
               size="lg"
             >
-              Start My Journey
+              {isLoading ? "Getting Started..." : "Start My Journey"}
               <Sparkles className="w-5 h-5 ml-2" />
             </Button>
           </div>
