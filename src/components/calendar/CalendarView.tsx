@@ -197,9 +197,9 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
   // Multi-month view for 6months and year - Mobile Optimized
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="grid gap-4 sm:gap-6 max-h-80 sm:max-h-96 overflow-y-auto">
+      <div className="grid gap-4 sm:gap-6 max-h-80 sm:max-h-96 overflow-y-auto pb-4">
         {months.map((month, index) => (
-          <div key={index} className="bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-border">
+          <div key={index} className="bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 pb-6 shadow-sm border border-border">
             <h3 className="text-sm sm:text-base font-semibold text-center mb-2 sm:mb-3 text-foreground bg-background rounded-lg py-1.5 sm:py-2 shadow-sm border border-border">
               {format(month, "MMMM yyyy")}
             </h3>
