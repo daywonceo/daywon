@@ -128,19 +128,20 @@ export const useHabitActivities = (habitList?: string[]) => {
       
       console.log(`Status updated: ${category} -> ${newStatus}`);
       
-      // Handle background operations asynchronously without affecting UI
+      // Calculate the date for this activity
       const today = new Date();
       const date = new Date(today);
       date.setDate(today.getDate() - dayIndex);
       
-      // Fire and forget - don't wait for this
+      // Dispatch event immediately after state update for real-time UI updates
+      window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+        detail: { category, status: newStatus, date: date.toISOString().split('T')[0] } 
+      }));
+      
+      // Handle background operations asynchronously without affecting UI
       Promise.resolve().then(() => {
         recordHabitActivity(category, newStatus, date);
         hapticSuccess();
-        // Dispatch custom event for other components that need to know
-        window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
-          detail: { category, status: newStatus, date: date.toISOString().split('T')[0] } 
-        }));
       });
       
       return newActivities;
