@@ -25,7 +25,10 @@ const CalendarGrid = ({ month, onDateClick, size }: CalendarGridProps) => {
       {/* Weekday headers */}
       <div className={`grid grid-cols-7 ${gridGapClasses} ${headerMarginClasses}`}>
         {weekdayLabels.map((day) => (
-          <div key={day} className={headerTextClasses}>
+          <div 
+            key={day} 
+            className={`${headerTextClasses} ${size === 'small' ? 'w-7 sm:w-8 flex items-center justify-center' : ''}`}
+          >
             {day}
           </div>
         ))}
