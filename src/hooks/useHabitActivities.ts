@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { recordHabitActivity, getHabitActivities, autoActivateRecentHabits } from "@/utils/habitActivity";
+import { recordHabitActivity, getHabitActivities, autoActivateRecentHabits, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 
@@ -25,10 +25,10 @@ export const useHabitActivities = (habitList?: string[]) => {
       ? habitList
       : DEFAULT_HABITS;
 
-  const loadActivities = useCallback(() => {
+  const loadActivities = useCallback(async () => {
     try {
       // Auto-activate habits that have been completed recently
-      autoActivateRecentHabits();
+      await autoActivateRecentHabits();
       
       // Get recent dates (past 3 days including today)
       const today = new Date();
@@ -41,8 +41,8 @@ export const useHabitActivities = (habitList?: string[]) => {
       // Format dates as YYYY-MM-DD strings
       const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
       
-      // Get all habit activities from storage
-      const storedActivities = getHabitActivities();
+      // Get all habit activities from database (with fallback to local storage)
+      const storedActivities = await loadHabitActivitiesFromDatabase();
       
       // Create activities for the past 3 days
       const newActivities = dates.map((date, index) => {
@@ -89,9 +89,9 @@ export const useHabitActivities = (habitList?: string[]) => {
     }
   }, [userHabits.join(',')]);
 
-  const refreshActivities = useCallback(() => {
+  const refreshActivities = useCallback(async () => {
     console.log('Refreshing activities and streak data...');
-    loadActivities();
+    await loadActivities();
   }, [loadActivities]);
 
   const toggleStatus = useCallback((dayIndex: number, category: string) => {

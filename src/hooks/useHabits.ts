@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
-import { getHabitActivities, isHabitRecentlyActive } from "@/utils/habitActivity";
+import { getHabitActivities, isHabitRecentlyActiveSync, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
 import { findDuplicateHabit } from "@/utils/habitDeduplication";
 
 export type Habit = Tables<'habits'>;
@@ -63,7 +63,7 @@ async function deleteHabit(habitId: string) {
 async function ensureTrackedHabitsVisible(userId: string) {
   try {
     console.log('Ensuring tracked habits are visible for user:', userId);
-    const activities = getHabitActivities();
+    const activities = await loadHabitActivitiesFromDatabase();
     const trackedHabits = [...new Set(activities.map(a => a.habitName))];
     console.log('Found tracked habits in local storage:', trackedHabits);
     
@@ -104,7 +104,7 @@ async function ensureTrackedHabitsVisible(userId: string) {
     
     // Auto-activate habits that have been completed recently
     const habitsToReactivate = existingHabits
-      ?.filter(h => h.status === 'archived' && isHabitRecentlyActive(h.name))
+      ?.filter(h => h.status === 'archived' && isHabitRecentlyActiveSync(h.name))
       .map(h => h.name) || [];
     
     console.log('Habits to reactivate:', habitsToReactivate);

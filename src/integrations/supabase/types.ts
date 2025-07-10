@@ -97,6 +97,36 @@ export type Database = {
           },
         ]
       }
+      habit_activities: {
+        Row: {
+          activity_date: string
+          created_at: string
+          habit_name: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          created_at?: string
+          habit_name: string
+          id?: string
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          created_at?: string
+          habit_name?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       habit_difficulty: {
         Row: {
           created_at: string
