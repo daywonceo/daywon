@@ -1,5 +1,5 @@
 
-import { getHabitActivities } from "./habitActivity";
+import { getHabitActivities, loadHabitActivitiesFromDatabase } from "./habitActivity";
 import { hasRecentRecovery } from "./streakRecovery";
 
 // Format large numbers with appropriate suffixes (e.g., 1.2k, 1.5M)
