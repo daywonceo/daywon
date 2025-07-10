@@ -47,21 +47,33 @@ export const useHabitDeduplication = () => {
       for (const group of duplicateGroups) {
         const { preferredName, habits: duplicateHabits } = group;
         
-        // Find the habit to keep (prefer the one with the preferred name, or the first one)
-        const keepHabit = duplicateHabits.find(h => h.name === preferredName) || duplicateHabits[0];
+        // Get completion history for each duplicate habit
+        const activities = getHabitActivities();
+        const habitCompletions = duplicateHabits.map(habit => {
+          const habitActivities = activities.filter(a => a.habitName === habit.name);
+          const completed = habitActivities.filter(a => a.status === 'completed').length;
+          const total = habitActivities.length;
+          return { habit, completed, total, completionRate: total > 0 ? completed / total : 0 };
+        });
+        
+        // Sort by completion history (total completed first, then completion rate)
+        habitCompletions.sort((a, b) => {
+          if (a.completed !== b.completed) return b.completed - a.completed;
+          return b.completionRate - a.completionRate;
+        });
+        
+        // Keep the habit with the most completion data
+        const keepHabit = habitCompletions[0].habit;
         const habitsToRemove = duplicateHabits.filter(h => h.id !== keepHabit.id);
         
-        // Update the kept habit to use the preferred name
-        if (keepHabit.name !== preferredName) {
-          await updateHabit({ id: keepHabit.id, name: preferredName });
-        }
+        // Update the kept habit to use the preferred name (but keep the one with most data)
+        const finalName = keepHabit.name; // Keep the name of the habit with most completion data
         
-        // Update local storage activities to use the preferred name
-        const activities = getHabitActivities();
+        // Update local storage activities to consolidate under the kept habit's name
         const updatedActivities = activities.map(activity => {
-          const shouldUpdate = duplicateHabits.some(h => h.name === activity.habitName);
+          const shouldUpdate = habitsToRemove.some(h => h.name === activity.habitName);
           return shouldUpdate 
-            ? { ...activity, habitName: preferredName }
+            ? { ...activity, habitName: finalName }
             : activity;
         });
         

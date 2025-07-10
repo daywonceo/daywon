@@ -22,6 +22,7 @@ import HabitGallery from "@/components/habit/HabitGallery";
 import CompletionRateCard from "@/components/progress/CompletionRateCard";
 import MilestoneTracker from "@/components/progress/MilestoneTracker";
 import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard";
+import { useAutomaticDeduplication } from "@/hooks/useAutomaticDeduplication";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +42,9 @@ const Index = () => {
 
   // get top 3 habits and mutation
   const { topHabits, isLoading: topHabitsLoading, saveTopHabits, refetch } = useTopHabits();
+  
+  // Automatically detect and merge duplicate habits
+  useAutomaticDeduplication();
 
   // Auto-refresh data when app becomes visible or gains focus
   useEffect(() => {
@@ -133,7 +137,7 @@ const Index = () => {
 
           {/* New Progress Components */}
           <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-8 sm:mb-12">
-            <CompletionRateCard userHabits={activityHabits} />
+            <CompletionRateCard />
             <MilestoneTracker userHabits={activityHabits} />
             <DailyEncouragementCard />
           </div>
