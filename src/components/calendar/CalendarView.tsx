@@ -163,6 +163,15 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                   const backgroundColorClass = getHabitBackgroundColor(habitCount);
                   const textColorClass = getTextColor(habitCount);
                   
+                  // Check if this is an outside day (not in current month)
+                  const isOutsideDay = dayDate.getMonth() !== currentMonth.getMonth() || 
+                                       dayDate.getFullYear() !== currentMonth.getFullYear();
+                  
+                  // Don't render outside days
+                  if (isOutsideDay) {
+                    return <div className="h-10 w-10 sm:h-12 sm:w-12"></div>;
+                  }
+                  
                   return (
                     <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
                       <button 
@@ -230,6 +239,15 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                   const isToday = dayDate.toDateString() === new Date().toDateString();
                   const backgroundColorClass = getHabitBackgroundColor(habitCount);
                   const textColorClass = getTextColor(habitCount);
+                  
+                  // Check if this is an outside day (not in current month)
+                  const isOutsideDay = dayDate.getMonth() !== month.getMonth() || 
+                                       dayDate.getFullYear() !== month.getFullYear();
+                  
+                  // Don't render outside days
+                  if (isOutsideDay) {
+                    return <div className="h-8 w-7 sm:h-9 sm:w-8"></div>;
+                  }
                   
                   return (
                     <div className="relative h-8 w-7 sm:h-9 sm:w-8 flex items-center justify-center">
