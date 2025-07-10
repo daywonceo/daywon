@@ -36,7 +36,7 @@ const DailyEncouragementCard: React.FC = () => {
     return estTime.toDateString();
   };
 
-  const dailyQuote = useMemo(async () => {
+  const fetchDailyQuote = async (): Promise<Quote> => {
     try {
       // Check if we have a cached quote for today (based on 3 AM EST cutoff)
       const currentDay = getCurrentDay();
@@ -45,10 +45,13 @@ const DailyEncouragementCard: React.FC = () => {
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
         if (parsed.date === currentDay && parsed.quote) {
+          console.log('Using cached quote for:', currentDay);
           return parsed.quote;
         }
       }
 
+      console.log('Fetching new quote for:', currentDay);
+      
       // Fetch new quote from API
       const response = await fetch('https://type.fit/api/quotes');
       const quotes = await response.json();
@@ -88,33 +91,46 @@ const DailyEncouragementCard: React.FC = () => {
       text: "Every day is a new opportunity to grow.",
       author: "Unknown"
     };
-  }, []);
+  };
 
   useEffect(() => {
-    dailyQuote.then(q => {
-      setQuote(q);
+    const loadQuote = async () => {
+      setIsLoading(true);
+      const dailyQuote = await fetchDailyQuote();
+      setQuote(dailyQuote);
       setIsLoading(false);
       
       // Check if this quote is already saved
       const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
       const isQuoteSaved = savedQuotes.some((saved: SavedQuote) => 
-        saved.text === q.text && saved.author === q.author
+        saved.text === dailyQuote.text && saved.author === dailyQuote.author
       );
       setIsSaved(isQuoteSaved);
-    });
-  }, [dailyQuote]);
+    };
+
+    loadQuote();
+  }, []);
 
   // Set up interval to check for day change at 3 AM EST
   useEffect(() => {
-    const checkForNewDay = () => {
+    const checkForNewDay = async () => {
       const currentDay = getCurrentDay();
       const cachedData = localStorage.getItem('dailyQuote');
       
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
         if (parsed.date !== currentDay) {
-          // It's a new day, reload the component
-          window.location.reload();
+          console.log('New day detected, fetching new quote');
+          // It's a new day, fetch new quote
+          const newQuote = await fetchDailyQuote();
+          setQuote(newQuote);
+          
+          // Check if this quote is already saved
+          const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+          const isQuoteSaved = savedQuotes.some((saved: SavedQuote) => 
+            saved.text === newQuote.text && saved.author === newQuote.author
+          );
+          setIsSaved(isQuoteSaved);
         }
       }
     };
