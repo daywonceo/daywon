@@ -7,5 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export function capitalizeHabitName(name: string): string {
   if (!name) return name;
-  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
