@@ -9,6 +9,7 @@ import { getHabitActivities } from "@/utils/habitActivity";
 import { calculateStreakForDate } from "@/utils/habitStreaks";
 import { useGuidanceActivity } from "@/hooks/useGuidanceActivity";
 import { useAppSessions } from "@/hooks/useAppSessions";
+import { capitalizeHabitName } from "@/lib/utils";
 
 interface DailySummaryModalProps {
   date: Date | null;
@@ -168,7 +169,7 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
               <div className="space-y-2">
                 {completedHabits.map((habit, index) => (
                   <div key={index} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
-                    <span className="text-sm font-medium">{habit.name}</span>
+                    <span className="text-sm font-medium">{capitalizeHabitName(habit.name)}</span>
                     <Badge variant="secondary" className="text-xs">
                       <Trophy className="h-3 w-3 mr-1" />
                       {habit.streak} day streak
@@ -193,7 +194,7 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
                 <div className="space-y-2">
                   {failedHabits.map((habit, index) => (
                     <div key={index} className="flex items-center justify-between bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
-                      <span className="text-sm font-medium">{habit.name}</span>
+                      <span className="text-sm font-medium">{capitalizeHabitName(habit.name)}</span>
                       <Badge variant="outline" className="text-xs">
                         Try again tomorrow
                       </Badge>

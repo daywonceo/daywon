@@ -5,6 +5,7 @@ import { Play, Music, ExternalLink, Volume2, VolumeX } from "lucide-react";
 import { getPlaylistsForHabit, getSpotifyAccessToken, isSpotifyConnected } from "@/services/spotifyService";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { capitalizeHabitName } from "@/lib/utils";
 
 interface Playlist {
   id: string;
@@ -91,7 +92,7 @@ const PlaylistRecommendations = ({ habitName, isHabitActive }: PlaylistRecommend
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center text-lg font-semibold text-green-800 dark:text-green-400">
             <Music className="w-5 h-5 mr-2" />
-            Recommended Playlists for {habitName}
+            Recommended Playlists for {capitalizeHabitName(habitName)}
           </CardTitle>
           <Button
             variant="outline"

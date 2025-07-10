@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Archive, ArchiveRestore, Trash2, MoreVertical } from "lucide-react";
 import { Habit } from "@/hooks/useHabits";
+import { capitalizeHabitName } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,7 @@ const HabitItem: React.FC<HabitItemProps> = ({
   return (
     <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
       <div className="flex flex-col gap-1">
-        <p className="font-semibold text-gray-800 dark:text-gray-200">{habit.name}</p>
+        <p className="font-semibold text-gray-800 dark:text-gray-200">{capitalizeHabitName(habit.name)}</p>
         {habit.category && <Badge variant="secondary">{habit.category}</Badge>}
       </div>
       <DropdownMenu>

@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { hapticSuccess } from '@/utils/haptics';
+import { capitalizeHabitName } from '@/lib/utils';
 
 interface PhotoUploadButtonProps {
   habitName: string;
@@ -126,7 +127,7 @@ const PhotoUploadButton: React.FC<PhotoUploadButtonProps> = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Visual Proof for {habitName}</DialogTitle>
+          <DialogTitle>Visual Proof for {capitalizeHabitName(habitName)}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {!selectedFile ? (

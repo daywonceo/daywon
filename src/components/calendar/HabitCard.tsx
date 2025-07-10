@@ -8,6 +8,7 @@ import { LucideIcon } from 'lucide-react';
 import { Habit } from '@/hooks/useHabits';
 import { recordHabitActivity } from '@/utils/habitActivity';
 import { hapticSuccess } from '@/utils/haptics';
+import { capitalizeHabitName } from '@/lib/utils';
 
 type Color = 'green' | 'purple' | 'red' | 'orange' | 'blue';
 
@@ -36,7 +37,7 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="flex-1">
-                    <CardTitle className="text-base sm:text-lg font-bold">{habit.name}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg font-bold">{capitalizeHabitName(habit.name)}</CardTitle>
                     {habit.description && <CardDescription className="text-xs sm:text-sm text-gray-500 mt-1">{habit.description}</CardDescription>}
                 </div>
                 <Button size="icon" variant="ghost" className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 ${isCompletedToday ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`} onClick={handleToggleComplete}>

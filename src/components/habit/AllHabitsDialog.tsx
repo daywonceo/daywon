@@ -11,6 +11,7 @@ import HabitFormDialog from "./HabitFormDialog";
 import HabitAddSheet from "./HabitAddSheet";
 import AllTimeHabitsModal from "./AllTimeHabitsModal";
 import HabitList from "./HabitList";
+import { capitalizeHabitName } from "@/lib/utils";
 
 type AllHabitsDialogProps = {
   open: boolean;
@@ -110,7 +111,7 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
         category: getHabitCategory(habitName),
         description: null
       });
-      toast({ title: `${habitName} added!` });
+      toast({ title: `${capitalizeHabitName(habitName)} added!` });
     } catch (error) {
       console.error('Error adding habit:', error);
       toast({ title: "Error adding habit", variant: "destructive" });

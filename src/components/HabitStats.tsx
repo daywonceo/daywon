@@ -6,6 +6,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { calculateHabitStats, HabitStats as HabitStatsType } from "@/utils/habitStats";
 import { toast } from "@/hooks/use-toast";
 import HabitDetailModal from "@/components/habit/HabitDetailModal";
+import { capitalizeHabitName } from "@/lib/utils";
 
 interface HabitStatsProps {
   refreshTrigger?: number; // Add prop to force refresh when habits change
@@ -74,7 +75,7 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
           >
             <div className="flex justify-between items-center">
               <span className={`font-medium text-sm sm:text-base ${colorClass}`}>
-                {habit.habitName}
+                {capitalizeHabitName(habit.habitName)}
               </span>
               <div className="flex items-center gap-2">
                 <span className={`text-sm sm:text-base ${colorClass.replace('800', '600')}`}>

@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { capitalizeHabitName } from "@/lib/utils";
 import {
   Settings,
   Target,
@@ -91,7 +92,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                 <div key={habit.id} className="flex items-center justify-between p-3 rounded-lg border">
                   <div className="flex items-center space-x-3">
                     <Target className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium">{habit.name}</span>
+                    <span className="font-medium">{capitalizeHabitName(habit.name)}</span>
                     {habit.active && <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>}
                   </div>
                   <div className="flex items-center space-x-2">

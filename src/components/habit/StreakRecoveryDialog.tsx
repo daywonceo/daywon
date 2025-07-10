@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Heart, Target, Zap } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { capitalizeHabitName } from "@/lib/utils";
 
 interface StreakRecoveryDialogProps {
   isOpen: boolean;
@@ -85,7 +86,7 @@ const StreakRecoveryDialog: React.FC<StreakRecoveryDialogProps> = ({
     // Show success message with animation
     toast({
       title: "🎉 Streak Recovered!",
-      description: `Your ${streakCount}-day streak for ${habitName} has been restored!`,
+      description: `Your ${streakCount}-day streak for ${capitalizeHabitName(habitName)} has been restored!`,
     });
 
     onRecoveryComplete();
@@ -116,7 +117,7 @@ const StreakRecoveryDialog: React.FC<StreakRecoveryDialogProps> = ({
             Oops! Want to save your streak?
           </DialogTitle>
           <DialogDescription className="text-center">
-            Your {streakCount}-day {habitName} streak is about to break! Choose a redemption option to keep it alive.
+            Your {streakCount}-day {capitalizeHabitName(habitName)} streak is about to break! Choose a redemption option to keep it alive.
           </DialogDescription>
         </DialogHeader>
 
@@ -163,7 +164,7 @@ const StreakRecoveryDialog: React.FC<StreakRecoveryDialogProps> = ({
             {selectedOption === "reflection" && (
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Why is your {habitName} habit important to you?
+                  Why is your {capitalizeHabitName(habitName)} habit important to you?
                 </label>
                 <Textarea
                   value={reflection}
@@ -179,7 +180,7 @@ const StreakRecoveryDialog: React.FC<StreakRecoveryDialogProps> = ({
 
             {selectedOption === "double" && (
               <div className="text-center space-y-4">
-                <p className="text-sm">Complete your {habitName} habit twice today to recover your streak.</p>
+                <p className="text-sm">Complete your {capitalizeHabitName(habitName)} habit twice today to recover your streak.</p>
                 <div className="flex items-center justify-center space-x-2">
                   <input
                     type="checkbox"
@@ -189,7 +190,7 @@ const StreakRecoveryDialog: React.FC<StreakRecoveryDialogProps> = ({
                     className="w-4 h-4"
                   />
                   <label htmlFor="doubleComplete" className="text-sm">
-                    I have completed {habitName} twice today
+                    I have completed {capitalizeHabitName(habitName)} twice today
                   </label>
                 </div>
               </div>

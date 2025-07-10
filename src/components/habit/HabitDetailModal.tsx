@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown, Target, Calendar, CheckCircle, XCircle } from "lucide-react";
 import { HabitStats } from "@/utils/habitStats";
+import { capitalizeHabitName } from "@/lib/utils";
 
 interface HabitDetailModalProps {
   habit: HabitStats | null;
@@ -65,7 +66,7 @@ const HabitDetailModal = ({ habit, isOpen, onClose, timeframe }: HabitDetailModa
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{habit.habitName}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">{capitalizeHabitName(habit.habitName)}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
