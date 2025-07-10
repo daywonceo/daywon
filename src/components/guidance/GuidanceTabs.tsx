@@ -46,7 +46,7 @@ const GuidanceTabs = ({
         </TabsTrigger>
         <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
           <Book className="w-3 h-3 mb-0.5" />
-          <span className="leading-none font-medium">DEVOTIONS</span>
+          <span className="leading-none font-medium">SPIRITUAL</span>
         </TabsTrigger>
         <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full">
           <Heart className="w-3 h-3 mb-0.5" />

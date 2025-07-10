@@ -25,7 +25,7 @@ const DevotionsTab = ({
     <div className="animate-fade-in">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-          Daily Devotions
+          Spiritual Growth
         </h3>
         <p className="text-gray-600 dark:text-gray-300 text-sm">
           Explore verses, devotions, and sermons to deepen your faith journey
