@@ -56,6 +56,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				completion: {
+					low: 'hsl(var(--completion-low))',
+					medium: 'hsl(var(--completion-medium))',
+					high: 'hsl(var(--completion-high))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

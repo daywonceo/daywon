@@ -29,6 +29,9 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --completion-low: 0 84% 60%;
+    --completion-medium: 43 74% 66%;
+    --completion-high: 142 76% 36%;
     --radius: 0.5rem;
   }
 
@@ -57,6 +60,9 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --completion-low: 0 84% 60%;
+    --completion-medium: 43 74% 66%;
+    --completion-high: 142 69% 58%;
   }
 }
 
