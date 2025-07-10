@@ -14,6 +14,7 @@ import { initializeDefaultHabits } from "@/utils/habitCategories";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Camera } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
+import { useNavigate } from "react-router-dom";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
 import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
 import AllHabitsDialog from "@/components/habit/AllHabitsDialog";
@@ -25,11 +26,11 @@ import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showHabitsModal, setShowHabitsModal] = useState(false);
-  const [showAllHabits, setShowAllHabits] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -149,7 +150,6 @@ const Index = () => {
             }}
           />
 
-          <AllHabitsDialog open={showAllHabits} onOpenChange={setShowAllHabits} />
           <HabitGallery open={showGallery} onOpenChange={setShowGallery} />
 
           <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -167,7 +167,7 @@ const Index = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setShowAllHabits(true)}
+                onClick={() => navigate("/all-habits")}
                 className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
               >
                 <BookOpen className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
