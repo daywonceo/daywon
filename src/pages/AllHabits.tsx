@@ -12,8 +12,7 @@ import HabitFormDialog from "@/components/habit/HabitFormDialog";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import AllTimeHabitsModal from "@/components/habit/AllTimeHabitsModal";
 import { capitalizeHabitName } from "@/lib/utils";
-import { recordHabitActivity } from "@/utils/habitActivity";
-import { getHabitActivities } from "@/utils/habitActivity";
+import { recordHabitActivity, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
 import { hapticSuccess } from "@/utils/haptics";
 import { Check, Plus as PlusIcon, Flame, Target } from "lucide-react";
 import { calculateStreakForDate } from "@/utils/habitTracking";
@@ -34,17 +33,21 @@ const AllHabits = () => {
 
   // Load habit activities and completion status
   useEffect(() => {
-    const activities = getHabitActivities();
-    const today = new Date().toISOString().split('T')[0];
-    const statuses: Record<string, boolean> = {};
+    const loadHabitStatuses = async () => {
+      const activities = await loadHabitActivitiesFromDatabase();
+      const today = new Date().toISOString().split('T')[0];
+      const statuses: Record<string, boolean> = {};
+      
+      activities.forEach(activity => {
+        if (activity.date === today) {
+          statuses[activity.habitName] = activity.status === 'completed';
+        }
+      });
+      
+      setHabitStatuses(statuses);
+    };
     
-    activities.forEach(activity => {
-      if (activity.date === today) {
-        statuses[activity.habitName] = activity.status === 'completed';
-      }
-    });
-    
-    setHabitStatuses(statuses);
+    loadHabitStatuses();
   }, []);
 
   // Refresh habits when component mounts
@@ -57,7 +60,7 @@ const AllHabits = () => {
     try {
       await refreshHabits();
       // Refresh habit statuses as well
-      const activities = getHabitActivities();
+      const activities = await loadHabitActivitiesFromDatabase();
       const today = new Date().toISOString().split('T')[0];
       const statuses: Record<string, boolean> = {};
       

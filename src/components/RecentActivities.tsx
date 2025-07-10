@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHabitActivities } from "@/hooks/useHabitActivities";
 import HabitActivityRow from "@/components/habit/HabitActivityRow";
 
@@ -20,6 +21,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
     toggleEditMode,
     updateActivityText,
     refreshActivities,
+    isLoading,
   } = useHabitActivities(habitList);
 
   // Listen for habit changes to trigger parent updates
@@ -77,20 +79,42 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
           ))}
 
           {/* Activity rows */}
-          {activities.map((activity, activityIndex) => (
-            <HabitActivityRow
-              key={activityIndex}
-              activity={activity}
-              activityIndex={activityIndex}
-              activities={activities}
-              setActivities={setActivities}
-              activeHabit={activeHabit}
-              setActiveHabit={setActiveHabit}
-              toggleStatus={toggleStatus}
-              toggleEditMode={toggleEditMode}
-              updateActivityText={updateActivityText}
-            />
-          ))}
+          {isLoading ? (
+            // Loading skeleton for 3 days
+            Array.from({ length: 3 }).map((_, index) => (
+              <React.Fragment key={`skeleton-${index}`}>
+                {/* Day skeleton */}
+                <div className="flex items-center justify-center">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                </div>
+                {/* Activity text skeleton */}
+                <div className="flex items-center justify-center">
+                  <Skeleton className="h-4 w-16" />
+                </div>
+                {/* Habit status boxes skeleton */}
+                {userHabits.map((_, habitIndex) => (
+                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center">
+                    <Skeleton className="h-8 w-8 rounded" />
+                  </div>
+                ))}
+              </React.Fragment>
+            ))
+          ) : (
+            activities.map((activity, activityIndex) => (
+              <HabitActivityRow
+                key={activityIndex}
+                activity={activity}
+                activityIndex={activityIndex}
+                activities={activities}
+                setActivities={setActivities}
+                activeHabit={activeHabit}
+                setActiveHabit={setActiveHabit}
+                toggleStatus={toggleStatus}
+                toggleEditMode={toggleEditMode}
+                updateActivityText={updateActivityText}
+              />
+            ))
+          )}
         </div>
       </CardContent>
     </Card>

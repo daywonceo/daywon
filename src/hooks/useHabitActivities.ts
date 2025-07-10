@@ -19,6 +19,7 @@ const DEFAULT_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
 export const useHabitActivities = (habitList?: string[]) => {
   const [activities, setActivities] = useState<DayActivity[]>([]);
   const [activeHabit, setActiveHabit] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const userHabits =
     habitList && habitList.length === 3
@@ -27,6 +28,8 @@ export const useHabitActivities = (habitList?: string[]) => {
 
   const loadActivities = useCallback(async () => {
     try {
+      setIsLoading(true);
+      
       // Auto-activate habits that have been completed recently
       await autoActivateRecentHabits();
       
@@ -86,6 +89,8 @@ export const useHabitActivities = (habitList?: string[]) => {
         description: "Failed to load your recent activities.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   }, [userHabits.join(',')]);
 
@@ -180,5 +185,6 @@ export const useHabitActivities = (habitList?: string[]) => {
     toggleEditMode,
     updateActivityText,
     refreshActivities,
+    isLoading,
   };
 };
