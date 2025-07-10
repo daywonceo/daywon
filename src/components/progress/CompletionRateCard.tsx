@@ -4,13 +4,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle } from 'lucide-react';
 import { useHabitStats } from '@/hooks/useHabitStats';
+import { useHabits } from '@/hooks/useHabits';
 
 interface CompletionRateCardProps {
   userHabits?: string[];
 }
 
 const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) => {
-  const { weeklyStats } = useHabitStats(userHabits);
+  const { habits } = useHabits();
+  
+  // Use all active habits instead of just the default ones
+  const activeHabitNames = userHabits || habits?.filter(h => h.status === 'active').map(h => h.name) || [];
+  
+  const { weeklyStats } = useHabitStats(activeHabitNames);
 
   return (
     <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-green-500 shadow-md">
@@ -18,7 +24,7 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
         <div className="flex items-center gap-2 mb-3">
           <CheckCircle className="h-5 w-5 text-green-500" />
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Completion Rate This Week
+            Completion Rate (Last 7 Days)
           </h3>
         </div>
         
@@ -28,7 +34,7 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
           </p>
           
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            You've completed {weeklyStats.completedCount} of {weeklyStats.totalPossible} habits this week
+            You've completed {weeklyStats.completedCount} of {weeklyStats.totalPossible} habits in the last 7 days
           </p>
           
           <Progress 

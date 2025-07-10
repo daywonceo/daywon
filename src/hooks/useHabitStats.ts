@@ -6,19 +6,16 @@ import { calculateStreakForDate, calculateOverallLongestStreak } from '@/utils/h
 export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
   const stats = useMemo(() => {
     const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
-    
     const activities = getHabitActivities();
     
-    // Calculate weekly completion stats
+    // Calculate completion stats for the last 7 days
     let completedCount = 0;
     let totalPossible = 0;
     
-    // Check each day of the current week (up to today)
-    for (let dayOffset = 0; dayOffset <= now.getDay(); dayOffset++) {
-      const checkDate = new Date(startOfWeek);
-      checkDate.setDate(startOfWeek.getDate() + dayOffset);
+    // Check each of the last 7 days (including today)
+    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+      const checkDate = new Date(now);
+      checkDate.setDate(now.getDate() - dayOffset);
       const dateStr = checkDate.toISOString().split('T')[0];
       
       userHabits.forEach(habit => {
