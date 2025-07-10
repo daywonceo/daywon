@@ -12,7 +12,7 @@ import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitCategories";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Camera } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { useNavigate } from "react-router-dom";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
@@ -155,15 +155,6 @@ const Index = () => {
           <div className="flex justify-between items-center mb-4 sm:mb-6">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
             <div className="flex gap-1 sm:gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowGallery(true)}
-                className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
-              >
-                <Camera className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Gallery</span>
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm"

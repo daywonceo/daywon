@@ -55,6 +55,28 @@ const AllHabits = () => {
     handleRefresh();
   }, []);
 
+  // Listen for habit status changes from other parts of the app
+  useEffect(() => {
+    const handleHabitStatusChange = (event: CustomEvent) => {
+      const { category, status, date } = event.detail;
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Only update if it's for today's date
+      if (date === today) {
+        setHabitStatuses(prev => ({
+          ...prev,
+          [category]: status === 'completed'
+        }));
+      }
+    };
+
+    window.addEventListener('habitStatusChanged', handleHabitStatusChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('habitStatusChanged', handleHabitStatusChange as EventListener);
+    };
+  }, []);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -111,6 +133,11 @@ const AllHabits = () => {
       setHabitStatuses(prev => ({
         ...prev,
         [habit.name]: !isCurrentlyCompleted
+      }));
+      
+      // Dispatch event for other components to listen
+      window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+        detail: { category: habit.name, status: newStatus, date: new Date().toISOString().split('T')[0] } 
       }));
       
       toast({ 

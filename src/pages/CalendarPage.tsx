@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getHabitActivities, HabitActivity } from "@/utils/habitTracking";
+import { loadHabitActivitiesFromDatabase, HabitActivity } from "@/utils/habitActivity";
 import CalendarView from "@/components/calendar/CalendarView";
 import CalendarHeader from "@/components/calendar/CalendarHeader";
 import DailySummaryModal from "@/components/calendar/DailySummaryModal";
@@ -16,12 +16,34 @@ const CalendarPage = () => {
   const [showDailySummary, setShowDailySummary] = useState(false);
   const [summaryDate, setSummaryDate] = useState<Date | null>(null);
 
+  const loadActivities = async () => {
+    try {
+      const activities = await loadHabitActivitiesFromDatabase();
+      setAllActivities(activities);
+    } catch (error) {
+      console.error('Error loading activities:', error);
+    }
+  };
+
   useEffect(() => {
-    setAllActivities(getHabitActivities());
+    loadActivities();
+  }, []);
+
+  // Listen for habit status changes from other parts of the app
+  useEffect(() => {
+    const handleHabitStatusChange = () => {
+      loadActivities();
+    };
+
+    window.addEventListener('habitStatusChanged', handleHabitStatusChange);
+    
+    return () => {
+      window.removeEventListener('habitStatusChanged', handleHabitStatusChange);
+    };
   }, []);
 
   const refreshActivities = () => {
-    setAllActivities(getHabitActivities());
+    loadActivities();
   }
 
   const handleDateClick = (date: Date) => {
