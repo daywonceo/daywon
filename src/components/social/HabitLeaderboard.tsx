@@ -79,9 +79,9 @@ const HabitLeaderboard = () => {
           onValueChange={(value) => value && setPeriod(value as TimePeriod)} 
           className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-1 rounded-lg border border-gray-200 dark:border-gray-700"
         >
-          <ToggleGroupItem value="weekly" className="text-xs font-medium px-3 py-1.5">Week</ToggleGroupItem>
-          <ToggleGroupItem value="monthly" className="text-xs font-medium px-3 py-1.5">Month</ToggleGroupItem>
-          <ToggleGroupItem value="yearly" className="text-xs font-medium px-3 py-1.5">Year</ToggleGroupItem>
+          <ToggleGroupItem value="weekly" className="text-sm font-semibold px-4 py-2.5">Week</ToggleGroupItem>
+          <ToggleGroupItem value="monthly" className="text-sm font-semibold px-4 py-2.5">Month</ToggleGroupItem>
+          <ToggleGroupItem value="yearly" className="text-sm font-semibold px-4 py-2.5">Year</ToggleGroupItem>
         </ToggleGroup>
       </div>
 
@@ -209,6 +209,51 @@ const HabitLeaderboard = () => {
           </Card>
         ))}
       </div>
+
+      {/* Scoring Formula */}
+      <Card className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
+        <CardContent className="p-4">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+            <Award className="w-4 h-4 mr-2 text-blue-500" />
+            How Your Habit Score is Calculated
+          </h4>
+          <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center">
+                <Target className="w-3 h-3 text-blue-500 mr-2" />
+                <strong>Consistency Rate (40%)</strong>
+              </span>
+              <span>Days completed ÷ Total days</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center">
+                <Zap className="w-3 h-3 text-orange-500 mr-2" />
+                <strong>Streak Score (30%)</strong>
+              </span>
+              <span>Current streak × difficulty multiplier</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center">
+                <TrendingUp className="w-3 h-3 text-green-500 mr-2" />
+                <strong>Variety Score (20%)</strong>
+              </span>
+              <span>Number of different habits tracked</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center">
+                <Clock className="w-3 h-3 text-purple-500 mr-2" />
+                <strong>Recency Bonus (10%)</strong>
+              </span>
+              <span>Activity in the last 7 days</span>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              <strong>Total Score = </strong>(Consistency × 0.4) + (Streak × 0.3) + (Variety × 0.2) + (Recency × 0.1)
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
