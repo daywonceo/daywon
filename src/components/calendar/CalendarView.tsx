@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { addMonths, subMonths, format, startOfMonth, endOfMonth } from "date-fns";
+import { addMonths, subMonths, format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, getDay } from "date-fns";
 import { getHabitActivities } from "@/utils/habitActivity";
 import { Leaf } from "lucide-react";
 
@@ -101,12 +101,41 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
 
   const months = getCalendarMonths();
 
+  // Generate the calendar grid for proper alignment
+  const generateCalendarGrid = (month: Date) => {
+    const firstDay = startOfMonth(month);
+    const lastDay = endOfMonth(month);
+    
+    // Get all days in the month
+    const daysInMonth = eachDayOfInterval({
+      start: firstDay,
+      end: lastDay
+    });
+    
+    // Create a grid starting from the first day of the week
+    const startDay = getDay(firstDay); // 0 = Sunday, 1 = Monday, etc.
+    const grid = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startDay; i++) {
+      grid.push(null);
+    }
+    
+    // Add all days of the month
+    daysInMonth.forEach(day => {
+      grid.push(day);
+    });
+    
+    return grid;
+  };
+
   if (timePeriod === "current") {
-    // Single month view with smooth animations
+    const calendarGrid = generateCalendarGrid(currentMonth);
+    
+    // Single month view with custom grid layout
     return (
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full">
-          {/* Custom animated calendar container */}
           <div 
             className={`transition-all duration-300 ease-in-out ${
               isTransitioning 
@@ -114,68 +143,59 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                 : 'opacity-100 translate-x-0 scale-100'
             }`}
           >
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleDayClick}
-              month={currentMonth}
-              showOutsideDays={false}
-              className="rounded-xl border-0 p-0 w-full"
-              classNames={{
-                months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
-                month: "space-y-4 w-full",
-                caption: "flex justify-center pt-2 sm:pt-3 relative items-center text-foreground font-semibold text-lg sm:text-xl mb-4",
-                nav_button: "h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105",
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-lg shadow-md border-2 border-primary",
-                day_today: "bg-accent text-accent-foreground font-semibold rounded-lg border-2 border-primary/50 shadow-sm",
-                day: "h-10 w-10 sm:h-12 sm:w-12 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-lg transition-all duration-200 border-2 border-green-700 dark:border-green-600 hover:border-green-500 text-sm sm:text-base",
-                head_cell: "text-muted-foreground rounded-md w-10 sm:w-12 font-semibold text-xs sm:text-sm uppercase tracking-wide py-2",
-                table: "w-full border-collapse space-y-2",
-                head_row: "flex mb-3 sm:mb-4",
-                row: "flex w-full mt-1 sm:mt-2 gap-1 sm:gap-2",
-              }}
-              components={{
-                IconLeft: () => (
-                  <button
-                    onClick={() => handleMonthNavigation('prev')}
-                    disabled={isTransitioning}
-                    className="h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                ),
-                IconRight: () => (
-                  <button
-                    onClick={() => handleMonthNavigation('next')}
-                    disabled={isTransitioning}
-                    className="h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                ),
-                Day: ({ date: dayDate, ...props }) => {
+            <div className="bg-card rounded-xl p-4 sm:p-6">
+              {/* Month header with navigation */}
+              <div className="flex justify-between items-center mb-6">
+                <button
+                  onClick={() => handleMonthNavigation('prev')}
+                  disabled={isTransitioning}
+                  className="h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">
+                  {format(currentMonth, "MMMM yyyy")}
+                </h2>
+                
+                <button
+                  onClick={() => handleMonthNavigation('next')}
+                  disabled={isTransitioning}
+                  className="h-8 w-8 sm:h-9 sm:w-9 bg-secondary hover:bg-secondary/80 p-0 rounded-lg text-secondary-foreground transition-all duration-200 shadow-sm border border-border hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Weekday headers */}
+              <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3 sm:mb-4">
+                {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
+                  <div key={day} className="text-muted-foreground text-center font-semibold text-xs sm:text-sm uppercase tracking-wide py-2">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                {calendarGrid.map((dayDate, index) => {
+                  if (!dayDate) {
+                    // Empty cell for days before the first day of the month
+                    return <div key={index} className="h-10 w-10 sm:h-12 sm:w-12"></div>;
+                  }
+
                   const habitCount = getHabitCompletionCount(dayDate);
                   const isToday = dayDate.toDateString() === new Date().toDateString();
                   const backgroundColorClass = getHabitBackgroundColor(habitCount);
                   const textColorClass = getTextColor(habitCount);
                   
-                  // Check if this is an outside day (not in current month)
-                  const isOutsideDay = dayDate.getMonth() !== currentMonth.getMonth() || 
-                                       dayDate.getFullYear() !== currentMonth.getFullYear();
-                  
-                  // Don't render outside days
-                  if (isOutsideDay) {
-                    return <div className="h-10 w-10 sm:h-12 sm:w-12"></div>;
-                  }
-                  
                   return (
-                    <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
+                    <div key={index} className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center">
                       <button 
-                        {...props}
                         onClick={() => handleDayClick(dayDate)}
                         className={`w-full h-full flex items-center justify-center text-sm sm:text-base font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
                           isToday 
@@ -195,9 +215,9 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                       )}
                     </div>
                   );
-                },
-              }}
-            />
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -208,51 +228,40 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="grid gap-4 sm:gap-6 max-h-none overflow-visible">
-        {months.map((month, index) => (
-          <div key={index} className="bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 pb-6 shadow-sm border border-border">
-            <h3 className="text-sm sm:text-base font-semibold text-center mb-2 sm:mb-3 text-foreground bg-background rounded-lg py-1.5 sm:py-2 shadow-sm border border-border">
-              {format(month, "MMMM yyyy")}
-            </h3>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleDayClick}
-              month={month}
-              showOutsideDays={false}
-              className="w-full"
-              classNames={{
-                months: "flex flex-col",
-                month: "space-y-2 w-full",
-                caption: "hidden", // Hide caption since we have our own header
-                nav: "hidden", // Hide navigation for individual months
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 rounded-md border border-primary",
-                day_today: "bg-accent text-accent-foreground font-semibold rounded-md border border-primary/50",
-                day: "h-8 w-7 sm:h-9 sm:w-8 p-0 font-medium aria-selected:opacity-100 relative cursor-pointer hover:bg-accent/50 rounded-md transition-all duration-200 text-xs sm:text-sm border border-green-700 dark:border-green-600 hover:border-green-500",
-                head_cell: "text-muted-foreground w-7 sm:w-8 font-semibold text-[0.6rem] sm:text-[0.7rem] uppercase tracking-wide py-1",
-                table: "w-full border-collapse space-y-1",
-                head_row: "flex mb-2",
-                row: "flex w-full mt-0.5 gap-0.5",
-              }}
-              components={{
-                Day: ({ date: dayDate, ...props }) => {
+        {months.map((month, index) => {
+          const calendarGrid = generateCalendarGrid(month);
+          
+          return (
+            <div key={index} className="bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 pb-6 shadow-sm border border-border">
+              <h3 className="text-sm sm:text-base font-semibold text-center mb-2 sm:mb-3 text-foreground bg-background rounded-lg py-1.5 sm:py-2 shadow-sm border border-border">
+                {format(month, "MMMM yyyy")}
+              </h3>
+              
+              {/* Weekday headers */}
+              <div className="grid grid-cols-7 gap-0.5 mb-2">
+                {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
+                  <div key={day} className="text-muted-foreground text-center font-semibold text-[0.6rem] sm:text-[0.7rem] uppercase tracking-wide py-1">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-0.5">
+                {calendarGrid.map((dayDate, cellIndex) => {
+                  if (!dayDate) {
+                    // Empty cell for days before the first day of the month
+                    return <div key={cellIndex} className="h-8 w-7 sm:h-9 sm:w-8"></div>;
+                  }
+
                   const habitCount = getHabitCompletionCount(dayDate);
                   const isToday = dayDate.toDateString() === new Date().toDateString();
                   const backgroundColorClass = getHabitBackgroundColor(habitCount);
                   const textColorClass = getTextColor(habitCount);
                   
-                  // Check if this is an outside day (not in current month)
-                  const isOutsideDay = dayDate.getMonth() !== month.getMonth() || 
-                                       dayDate.getFullYear() !== month.getFullYear();
-                  
-                  // Don't render outside days
-                  if (isOutsideDay) {
-                    return <div className="h-8 w-7 sm:h-9 sm:w-8"></div>;
-                  }
-                  
                   return (
-                    <div className="relative h-8 w-7 sm:h-9 sm:w-8 flex items-center justify-center">
+                    <div key={cellIndex} className="relative h-8 w-7 sm:h-9 sm:w-8 flex items-center justify-center">
                        <button 
-                         {...props}
                          onClick={() => handleDayClick(dayDate)}
                          className={`text-xs sm:text-sm w-full h-full flex items-center justify-center font-medium rounded-md transition-all duration-200 ${
                            isToday 
@@ -272,11 +281,11 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
                       )}
                     </div>
                   );
-                },
-              }}
-            />
-          </div>
-        ))}
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
