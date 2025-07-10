@@ -63,10 +63,19 @@ const AllHabits = () => {
       
       // Only update if it's for today's date
       if (date === today) {
-        setHabitStatuses(prev => ({
-          ...prev,
-          [category]: status === 'completed'
-        }));
+        // Find matching habit by normalizing names for comparison
+        const matchingHabit = habits.find(habit => 
+          habit.name.toUpperCase() === category.toUpperCase() ||
+          habit.name.toLowerCase() === category.toLowerCase() ||
+          habit.name === category
+        );
+        
+        if (matchingHabit) {
+          setHabitStatuses(prev => ({
+            ...prev,
+            [matchingHabit.name]: status === 'completed'
+          }));
+        }
       }
     };
 
@@ -75,7 +84,7 @@ const AllHabits = () => {
     return () => {
       window.removeEventListener('habitStatusChanged', handleHabitStatusChange as EventListener);
     };
-  }, []);
+  }, [habits]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
