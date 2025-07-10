@@ -30,18 +30,15 @@ const DevotionsSubTabs = ({
       <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-6 h-10 sm:h-12">
         <TabsTrigger value="verses" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
           <Book className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span className="hidden xs:inline">Verses</span>
-          <span className="xs:hidden">V</span>
+          <span>Verses</span>
         </TabsTrigger>
         <TabsTrigger value="devotions" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
           <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span className="hidden xs:inline">Devotions</span>
-          <span className="xs:hidden">D</span>
+          <span>Devotions</span>
         </TabsTrigger>
         <TabsTrigger value="saved" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-1 sm:px-3">
           <Archive className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span className="hidden xs:inline">Saved</span>
-          <span className="xs:hidden">★</span>
+          <span>Saved</span>
         </TabsTrigger>
       </TabsList>
       
