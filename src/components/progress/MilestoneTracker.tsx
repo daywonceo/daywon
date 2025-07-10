@@ -18,7 +18,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         <div className="flex items-center gap-2 mb-3">
           <Flame className="h-5 w-5 text-blue-500" />
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Longest Streak
+            Longest Current Streak
           </h3>
         </div>
         
