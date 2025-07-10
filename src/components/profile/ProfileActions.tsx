@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Settings, Share2, LogOut } from "lucide-react";
+import { Settings, Share2, LogOut, RefreshCcw } from "lucide-react";
 
 interface ProfileActionsProps {
   onOpenSettings: () => void;
@@ -9,8 +9,14 @@ interface ProfileActionsProps {
 }
 
 const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
+  const handleStartOnboarding = () => {
+    localStorage.removeItem('onboardingComplete');
+    localStorage.removeItem('onboardingData');
+    window.location.reload();
+  };
+
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-2 gap-3">
       <Button 
         variant="outline" 
         className="border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900/20"
@@ -25,6 +31,14 @@ const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
       >
         <Share2 className="w-4 h-4 mr-2" />
         Share
+      </Button>
+      <Button 
+        variant="outline" 
+        className="border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+        onClick={handleStartOnboarding}
+      >
+        <RefreshCcw className="w-4 h-4 mr-2" />
+        Restart Onboarding
       </Button>
       <Button 
         variant="outline" 
