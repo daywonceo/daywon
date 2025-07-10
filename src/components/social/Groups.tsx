@@ -3,16 +3,50 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, Trophy, Clock, Heart, MessageCircle, Star, Target } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Users, Trophy, Clock, Heart, MessageCircle, Star, Target, Pin, ArrowLeft, Send } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import ChallengePlaylist from "./ChallengePlaylist";
+import CommunityDetail from "./CommunityDetail";
+import ChallengeDetail from "./ChallengeDetail";
+
+interface User {
+  id: number;
+  name: string;
+  avatar: string;
+  initials: string;
+  topHabits: string[];
+  streak: number;
+}
+
+interface ChatMessage {
+  id: number;
+  userId: number;
+  userName: string;
+  avatar: string;
+  message: string;
+  timestamp: string;
+  emoji?: string;
+}
 
 interface Community {
   id: number;
   name: string;
   description: string;
-  members: number;
+  members: User[];
   joined: boolean;
   category: string;
+  pinnedMessage?: string;
+  recentMessages: ChatMessage[];
+}
+
+interface ChallengeParticipant {
+  id: number;
+  name: string;
+  avatar: string;
+  progress: number;
+  dayStreak: number;
+  totalDays: number;
 }
 
 interface Challenge {
@@ -20,90 +54,209 @@ interface Challenge {
   title: string;
   habit: string;
   duration: string;
-  participants: number;
+  participants: ChallengeParticipant[];
   progress: number;
   rank: number;
   totalParticipants: number;
   timeRemaining: string;
   joined: boolean;
+  communityId: number;
+  chatMessages: ChatMessage[];
 }
 
 const Groups = () => {
   const [activeTab, setActiveTab] = useState<"communities" | "challenges">("communities");
+  const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
+  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const { toast } = useToast();
+
+  // Mock users
+  const mockUsers: User[] = [
+    { id: 1, name: "Alex Chen", avatar: "/placeholder.svg", initials: "AC", topHabits: ["Morning Prayer", "Exercise", "Reading"], streak: 15 },
+    { id: 2, name: "Maya Johnson", avatar: "/placeholder.svg", initials: "MJ", topHabits: ["Bible Study", "Meditation", "Journaling"], streak: 22 },
+    { id: 3, name: "Nate Rodriguez", avatar: "/placeholder.svg", initials: "NR", topHabits: ["Workout", "Meal Prep", "Scripture"], streak: 10 },
+    { id: 4, name: "Sarah Kim", avatar: "/placeholder.svg", initials: "SK", topHabits: ["Yoga", "Prayer", "Gratitude"], streak: 28 },
+    { id: 5, name: "David Park", avatar: "/placeholder.svg", initials: "DP", topHabits: ["Running", "Devotions", "Reading"], streak: 18 },
+    { id: 6, name: "Emma Wilson", avatar: "/placeholder.svg", initials: "EW", topHabits: ["Stretching", "Bible Reading", "Smoothies"], streak: 7 },
+    { id: 7, name: "Jordan Lee", avatar: "/placeholder.svg", initials: "JL", topHabits: ["Gym", "Prayer Walk", "Study"], streak: 12 },
+    { id: 8, name: "Taylor Brown", avatar: "/placeholder.svg", initials: "TB", topHabits: ["Morning Routine", "Scripture", "Planning"], streak: 25 }
+  ];
 
   const communities: Community[] = [
     {
       id: 1,
-      name: "MORNING WARRIORS",
-      description: "Early risers building better mornings together",
-      members: 247,
+      name: "📖 Morning Devotion Circle",
+      description: "Start each day with scripture and prayer together",
+      members: mockUsers.slice(0, 5),
       joined: true,
-      category: "LIFESTYLE"
+      category: "SPIRITUAL",
+      pinnedMessage: "🌅 This week's focus: Psalm 23. Share your reflections!",
+      recentMessages: [
+        { id: 1, userId: 2, userName: "Maya Johnson", avatar: "/placeholder.svg", message: "Just finished today's reading! 🙏", timestamp: "2 min ago", emoji: "🙏" },
+        { id: 2, userId: 4, userName: "Sarah Kim", avatar: "/placeholder.svg", message: "Great discussion yesterday about patience 💫", timestamp: "1 hr ago" },
+        { id: 3, userId: 1, userName: "Alex Chen", avatar: "/placeholder.svg", message: "Anyone else loving this Psalm series?", timestamp: "3 hrs ago", emoji: "❤️" }
+      ]
     },
     {
       id: 2,
-      name: "FITNESS FIGHTERS",
-      description: "Crushing fitness goals one day at a time",
-      members: 189,
+      name: "💪 5AM Gym Club",
+      description: "Early birds crushing workouts before sunrise",
+      members: mockUsers.slice(2, 7),
       joined: false,
-      category: "FITNESS"
+      category: "FITNESS",
+      pinnedMessage: "💪 Week 3 Challenge: Add 5 minutes to your cardio!",
+      recentMessages: [
+        { id: 4, userId: 3, userName: "Nate Rodriguez", avatar: "/placeholder.svg", message: "Crushed leg day this morning! 🔥", timestamp: "15 min ago", emoji: "🔥" },
+        { id: 5, userId: 7, userName: "Jordan Lee", avatar: "/placeholder.svg", message: "New bench press PR today! 💪", timestamp: "45 min ago" },
+        { id: 6, userId: 5, userName: "David Park", avatar: "/placeholder.svg", message: "Running group at 5:30 tomorrow?", timestamp: "2 hrs ago" }
+      ]
     },
     {
       id: 3,
-      name: "MINDFUL READERS",
-      description: "Growing through daily reading habits",
-      members: 156,
+      name: "🥗 Healthy Habits Crew",
+      description: "Nutrition, meal prep, and wellness journey together",
+      members: mockUsers.slice(3, 8),
       joined: true,
-      category: "LEARNING"
-    },
-    {
-      id: 4,
-      name: "SPIRITUAL JOURNEY",
-      description: "Deepening faith through daily devotions",
-      members: 203,
-      joined: false,
-      category: "SPIRITUAL"
+      category: "NUTRITION",
+      pinnedMessage: "🥗 Meal Prep Sunday tips: Prep proteins first, then veggies!",
+      recentMessages: [
+        { id: 7, userId: 6, userName: "Emma Wilson", avatar: "/placeholder.svg", message: "Made the best green smoothie today! 🥬", timestamp: "30 min ago", emoji: "🥬" },
+        { id: 8, userId: 8, userName: "Taylor Brown", avatar: "/placeholder.svg", message: "Sharing my meal prep containers in photos 📸", timestamp: "1 hr ago" },
+        { id: 9, userId: 4, userName: "Sarah Kim", avatar: "/placeholder.svg", message: "Week 2 of no processed foods! Feeling great ✨", timestamp: "4 hrs ago", emoji: "✨" }
+      ]
     }
   ];
 
   const challenges: Challenge[] = [
     {
       id: 1,
-      title: "30-DAY WORKOUT STREAK",
-      habit: "WORKOUT",
+      title: "Stretch Daily for 30 Days",
+      habit: "STRETCHING",
       duration: "30 days",
-      participants: 45,
+      participants: [
+        { id: 3, name: "Nate Rodriguez", avatar: "/placeholder.svg", progress: 47, dayStreak: 14, totalDays: 30 },
+        { id: 2, name: "Maya Johnson", avatar: "/placeholder.svg", progress: 73, dayStreak: 22, totalDays: 30 },
+        { id: 6, name: "Emma Wilson", avatar: "/placeholder.svg", progress: 23, dayStreak: 7, totalDays: 30 },
+        { id: 4, name: "Sarah Kim", avatar: "/placeholder.svg", progress: 93, dayStreak: 28, totalDays: 30 },
+        { id: 7, name: "Jordan Lee", avatar: "/placeholder.svg", progress: 40, dayStreak: 12, totalDays: 30 }
+      ],
       progress: 67,
-      rank: 12,
-      totalParticipants: 45,
+      rank: 3,
+      totalParticipants: 5,
       timeRemaining: "8 days left",
-      joined: true
+      joined: true,
+      communityId: 2,
+      chatMessages: [
+        { id: 10, userId: 4, userName: "Sarah Kim", avatar: "/placeholder.svg", message: "Let's go team! 💪", timestamp: "5 min ago", emoji: "💪" },
+        { id: 11, userId: 2, userName: "Maya Johnson", avatar: "/placeholder.svg", message: "Hit 5 days in a row! 🔥", timestamp: "2 hrs ago", emoji: "🔥" },
+        { id: 12, userId: 3, userName: "Nate Rodriguez", avatar: "/placeholder.svg", message: "My hamstrings are thanking me already 😅", timestamp: "1 day ago" }
+      ]
     },
     {
       id: 2,
-      title: "DAILY DEVOTIONS CHALLENGE",
-      habit: "DEVOTIONS",
+      title: "Morning Prayer - 21 Days",
+      habit: "PRAYER",
       duration: "21 days",
-      participants: 32,
-      progress: 0,
-      rank: 0,
-      totalParticipants: 32,
-      timeRemaining: "21 days left",
-      joined: false
+      participants: [
+        { id: 1, name: "Alex Chen", avatar: "/placeholder.svg", progress: 71, dayStreak: 15, totalDays: 21 },
+        { id: 2, name: "Maya Johnson", avatar: "/placeholder.svg", progress: 100, dayStreak: 21, totalDays: 21 },
+        { id: 4, name: "Sarah Kim", avatar: "/placeholder.svg", progress: 81, dayStreak: 17, totalDays: 21 },
+        { id: 5, name: "David Park", avatar: "/placeholder.svg", progress: 86, dayStreak: 18, totalDays: 21 }
+      ],
+      progress: 71,
+      rank: 3,
+      totalParticipants: 4,
+      timeRemaining: "6 days left",
+      joined: true,
+      communityId: 1,
+      chatMessages: [
+        { id: 13, userId: 2, userName: "Maya Johnson", avatar: "/placeholder.svg", message: "Completed the full 21 days! 🙌", timestamp: "1 hr ago", emoji: "🙌" },
+        { id: 14, userId: 1, userName: "Alex Chen", avatar: "/placeholder.svg", message: "This challenge has been life-changing 🙏", timestamp: "3 hrs ago", emoji: "🙏" },
+        { id: 15, userId: 5, userName: "David Park", avatar: "/placeholder.svg", message: "Almost there everyone! Keep going!", timestamp: "5 hrs ago" }
+      ]
     },
     {
       id: 3,
-      title: "READING MARATHON",
-      habit: "READ",
+      title: "Healthy Meal Prep Challenge",
+      habit: "MEAL PREP",
       duration: "14 days",
-      participants: 28,
-      progress: 85,
-      rank: 3,
-      totalParticipants: 28,
-      timeRemaining: "2 days left",
-      joined: true
+      participants: [
+        { id: 6, name: "Emma Wilson", avatar: "/placeholder.svg", progress: 50, dayStreak: 7, totalDays: 14 },
+        { id: 8, name: "Taylor Brown", avatar: "/placeholder.svg", progress: 86, dayStreak: 12, totalDays: 14 },
+        { id: 4, name: "Sarah Kim", avatar: "/placeholder.svg", progress: 79, dayStreak: 11, totalDays: 14 }
+      ],
+      progress: 0,
+      rank: 0,
+      totalParticipants: 3,
+      timeRemaining: "7 days left",
+      joined: false,
+      communityId: 3,
+      chatMessages: [
+        { id: 16, userId: 8, userName: "Taylor Brown", avatar: "/placeholder.svg", message: "Sunday prep session complete! 🥗", timestamp: "2 hrs ago", emoji: "🥗" },
+        { id: 17, userId: 6, userName: "Emma Wilson", avatar: "/placeholder.svg", message: "Love the overnight oats recipe!", timestamp: "1 day ago" }
+      ]
     }
   ];
+
+  const handleJoinCommunity = (communityId: number) => {
+    toast({
+      title: "Joined Community!",
+      description: "Welcome to the group! Start chatting with members.",
+    });
+  };
+
+  const handleJoinChallenge = (challengeId: number) => {
+    toast({
+      title: "Challenge Accepted!",
+      description: "You're now part of this challenge. Good luck!",
+    });
+  };
+
+  const handleLeaveChallenge = (challengeId: number, challengeTitle: string) => {
+    if (confirm(`Are you sure you want to leave "${challengeTitle}"?`)) {
+      toast({
+        title: "Left Challenge",
+        description: "You've been removed from this challenge.",
+      });
+    }
+  };
+
+  const sendMessage = (type: 'community' | 'challenge', id: number) => {
+    if (!newMessage.trim()) return;
+    
+    toast({
+      title: "Message Sent!",
+      description: "Your message has been posted to the group.",
+    });
+    setNewMessage("");
+  };
+
+  // Show detailed view if selected
+  if (selectedCommunity) {
+    return (
+      <CommunityDetail
+        community={selectedCommunity}
+        onBack={() => setSelectedCommunity(null)}
+        newMessage={newMessage}
+        setNewMessage={setNewMessage}
+        onSendMessage={() => sendMessage('community', selectedCommunity.id)}
+      />
+    );
+  }
+
+  if (selectedChallenge) {
+    return (
+      <ChallengeDetail
+        challenge={selectedChallenge}
+        onBack={() => setSelectedChallenge(null)}
+        newMessage={newMessage}
+        setNewMessage={setNewMessage}
+        onSendMessage={() => sendMessage('challenge', selectedChallenge.id)}
+        onLeaveChallenge={() => handleLeaveChallenge(selectedChallenge.id, selectedChallenge.title)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -144,7 +297,11 @@ const Groups = () => {
       {activeTab === "communities" && (
         <div className="space-y-4">
           {communities.map((community) => (
-            <Card key={community.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
+            <Card 
+              key={community.id} 
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer"
+              onClick={() => setSelectedCommunity(community)}
+            >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
@@ -162,18 +319,45 @@ const Groups = () => {
                     </p>
                     <div className="flex items-center space-x-1 text-xs text-gray-500">
                       <Users size={14} />
-                      <span>{community.members} members</span>
+                      <span>{community.members.length} members</span>
                     </div>
                   </div>
                   <Button
                     variant={community.joined ? "secondary" : "default"}
                     size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!community.joined) {
+                        handleJoinCommunity(community.id);
+                      }
+                    }}
                     disabled={community.joined}
                     className="ml-3 text-xs px-3 py-1.5 h-auto"
                   >
                     {community.joined ? "JOINED" : "JOIN"}
                   </Button>
                 </div>
+                
+                {/* Recent Activity Preview */}
+                {community.joined && community.recentMessages.length > 0 && (
+                  <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <MessageCircle size={12} className="text-gray-400" />
+                      <span className="text-xs text-gray-500">Recent activity</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={community.recentMessages[0].avatar} />
+                        <AvatarFallback className="text-xs">
+                          {community.recentMessages[0].userName.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate flex-1">
+                        <span className="font-medium">{community.recentMessages[0].userName}:</span> {community.recentMessages[0].message}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -184,7 +368,11 @@ const Groups = () => {
       {activeTab === "challenges" && (
         <div className="space-y-4">
           {challenges.map((challenge) => (
-            <Card key={challenge.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
+            <Card 
+              key={challenge.id} 
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer"
+              onClick={() => setSelectedChallenge(challenge)}
+            >
               <CardContent className="p-4">
                 <div className="space-y-3">
                   {/* Challenge Header */}
@@ -203,6 +391,12 @@ const Groups = () => {
                     <Button
                       variant={challenge.joined ? "secondary" : "default"}
                       size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!challenge.joined) {
+                          handleJoinChallenge(challenge.id);
+                        }
+                      }}
                       disabled={challenge.joined}
                       className="ml-3 text-xs px-3 py-1.5 h-auto"
                     >
@@ -214,11 +408,29 @@ const Groups = () => {
                   <div className="flex items-center space-x-4 text-xs text-gray-500">
                     <div className="flex items-center space-x-1">
                       <Users size={14} />
-                      <span>{challenge.participants} participants</span>
+                      <span>{challenge.participants.length} participants</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Clock size={14} />
                       <span>{challenge.timeRemaining}</span>
+                    </div>
+                  </div>
+
+                  {/* Top 3 Participants Preview */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">Top performers:</span>
+                    <div className="flex -space-x-1">
+                      {challenge.participants
+                        .sort((a, b) => b.progress - a.progress)
+                        .slice(0, 3)
+                        .map((participant) => (
+                        <Avatar key={participant.id} className="h-6 w-6 border-2 border-white dark:border-gray-800">
+                          <AvatarImage src={participant.avatar} alt={participant.name} />
+                          <AvatarFallback className="text-xs">
+                            {participant.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
                     </div>
                   </div>
 
@@ -234,7 +446,7 @@ const Groups = () => {
                         <div className="flex items-center space-x-1 text-xs">
                           <Trophy size={14} className="text-yellow-500" />
                           <span className="font-medium text-gray-700 dark:text-gray-300">
-                            Rank #{challenge.rank} of {challenge.totalParticipants}
+                            Rank #{challenge.rank} of {challenge.participants.length}
                           </span>
                         </div>
                         <div className="flex space-x-1">
@@ -242,6 +454,7 @@ const Groups = () => {
                             variant="ghost"
                             size="sm"
                             className="text-gray-500 hover:text-red-500 h-7 px-2 text-xs"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <Heart size={12} className="mr-1" />
                             Cheer
@@ -250,11 +463,33 @@ const Groups = () => {
                             variant="ghost"
                             size="sm"
                             className="text-gray-500 hover:text-blue-500 h-7 px-2 text-xs"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <MessageCircle size={12} className="mr-1" />
                             Chat
                           </Button>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recent Chat Preview */}
+                  {challenge.chatMessages.length > 0 && (
+                    <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <MessageCircle size={12} className="text-gray-400" />
+                        <span className="text-xs text-gray-500">Recent chat</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={challenge.chatMessages[0].avatar} />
+                          <AvatarFallback className="text-xs">
+                            {challenge.chatMessages[0].userName.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate flex-1">
+                          <span className="font-medium">{challenge.chatMessages[0].userName}:</span> {challenge.chatMessages[0].message}
+                        </p>
                       </div>
                     </div>
                   )}
