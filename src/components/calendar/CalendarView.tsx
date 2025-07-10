@@ -119,6 +119,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
               selected={date}
               onSelect={handleDayClick}
               month={currentMonth}
+              showOutsideDays={false}
               className="rounded-xl border-0 p-0 w-full"
               classNames={{
                 months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
@@ -208,6 +209,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
               selected={date}
               onSelect={handleDayClick}
               month={month}
+              showOutsideDays={false}
               className="w-full"
               classNames={{
                 months: "flex flex-col",
