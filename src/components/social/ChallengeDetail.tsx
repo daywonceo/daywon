@@ -43,6 +43,15 @@ interface Challenge {
   chatMessages: ChatMessage[];
 }
 
+interface User {
+  id: number;
+  name: string;
+  avatar: string;
+  initials: string;
+  topHabits: string[];
+  streak: number;
+}
+
 interface ChallengeDetailProps {
   challenge: Challenge;
   onBack: () => void;
@@ -51,6 +60,7 @@ interface ChallengeDetailProps {
   onSendMessage: () => void;
   onLeaveChallenge: () => void;
   onInvite?: (challenge: Challenge) => void;
+  onViewAllMembers: (title: string, members: User[]) => void;
 }
 
 const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
@@ -60,7 +70,8 @@ const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
   setNewMessage,
   onSendMessage,
   onLeaveChallenge,
-  onInvite
+  onInvite,
+  onViewAllMembers
 }) => {
   const { toast } = useToast();
   const currentUserId = 1; // Mock current user ID
@@ -156,14 +167,24 @@ const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
         </CardContent>
       </Card>
 
-      {/* Leaderboard */}
+  {/* Leaderboard */}
       <div>
-        <div className="flex items-center space-x-2 mb-4">
-          <Trophy className="text-yellow-500" size={18} />
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Trophy className="text-yellow-500" size={18} />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h2>
+          </div>
+          <Button
+            variant="ghost" 
+            size="sm"
+            onClick={() => onViewAllMembers(`${challenge.title} Participants`, participantsAsMembers)}
+            className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
+          >
+            View All
+          </Button>
         </div>
         <div className="space-y-3">
-          {sortedParticipants.map((participant, index) => {
+          {sortedParticipants.slice(0, 3).map((participant, index) => {
             const memberData = participantsAsMembers.find(m => m.id === participant.id);
             if (!memberData) return null;
             

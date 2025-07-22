@@ -45,6 +45,7 @@ interface CommunityDetailProps {
   setNewMessage: (message: string) => void;
   onSendMessage: () => void;
   onInvite?: (community: Community) => void;
+  onViewAllMembers: (title: string, members: User[]) => void;
 }
 
 const CommunityDetail: React.FC<CommunityDetailProps> = ({
@@ -53,7 +54,8 @@ const CommunityDetail: React.FC<CommunityDetailProps> = ({
   newMessage,
   setNewMessage,
   onSendMessage,
-  onInvite
+  onInvite,
+  onViewAllMembers
 }) => {
   const { toast } = useToast();
   const currentUserId = 1; // Mock current user ID
@@ -111,20 +113,33 @@ const CommunityDetail: React.FC<CommunityDetailProps> = ({
 
       {/* Members List */}
       <div>
-        <div className="flex items-center space-x-2 mb-4">
-          <Users size={18} className="text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Members</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Users size={18} className="text-gray-600 dark:text-gray-400" />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Members</h2>
+          </div>
+          <Button
+            variant="ghost" 
+            size="sm"
+            onClick={() => onViewAllMembers(`${community.name} Members`, community.members)}
+            className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
+          >
+            View All
+          </Button>
         </div>
         <div className="space-y-3">
-          {community.members.map((member) => (
-            <MemberCard
-              key={member.id}
-              member={member}
-              currentUserId={currentUserId}
-              showInviteButton={false} // Don't show invite for existing members
-              onMessage={handleMemberMessage}
-              onInvite={handleMemberInvite}
-            />
+          {community.members
+            .sort((a, b) => b.streak - a.streak)
+            .slice(0, 3)
+            .map((member) => (
+              <MemberCard
+                key={member.id}
+                member={member}
+                currentUserId={currentUserId}
+                showInviteButton={false}
+                onMessage={handleMemberMessage}
+                onInvite={handleMemberInvite}
+              />
           ))}
         </div>
       </div>
