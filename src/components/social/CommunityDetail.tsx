@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Pin, Send, Users } from "lucide-react";
+import { ArrowLeft, Pin, Send, Users, Share } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface User {
@@ -42,6 +42,7 @@ interface CommunityDetailProps {
   newMessage: string;
   setNewMessage: (message: string) => void;
   onSendMessage: () => void;
+  onInvite?: (community: Community) => void;
 }
 
 const CommunityDetail: React.FC<CommunityDetailProps> = ({
@@ -49,7 +50,8 @@ const CommunityDetail: React.FC<CommunityDetailProps> = ({
   onBack,
   newMessage,
   setNewMessage,
-  onSendMessage
+  onSendMessage,
+  onInvite
 }) => {
   return (
     <div className="space-y-4">
@@ -62,6 +64,17 @@ const CommunityDetail: React.FC<CommunityDetailProps> = ({
           <h3 className="font-bold text-lg text-gray-900 dark:text-white">{community.name}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">{community.members.length} members</p>
         </div>
+        {onInvite && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onInvite(community)}
+            className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+          >
+            <Share size={14} />
+            <span className="hidden sm:inline">Invite</span>
+          </Button>
+        )}
       </div>
 
       {/* Pinned Message */}

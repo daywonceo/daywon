@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Trophy, Flame, Send, Users, Clock } from "lucide-react";
+import { ArrowLeft, Trophy, Flame, Send, Users, Clock, Share } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface ChallengeParticipant {
@@ -48,6 +48,7 @@ interface ChallengeDetailProps {
   setNewMessage: (message: string) => void;
   onSendMessage: () => void;
   onLeaveChallenge: () => void;
+  onInvite?: (challenge: Challenge) => void;
 }
 
 const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
@@ -56,7 +57,8 @@ const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
   newMessage,
   setNewMessage,
   onSendMessage,
-  onLeaveChallenge
+  onLeaveChallenge,
+  onInvite
 }) => {
   const sortedParticipants = [...challenge.participants].sort((a, b) => b.progress - a.progress);
   const userRank = challenge.joined ? challenge.rank : null;
@@ -78,11 +80,24 @@ const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
             </div>
           </div>
         </div>
-        {challenge.joined && (
-          <Button variant="outline" size="sm" onClick={onLeaveChallenge}>
-            Leave
-          </Button>
-        )}
+        <div className="flex items-center space-x-2">
+          {onInvite && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onInvite(challenge)}
+              className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              <Share size={14} />
+              <span className="hidden sm:inline">Invite</span>
+            </Button>
+          )}
+          {challenge.joined && (
+            <Button variant="outline" size="sm" onClick={onLeaveChallenge}>
+              Leave
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Challenge Stats */}

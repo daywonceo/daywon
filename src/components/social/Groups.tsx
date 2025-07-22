@@ -4,11 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, Trophy, Clock, Heart, MessageCircle, Star, Target, Pin, ArrowLeft, Send } from "lucide-react";
+import { Users, Trophy, Clock, Heart, MessageCircle, Star, Target, Pin, ArrowLeft, Send, Share, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ChallengePlaylist from "./ChallengePlaylist";
 import CommunityDetail from "./CommunityDetail";
 import ChallengeDetail from "./ChallengeDetail";
+import InviteModal from "./InviteModal";
 
 interface User {
   id: number;
@@ -69,7 +70,19 @@ const Groups = () => {
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [inviteModal, setInviteModal] = useState<{ 
+    isOpen: boolean; 
+    type: 'community' | 'challenge'; 
+    data: Community | Challenge | null; 
+  }>({ 
+    isOpen: false, 
+    type: 'community', 
+    data: null 
+  });
   const { toast } = useToast();
+  
+  // Mock current user for auth checks
+  const currentUser = { id: 1, name: "Current User" };
 
   // Mock users
   const mockUsers: User[] = [
@@ -232,6 +245,52 @@ const Groups = () => {
     setNewMessage("");
   };
 
+  const handleInvite = async (type: 'community' | 'challenge', data: Community | Challenge) => {
+    const baseUrl = window.location.origin;
+    const inviteLink = `${baseUrl}/invite/${type}/${data.id}`;
+    
+    try {
+      // Use Web Share API if available
+      if (navigator.share) {
+        const displayName = type === 'community' ? (data as Community).name : (data as Challenge).title;
+        await navigator.share({
+          title: `Join this ${type}!`,
+          text: `I think you'd love this ${type}: "${displayName}"`,
+          url: inviteLink,
+        });
+        toast({
+          title: "Invitation Sent!",
+          description: "Your invite has been shared successfully.",
+        });
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(inviteLink);
+        toast({
+          title: "Link Copied!",
+          description: "The invite link has been copied to your clipboard.",
+        });
+      }
+    } catch (error) {
+      // Fallback for older browsers
+      toast({
+        title: "Invite Link Ready",
+        description: `Share this link: ${inviteLink}`,
+      });
+    }
+  };
+
+  const openInviteModal = (type: 'community' | 'challenge', data: Community | Challenge) => {
+    setInviteModal({ isOpen: true, type, data });
+  };
+
+  const handleJoinFromModal = (id: number) => {
+    if (inviteModal.type === 'community') {
+      handleJoinCommunity(id);
+    } else {
+      handleJoinChallenge(id);
+    }
+  };
+
   // Show detailed view if selected
   if (selectedCommunity) {
     return (
@@ -241,6 +300,7 @@ const Groups = () => {
         newMessage={newMessage}
         setNewMessage={setNewMessage}
         onSendMessage={() => sendMessage('community', selectedCommunity.id)}
+        onInvite={(community) => handleInvite('community', community)}
       />
     );
   }
@@ -254,6 +314,7 @@ const Groups = () => {
         setNewMessage={setNewMessage}
         onSendMessage={() => sendMessage('challenge', selectedChallenge.id)}
         onLeaveChallenge={() => handleLeaveChallenge(selectedChallenge.id, selectedChallenge.title)}
+        onInvite={(challenge) => handleInvite('challenge', challenge)}
       />
     );
   }
@@ -322,20 +383,33 @@ const Groups = () => {
                       <span>{community.members.length} members</span>
                     </div>
                   </div>
-                  <Button
-                    variant={community.joined ? "secondary" : "default"}
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!community.joined) {
-                        handleJoinCommunity(community.id);
-                      }
-                    }}
-                    disabled={community.joined}
-                    className="ml-3 text-xs px-3 py-1.5 h-auto"
-                  >
-                    {community.joined ? "JOINED" : "JOIN"}
-                  </Button>
+                  <div className="flex items-center space-x-2 ml-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleInvite('community', community);
+                      }}
+                      className="h-8 w-8 p-0 text-gray-500 hover:text-blue-500"
+                    >
+                      <Send size={14} />
+                    </Button>
+                    <Button
+                      variant={community.joined ? "secondary" : "default"}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!community.joined) {
+                          handleJoinCommunity(community.id);
+                        }
+                      }}
+                      disabled={community.joined}
+                      className="text-xs px-3 py-1.5 h-auto"
+                    >
+                      {community.joined ? "JOINED" : "JOIN"}
+                    </Button>
+                  </div>
                 </div>
                 
                 {/* Recent Activity Preview */}
@@ -388,20 +462,33 @@ const Groups = () => {
                         {challenge.habit} • {challenge.duration}
                       </p>
                     </div>
-                    <Button
-                      variant={challenge.joined ? "secondary" : "default"}
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!challenge.joined) {
-                          handleJoinChallenge(challenge.id);
-                        }
-                      }}
-                      disabled={challenge.joined}
-                      className="ml-3 text-xs px-3 py-1.5 h-auto"
-                    >
-                      {challenge.joined ? "JOINED" : "JOIN"}
-                    </Button>
+                    <div className="flex items-center space-x-2 ml-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleInvite('challenge', challenge);
+                        }}
+                        className="h-8 w-8 p-0 text-gray-500 hover:text-blue-500"
+                      >
+                        <Send size={14} />
+                      </Button>
+                      <Button
+                        variant={challenge.joined ? "secondary" : "default"}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!challenge.joined) {
+                            handleJoinChallenge(challenge.id);
+                          }
+                        }}
+                        disabled={challenge.joined}
+                        className="text-xs px-3 py-1.5 h-auto"
+                      >
+                        {challenge.joined ? "JOINED" : "JOIN"}
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Challenge Stats */}
@@ -510,6 +597,16 @@ const Groups = () => {
           ))}
         </div>
       )}
+
+      {/* Invite Modal */}
+      <InviteModal
+        isOpen={inviteModal.isOpen}
+        onClose={() => setInviteModal({ ...inviteModal, isOpen: false })}
+        type={inviteModal.type}
+        data={inviteModal.data as any}
+        currentUser={currentUser}
+        onJoin={handleJoinFromModal}
+      />
     </div>
   );
 };
