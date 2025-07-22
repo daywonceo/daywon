@@ -12,7 +12,7 @@ import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitCategories";
 import { Button } from "@/components/ui/button";
-import { List } from "lucide-react";
+import { List, Calendar } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { useNavigate } from "react-router-dom";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
@@ -23,11 +23,13 @@ import CompletionRateCard from "@/components/progress/CompletionRateCard";
 import MilestoneTracker from "@/components/progress/MilestoneTracker";
 import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard";
 import { useAutomaticDeduplication } from "@/hooks/useAutomaticDeduplication";
+import CatchUpView from "@/components/habit/CatchUpView";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showHabitsModal, setShowHabitsModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [showCatchUp, setShowCatchUp] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const isMobile = useIsMobile();
@@ -155,18 +157,34 @@ const Index = () => {
           />
 
           <HabitGallery open={showGallery} onOpenChange={setShowGallery} />
+          <CatchUpView 
+            open={showCatchUp} 
+            onClose={() => setShowCatchUp(false)}
+            userHabits={activityHabits}
+          />
 
           <div className="flex justify-between items-center mb-4 sm:mb-6">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
             <div className="flex gap-1 sm:gap-2">
               <Button 
                 variant="outline" 
-                size="default"
-                onClick={() => navigate("/all-habits")}
-                className="text-sm px-4 py-2"
+                size="sm"
+                onClick={() => setShowCatchUp(true)}
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-8 sm:h-9"
               >
-                <List className="mr-2 h-4 w-4" />
-                <span>All Habits</span>
+                <Calendar className="mr-1 sm:mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">Catch Up</span>
+                <span className="sm:hidden">Catch Up</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate("/all-habits")}
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-8 sm:h-9"
+              >
+                <List className="mr-1 sm:mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">All Habits</span>
+                <span className="sm:hidden">All</span>
               </Button>
             </div>
           </div>
