@@ -16,6 +16,7 @@ import { List, Calendar } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { useNavigate } from "react-router-dom";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
+import { useHabits } from "@/hooks/useHabits";
 import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
 import AllHabitsDialog from "@/components/habit/AllHabitsDialog";
 import HabitGallery from "@/components/habit/HabitGallery";
@@ -44,6 +45,9 @@ const Index = () => {
 
   // get top 3 habits and mutation
   const { topHabits, isLoading: topHabitsLoading, saveTopHabits, refetch } = useTopHabits();
+  
+  // get all user habits
+  const { habits: allHabits, isLoading: allHabitsLoading } = useHabits();
   
   // Automatically detect and merge duplicate habits
   useAutomaticDeduplication();
@@ -125,6 +129,9 @@ const Index = () => {
     ? topHabits
     : ["WORKOUT", "DEVOTIONS", "READ"];
 
+  // Get all active habit names for sections that need to show all habits
+  const allActiveHabitNames = allHabits?.filter(h => h.status === 'active').map(h => h.name) || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50/50 via-white to-blue-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
       <Header />
@@ -139,8 +146,8 @@ const Index = () => {
 
           {/* New Progress Components */}
           <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-8 sm:mb-12">
-            <CompletionRateCard />
-            <MilestoneTracker userHabits={activityHabits} />
+            <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+            <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
             <DailyEncouragementCard />
           </div>
 
@@ -160,7 +167,7 @@ const Index = () => {
           <CatchUpView 
             open={showCatchUp} 
             onClose={() => setShowCatchUp(false)}
-            userHabits={activityHabits}
+            userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits}
           />
 
           <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -191,7 +198,7 @@ const Index = () => {
 
           <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />
           <HabitStats refreshTrigger={refreshTrigger} />
-          <Progress userHabits={activityHabits} />
+          <Progress userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
         </main>
       </PullToRefresh>
       <Footer />
