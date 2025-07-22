@@ -441,41 +441,6 @@ const Groups = () => {
                     </Button>
                   </div>
                 </div>
-                
-                {/* Top 3 Members Display */}
-                <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <Users size={14} className="text-gray-400" />
-                      <span className="text-xs text-gray-500 font-medium">Top Members</span>
-                    </div>
-                    <Button
-                      variant="ghost" 
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewAllMembers(`${community.name} Members`, community.members);
-                      }}
-                      className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
-                    >
-                      View All
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {community.members
-                      .sort((a, b) => b.streak - a.streak)
-                      .slice(0, 3)
-                      .map((member) => (
-                        <MemberCard
-                          key={member.id}
-                          member={member}
-                          currentUserId={currentUser.id}
-                          showInviteButton={false}
-                          onMessage={handleMemberMessage}
-                        />
-                      ))}
-                  </div>
-                </div>
 
                 {/* Recent Activity Preview */}
                 {community.joined && community.recentMessages.length > 0 && (
@@ -568,55 +533,6 @@ const Groups = () => {
                     </div>
                   </div>
 
-                  {/* Top 3 Participants Display */}
-                  <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <Trophy size={14} className="text-yellow-500" />
-                        <span className="text-xs text-gray-500 font-medium">Top Performers</span>
-                      </div>
-                      <Button
-                        variant="ghost" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const participantMembers = challenge.participants.map(p => ({
-                            id: p.id,
-                            name: p.name,
-                            avatar: p.avatar,
-                            initials: p.name.split(' ').map(n => n[0]).join(''),
-                            topHabits: [challenge.habit],
-                            streak: p.dayStreak
-                          }));
-                          handleViewAllMembers(`${challenge.title} Participants`, participantMembers);
-                        }}
-                        className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
-                      >
-                        View All
-                      </Button>
-                    </div>
-                    <div className="space-y-2">
-                      {challenge.participants
-                        .sort((a, b) => b.progress - a.progress)
-                        .slice(0, 3)
-                        .map((participant) => (
-                          <MemberCard
-                            key={participant.id}
-                            member={{
-                              id: participant.id,
-                              name: participant.name,
-                              avatar: participant.avatar,
-                              initials: participant.name.split(' ').map(n => n[0]).join(''),
-                              topHabits: [challenge.habit],
-                              streak: participant.dayStreak
-                            }}
-                            currentUserId={currentUser.id}
-                            showInviteButton={false}
-                            onMessage={handleMemberMessage}
-                          />
-                        ))}
-                    </div>
-                  </div>
 
                   {/* Progress (only for joined challenges) */}
                   {challenge.joined && (
