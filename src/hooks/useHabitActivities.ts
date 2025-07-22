@@ -44,8 +44,18 @@ export const useHabitActivities = (habitList?: string[]) => {
       // Format dates as YYYY-MM-DD strings
       const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
       
-      // Get all habit activities from database (with fallback to local storage)
-      const storedActivities = await loadHabitActivitiesFromDatabase();
+      // Trigger sync before loading data
+      try {
+        // Dynamically import to avoid circular dependencies
+        const { synchronizeHabits } = await import('@/utils/habitSynchronization');
+        await synchronizeHabits();
+      } catch (syncError) {
+        console.error("Failed to sync habit data:", syncError);
+        // Continue with local data even if sync fails
+      }
+      
+      // Get all habit activities from local storage
+      const storedActivities = getHabitActivities();
       
       // Create activities for the past 3 days
       const newActivities = dates.map((date, index) => {

@@ -16,14 +16,11 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
     const targetDateStr = targetDate.toISOString().split('T')[0];
     
     console.log(`Calculating streak for ${habitName} on ${targetDateStr}`);
-    console.log(`All habit activities in storage:`, activities);
     
     // Filter activities for this habit, sorted by date (newest first)
     const habitActivities = activities
       .filter(activity => activity.habitName === habitName)
       .sort((a, b) => b.date.localeCompare(a.date));
-    
-    console.log(`Found ${habitActivities.length} activities for ${habitName}:`, habitActivities);
     
     // Check if the target date was completed
     const targetActivity = habitActivities.find(activity => activity.date === targetDateStr);
@@ -59,7 +56,24 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
         console.log(`Day ${currentDateStr} failed, breaking streak at: ${streak}`);
         break;
       } else {
-        // No activity recorded (empty) - this breaks the streak
+        // Check if the date is in the future (this shouldn't break the streak)
+        const now = new Date();
+        if (currentDate > now) {
+          console.log(`Date ${currentDateStr} is in the future, continuing streak check`);
+          currentDate.setDate(currentDate.getDate() - 1);
+          continue;
+        }
+        
+        // Check if this is today (for current day, empty doesn't break streak)
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        if (currentDateStr === todayStr) {
+          console.log(`Today (${todayStr}) has no activity yet, continuing streak check`);
+          currentDate.setDate(currentDate.getDate() - 1);
+          continue;
+        }
+        
+        // No activity recorded (empty) for a past day - this breaks the streak
         console.log(`Day ${currentDateStr} has no activity, breaking streak at: ${streak}`);
         break;
       }

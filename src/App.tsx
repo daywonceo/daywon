@@ -38,10 +38,42 @@ const setupReducedMotion = () => {
   }
 };
 
-// Component that handles time tracking integration
-const TimeTrackingWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Component that handles time tracking and habit sync integration
+const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { sessionTime, sectionTimes } = useAppTimeTracking();
   const { saveSession } = useAppSessions();
+  const { user } = useAuth();
+  
+  // Initialize habit synchronization
+  useEffect(() => {
+    // Only initialize sync if user is logged in
+    if (user) {
+      // Dynamically import to avoid circular dependencies
+      import('./utils/habitSynchronization').then(({ initHabitSync, processEndOfDayHabits }) => {
+        console.log('Initializing habit synchronization system');
+        
+        // Initialize synchronization
+        const cleanup = initHabitSync();
+        
+        // Process end-of-day habits
+        processEndOfDayHabits();
+        
+        // Also run end-of-day processing when a new day starts
+        const midnightCheck = setInterval(() => {
+          const now = new Date();
+          // Run at the start of each new day (midnight)
+          if (now.getHours() === 0 && now.getMinutes() === 0) {
+            processEndOfDayHabits();
+          }
+        }, 60000); // Check every minute
+        
+        return () => {
+          cleanup();
+          clearInterval(midnightCheck);
+        };
+      });
+    }
+  }, [user]);
   
   // Save to database periodically
   useEffect(() => {
@@ -108,7 +140,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <TimeTrackingWrapper>
+    <AppIntegrationsWrapper>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/social" element={<Social />} />
@@ -124,7 +156,7 @@ const AppContent: React.FC = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </TimeTrackingWrapper>
+    </AppIntegrationsWrapper>
   );
 };
 
