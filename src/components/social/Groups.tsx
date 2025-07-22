@@ -599,14 +599,16 @@ const Groups = () => {
       )}
 
       {/* Invite Modal */}
-      <InviteModal
-        isOpen={inviteModal.isOpen}
-        onClose={() => setInviteModal({ ...inviteModal, isOpen: false })}
-        type={inviteModal.type}
-        data={inviteModal.data as any}
-        currentUser={currentUser}
-        onJoin={handleJoinFromModal}
-      />
+      {inviteModal.data && (
+        <InviteModal
+          isOpen={inviteModal.isOpen}
+          onClose={() => setInviteModal({ ...inviteModal, isOpen: false })}
+          type={inviteModal.type}
+          data={inviteModal.data}
+          currentUser={currentUser}
+          onJoin={handleJoinFromModal}
+        />
+      )}
     </div>
   );
 };

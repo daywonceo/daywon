@@ -22,7 +22,7 @@ interface InviteModalProps {
     members?: any[];
     participants?: any[];
     timeRemaining?: string;
-  };
+  } | null;
   currentUser?: any;
   onJoin: (id: number) => void;
 }
@@ -36,6 +36,11 @@ const InviteModal: React.FC<InviteModalProps> = ({
   onJoin
 }) => {
   const { toast } = useToast();
+  
+  // Early return if no data
+  if (!data) {
+    return null;
+  }
   
   const displayName = type === 'community' ? data.name : data.title;
   const memberCount = type === 'community' ? data.members?.length : data.participants?.length;
