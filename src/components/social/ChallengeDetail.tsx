@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Trophy, Flame, Send, Users, Clock, Share } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import MemberCard from "./MemberCard";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChallengeParticipant {
   id: number;
@@ -60,8 +62,34 @@ const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
   onLeaveChallenge,
   onInvite
 }) => {
+  const { toast } = useToast();
+  const currentUserId = 1; // Mock current user ID
   const sortedParticipants = [...challenge.participants].sort((a, b) => b.progress - a.progress);
   const userRank = challenge.joined ? challenge.rank : null;
+
+  // Convert participants to member format for MemberCard
+  const participantsAsMembers = sortedParticipants.map(participant => ({
+    id: participant.id,
+    name: participant.name,
+    avatar: participant.avatar,
+    initials: participant.name.split(' ').map(n => n[0]).join(''),
+    topHabits: [challenge.habit],
+    streak: participant.dayStreak
+  }));
+
+  const handleMemberMessage = (memberId: number) => {
+    toast({
+      title: "Message Sent!",
+      description: "Your message has been delivered.",
+    });
+  };
+
+  const handleMemberInvite = (memberId: number) => {
+    toast({
+      title: "Invitation Sent!",
+      description: "Your invitation has been sent to this participant.",
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -129,50 +157,95 @@ const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
       </Card>
 
       {/* Leaderboard */}
-      <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <Trophy className="text-yellow-500" size={16} />
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Leaderboard</h4>
-          </div>
-          <div className="space-y-3">
-            {sortedParticipants.map((participant, index) => (
-              <div key={participant.id} className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700">
-                  <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                    {index + 1}
+      <div>
+        <div className="flex items-center space-x-2 mb-4">
+          <Trophy className="text-yellow-500" size={18} />
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h2>
+        </div>
+        <div className="space-y-3">
+          {sortedParticipants.map((participant, index) => {
+            const memberData = participantsAsMembers.find(m => m.id === participant.id);
+            if (!memberData) return null;
+            
+            return (
+              <div key={participant.id} className="relative">
+                {/* Rank Badge */}
+                <div className="absolute -left-2 top-4 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 border-2 border-white dark:border-gray-900 shadow-sm">
+                  <span className="text-xs font-bold text-white">
+                    #{index + 1}
                   </span>
                 </div>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={participant.avatar} alt={participant.name} />
-                  <AvatarFallback className="text-xs font-medium">
-                    {participant.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {participant.name}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="secondary" className="text-xs">
-                        <Flame size={10} className="mr-1" />
-                        {participant.dayStreak}
-                      </Badge>
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                        {participant.dayStreak}/{participant.totalDays}
-                      </span>
+                
+                {/* Enhanced Member Card with Progress */}
+                <div className="ml-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-start space-x-3">
+                    {/* Profile Picture */}
+                    <Avatar className="h-14 w-14 border-2 border-gray-200 dark:border-gray-600">
+                      <AvatarImage src={participant.avatar} alt={participant.name} />
+                      <AvatarFallback className="text-lg font-medium bg-gradient-to-br from-green-400 to-blue-500 text-white">
+                        {participant.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Member Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-base">
+                            {participant.name}
+                          </h3>
+                          <div className="flex items-center space-x-1 mt-1">
+                            <span className="text-orange-500">🔥</span>
+                            <span className="text-orange-500 font-medium text-sm">
+                              {participant.dayStreak} day streak
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            {participant.dayStreak}/{participant.totalDays} days
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mb-3">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-gray-500">Progress</span>
+                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{participant.progress}%</span>
+                        </div>
+                        <Progress value={participant.progress} className="h-2" />
+                      </div>
+
+                      {/* Habit Tag */}
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        <Badge
+                          className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 text-xs px-2.5 py-1 font-medium hover:bg-green-200 dark:hover:bg-green-900/50"
+                        >
+                          {challenge.habit}
+                        </Badge>
+                      </div>
+
+                      {/* Action Buttons */}
+                      {participant.id !== currentUserId && (
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={() => handleMemberMessage(participant.id)}
+                            className="flex-1 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white h-10 rounded-full font-medium"
+                          >
+                            <Send size={16} className="mr-2" />
+                            Message
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div className="mt-1">
-                    <Progress value={participant.progress} className="h-2" />
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Challenge Chat */}
       <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">

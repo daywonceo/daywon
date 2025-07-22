@@ -84,16 +84,16 @@ const Groups = () => {
   // Mock current user for auth checks
   const currentUser = { id: 1, name: "Current User" };
 
-  // Mock users
+  // Mock users with better profile pictures
   const mockUsers: User[] = [
-    { id: 1, name: "Alex Chen", avatar: "/placeholder.svg", initials: "AC", topHabits: ["Morning Prayer", "Exercise", "Reading"], streak: 15 },
-    { id: 2, name: "Maya Johnson", avatar: "/placeholder.svg", initials: "MJ", topHabits: ["Bible Study", "Meditation", "Journaling"], streak: 22 },
-    { id: 3, name: "Nate Rodriguez", avatar: "/placeholder.svg", initials: "NR", topHabits: ["Workout", "Meal Prep", "Scripture"], streak: 10 },
-    { id: 4, name: "Sarah Kim", avatar: "/placeholder.svg", initials: "SK", topHabits: ["Yoga", "Prayer", "Gratitude"], streak: 28 },
-    { id: 5, name: "David Park", avatar: "/placeholder.svg", initials: "DP", topHabits: ["Running", "Devotions", "Reading"], streak: 18 },
-    { id: 6, name: "Emma Wilson", avatar: "/placeholder.svg", initials: "EW", topHabits: ["Stretching", "Bible Reading", "Smoothies"], streak: 7 },
-    { id: 7, name: "Jordan Lee", avatar: "/placeholder.svg", initials: "JL", topHabits: ["Gym", "Prayer Walk", "Study"], streak: 12 },
-    { id: 8, name: "Taylor Brown", avatar: "/placeholder.svg", initials: "TB", topHabits: ["Morning Routine", "Scripture", "Planning"], streak: 25 }
+    { id: 1, name: "Alex Chen", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", initials: "AC", topHabits: ["Morning Prayer", "Exercise"], streak: 15 },
+    { id: 2, name: "Maya Johnson", avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face", initials: "MJ", topHabits: ["Bible Study", "Meditation"], streak: 22 },
+    { id: 3, name: "Nate Rodriguez", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face", initials: "NR", topHabits: ["Workout", "Meal Prep", "Scripture"], streak: 10 },
+    { id: 4, name: "Sarah Kim", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face", initials: "SK", topHabits: ["Yoga", "Prayer", "Gratitude"], streak: 28 },
+    { id: 5, name: "David Park", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", initials: "DP", topHabits: ["Running", "Devotions"], streak: 18 },
+    { id: 6, name: "Emma Wilson", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face", initials: "EW", topHabits: ["Stretching", "Bible Reading"], streak: 7 },
+    { id: 7, name: "Jordan Lee", avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop&crop=face", initials: "JL", topHabits: ["Gym", "Prayer Walk", "Study"], streak: 12 },
+    { id: 8, name: "Taylor Brown", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face", initials: "TB", topHabits: ["Morning Routine", "Scripture"], streak: 25 }
   ];
 
   const communities: Community[] = [

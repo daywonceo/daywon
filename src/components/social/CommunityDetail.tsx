@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Pin, Send, Users, Share } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import MemberCard from "./MemberCard";
+import { useToast } from "@/hooks/use-toast";
 
 interface User {
   id: number;
@@ -53,6 +55,22 @@ const CommunityDetail: React.FC<CommunityDetailProps> = ({
   onSendMessage,
   onInvite
 }) => {
+  const { toast } = useToast();
+  const currentUserId = 1; // Mock current user ID
+
+  const handleMemberMessage = (memberId: number) => {
+    toast({
+      title: "Message Sent!",
+      description: "Your message has been delivered.",
+    });
+  };
+
+  const handleMemberInvite = (memberId: number) => {
+    toast({
+      title: "Invitation Sent!",
+      description: "Your invitation has been sent to this member.",
+    });
+  };
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -92,41 +110,24 @@ const CommunityDetail: React.FC<CommunityDetailProps> = ({
       )}
 
       {/* Members List */}
-      <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-2 mb-3">
-            <Users size={16} className="text-gray-600 dark:text-gray-400" />
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Members</h4>
-          </div>
-          <div className="space-y-3">
-            {community.members.map((member) => (
-              <div key={member.id} className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={member.avatar} alt={member.name} />
-                  <AvatarFallback className="text-xs font-medium">{member.initials}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {member.name}
-                    </p>
-                    <Badge variant="secondary" className="text-xs">
-                      {member.streak} day streak
-                    </Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {member.topHabits.slice(0, 3).map((habit, index) => (
-                      <Badge key={index} variant="outline" className="text-xs px-1.5 py-0">
-                        {habit}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div>
+        <div className="flex items-center space-x-2 mb-4">
+          <Users size={18} className="text-gray-600 dark:text-gray-400" />
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Members</h2>
+        </div>
+        <div className="space-y-3">
+          {community.members.map((member) => (
+            <MemberCard
+              key={member.id}
+              member={member}
+              currentUserId={currentUserId}
+              showInviteButton={false} // Don't show invite for existing members
+              onMessage={handleMemberMessage}
+              onInvite={handleMemberInvite}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Chat Messages */}
       <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
