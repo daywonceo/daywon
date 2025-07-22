@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
 import { getHabitActivities } from "@/utils/habitActivity";
 
-export const useCalendarLogic = () => {
+export const useCalendarLogic = (setDate?: (date: Date | undefined) => void) => {
   // Animation state management
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -40,6 +40,11 @@ export const useCalendarLogic = () => {
       : addMonths(currentMonth, 1);
     
     setCurrentMonth(newMonth);
+    
+    // Update parent's date state to sync with the new month
+    if (setDate) {
+      setDate(newMonth);
+    }
     
     // Wait for fade in animation
     await new Promise(resolve => setTimeout(resolve, 150));

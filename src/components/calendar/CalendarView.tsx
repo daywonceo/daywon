@@ -20,7 +20,7 @@ const CalendarView = ({ date, setDate, onDateClick, timePeriod }: CalendarViewPr
     updateCurrentMonth,
     handleMonthNavigation,
     getCalendarMonths
-  } = useCalendarLogic();
+  } = useCalendarLogic(setDate);
 
   // Update current month when date changes externally
   React.useEffect(() => {
