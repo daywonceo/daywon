@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, Heart, RefreshCw } from 'lucide-react';
+import { Heart, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,6 +13,50 @@ interface SavedQuote extends Quote {
   savedAt: string;
   id: string;
 }
+
+// Backup quotes to use if API fails
+const fallbackQuotes: Quote[] = [
+  {
+    text: "The best way to predict your future is to create it.",
+    author: "Abraham Lincoln"
+  },
+  {
+    text: "It does not matter how slowly you go as long as you do not stop.",
+    author: "Confucius"
+  },
+  {
+    text: "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    author: "Winston Churchill"
+  },
+  {
+    text: "Your time is limited, so don't waste it living someone else's life.",
+    author: "Steve Jobs"
+  },
+  {
+    text: "Believe you can and you're halfway there.",
+    author: "Theodore Roosevelt"
+  },
+  {
+    text: "The only way to do great work is to love what you do.",
+    author: "Steve Jobs"
+  },
+  {
+    text: "If you want to live a happy life, tie it to a goal, not to people or things.",
+    author: "Albert Einstein"
+  },
+  {
+    text: "You miss 100% of the shots you don't take.",
+    author: "Wayne Gretzky"
+  },
+  {
+    text: "You are never too old to set another goal or to dream a new dream.",
+    author: "C.S. Lewis"
+  },
+  {
+    text: "Every day is a new opportunity to grow.",
+    author: "Anonymous"
+  }
+];
 
 const DailyEncouragementCard: React.FC = () => {
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -43,13 +87,23 @@ const DailyEncouragementCard: React.FC = () => {
     return new Date(Date.UTC(year, month, day)).toISOString().split('T')[0];
   };
 
-  const fetchDailyQuote = async (): Promise<Quote> => {
+  // Get a quote based on the current day
+  const getQuoteForDay = (day: string, quotesSource: Quote[]): Quote => {
+    // Use a hash of the day string to select a quote
+    const dayHash = day.split('').reduce((acc, char) => {
+      return acc + char.charCodeAt(0);
+    }, 0);
+    
+    return quotesSource[dayHash % quotesSource.length];
+  };
+
+  const fetchDailyQuote = async (forceRefresh = false): Promise<Quote> => {
     try {
-      // Check if we have a cached quote for today (based on 3 AM EST cutoff)
+      // Check if we have a cached quote for today
       const currentDay = getCurrentDay();
       const cachedData = localStorage.getItem('dailyQuote');
       
-      if (cachedData) {
+      if (!forceRefresh && cachedData) {
         const parsed = JSON.parse(cachedData);
         if (parsed.date === currentDay && parsed.quote) {
           console.log('Using cached quote for:', currentDay);
@@ -57,51 +111,27 @@ const DailyEncouragementCard: React.FC = () => {
         }
       }
 
-      console.log('Fetching new quote for:', currentDay);
+      console.log('Selecting new quote for:', currentDay);
       
-      // Fetch new quote from API
-      const response = await fetch('https://type.fit/api/quotes');
-      const quotes = await response.json();
+      // Just use a fallback quote based on the current day
+      const selectedQuote = getQuoteForDay(currentDay, fallbackQuotes);
       
-      if (quotes && quotes.length > 0) {
-        // Filter quotes to prioritize those with known authors
-        const quotesWithAuthors = quotes.filter(q => 
-          q.author && q.author !== "null" && !q.author.includes("Unknown")
-        );
-        
-        // Use quotes with authors if available, otherwise use all quotes
-        const quotesSource = quotesWithAuthors.length > 0 ? quotesWithAuthors : quotes;
-        
-        // Use a hash of the currentDay string to select a quote
-        // This ensures the same quote is selected for the same day
-        const dayHash = currentDay.split('').reduce((acc, char) => {
-          return acc + char.charCodeAt(0);
-        }, 0);
-        
-        const selectedQuote = quotesSource[dayHash % quotesSource.length];
-        
-        const formattedQuote = {
-          text: selectedQuote.text || selectedQuote.quote || "Every day is a new opportunity to grow.",
-          author: selectedQuote.author ? selectedQuote.author.replace(', type.fit', '') : "Unknown"
-        };
-
-        // Cache the quote for today
-        localStorage.setItem('dailyQuote', JSON.stringify({
-          date: currentDay,
-          quote: formattedQuote
-        }));
-
-        return formattedQuote;
-      }
+      // Cache the quote for today
+      localStorage.setItem('dailyQuote', JSON.stringify({
+        date: currentDay,
+        quote: selectedQuote
+      }));
+      
+      return selectedQuote;
     } catch (error) {
       console.error('Error fetching quote:', error);
+      
+      // Return a simple default quote if everything fails
+      return {
+        text: "Every day is a new opportunity to grow.",
+        author: "Anonymous"
+      };
     }
-
-    // Fallback quote
-    return {
-      text: "Every day is a new opportunity to grow.",
-      author: "Unknown"
-    };
   };
 
   useEffect(() => {
@@ -120,9 +150,6 @@ const DailyEncouragementCard: React.FC = () => {
     };
 
     loadQuote();
-    
-    // Run once on mount to fetch the quote
-    return () => {}; // Cleanup function
   }, []);
 
   // Check for day change whenever the component is focused
@@ -191,12 +218,14 @@ const DailyEncouragementCard: React.FC = () => {
   
   const handleRefreshQuote = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
+    
+    if (isRefreshing) return; // Prevent multiple clicks
+    
     setIsRefreshing(true);
     
     try {
-      // Clear the cached quote to force a new fetch
-      localStorage.removeItem('dailyQuote');
-      const newQuote = await fetchDailyQuote();
+      // Force a new quote selection by passing true
+      const newQuote = await fetchDailyQuote(true);
       setQuote(newQuote);
       
       // Check if this quote is already saved
@@ -214,7 +243,7 @@ const DailyEncouragementCard: React.FC = () => {
       console.error('Error refreshing quote:', error);
       toast({
         title: "Failed to refresh",
-        description: "Please try again later",
+        description: "Using a backup quote instead",
         variant: "destructive"
       });
     } finally {
