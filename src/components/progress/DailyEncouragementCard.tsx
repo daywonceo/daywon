@@ -1,7 +1,8 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, Heart } from 'lucide-react';
+import { MessageSquare, Heart, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface Quote {
   text: string;
@@ -17,23 +18,29 @@ const DailyEncouragementCard: React.FC = () => {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  // Function to get the current "day" based on 3 AM EST cutoff
+  // Function to get the current "day" based on a fixed cutoff time (UTC)
   const getCurrentDay = () => {
+    // Get current date in UTC 
     const now = new Date();
     
-    // Convert to EST (UTC-5) or EDT (UTC-4) - using a simple approach
-    // This accounts for daylight saving time roughly
-    const estOffset = -5; // EST is UTC-5
-    const estTime = new Date(now.getTime() + (estOffset * 60 * 60 * 1000));
+    // Use UTC date as our reference point to avoid timezone issues
+    const year = now.getUTCFullYear();
+    const month = now.getUTCMonth();
+    const day = now.getUTCDate();
     
-    // If it's before 3 AM EST, use the previous day
-    if (estTime.getUTCHours() < 3) {
-      estTime.setUTCDate(estTime.getUTCDate() - 1);
+    // If it's before 8 AM UTC (roughly 3 AM EST), use the previous day
+    if (now.getUTCHours() < 8) {
+      // Create new date with previous day
+      const yesterday = new Date(Date.UTC(year, month, day - 1));
+      return yesterday.toISOString().split('T')[0]; // YYYY-MM-DD format
     }
     
-    return estTime.toDateString();
+    // Use today's date
+    return new Date(Date.UTC(year, month, day)).toISOString().split('T')[0];
   };
 
   const fetchDailyQuote = async (): Promise<Quote> => {
@@ -65,9 +72,13 @@ const DailyEncouragementCard: React.FC = () => {
         // Use quotes with authors if available, otherwise use all quotes
         const quotesSource = quotesWithAuthors.length > 0 ? quotesWithAuthors : quotes;
         
-        // Use current day as seed for consistent daily quote
-        const daysSinceEpoch = Math.floor(new Date(currentDay).getTime() / (1000 * 60 * 60 * 24));
-        const selectedQuote = quotesSource[daysSinceEpoch % quotesSource.length];
+        // Use a hash of the currentDay string to select a quote
+        // This ensures the same quote is selected for the same day
+        const dayHash = currentDay.split('').reduce((acc, char) => {
+          return acc + char.charCodeAt(0);
+        }, 0);
+        
+        const selectedQuote = quotesSource[dayHash % quotesSource.length];
         
         const formattedQuote = {
           text: selectedQuote.text || selectedQuote.quote || "Every day is a new opportunity to grow.",
@@ -109,23 +120,24 @@ const DailyEncouragementCard: React.FC = () => {
     };
 
     loadQuote();
+    
+    // Run once on mount to fetch the quote
+    return () => {}; // Cleanup function
   }, []);
 
-  // Set up interval to check for day change at 3 AM EST
+  // Check for day change whenever the component is focused
   useEffect(() => {
     const checkForNewDay = async () => {
-      const currentDay = getCurrentDay();
+      const newCurrentDay = getCurrentDay();
       const cachedData = localStorage.getItem('dailyQuote');
       
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
-        if (parsed.date !== currentDay) {
+        if (parsed.date !== newCurrentDay) {
           console.log('New day detected, fetching new quote');
-          // It's a new day, fetch new quote
           const newQuote = await fetchDailyQuote();
           setQuote(newQuote);
           
-          // Check if this quote is already saved
           const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
           const isQuoteSaved = savedQuotes.some((saved: SavedQuote) => 
             saved.text === newQuote.text && saved.author === newQuote.author
@@ -135,10 +147,15 @@ const DailyEncouragementCard: React.FC = () => {
       }
     };
 
-    // Check every minute for day change
-    const interval = setInterval(checkForNewDay, 60000);
+    // Add visibility change listener to check for day change when tab becomes visible
+    document.addEventListener('visibilitychange', checkForNewDay);
     
-    return () => clearInterval(interval);
+    // Also check once when this effect runs
+    checkForNewDay();
+    
+    return () => {
+      document.removeEventListener('visibilitychange', checkForNewDay);
+    };
   }, []);
 
   const handleSaveQuote = (e: React.MouseEvent) => {
@@ -171,6 +188,39 @@ const DailyEncouragementCard: React.FC = () => {
   const handleCardClick = () => {
     navigate('/saved-quotes');
   };
+  
+  const handleRefreshQuote = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click navigation
+    setIsRefreshing(true);
+    
+    try {
+      // Clear the cached quote to force a new fetch
+      localStorage.removeItem('dailyQuote');
+      const newQuote = await fetchDailyQuote();
+      setQuote(newQuote);
+      
+      // Check if this quote is already saved
+      const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+      const isQuoteSaved = savedQuotes.some((saved: SavedQuote) => 
+        saved.text === newQuote.text && saved.author === newQuote.author
+      );
+      setIsSaved(isQuoteSaved);
+      
+      toast({
+        title: "Quote refreshed",
+        description: "You've got a new quote to inspire you!",
+      });
+    } catch (error) {
+      console.error('Error refreshing quote:', error);
+      toast({
+        title: "Failed to refresh",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -197,23 +247,36 @@ const DailyEncouragementCard: React.FC = () => {
       onClick={handleCardClick}
     >
       <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSaveQuote}
+              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label={isSaved ? "Remove from saved quotes" : "Save quote"}
+            >
+              <Heart 
+                className={`h-5 w-5 transition-colors ${
+                  isSaved 
+                    ? 'fill-red-500 text-red-500' 
+                    : 'text-teal-500 hover:text-red-500'
+                }`}
+              />
+            </button>
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Daily Encouragement
+            </h3>
+          </div>
+          
           <button
-            onClick={handleSaveQuote}
+            onClick={handleRefreshQuote}
             className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            aria-label={isSaved ? "Remove from saved quotes" : "Save quote"}
+            aria-label="Refresh quote"
+            disabled={isRefreshing}
           >
-            <Heart 
-              className={`h-5 w-5 transition-colors ${
-                isSaved 
-                  ? 'fill-red-500 text-red-500' 
-                  : 'text-teal-500 hover:text-red-500'
-              }`}
+            <RefreshCw 
+              className={`h-4 w-4 text-gray-400 hover:text-teal-500 ${isRefreshing ? 'animate-spin' : ''}`}
             />
           </button>
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Daily Encouragement
-          </h3>
         </div>
         
         {quote && (
