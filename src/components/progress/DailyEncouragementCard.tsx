@@ -87,8 +87,26 @@ const DailyEncouragementCard: React.FC = () => {
     return new Date(Date.UTC(year, month, day)).toISOString().split('T')[0];
   };
 
-  // Get a quote based on the current day
-  const getQuoteForDay = (day: string, quotesSource: Quote[]): Quote => {
+  // Get a quote based on the current day or randomly if forced
+  const getQuoteForDay = (day: string, quotesSource: Quote[], forceRandom = false, currentQuote?: Quote): Quote => {
+    if (forceRandom) {
+      // Select a truly random quote when forced, ensuring it's different from current
+      let attempts = 0;
+      let randomIndex;
+      let selectedQuote;
+      
+      do {
+        randomIndex = Math.floor(Math.random() * quotesSource.length);
+        selectedQuote = quotesSource[randomIndex];
+        attempts++;
+        // Prevent infinite loop by limiting attempts
+      } while (currentQuote && 
+               selectedQuote.text === currentQuote.text && 
+               attempts < 10);
+               
+      return selectedQuote;
+    }
+    
     // Use a hash of the day string to select a quote
     const dayHash = day.split('').reduce((acc, char) => {
       return acc + char.charCodeAt(0);
@@ -111,16 +129,18 @@ const DailyEncouragementCard: React.FC = () => {
         }
       }
 
-      console.log('Selecting new quote for:', currentDay);
+      console.log('Selecting new quote for:', forceRefresh ? 'refresh request' : currentDay);
       
-      // Just use a fallback quote based on the current day
-      const selectedQuote = getQuoteForDay(currentDay, fallbackQuotes);
+      // Get a random quote if forcing refresh, otherwise get the day's quote
+      const selectedQuote = getQuoteForDay(currentDay, fallbackQuotes, forceRefresh, forceRefresh ? quote || undefined : undefined);
       
-      // Cache the quote for today
-      localStorage.setItem('dailyQuote', JSON.stringify({
-        date: currentDay,
-        quote: selectedQuote
-      }));
+      // Only cache if it's the daily quote (not a forced refresh)
+      if (!forceRefresh) {
+        localStorage.setItem('dailyQuote', JSON.stringify({
+          date: currentDay,
+          quote: selectedQuote
+        }));
+      }
       
       return selectedQuote;
     } catch (error) {
@@ -224,8 +244,10 @@ const DailyEncouragementCard: React.FC = () => {
     setIsRefreshing(true);
     
     try {
+      console.log('Refreshing quote, current quote:', quote?.text);
       // Force a new quote selection by passing true
       const newQuote = await fetchDailyQuote(true);
+      console.log('New quote selected:', newQuote.text);
       setQuote(newQuote);
       
       // Check if this quote is already saved
