@@ -10,6 +10,8 @@ import ChallengePlaylist from "./ChallengePlaylist";
 import CommunityDetail from "./CommunityDetail";
 import ChallengeDetail from "./ChallengeDetail";
 import InviteModal from "./InviteModal";
+import AllMembersView from "./AllMembersView";
+import MemberCard from "./MemberCard";
 
 interface User {
   id: number;
@@ -69,6 +71,11 @@ const Groups = () => {
   const [activeTab, setActiveTab] = useState<"communities" | "challenges">("communities");
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [allMembersView, setAllMembersView] = useState<{
+    isOpen: boolean;
+    title: string;
+    members: User[];
+  }>({ isOpen: false, title: "", members: [] });
   const [newMessage, setNewMessage] = useState("");
   const [inviteModal, setInviteModal] = useState<{ 
     isOpen: boolean; 
@@ -291,6 +298,29 @@ const Groups = () => {
     }
   };
 
+  const handleViewAllMembers = (title: string, members: User[]) => {
+    setAllMembersView({ isOpen: true, title, members });
+  };
+
+  const handleMemberMessage = (memberId: number) => {
+    toast({
+      title: "Message Sent!",
+      description: "Your message has been delivered.",
+    });
+  };
+
+  // Show all members view if active
+  if (allMembersView.isOpen) {
+    return (
+      <AllMembersView
+        title={allMembersView.title}
+        members={allMembersView.members}
+        onBack={() => setAllMembersView({ isOpen: false, title: "", members: [] })}
+        currentUserId={currentUser.id}
+      />
+    );
+  }
+
   // Show detailed view if selected
   if (selectedCommunity) {
     return (
@@ -412,6 +442,41 @@ const Groups = () => {
                   </div>
                 </div>
                 
+                {/* Top 3 Members Display */}
+                <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Users size={14} className="text-gray-400" />
+                      <span className="text-xs text-gray-500 font-medium">Top Members</span>
+                    </div>
+                    <Button
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewAllMembers(`${community.name} Members`, community.members);
+                      }}
+                      className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
+                    >
+                      View All
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {community.members
+                      .sort((a, b) => b.streak - a.streak)
+                      .slice(0, 3)
+                      .map((member) => (
+                        <MemberCard
+                          key={member.id}
+                          member={member}
+                          currentUserId={currentUser.id}
+                          showInviteButton={false}
+                          onMessage={handleMemberMessage}
+                        />
+                      ))}
+                  </div>
+                </div>
+
                 {/* Recent Activity Preview */}
                 {community.joined && community.recentMessages.length > 0 && (
                   <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
@@ -503,21 +568,53 @@ const Groups = () => {
                     </div>
                   </div>
 
-                  {/* Top 3 Participants Preview */}
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500">Top performers:</span>
-                    <div className="flex -space-x-1">
+                  {/* Top 3 Participants Display */}
+                  <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <Trophy size={14} className="text-yellow-500" />
+                        <span className="text-xs text-gray-500 font-medium">Top Performers</span>
+                      </div>
+                      <Button
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const participantMembers = challenge.participants.map(p => ({
+                            id: p.id,
+                            name: p.name,
+                            avatar: p.avatar,
+                            initials: p.name.split(' ').map(n => n[0]).join(''),
+                            topHabits: [challenge.habit],
+                            streak: p.dayStreak
+                          }));
+                          handleViewAllMembers(`${challenge.title} Participants`, participantMembers);
+                        }}
+                        className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
+                      >
+                        View All
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
                       {challenge.participants
                         .sort((a, b) => b.progress - a.progress)
                         .slice(0, 3)
                         .map((participant) => (
-                        <Avatar key={participant.id} className="h-6 w-6 border-2 border-white dark:border-gray-800">
-                          <AvatarImage src={participant.avatar} alt={participant.name} />
-                          <AvatarFallback className="text-xs">
-                            {participant.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
+                          <MemberCard
+                            key={participant.id}
+                            member={{
+                              id: participant.id,
+                              name: participant.name,
+                              avatar: participant.avatar,
+                              initials: participant.name.split(' ').map(n => n[0]).join(''),
+                              topHabits: [challenge.habit],
+                              streak: participant.dayStreak
+                            }}
+                            currentUserId={currentUser.id}
+                            showInviteButton={false}
+                            onMessage={handleMemberMessage}
+                          />
+                        ))}
                     </div>
                   </div>
 
