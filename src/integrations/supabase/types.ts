@@ -358,6 +358,7 @@ export type Database = {
         Row: {
           activity_date: string
           created_at: string
+          habit_id: string | null
           habit_name: string
           id: string
           status: string
@@ -367,6 +368,7 @@ export type Database = {
         Insert: {
           activity_date: string
           created_at?: string
+          habit_id?: string | null
           habit_name: string
           id?: string
           status: string
@@ -376,13 +378,22 @@ export type Database = {
         Update: {
           activity_date?: string
           created_at?: string
+          habit_id?: string | null
           habit_name?: string
           id?: string
           status?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "habit_activities_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       habit_difficulty: {
         Row: {
@@ -1097,7 +1108,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      find_or_create_habit: {
+        Args: {
+          p_user_id: string
+          p_name: string
+          p_description?: string
+          p_category?: string
+        }
+        Returns: string
+      }
+      merge_duplicate_habits: {
+        Args: {
+          p_user_id: string
+          p_keep_habit_id: string
+          p_merge_habit_ids: string[]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
