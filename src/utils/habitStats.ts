@@ -34,34 +34,45 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
         break;
     }
     
+    // Calculate total days in the timeframe
+    const totalDaysInPeriod = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
     // Filter activities by date
     const startDateStr = startDate.toISOString().split('T')[0];
     const filteredActivities = activities.filter(
       activity => activity.date >= startDateStr
     );
     
-    // Group by habit_id (primary) or habit_name (fallback for legacy data)
-    const habitGroups = filteredActivities.reduce<Record<string, HabitActivityV2[]>>((acc, activity) => {
-      // Use habit_id as primary key, fallback to habit_name for legacy data
-      const groupKey = activity.habitId || activity.habitName;
-      if (!acc[groupKey]) {
-        acc[groupKey] = [];
+    // Get all unique habits (using habit_id as primary key, habitName as fallback)
+    const habitMap = new Map<string, string>(); // habitId -> habitName mapping
+    filteredActivities.forEach(activity => {
+      const key = activity.habitId || activity.habitName;
+      if (!habitMap.has(key)) {
+        habitMap.set(key, activity.habitName);
       }
-      acc[groupKey].push(activity);
-      return acc;
-    }, {});
+    });
     
-    // Calculate statistics for each habit with automatic categorization
-    // NEW RULE: Treat "empty" (unchecked) habits as incomplete/failed for calculation purposes
-    const allHabitStats: HabitStats[] = Object.keys(habitGroups).map(groupKey => {
-      const habitActivities = habitGroups[groupKey];
+    // Calculate statistics for each habit
+    const allHabitStats: HabitStats[] = Array.from(habitMap.entries()).map(([habitKey, habitName]) => {
+      // Get all activities for this habit
+      const habitActivities = filteredActivities.filter(activity => {
+        const activityKey = activity.habitId || activity.habitName;
+        return activityKey === habitKey;
+      });
+      
+      // Count completed, failed, and empty activities that were explicitly recorded
       const completed = habitActivities.filter(a => a.status === "completed").length;
       const failed = habitActivities.filter(a => a.status === "failed").length;
       const empty = habitActivities.filter(a => a.status === "empty").length;
-      const total = habitActivities.length;
       
-      // For percentage calculation, treat "empty" as "failed" (not completed)
-      // Only "completed" counts as success
+      // CRITICAL FIX: Total should be ALL days in the period, not just recorded activities
+      // Days without any record are considered "missed" (empty/incomplete)
+      const recordedDays = habitActivities.length;
+      const missedDays = totalDaysInPeriod - recordedDays;
+      const total = totalDaysInPeriod;
+      
+      // For percentage calculation: only "completed" counts as success
+      // Failed, empty, and missed days all count as incomplete
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
       // Automatic categorization based on completion percentage
@@ -74,14 +85,11 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
         category = 'in-progress';
       }
       
-      // Use the habit name from the first activity in the group (for display purposes)
-      const habitName = habitActivities[0]?.habitName || groupKey;
-      
       return {
         habitName,
         completed,
         failed,
-        empty,
+        empty: empty + missedDays, // Include missed days as "empty"
         total,
         percentage,
         category
