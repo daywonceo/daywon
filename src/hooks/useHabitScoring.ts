@@ -57,7 +57,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateConsistencyRate = (period: 'weekly' | 'monthly' | 'yearly'): number => {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const now = new Date();
     
     let startDate: Date;
@@ -110,14 +110,27 @@ export const useHabitScoring = () => {
   };
 
   const calculateStreakScore = (): number => {
-    const activities = getHabitActivities();
-    const habitNames = [...new Set(activities.map(a => a.habitName))];
+    const activities = getHabitActivitiesV2();
     const now = new Date();
 
     let maxWeightedStreak = 0;
 
-    habitNames.forEach(habitName => {
-      const streak = calculateStreakForDate(habitName, now);
+    // Group by habit_id when available, fallback to habit_name
+    const habitGroups = new Map<string, { habitName: string; habitId?: string }>();
+    activities.forEach(activity => {
+      const key = activity.habitId || activity.habitName;
+      if (!habitGroups.has(key)) {
+        habitGroups.set(key, { 
+          habitName: activity.habitName, 
+          habitId: activity.habitId 
+        });
+      }
+    });
+
+    habitGroups.forEach(({ habitName, habitId }) => {
+      const streak = habitId 
+        ? calculateStreakForDateV2(habitId, now)
+        : 0; // Fallback for legacy data without habit_id
       const multiplier = getHabitMultiplier(habitName);
       const weightedStreak = streak * multiplier;
       
@@ -131,7 +144,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateVarietyScore = (): number => {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const now = new Date();
     const weekAgo = new Date(now);
     weekAgo.setDate(now.getDate() - 7);
@@ -155,7 +168,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateRecencyScore = (): number => {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const now = new Date();
     const weekAgo = new Date(now);
     weekAgo.setDate(now.getDate() - 7);

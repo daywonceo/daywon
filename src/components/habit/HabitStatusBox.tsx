@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActivityStatus } from "@/hooks/useHabitActivities";
-import { calculateStreakForDate, formatStreakNumber } from "@/utils/habitStreaks";
+import { calculateStreakForDateV2, formatStreakNumber } from "@/utils/habitStreaksV2";
+import { getHabitActivitiesV2 } from "@/utils/habitActivityV2";
 import { hasRecentRecovery } from "@/utils/streakRecovery";
 
 interface HabitStatusBoxProps {
@@ -25,24 +26,41 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
 }) => {
   const [streak, setStreak] = useState(0);
 
-  // Calculate streak and listen for updates
+  // Calculate streak and listen for updates using habit_id
   useEffect(() => {
     const calculateCurrentStreak = () => {
-      let currentStreak = status === "completed" 
-        ? calculateStreakForDate(category, activityDate) 
-        : 0;
-
-      // Check for recovery that might restore the streak
-      if (status === "completed" && hasRecentRecovery(category, activityDate)) {
-        const previousDayDate = new Date(activityDate);
-        previousDayDate.setDate(previousDayDate.getDate() - 1);
-        const previousStreak = calculateStreakForDate(category, previousDayDate);
-        if (previousStreak > currentStreak) {
-          currentStreak = previousStreak + 1; // Restore the streak
-        }
+      if (status !== "completed") {
+        setStreak(0);
+        return;
       }
 
-      setStreak(currentStreak);
+      try {
+        const activities = getHabitActivitiesV2();
+        // Find the habit_id for this habit name
+        const habitActivity = activities.find(a => a.habitName === category && a.habitId);
+        
+        if (habitActivity?.habitId) {
+          let currentStreak = calculateStreakForDateV2(habitActivity.habitId, activityDate);
+
+          // Check for recovery that might restore the streak
+          if (hasRecentRecovery(category, activityDate)) {
+            const previousDayDate = new Date(activityDate);
+            previousDayDate.setDate(previousDayDate.getDate() - 1);
+            const previousStreak = calculateStreakForDateV2(habitActivity.habitId, previousDayDate);
+            if (previousStreak > currentStreak) {
+              currentStreak = previousStreak + 1; // Restore the streak
+            }
+          }
+
+          setStreak(currentStreak);
+        } else {
+          console.warn(`No habit_id found for ${category}, setting streak to 0`);
+          setStreak(0);
+        }
+      } catch (error) {
+        console.error("Error calculating streak:", error);
+        setStreak(0);
+      }
     };
 
     // Calculate initial streak

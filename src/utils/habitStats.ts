@@ -1,5 +1,5 @@
 
-import { getHabitActivities, HabitActivity } from "./habitActivity";
+import { getHabitActivitiesV2, HabitActivityV2 } from "./habitActivityV2";
 
 export interface HabitStats {
   habitName: string;
@@ -11,10 +11,10 @@ export interface HabitStats {
   category: 'good' | 'bad' | 'in-progress';
 }
 
-// Calculate habit statistics for the specified timeframe with automatic categorization
+// Calculate habit statistics for the specified timeframe with automatic categorization using habit_id
 export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] } => {
   try {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const now = new Date();
     
     // Determine the start date based on timeframe
@@ -40,18 +40,20 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       activity => activity.date >= startDateStr
     );
     
-    // Group by habit name
-    const habitGroups = filteredActivities.reduce<Record<string, HabitActivity[]>>((acc, activity) => {
-      if (!acc[activity.habitName]) {
-        acc[activity.habitName] = [];
+    // Group by habit_id (primary) or habit_name (fallback for legacy data)
+    const habitGroups = filteredActivities.reduce<Record<string, HabitActivityV2[]>>((acc, activity) => {
+      // Use habit_id as primary key, fallback to habit_name for legacy data
+      const groupKey = activity.habitId || activity.habitName;
+      if (!acc[groupKey]) {
+        acc[groupKey] = [];
       }
-      acc[activity.habitName].push(activity);
+      acc[groupKey].push(activity);
       return acc;
     }, {});
     
     // Calculate statistics for each habit with automatic categorization
-    const allHabitStats: HabitStats[] = Object.keys(habitGroups).map(habitName => {
-      const habitActivities = habitGroups[habitName];
+    const allHabitStats: HabitStats[] = Object.keys(habitGroups).map(groupKey => {
+      const habitActivities = habitGroups[groupKey];
       const completed = habitActivities.filter(a => a.status === "completed").length;
       const failed = habitActivities.filter(a => a.status === "failed").length;
       const empty = habitActivities.filter(a => a.status === "empty").length;
@@ -67,6 +69,9 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       } else {
         category = 'in-progress';
       }
+      
+      // Use the habit name from the first activity in the group (for display purposes)
+      const habitName = habitActivities[0]?.habitName || groupKey;
       
       return {
         habitName,

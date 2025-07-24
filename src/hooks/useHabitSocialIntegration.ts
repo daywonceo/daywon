@@ -121,9 +121,17 @@ export const useHabitSocialIntegration = () => {
     if (status !== 'completed') return;
 
     try {
-      // Calculate current streak for this completion
+      // Calculate current streak for this completion using habit_id
       const completionDate = new Date(date);
-      const streak = calculateStreakForDate(category, completionDate);
+      const activities = getHabitActivitiesV2();
+      const habitActivity = activities.find(a => a.habitName === category && a.habitId);
+      
+      if (!habitActivity?.habitId) {
+        console.warn(`No habit_id found for ${category}, skipping social post`);
+        return;
+      }
+      
+      const streak = calculateStreakForDateV2(habitActivity.habitId, completionDate);
       
       console.log(`Habit completed: ${category}, streak: ${streak}`);
 
@@ -170,7 +178,14 @@ export const useHabitSocialIntegration = () => {
   const shareHabitMilestone = async (habitName: string, date?: Date) => {
     try {
       const targetDate = date || new Date();
-      const streak = calculateStreakForDate(habitName, targetDate);
+      const activities = getHabitActivitiesV2();
+      const habitActivity = activities.find(a => a.habitName === habitName && a.habitId);
+      
+      if (!habitActivity?.habitId) {
+        throw new Error(`No habit_id found for ${habitName}`);
+      }
+      
+      const streak = calculateStreakForDateV2(habitActivity.habitId, targetDate);
       
       if (streak === 0) {
         throw new Error('Cannot share milestone for incomplete habit');
@@ -194,14 +209,27 @@ export const useHabitSocialIntegration = () => {
     }
   };
 
-  // Get user's current streaks for sharing
+  // Get user's current streaks for sharing using habit_id
   const getCurrentStreaks = () => {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const today = new Date();
-    const habitNames = [...new Set(activities.map(a => a.habitName))];
     
-    return habitNames.map(habitName => {
-      const streak = calculateStreakForDate(habitName, today);
+    // Group by habit_id when available, fallback to habit_name
+    const habitGroups = new Map<string, { habitName: string; habitId?: string }>();
+    activities.forEach(activity => {
+      const key = activity.habitId || activity.habitName;
+      if (!habitGroups.has(key)) {
+        habitGroups.set(key, { 
+          habitName: activity.habitName, 
+          habitId: activity.habitId 
+        });
+      }
+    });
+    
+    return Array.from(habitGroups.values()).map(({ habitName, habitId }) => {
+      const streak = habitId 
+        ? calculateStreakForDateV2(habitId, today)
+        : 0; // Fallback for legacy data without habit_id
       return {
         habitName,
         streak,

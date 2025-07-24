@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
-import { getHabitActivities } from "@/utils/habitActivity";
+import { getHabitActivitiesV2 } from "@/utils/habitActivityV2";
 
 export const useCalendarLogic = (setDate?: (date: Date | undefined) => void) => {
   // Animation state management
@@ -15,10 +15,10 @@ export const useCalendarLogic = (setDate?: (date: Date | undefined) => void) => 
     }
   };
 
-  // Get habit completion count for a specific date
+  // Get habit completion count for a specific date using V2 system
   const getHabitCompletionCount = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    const habitActivities = getHabitActivities();
+    const habitActivities = getHabitActivitiesV2();
     
     return habitActivities.filter(activity => 
       activity.date === dateStr && activity.status === 'completed'

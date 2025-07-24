@@ -1,5 +1,4 @@
-
-import { getHabitActivities, loadHabitActivitiesFromDatabase } from "./habitActivity";
+import { getHabitActivitiesV2, type HabitActivityV2 } from "./habitActivityV2";
 import { hasRecentRecovery } from "./streakRecovery";
 
 // Format large numbers with appropriate suffixes (e.g., 1.2k, 1.5M)
@@ -9,34 +8,23 @@ export const formatStreakNumber = (streak: number): string => {
   return `${(streak / 1000000).toFixed(1).replace('.0', '')}M`;
 };
 
-// Calculate streak for a specific habit on a specific date using habit_id when available
-export const calculateStreakForDate = (habitName: string, targetDate: Date): number => {
+// Calculate streak for a specific habit_id on a specific date - V2 using habit_id
+export const calculateStreakForDateV2 = (habitId: string, targetDate: Date): number => {
   try {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const targetDateStr = targetDate.toISOString().split('T')[0];
     
-    console.log(`Calculating streak for ${habitName} on ${targetDateStr}`);
+    console.log(`Calculating streak for habit_id ${habitId} on ${targetDateStr}`);
     
-    // Filter activities for this habit - use habit_id if available, otherwise fall back to habitName
+    // Filter activities for this habit_id, sorted by date (newest first)
     const habitActivities = activities
-      .filter(activity => {
-        // Prefer habit_id matching when available
-        if (activity.habitId) {
-          // Find the habit_id for this habitName from any activity that has both
-          const referenceActivity = activities.find(a => a.habitName === habitName && a.habitId);
-          if (referenceActivity) {
-            return activity.habitId === referenceActivity.habitId;
-          }
-        }
-        // Fallback to name matching
-        return activity.habitName === habitName;
-      })
+      .filter(activity => activity.habitId === habitId)
       .sort((a, b) => b.date.localeCompare(a.date));
     
     // Check if the target date was completed
     const targetActivity = habitActivities.find(activity => activity.date === targetDateStr);
     if (!targetActivity || targetActivity.status !== 'completed') {
-      console.log(`Target date ${targetDateStr} not completed for ${habitName}`);
+      console.log(`Target date ${targetDateStr} not completed for habit_id ${habitId}`);
       return 0;
     }
     
@@ -56,8 +44,8 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
         // Move to previous day
         currentDate.setDate(currentDate.getDate() - 1);
       } else if (activity && activity.status === 'failed') {
-        // Check if there's a recovery for this failed day that should continue the streak
-        if (hasRecentRecovery(habitName, currentDate)) {
+        // Check if there's a recovery for this failed day using habitName for compatibility
+        if (hasRecentRecovery(activity.habitName, currentDate)) {
           streak++;
           console.log(`Day ${currentDateStr} failed but recovered, streak now: ${streak}`);
           currentDate.setDate(currentDate.getDate() - 1);
@@ -97,7 +85,7 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
       }
     }
     
-    console.log(`Final streak for ${habitName}: ${streak}`);
+    console.log(`Final streak for habit_id ${habitId}: ${streak}`);
     return streak;
   } catch (error) {
     console.error("Error calculating streak for date:", error);
@@ -105,25 +93,14 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
   }
 };
 
-// Calculate the longest streak ever achieved for a habit using habit_id when available
-export const calculateLongestStreak = (habitName: string): number => {
+// Calculate the longest streak ever achieved for a habit_id - V2 using habit_id
+export const calculateLongestStreakV2 = (habitId: string): number => {
   try {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     
-    // Filter activities for this habit - use habit_id if available, otherwise fall back to habitName
+    // Filter and sort activities for this habit_id
     const habitActivities = activities
-      .filter(activity => {
-        // Prefer habit_id matching when available
-        if (activity.habitId) {
-          // Find the habit_id for this habitName from any activity that has both
-          const referenceActivity = activities.find(a => a.habitName === habitName && a.habitId);
-          if (referenceActivity) {
-            return activity.habitId === referenceActivity.habitId && activity.status === 'completed';
-          }
-        }
-        // Fallback to name matching
-        return activity.habitName === habitName && activity.status === 'completed';
-      })
+      .filter(activity => activity.habitId === habitId && activity.status === 'completed')
       .sort((a, b) => a.date.localeCompare(b.date));
     
     if (habitActivities.length === 0) return 0;
@@ -157,7 +134,7 @@ export const calculateLongestStreak = (habitName: string): number => {
     // Don't forget to check the final streak
     longestStreak = Math.max(longestStreak, currentStreak);
     
-    console.log(`Longest streak for ${habitName}: ${longestStreak}`);
+    console.log(`Longest streak for habit_id ${habitId}: ${longestStreak}`);
     return longestStreak;
   } catch (error) {
     console.error("Error calculating longest streak:", error);
@@ -165,26 +142,81 @@ export const calculateLongestStreak = (habitName: string): number => {
   }
 };
 
-// Calculate the overall longest streak across all habits
-export const calculateOverallLongestStreak = (): { streak: number; habitName: string } => {
+// Calculate the overall longest streak across all habits - V2 using habit_id
+export const calculateOverallLongestStreakV2 = (): { streak: number; habitId: string; habitName: string } => {
   try {
-    const activities = getHabitActivities();
-    const habitNames = [...new Set(activities.map(a => a.habitName))];
+    const activities = getHabitActivitiesV2();
+    const habitIds = [...new Set(activities.map(a => a.habitId))];
     
     let overallLongest = 0;
-    let longestHabit = '';
+    let longestHabitId = '';
+    let longestHabitName = '';
     
-    for (const habitName of habitNames) {
-      const habitLongest = calculateLongestStreak(habitName);
+    for (const habitId of habitIds) {
+      const habitLongest = calculateLongestStreakV2(habitId);
       if (habitLongest > overallLongest) {
         overallLongest = habitLongest;
-        longestHabit = habitName;
+        longestHabitId = habitId;
+        // Get the habit name from any activity with this habit_id
+        const habitActivity = activities.find(a => a.habitId === habitId);
+        longestHabitName = habitActivity?.habitName || '';
       }
     }
     
-    return { streak: overallLongest, habitName: longestHabit };
+    return { streak: overallLongest, habitId: longestHabitId, habitName: longestHabitName };
   } catch (error) {
     console.error("Error calculating overall longest streak:", error);
+    return { streak: 0, habitId: '', habitName: '' };
+  }
+};
+
+// Backward compatibility wrapper that uses habit_id when available
+export const calculateStreakForDate = (habitName: string, targetDate: Date): number => {
+  try {
+    const activities = getHabitActivitiesV2();
+    
+    // Find the habit_id for this habitName
+    const habitActivity = activities.find(a => a.habitName === habitName);
+    if (habitActivity?.habitId) {
+      return calculateStreakForDateV2(habitActivity.habitId, targetDate);
+    }
+    
+    // Fallback to name-based calculation if no habit_id found
+    console.warn(`No habit_id found for ${habitName}, using legacy calculation`);
+    return 0;
+  } catch (error) {
+    console.error("Error in calculateStreakForDate wrapper:", error);
+    return 0;
+  }
+};
+
+// Backward compatibility wrapper
+export const calculateLongestStreak = (habitName: string): number => {
+  try {
+    const activities = getHabitActivitiesV2();
+    
+    // Find the habit_id for this habitName
+    const habitActivity = activities.find(a => a.habitName === habitName);
+    if (habitActivity?.habitId) {
+      return calculateLongestStreakV2(habitActivity.habitId);
+    }
+    
+    // Fallback to name-based calculation if no habit_id found
+    console.warn(`No habit_id found for ${habitName}, using legacy calculation`);
+    return 0;
+  } catch (error) {
+    console.error("Error in calculateLongestStreak wrapper:", error);
+    return 0;
+  }
+};
+
+// Backward compatibility wrapper
+export const calculateOverallLongestStreak = (): { streak: number; habitName: string } => {
+  try {
+    const result = calculateOverallLongestStreakV2();
+    return { streak: result.streak, habitName: result.habitName };
+  } catch (error) {
+    console.error("Error in calculateOverallLongestStreak wrapper:", error);
     return { streak: 0, habitName: '' };
   }
 };

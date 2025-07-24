@@ -5,17 +5,17 @@ export { calculateHabitStats, type HabitStats } from "./habitStats";
 export { 
   calculateStreakForDate, 
   calculateLongestStreak, 
-  calculateOverallLongestStreak,
-  formatStreakNumber 
+  calculateOverallLongestStreak
 } from "./habitStreaks";
 export { initializeDefaultHabits, getHabitCategories } from "./habitCategories";
 
-// Export V2 functionality for gradual migration
+// Export V2 functionality as primary - habit_id based system
 export { 
   recordHabitActivityV2, 
   getHabitActivitiesV2, 
   getHabitActivitiesByIdV2,
   getHabitActivitiesByNameV2,
+  loadHabitActivitiesFromDatabaseV2,
   migrateHabitActivitiesToV2,
   type HabitActivityV2 
 } from "./habitActivityV2";
@@ -25,3 +25,11 @@ export {
   getSyncStatusV2,
   type SyncStatsV2 
 } from "./habitSynchronizationV2";
+
+// Export V2 streak functions as primary
+export {
+  calculateStreakForDateV2,
+  calculateLongestStreakV2,
+  calculateOverallLongestStreakV2,
+  formatStreakNumber
+} from "./habitStreaksV2";

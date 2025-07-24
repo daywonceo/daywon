@@ -1,8 +1,8 @@
 
-import { getHabitActivities } from "./habitActivity";
+import { getHabitActivitiesV2 } from "./habitActivityV2";
 
 export const generateHabitReport = async (userHabits: string[]) => {
-  const activities = getHabitActivities();
+  const activities = getHabitActivitiesV2();
   const now = new Date();
   
   // Get data for the last 30 days

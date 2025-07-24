@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { recordHabitActivity, getHabitActivities, autoActivateRecentHabits, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
+import { recordHabitActivityV2, getHabitActivitiesV2, loadHabitActivitiesFromDatabaseV2 } from "@/utils/habitActivityV2";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 
@@ -30,9 +30,6 @@ export const useHabitActivities = (habitList?: string[]) => {
     try {
       setIsLoading(true);
       
-      // Auto-activate habits that have been completed recently
-      await autoActivateRecentHabits();
-      
       // Get recent dates (past 3 days including today)
       const today = new Date();
       const dates = [0, 1, 2].map(daysAgo => {
@@ -44,18 +41,18 @@ export const useHabitActivities = (habitList?: string[]) => {
       // Format dates as YYYY-MM-DD strings
       const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
       
-      // Trigger sync before loading data
+      // Trigger sync before loading data using V2 system
       try {
         // Dynamically import to avoid circular dependencies
-        const { synchronizeHabits } = await import('@/utils/habitSynchronization');
-        await synchronizeHabits();
+        const { synchronizeHabitsV2 } = await import('@/utils/habitSynchronizationV2');
+        await synchronizeHabitsV2();
       } catch (syncError) {
         console.error("Failed to sync habit data:", syncError);
         // Continue with local data even if sync fails
       }
       
-      // Get all habit activities from local storage
-      const storedActivities = getHabitActivities();
+      // Get all habit activities from V2 system (uses habit_id)
+      const storedActivities = getHabitActivitiesV2();
       
       // Create activities for the past 3 days
       const newActivities = dates.map((date, index) => {
@@ -74,11 +71,19 @@ export const useHabitActivities = (habitList?: string[]) => {
         // Initialize statuses map
         const statuses: Record<string, ActivityStatus> = {};
         
-        // Populate statuses from stored activities
+        // Populate statuses from stored activities using habit_id when available
         userHabits.forEach(category => {
-          const activity = storedActivities.find(
-            a => a.habitName === category && a.date === dateStr
-          );
+          // Find by habit_id if available, otherwise fallback to name
+          const activity = storedActivities.find(a => {
+            if (a.habitId) {
+              // Find the habit_id for this habit name
+              const referenceActivity = storedActivities.find(ref => ref.habitName === category && ref.habitId);
+              if (referenceActivity) {
+                return a.habitId === referenceActivity.habitId && a.date === dateStr;
+              }
+            }
+            return a.habitName === category && a.date === dateStr;
+          });
           statuses[category] = activity ? activity.status : "empty";
         });
         
@@ -153,9 +158,9 @@ export const useHabitActivities = (habitList?: string[]) => {
         detail: { category, status: newStatus, date: date.toISOString().split('T')[0] } 
       }));
       
-      // Handle background operations asynchronously without affecting UI
+      // Handle background operations asynchronously without affecting UI using V2 system
       Promise.resolve().then(() => {
-        recordHabitActivity(category, newStatus, date);
+        recordHabitActivityV2(category, newStatus, date);
         hapticSuccess();
       });
       

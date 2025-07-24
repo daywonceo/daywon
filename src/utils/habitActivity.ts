@@ -5,6 +5,7 @@ export interface HabitActivity {
   id: string;
   date: string; // ISO date string
   habitName: string; 
+  habitId?: string; // V2 field - will become required
   status: "completed" | "failed" | "empty";
 }
 
@@ -59,19 +60,12 @@ const getHabitCategory = (habitName: string): string => {
   return categoryMap[habitName] || 'Personal';
 };
 
-// Record a habit activity - backward compatibility wrapper for the new sync system
+// Record a habit activity - migrated to use V2 system with habit_id
 export const recordHabitActivity = async (habitName: string, status: "completed" | "failed" | "empty", date: Date = new Date()): Promise<void> => {
   try {
-    // Ensure habit exists in database when it's first tracked or completed
-    if (status === "completed") {
-      await ensureHabitExists(habitName);
-    }
-
-    // Import here to avoid circular dependency
-    const { recordHabitActivityWithSync } = await import('./habitSynchronization');
-    
-    // Use the new sync method which handles both local storage and server synchronization
-    await recordHabitActivityWithSync(habitName, status, date);
+    // Use the V2 system which handles habit_id properly
+    const { recordHabitActivityV2 } = await import('./habitActivityV2');
+    await recordHabitActivityV2(habitName, status, date);
     
     console.log(`Recorded habit: ${habitName} as ${status} on ${date.toISOString().split('T')[0]}`);
   } catch (error) {
@@ -79,32 +73,47 @@ export const recordHabitActivity = async (habitName: string, status: "completed"
   }
 };
 
-// Get all habit activities - synchronous for backward compatibility
+// Get all habit activities - migrated to use V2 system
 export const getHabitActivities = (): HabitActivity[] => {
-  const offlineData = getOfflineData();
-  return offlineData.habitActivities || [];
+  try {
+    // Import V2 function and convert to V1 format for backward compatibility
+    const { getHabitActivitiesV2 } = require('./habitActivityV2');
+    const v2Activities = getHabitActivitiesV2();
+    
+    // Convert V2 format to V1 format for backward compatibility
+    return v2Activities.map(v2Activity => ({
+      id: v2Activity.id,
+      date: v2Activity.date,
+      habitName: v2Activity.habitName,
+      habitId: v2Activity.habitId,
+      status: v2Activity.status
+    }));
+  } catch (error) {
+    console.error("Failed to get V2 activities, falling back to V1:", error);
+    // Fallback to old system
+    const offlineData = getOfflineData();
+    return offlineData.habitActivities || [];
+  }
 };
 
-// Load habit activities from database and sync with local storage
+// Load habit activities from database and sync - migrated to V2 system
 export const loadHabitActivitiesFromDatabase = async (): Promise<HabitActivity[]> => {
   try {
-    // Import the synchronization module
-    const { forceSyncFromServer } = await import('./habitSynchronization');
+    // Use V2 loading system which handles habit_id properly
+    const { loadHabitActivitiesFromDatabaseV2 } = await import('./habitActivityV2');
+    const v2Activities = await loadHabitActivitiesFromDatabaseV2();
     
-    // Try to perform a full sync from server first
-    const syncSuccess = await forceSyncFromServer();
-    
-    if (syncSuccess) {
-      console.log("Successfully synced habit data from server");
-    } else {
-      console.log("Failed to sync from server, using local data");
-    }
-    
-    // Return the current state from local storage (which will be updated if sync succeeded)
-    return getHabitActivities();
+    // Convert to V1 format for backward compatibility
+    return v2Activities.map(v2Activity => ({
+      id: v2Activity.id,
+      date: v2Activity.date,
+      habitName: v2Activity.habitName,
+      habitId: v2Activity.habitId,
+      status: v2Activity.status
+    }));
   } catch (error) {
-    console.error("Failed to load activities from database:", error);
-    // Fallback to local storage
+    console.error("Failed to load V2 activities from database:", error);
+    // Fallback to local data
     return getHabitActivities();
   }
 };

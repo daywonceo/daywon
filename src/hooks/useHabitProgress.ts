@@ -14,7 +14,7 @@ export interface ProgressPeriod {
 
 export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
   const progressData = useMemo(() => {
-    const activities = getHabitActivities();
+    const activities = getHabitActivitiesV2();
     const now = new Date();
     
     // Helper function to get date range
@@ -40,9 +40,16 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
         
         userHabits.forEach(habit => {
           totalPossible++;
-          const activity = activities.find(
-            a => a.habitName === habit && a.date === dateStr && a.status === 'completed'
-          );
+        const activity = activities.find(a => {
+          if (a.habitId) {
+            // Find the habit_id for this habit name
+            const referenceActivity = activities.find(ref => ref.habitName === habit && ref.habitId);
+            if (referenceActivity) {
+              return a.habitId === referenceActivity.habitId && a.date === dateStr && a.status === 'completed';
+            }
+          }
+          return a.habitName === habit && a.date === dateStr && a.status === 'completed';
+        });
           if (activity) {
             completed++;
           }
