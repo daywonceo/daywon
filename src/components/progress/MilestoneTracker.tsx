@@ -24,12 +24,12 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         
         <div className="space-y-3">
           <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
-            {formatStreakNumber(streakStats.longestStreak)} days
+            {formatStreakNumber(streakStats.bestStreak)} days
           </p>
           
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            {streakStats.longestStreakHabit ? (
-              <>Your best streak was for <span className="font-semibold">{streakStats.longestStreakHabit}</span></>
+            {streakStats.bestStreakHabit ? (
+              <>Your best current streak is <span className="font-semibold">{streakStats.bestStreakHabit}</span></>
             ) : (
               "Start completing habits to build your first streak!"
             )}
