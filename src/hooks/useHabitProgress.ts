@@ -1,6 +1,7 @@
 
 import { useMemo } from 'react';
 import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
+import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
 export interface ProgressPeriod {
   period: string;
@@ -17,12 +18,30 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
     const activities = getHabitActivitiesV2();
     const now = new Date();
     
-    // Helper function to get date range
-    const getDateRange = (daysBack: number, offsetDays: number = 0) => {
+    // Helper function to get user-aware date range
+    const getDateRange = (timeframe: "week" | "month" | "year", offsetDays: number = 0) => {
+      // Get base time window for this timeframe
+      const { startDate: baseStartDate, totalDaysAvailable } = getUserTimeWindowSync(timeframe);
+      
       const endDate = new Date(now);
       endDate.setDate(now.getDate() - offsetDays);
+      
+      // Calculate actual start date for this specific period
+      let daysInPeriod: number;
+      switch (timeframe) {
+        case "week": daysInPeriod = 7; break;
+        case "month": daysInPeriod = 30; break;
+        case "year": daysInPeriod = 365; break;
+      }
+      
       const startDate = new Date(endDate);
-      startDate.setDate(endDate.getDate() - daysBack + 1);
+      startDate.setDate(endDate.getDate() - daysInPeriod + 1);
+      
+      // Ensure we don't go before user's account creation
+      if (startDate < baseStartDate) {
+        return { startDate: baseStartDate, endDate };
+      }
+      
       return { startDate, endDate };
     };
 
@@ -68,8 +87,8 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
     const periods: ProgressPeriod[] = [];
 
     // This week vs last week
-    const thisWeek = getDateRange(7, 0);
-    const lastWeek = getDateRange(7, 7);
+    const thisWeek = getDateRange("week", 0);
+    const lastWeek = getDateRange("week", 7);
     const thisWeekData = countCompletions(thisWeek.startDate, thisWeek.endDate);
     const lastWeekData = countCompletions(lastWeek.startDate, lastWeek.endDate);
     
@@ -92,8 +111,8 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
     });
 
     // This month vs last month
-    const thisMonth = getDateRange(30, 0);
-    const lastMonth = getDateRange(30, 30);
+    const thisMonth = getDateRange("month", 0);
+    const lastMonth = getDateRange("month", 30);
     const thisMonthData = countCompletions(thisMonth.startDate, thisMonth.endDate);
     const lastMonthData = countCompletions(lastMonth.startDate, lastMonth.endDate);
     
@@ -116,8 +135,8 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
     });
 
     // Last 6 months vs previous 6 months
-    const last6Months = getDateRange(180, 0);
-    const previous6Months = getDateRange(180, 180);
+    const last6Months = getDateRange("year", 0); // Use year logic but limit to 6 months data
+    const previous6Months = getDateRange("year", 180);
     const last6MonthsData = countCompletions(last6Months.startDate, last6Months.endDate);
     const previous6MonthsData = countCompletions(previous6Months.startDate, previous6Months.endDate);
     
@@ -140,8 +159,8 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
     });
 
     // This year vs last year
-    const thisYear = getDateRange(365, 0);
-    const lastYear = getDateRange(365, 365);
+    const thisYear = getDateRange("year", 0);
+    const lastYear = getDateRange("year", 365);
     const thisYearData = countCompletions(thisYear.startDate, thisYear.endDate);
     const lastYearData = countCompletions(lastYear.startDate, lastYear.endDate);
     

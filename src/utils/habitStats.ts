@@ -1,5 +1,6 @@
 
 import { getHabitActivitiesV2, HabitActivityV2 } from "./habitActivityV2";
+import { getUserTimeWindowSync } from "./userTimeWindow";
 
 export interface HabitStats {
   habitName: string;
@@ -15,27 +16,11 @@ export interface HabitStats {
 export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] } => {
   try {
     const activities = getHabitActivitiesV2();
-    const now = new Date();
     
-    // Determine the start date based on timeframe
-    let startDate: Date;
-    switch (timeframe) {
-      case "week":
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate = new Date(now);
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate = new Date(now);
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-    }
+    // Get user-aware time window based on account creation date
+    const { startDate, totalDaysAvailable } = getUserTimeWindowSync(timeframe);
     
-    // Calculate total days in the timeframe
-    const totalDaysInPeriod = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    console.log(`Calculating habit stats for ${timeframe} - Start date: ${startDate.toISOString()}, Total days: ${totalDaysAvailable}`);
     
     // Filter activities by date
     const startDateStr = startDate.toISOString().split('T')[0];
@@ -65,11 +50,11 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       const failed = habitActivities.filter(a => a.status === "failed").length;
       const empty = habitActivities.filter(a => a.status === "empty").length;
       
-      // CRITICAL FIX: Total should be ALL days in the period, not just recorded activities
+      // CRITICAL FIX: Total should be ALL days in the user's available period
       // Days without any record are considered "missed" (empty/incomplete)
       const recordedDays = habitActivities.length;
-      const missedDays = totalDaysInPeriod - recordedDays;
-      const total = totalDaysInPeriod;
+      const missedDays = totalDaysAvailable - recordedDays;
+      const total = totalDaysAvailable;
       
       // For percentage calculation: only "completed" counts as success
       // Failed, empty, and missed days all count as incomplete

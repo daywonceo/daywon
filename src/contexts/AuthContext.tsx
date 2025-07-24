@@ -31,6 +31,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         setLoading(false);
         
+        // Cache user creation date for habit calculations
+        if (session?.user?.created_at) {
+          localStorage.setItem('user_creation_date', session.user.created_at);
+        }
+        
         // Store Spotify access token if available
         if (session?.provider_token && session?.provider_refresh_token) {
           localStorage.setItem('spotify_access_token', session.provider_token);
@@ -45,6 +50,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Cache user creation date for habit calculations
+      if (session?.user?.created_at) {
+        localStorage.setItem('user_creation_date', session.user.created_at);
+      }
       
       // Store Spotify tokens if available
       if (session?.provider_token && session?.provider_refresh_token) {

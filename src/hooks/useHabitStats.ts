@@ -2,18 +2,24 @@
 import { useMemo } from 'react';
 import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
 import { calculateStreakForDateV2, calculateOverallLongestStreakV2 } from '@/utils/habitStreaksV2';
+import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
 export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
   const stats = useMemo(() => {
     const now = new Date();
     const activities = getHabitActivitiesV2();
     
-    // Calculate completion stats for the last 7 days
+    // Get user-aware time window for weekly stats (7 days or since account creation)
+    const { startDate: weekStartDate, totalDaysAvailable: weekDays } = getUserTimeWindowSync("week");
+    
+    // Calculate completion stats for the user's available period (max 7 days for weekly)
     let completedCount = 0;
     let totalPossible = 0;
     
-    // Check each of the last 7 days (including today)
-    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+    // Generate all dates from start to now (limited to 7 days max for weekly)
+    const actualWeekDays = Math.min(weekDays, 7);
+    
+    for (let dayOffset = 0; dayOffset < actualWeekDays; dayOffset++) {
       const checkDate = new Date(now);
       checkDate.setDate(now.getDate() - dayOffset);
       const dateStr = checkDate.toISOString().split('T')[0];
