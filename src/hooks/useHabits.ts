@@ -20,19 +20,25 @@ async function fetchHabits(userId: string) {
   return data;
 }
 
-async function addHabit(habit: NewHabit, userId: string, existingHabits: Habit[]) {
-  // Check for duplicates before adding
-  const duplicate = findDuplicateHabit(habit.name, existingHabits);
-  if (duplicate) {
-    throw new Error(`Habit "${duplicate.name}" already exists. Try editing the existing one instead.`);
-  }
+async function addHabit(habit: NewHabit, userId: string) {
+  // Use the smart matching function to find or create habit
+  const { data: habitId, error: functionError } = await supabase
+    .rpc('find_or_create_habit', {
+      p_user_id: userId,
+      p_name: habit.name,
+      p_description: habit.description,
+      p_category: habit.category
+    });
 
+  if (functionError) throw functionError;
+
+  // Fetch the habit data
   const { data, error } = await supabase
-    .from("habits")
-    .insert([{ ...habit, user_id: userId }])
+    .from('habits')
     .select()
+    .eq('id', habitId)
     .single();
-  
+
   if (error) throw error;
   return data;
 }
@@ -162,7 +168,7 @@ export function useHabits() {
   });
 
   const addMutation = useMutation({
-    mutationFn: (newHabit: NewHabit) => addHabit(newHabit, user!.id, habits || []),
+    mutationFn: (newHabit: NewHabit) => addHabit(newHabit, user!.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },

@@ -24,6 +24,7 @@ import CompletionRateCard from "@/components/progress/CompletionRateCard";
 import MilestoneTracker from "@/components/progress/MilestoneTracker";
 import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard";
 import { useAutomaticDeduplication } from "@/hooks/useAutomaticDeduplication";
+import { useHabitSystemTransition } from "@/hooks/useHabitSystemTransition";
 import CatchUpView from "@/components/habit/CatchUpView";
 
 const Index = () => {
@@ -51,6 +52,9 @@ const Index = () => {
   
   // Automatically detect and merge duplicate habits
   useAutomaticDeduplication();
+  
+  // Initialize V2 habit system with backend ID handling
+  useHabitSystemTransition();
 
   // Auto-refresh data when app becomes visible or gains focus
   useEffect(() => {
