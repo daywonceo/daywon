@@ -107,7 +107,6 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
         {milestones.length > 0 && (
           <div>
             <div className="flex items-center space-x-2 mb-3">
-              <Trophy className="text-yellow-600 dark:text-yellow-400" size={16} />
               <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Milestones Ready to Share</h3>
             </div>
             <div className="space-y-2">
@@ -157,7 +156,6 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
         {regularStreaks.length > 0 && (
           <div>
             <div className="flex items-center space-x-2 mb-3">
-              <TrendingUp className="text-green-600 dark:text-green-400" size={16} />
               <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Current Streaks</h3>
             </div>
             <div className="grid grid-cols-1 gap-2">
