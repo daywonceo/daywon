@@ -31,7 +31,7 @@ const GoOnboarding = () => {
     {
       icon: <Heart className="w-6 h-6 text-red-500" />,
       title: "Our Mission & Canvas Growth",
-      description: "Learn about Life Canvas and how your canvas will grow"
+      description: "Learn about Day Won and how your canvas will grow"
     },
     {
       icon: <Target className="w-6 h-6 text-blue-500" />,

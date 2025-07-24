@@ -49,7 +49,7 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
         return;
       }
 
-      toast.success("Welcome to Life Canvas! 🎉");
+      toast.success("Welcome to Day Won! 🎉");
       onComplete();
     } catch (error) {
       console.error('Error completing onboarding:', error);

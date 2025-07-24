@@ -51,7 +51,7 @@ const MissionCanvasScreen = ({ onNext, onBack, onSkip }: MissionCanvasScreenProp
             </div>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-            Life Canvas
+            Day Won
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 mt-2 font-medium">
             Paint your life with purpose
@@ -61,7 +61,7 @@ const MissionCanvasScreen = ({ onNext, onBack, onSkip }: MissionCanvasScreenProp
         <CardContent className="space-y-6">
           <div className="text-center">
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-              Life Canvas believes that small, consistent habits are the brushstrokes that create a masterpiece life. 
+              Day Won believes that small, consistent habits are the brushstrokes that create a masterpiece life. 
               Every day is an opportunity to add meaningful colors to your canvas.
             </p>
           </div>
