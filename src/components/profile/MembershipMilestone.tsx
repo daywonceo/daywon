@@ -15,7 +15,7 @@ const MembershipMilestone = ({ daysActive }: MembershipMilestoneProps) => {
       </div>
       
       <div className="bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/30 dark:to-blue-900/30 rounded-lg p-6 text-center border border-green-200 dark:border-green-800">
-        <h3 className="font-bold mb-2 text-gray-700 dark:text-gray-300">Member Since Day One</h3>
+        <h3 className="font-bold mb-2 text-gray-700 dark:text-gray-300">Member Since Day Won</h3>
         <p className="text-2xl font-bold tracking-wider mb-2 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
           {daysActive} DAYS STRONG!
         </p>

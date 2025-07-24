@@ -4,7 +4,7 @@ import React from "react";
 import { HabitActivity } from "./habitTracking";
 import { HabitActivityV2 } from "./habitActivityV2";
 
-const STORAGE_KEY = 'dayOne_offlineData';
+const STORAGE_KEY = 'dayWon_offlineData';
 
 export type OfflineData = {
   lastUpdated: number;

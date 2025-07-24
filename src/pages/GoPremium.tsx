@@ -92,7 +92,7 @@ const GoPremium = () => {
             Go Premium
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Unlock your full potential with enhanced features and unlimited access to everything DayOne has to offer.
+            Unlock your full potential with enhanced features and unlimited access to everything Day Won has to offer.
           </p>
         </div>
 
