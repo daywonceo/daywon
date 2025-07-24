@@ -29,7 +29,7 @@ export interface PostReaction {
   id: string;
   post_id: string;
   user_id: string;
-  reaction_type: 'like' | 'love' | 'fire' | 'clap' | 'star';
+  reaction_type: 'like' | 'love' | 'fire' | 'clap' | 'star' | 'strong' | 'mind_blown' | 'celebrate';
   created_at: string;
 }
 
@@ -189,7 +189,7 @@ export const useSocialPosts = () => {
   };
 
   // Add or remove reaction
-  const toggleReaction = async (postId: string, reactionType: 'like' | 'love' | 'fire' | 'clap' | 'star') => {
+  const toggleReaction = async (postId: string, reactionType: 'like' | 'love' | 'fire' | 'clap' | 'star' | 'strong' | 'mind_blown' | 'celebrate') => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
@@ -227,6 +227,18 @@ export const useSocialPosts = () => {
           });
 
         if (error) throw error;
+
+        // Create notification for post owner (if not reacting to own post)
+        if (post.user_id !== user.id) {
+          await supabase.from('notifications').insert({
+            user_id: post.user_id,
+            actor_id: user.id,
+            type: 'reaction',
+            entity_type: 'post',
+            entity_id: postId,
+            message: `reacted ${reactionType} to your ${post.habit_name} post`,
+          });
+        }
       }
 
       // Refresh posts to get updated reactions

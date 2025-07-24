@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainFeed from "@/components/social/MainFeed";
 import ActivityTimeline from "@/components/social/ActivityTimeline";
+import NotificationCenter from "@/components/social/NotificationCenter";
 import HabitLeaderboard from "@/components/social/HabitLeaderboard";
 import FriendList from "@/components/social/FriendList";
 import Groups from "@/components/social/Groups";
@@ -18,17 +19,24 @@ const Social = () => {
       <Header />
       
       <main className="flex-grow px-3 sm:px-4 pb-20 pt-4 max-w-md sm:max-2xl mx-auto w-full">
-        {/* Hero Section */}
-        <div className="text-center mb-6 px-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-            <span className="text-2xl">🌟</span>
+        {/* Header with Notifications */}
+        <div className="flex items-center justify-between mb-6 px-2">
+          <div className="flex-1 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+              <span className="text-2xl">🌟</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Connect & Grow
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs mx-auto">
+              Share your journey and celebrate wins with your community
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Connect & Grow
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs mx-auto">
-            Share your journey and celebrate wins with your community
-          </p>
+          
+          {/* Notification Center */}
+          <div className="absolute top-4 right-4">
+            <NotificationCenter />
+          </div>
         </div>
 
         <Tabs defaultValue="timeline" className="w-full">

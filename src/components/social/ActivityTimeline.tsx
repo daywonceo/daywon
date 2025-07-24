@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Filter, TrendingUp, Calendar, Users } from 'lucide-react';
 import { useSocialPosts } from '@/hooks/useSocialPosts';
+import CommentSection from './CommentSection';
+import ExtendedReactions from './ExtendedReactions';
 import { useFriends } from '@/hooks/useFriends';
 import { formatDistanceToNow, isToday, isYesterday, format } from 'date-fns';
 
@@ -93,8 +95,8 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
     );
   };
 
-  const handleReaction = (postId: string, reactionType: 'like' | 'love' | 'fire' | 'clap' | 'star') => {
-    toggleReaction(postId, reactionType);
+  const handleReaction = async (postId: string, reactionType: 'like' | 'love' | 'fire' | 'clap' | 'star' | 'strong' | 'mind_blown' | 'celebrate') => {
+    await toggleReaction(postId, reactionType);
   };
 
   if (loading) {
@@ -216,26 +218,20 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{post.caption}</p>
                             )}
                             
-                            {/* Quick reactions */}
-                            <div className="flex items-center space-x-2">
-                              {(['like', 'fire'] as const).map((reactionType) => {
-                                const isSelected = post.user_reaction === reactionType;
-                                const count = post.reaction_counts?.[reactionType] || 0;
-                                
-                                return (
-                                  <Button
-                                    key={reactionType}
-                                    variant="ghost"
-                                    size="sm"
-                                    className={`h-6 px-2 text-xs ${isSelected ? 'text-red-600' : 'text-gray-500'}`}
-                                    onClick={() => handleReaction(post.id, reactionType)}
-                                  >
-                                    {reactionType === 'like' ? '👍' : '🔥'}
-                                    {count > 0 && <span className="ml-1">{count}</span>}
-                                  </Button>
-                                );
-                              })}
-                            </div>
+                            {/* Extended reactions */}
+                            <ExtendedReactions
+                              postId={post.id}
+                              currentReaction={post.user_reaction}
+                              reactionCounts={post.reaction_counts}
+                              onReact={handleReaction}
+                              className="mb-3"
+                            />
+                            
+                            {/* Comments section */}
+                            <CommentSection 
+                              postId={post.id}
+                              className="mt-3"
+                            />
                           </div>
                         </div>
                       </CardContent>
