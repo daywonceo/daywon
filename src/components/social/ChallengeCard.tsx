@@ -202,6 +202,22 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
             </Button>
           )}
         </div>
+        
+        {/* Quick interactions for active challenges */}
+        {isActive && challenge.user_participation && (
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onViewDetails(challenge.id)}
+                className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                💬 Join Discussion • ❤️ React • 📊 View Progress
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

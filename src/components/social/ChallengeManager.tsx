@@ -20,6 +20,7 @@ import { useChallengeManagement } from '@/hooks/useChallengeManagement';
 import { format } from 'date-fns';
 import ChallengeProgressTracker from './ChallengeProgressTracker';
 import MilestoneNotification from './MilestoneNotification';
+import ChallengeInteractions from './ChallengeInteractions';
 import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 
 interface ChallengeManagerProps {
@@ -334,12 +335,16 @@ const ChallengeManager = ({ className }: ChallengeManagerProps) => {
               )}
 
               {activeTab === 'progress' && selectedChallenge && (
-                <ChallengeProgressTracker 
-                  challengeId={selectedChallenge.id}
-                  showLeaderboard={true}
-                  showStats={true}
-                  showMilestones={true}
-                />
+                <div className="space-y-6">
+                  <ChallengeProgressTracker 
+                    challengeId={selectedChallenge.id}
+                    showLeaderboard={true}
+                    showStats={true}
+                    showMilestones={true}
+                  />
+                  
+                  <ChallengeInteractions challengeId={selectedChallenge.id} />
+                </div>
               )}
 
               {activeTab === 'analytics' && (

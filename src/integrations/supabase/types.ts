@@ -89,6 +89,39 @@ export type Database = {
           },
         ]
       }
+      challenge_comments: {
+        Row: {
+          challenge_id: string
+          content: string
+          created_at: string
+          id: string
+          is_edited: boolean | null
+          parent_comment_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_edited?: boolean | null
+          parent_comment_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_edited?: boolean | null
+          parent_comment_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       challenge_participants: {
         Row: {
           challenge_id: string
@@ -136,6 +169,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      challenge_reactions: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       challenge_teams: {
         Row: {
