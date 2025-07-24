@@ -87,7 +87,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       <Badge className={`${config.color} border-0 text-xs font-medium ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-1' : ''}`}>
         {config.emoji} {habitType}
         {streakCount && streakCount > 1 && (
-          <span className="ml-1 font-bold">{isMilestone ? '🏆' : '🔥'}{streakCount}</span>
+          <span className="ml-1 font-bold">{streakCount}</span>
         )}
       </Badge>
     );
@@ -137,8 +137,6 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
               className="text-xs px-3 py-1 h-7"
             >
               {filterType === 'all' && <Filter size={12} className="mr-1" />}
-              {filterType === 'milestones' && '🏆'}
-              {filterType === 'streaks' && '🔥'}
               {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
             </Button>
           ))}
