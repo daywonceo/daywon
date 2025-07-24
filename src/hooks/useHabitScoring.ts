@@ -91,16 +91,30 @@ export const useHabitScoring = () => {
                  activity.date <= endDateStr
     );
 
-    // Calculate weighted completion rate
+    // Calculate weighted completion rate using habit_id-first approach
     let totalWeightedCompletions = 0;
     let totalPossibleWeighted = 0;
 
-    // Get unique habit names from activities
-    const habitNames = [...new Set(activities.map(a => a.habitName))];
+    // Group by habit_id when available, fallback to habit_name (same pattern as streak calculation)
+    const habitGroups = new Map<string, { habitName: string; habitId?: string }>();
+    activities.forEach(activity => {
+      const key = activity.habitId || activity.habitName;
+      if (!habitGroups.has(key)) {
+        habitGroups.set(key, { 
+          habitName: activity.habitName, 
+          habitId: activity.habitId 
+        });
+      }
+    });
 
-    habitNames.forEach(habitName => {
+    habitGroups.forEach(({ habitName, habitId }) => {
       const multiplier = getHabitMultiplier(habitName);
-      const habitCompletions = completedActivities.filter(a => a.habitName === habitName).length;
+      // Count completions for this habit group
+      const habitCompletions = completedActivities.filter(a => {
+        const activityKey = a.habitId || a.habitName;
+        const groupKey = habitId || habitName;
+        return activityKey === groupKey;
+      }).length;
       
       totalWeightedCompletions += habitCompletions * multiplier;
       totalPossibleWeighted += daysInPeriod * multiplier;
@@ -152,19 +166,25 @@ export const useHabitScoring = () => {
     const weekAgoStr = weekAgo.toISOString().split('T')[0];
     const nowStr = now.toISOString().split('T')[0];
 
-    // Get unique habits completed this week
-    const uniqueHabitsThisWeek = new Set(
-      activities
-        .filter(activity => 
-          activity.status === 'completed' && 
-          activity.date >= weekAgoStr && 
-          activity.date <= nowStr
-        )
-        .map(activity => activity.habitName)
-    );
+    // Get completed activities this week
+    const weeklyCompleted = activities
+      .filter(a => 
+        a.date >= weekAgoStr && 
+        a.date <= nowStr && 
+        a.status === 'completed'
+      );
+    
+    // Count unique habits using habit_id when available, fallback to habit_name
+    const uniqueHabits = new Set();
+    weeklyCompleted.forEach(activity => {
+      const key = activity.habitId || activity.habitName;
+      uniqueHabits.add(key);
+    });
+    const uniqueHabitsCount = uniqueHabits.size;
 
-    // Max variety score for 10 different habits
-    return Math.min((uniqueHabitsThisWeek.size / 10) * 100, 100);
+    // Normalize variety to 100 (assuming 10 different habits as max variety)
+    const maxVariety = 10;
+    return Math.min((uniqueHabitsCount / maxVariety) * 100, 100);
   };
 
   const calculateRecencyScore = (): number => {

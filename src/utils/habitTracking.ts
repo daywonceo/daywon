@@ -1,5 +1,4 @@
-
-// Re-export all functionality to maintain backward compatibility
+// Re-export V1 functionality for backward compatibility - habit_name based (legacy)
 export { recordHabitActivity, getHabitActivities, type HabitActivity } from "./habitActivity";
 export { calculateHabitStats, type HabitStats } from "./habitStats";
 export { 

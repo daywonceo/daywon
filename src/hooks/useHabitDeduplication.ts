@@ -1,6 +1,6 @@
 import { useHabits } from "./useHabits";
 import { findDuplicateHabit, getPreferredHabitName, areHabitsEquivalent } from "@/utils/habitDeduplication";
-import { getHabitActivities } from "@/utils/habitActivity";
+import { getHabitActivitiesV2 } from "@/utils/habitActivityV2";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -47,10 +47,16 @@ export const useHabitDeduplication = () => {
       for (const group of duplicateGroups) {
         const { preferredName, habits: duplicateHabits } = group;
         
-        // Get completion history for each duplicate habit
-        const activities = getHabitActivities();
+        // Get completion history for each duplicate habit using V2 system
+        const activities = getHabitActivitiesV2();
         const habitCompletions = duplicateHabits.map(habit => {
-          const habitActivities = activities.filter(a => a.habitName === habit.name);
+          // Use habit_id when available, fallback to name matching
+          const habitActivities = activities.filter(a => {
+            if (a.habitId && habit.id) {
+              return a.habitId === habit.id;
+            }
+            return a.habitName === habit.name;
+          });
           const completed = habitActivities.filter(a => a.status === 'completed').length;
           const total = habitActivities.length;
           return { habit, completed, total, completionRate: total > 0 ? completed / total : 0 };
@@ -71,7 +77,12 @@ export const useHabitDeduplication = () => {
         
         // Update local storage activities to consolidate under the kept habit's name
         const updatedActivities = activities.map(activity => {
-          const shouldUpdate = habitsToRemove.some(h => h.name === activity.habitName);
+          const shouldUpdate = habitsToRemove.some(h => {
+            if (activity.habitId && h.id) {
+              return activity.habitId === h.id;
+            }
+            return activity.habitName === h.name;
+          });
           return shouldUpdate 
             ? { ...activity, habitName: finalName }
             : activity;
