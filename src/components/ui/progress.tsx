@@ -22,7 +22,7 @@ const Progress = React.forwardRef<
   >
     <ProgressPrimitive.Indicator
       className={cn(
-        "h-full w-full flex-1 transition-all",
+        "h-full flex-1 transition-all rounded-full",
         useGradient 
           ? "bg-gradient-to-r from-green-600 to-green-400"
           : "bg-primary"
