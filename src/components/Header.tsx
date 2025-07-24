@@ -41,7 +41,7 @@ const Header = () => {
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-black tracking-tighter flex items-center">
-          Day<span className="tracking-[-0.1em] text-green-700 dark:text-green-500">One</span>
+          Day<span className="tracking-[-0.1em] text-green-700 dark:text-green-500">Won</span>
         </h1>
 
         <div className="flex-1 flex justify-end items-center space-x-1">
