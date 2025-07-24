@@ -18,6 +18,9 @@ import {
 } from 'lucide-react';
 import { useChallengeManagement } from '@/hooks/useChallengeManagement';
 import { format } from 'date-fns';
+import ChallengeProgressTracker from './ChallengeProgressTracker';
+import MilestoneNotification from './MilestoneNotification';
+import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 
 interface ChallengeManagerProps {
   className?: string;
@@ -26,9 +29,15 @@ interface ChallengeManagerProps {
 const ChallengeManager = ({ className }: ChallengeManagerProps) => {
   const [challenges, setChallenges] = useState<any[]>([]);
   const [selectedChallenge, setSelectedChallenge] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'participants' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'participants' | 'progress' | 'analytics'>('overview');
+  const [milestoneNotifications, setMilestoneNotifications] = useState<Array<{
+    participant: any;
+    milestone: any;
+    challengeTitle: string;
+  }>>([]);
   
   const { getUserChallenges, deleteChallenge, loading } = useChallengeManagement();
+  const { recentMilestones, clearRecentMilestones } = useChallengeProgress(selectedChallenge?.id);
 
   useEffect(() => {
     loadUserChallenges();
@@ -71,6 +80,22 @@ const ChallengeManager = ({ className }: ChallengeManagerProps) => {
     const challenge = selectedChallenge;
     if (!challenge?.target_value) return 0;
     return Math.min((participant.current_progress / challenge.target_value) * 100, 100);
+  };
+
+  // Handle milestone notifications
+  useEffect(() => {
+    if (recentMilestones.length > 0 && selectedChallenge) {
+      const newNotifications = recentMilestones.map(achievement => ({
+        participant: achievement.participant,
+        milestone: achievement.milestone,
+        challengeTitle: selectedChallenge.title,
+      }));
+      setMilestoneNotifications(prev => [...newNotifications, ...prev]);
+    }
+  }, [recentMilestones, selectedChallenge]);
+
+  const handleCloseMilestone = (index: number) => {
+    setMilestoneNotifications(prev => prev.filter((_, i) => i !== index));
   };
 
   if (loading) {
@@ -210,17 +235,18 @@ const ChallengeManager = ({ className }: ChallengeManagerProps) => {
           <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
             <CardHeader>
               <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                {(['overview', 'participants', 'analytics'] as const).map((tab) => (
+                {(['overview', 'participants', 'progress', 'analytics'] as const).map((tab) => (
                   <Button
                     key={tab}
                     variant={activeTab === tab ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setActiveTab(tab)}
-                    className="capitalize flex-1"
+                    className="capitalize flex-1 text-xs"
                   >
-                    {tab === 'overview' && <Eye size={16} className="mr-1" />}
-                    {tab === 'participants' && <Users size={16} className="mr-1" />}
-                    {tab === 'analytics' && <BarChart3 size={16} className="mr-1" />}
+                    {tab === 'overview' && <Eye size={14} className="mr-1" />}
+                    {tab === 'participants' && <Users size={14} className="mr-1" />}
+                    {tab === 'progress' && <Trophy size={14} className="mr-1" />}
+                    {tab === 'analytics' && <BarChart3 size={14} className="mr-1" />}
                     {tab}
                   </Button>
                 ))}
@@ -307,6 +333,15 @@ const ChallengeManager = ({ className }: ChallengeManagerProps) => {
                 </div>
               )}
 
+              {activeTab === 'progress' && selectedChallenge && (
+                <ChallengeProgressTracker 
+                  challengeId={selectedChallenge.id}
+                  showLeaderboard={true}
+                  showStats={true}
+                  showMilestones={true}
+                />
+              )}
+
               {activeTab === 'analytics' && (
                 <div className="text-center py-8">
                   <BarChart3 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -320,6 +355,25 @@ const ChallengeManager = ({ className }: ChallengeManagerProps) => {
           </Card>
         </>
       )}
+
+      {/* Milestone Notifications */}
+      {milestoneNotifications.map((notification, index) => (
+        <MilestoneNotification
+          key={`${notification.participant.id}-${notification.milestone.id}-${index}`}
+          participant={notification.participant}
+          milestone={notification.milestone}
+          challengeTitle={notification.challengeTitle}
+          onClose={() => handleCloseMilestone(index)}
+          onShare={() => {
+            // Handle sharing logic
+            console.log('Share milestone:', notification);
+          }}
+          onCelebrate={() => {
+            // Handle celebration logic
+            console.log('Celebrate milestone:', notification);
+          }}
+        />
+      ))}
     </div>
   );
 };
