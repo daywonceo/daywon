@@ -116,7 +116,6 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
                   className="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800"
                 >
                   <div className="flex items-center space-x-3">
-                    <span className="text-lg">{getHabitIcon(habit.habitType)}</span>
                     <div>
                       <p className="font-medium text-sm text-gray-900 dark:text-white">
                         {habit.habitName}
@@ -165,7 +164,6 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex items-center space-x-3">
-                    <span className="text-base">{getHabitIcon(habit.habitType)}</span>
                     <div>
                       <p className="font-medium text-sm text-gray-900 dark:text-white">
                         {habit.habitName}
