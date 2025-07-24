@@ -52,12 +52,16 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
     }, {});
     
     // Calculate statistics for each habit with automatic categorization
+    // NEW RULE: Treat "empty" (unchecked) habits as incomplete/failed for calculation purposes
     const allHabitStats: HabitStats[] = Object.keys(habitGroups).map(groupKey => {
       const habitActivities = habitGroups[groupKey];
       const completed = habitActivities.filter(a => a.status === "completed").length;
       const failed = habitActivities.filter(a => a.status === "failed").length;
       const empty = habitActivities.filter(a => a.status === "empty").length;
       const total = habitActivities.length;
+      
+      // For percentage calculation, treat "empty" as "failed" (not completed)
+      // Only "completed" counts as success
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
       // Automatic categorization based on completion percentage

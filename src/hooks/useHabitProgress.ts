@@ -40,19 +40,22 @@ export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS",
         
         userHabits.forEach(habit => {
           totalPossible++;
-        const activity = activities.find(a => {
-          if (a.habitId) {
-            // Find the habit_id for this habit name
-            const referenceActivity = activities.find(ref => ref.habitName === habit && ref.habitId);
-            if (referenceActivity) {
-              return a.habitId === referenceActivity.habitId && a.date === dateStr && a.status === 'completed';
+          // NEW RULE: Only explicitly completed habits count as success
+          // Missing check-ins (no activity) are treated as incomplete
+          const activity = activities.find(a => {
+            if (a.habitId) {
+              // Find the habit_id for this habit name
+              const referenceActivity = activities.find(ref => ref.habitName === habit && ref.habitId);
+              if (referenceActivity) {
+                return a.habitId === referenceActivity.habitId && a.date === dateStr && a.status === 'completed';
+              }
             }
-          }
-          return a.habitName === habit && a.date === dateStr && a.status === 'completed';
-        });
+            return a.habitName === habit && a.date === dateStr && a.status === 'completed';
+          });
           if (activity) {
             completed++;
           }
+          // Note: No activity found (empty) is treated as not completed (no increment)
         });
         
         currentDate.setDate(currentDate.getDate() + 1);

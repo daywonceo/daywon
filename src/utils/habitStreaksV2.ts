@@ -63,17 +63,26 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date): num
           continue;
         }
         
-        // Check if this is today (for current day, empty doesn't break streak)
+        // NEW RULE: Any day without explicit completion breaks the streak
+        // This includes both "empty" (no interaction) and "failed" (explicit fail)
+        // Only allow grace for today if it's still early in the day
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
-        if (currentDateStr === todayStr) {
-          console.log(`Today (${todayStr}) has no activity yet, continuing streak check`);
-          currentDate.setDate(currentDate.getDate() - 1);
-          continue;
+        const isToday = currentDateStr === todayStr;
+        
+        if (isToday) {
+          // For today, only continue if it's still early (before end of day)
+          // Otherwise, treat unchecked as incomplete
+          const currentHour = now.getHours();
+          if (currentHour < 23) { // Allow until 11 PM
+            console.log(`Today (${todayStr}) has no activity yet but it's still early, continuing streak check`);
+            currentDate.setDate(currentDate.getDate() - 1);
+            continue;
+          }
         }
         
-        // No activity recorded (empty) for a past day - this breaks the streak
-        console.log(`Day ${currentDateStr} has no activity, breaking streak at: ${streak}`);
+        // No activity recorded (empty) or past day without completion - this breaks the streak
+        console.log(`Day ${currentDateStr} has no completion, breaking streak at: ${streak}`);
         break;
       }
       

@@ -20,7 +20,8 @@ export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "R
       
       userHabits.forEach(habit => {
         totalPossible++;
-        // Find by habit_id if available, otherwise fallback to name
+        // NEW RULE: Only explicitly completed habits count as success
+        // Missing check-ins are treated as incomplete
         const activity = activities.find(a => {
           if (a.habitId) {
             // Find the habit_id for this habit name
@@ -34,6 +35,7 @@ export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "R
         if (activity) {
           completedCount++;
         }
+        // Note: No activity found (empty) is treated as not completed (no increment)
       });
     }
     
