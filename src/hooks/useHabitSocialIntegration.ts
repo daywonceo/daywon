@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSocialPosts } from './useSocialPosts';
-import { calculateStreakForDate } from '@/utils/habitStreaks';
-import { getHabitActivities } from '@/utils/habitActivity';
+import { calculateStreakForDateV2 } from '@/utils/habitStreaksV2';
+import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
 
 interface HabitCompletionEvent extends CustomEvent {
   detail: {

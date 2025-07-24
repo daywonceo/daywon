@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { getHabitActivities } from '@/utils/habitActivity';
+import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
 
 export interface ProgressPeriod {
   period: string;

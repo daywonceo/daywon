@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { getHabitActivities } from '@/utils/habitActivity';
-import { calculateStreakForDate } from '@/utils/habitStreaks';
+import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
+import { calculateStreakForDateV2 } from '@/utils/habitStreaksV2';
 
 export interface HabitScore {
   userId: string;
