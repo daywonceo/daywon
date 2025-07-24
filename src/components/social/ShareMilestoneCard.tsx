@@ -124,7 +124,7 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
                       </p>
                       <div className="flex items-center space-x-2">
                         <Badge className={`${getStreakBadgeColor(habit.streak)} border-0 text-xs font-bold`}>
-                          🏆 {habit.streak} days
+                          {habit.streak} days
                         </Badge>
                         <span className="text-xs text-yellow-700 dark:text-yellow-300 font-medium">
                           Milestone!
@@ -173,7 +173,7 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
                         {habit.habitName}
                       </p>
                       <Badge className={`${getStreakBadgeColor(habit.streak)} border-0 text-xs`}>
-                        🔥 {habit.streak} days
+                        {habit.streak} days
                       </Badge>
                     </div>
                   </div>
