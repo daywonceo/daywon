@@ -3,6 +3,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { migrateHabitActivitiesToV2, initHabitSyncV2 } from '@/utils/habitTracking';
 import { toast } from './use-toast';
 
+const V2_MIGRATION_SHOWN_KEY = 'habit_v2_migration_shown';
+
 export const useHabitSystemTransition = () => {
   const { user } = useAuth();
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -24,12 +26,16 @@ export const useHabitSystemTransition = () => {
         setIsV2Ready(true);
         console.log('Habit system V2 initialized successfully');
         
-        // Show success message to user
-        toast({
-          title: "System Updated",
-          description: "Habit tracking system has been upgraded with improved duplicate handling.",
-          duration: 3000,
-        });
+        // Only show notification once per user
+        const migrationShown = localStorage.getItem(V2_MIGRATION_SHOWN_KEY);
+        if (!migrationShown) {
+          toast({
+            title: "System Updated",
+            description: "Habit tracking system has been upgraded with improved duplicate handling.",
+            duration: 3000,
+          });
+          localStorage.setItem(V2_MIGRATION_SHOWN_KEY, 'true');
+        }
 
         // Store cleanup function for unmount
         return cleanupSync;
