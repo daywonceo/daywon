@@ -6,6 +6,7 @@ import ProfileSettings from "@/components/ProfileSettings";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import PersonalBests from "@/components/profile/PersonalBests";
 import BestFriends from "@/components/profile/BestFriends";
+import ShareMilestoneCard from "@/components/social/ShareMilestoneCard";
 import MembershipMilestone from "@/components/profile/MembershipMilestone";
 import ConnectedApps from "@/components/profile/ConnectedApps";
 import ProfileActions from "@/components/profile/ProfileActions";
@@ -62,6 +63,8 @@ const Profile = () => {
           longestStreak={profile.longestStreak}
           mostConsistentHabit={profile.mostConsistentHabit}
         />
+        
+        <ShareMilestoneCard className="mb-6" />
         
         <BestFriends bestFriends={profile.bestFriends} />
         

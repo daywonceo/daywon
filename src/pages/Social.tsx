@@ -4,12 +4,15 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainFeed from "@/components/social/MainFeed";
+import ActivityTimeline from "@/components/social/ActivityTimeline";
 import HabitLeaderboard from "@/components/social/HabitLeaderboard";
 import FriendList from "@/components/social/FriendList";
 import Groups from "@/components/social/Groups";
-import { friends, feedPosts } from "@/components/social/socialData";
+import { useHabitSocialIntegration } from "@/hooks/useHabitSocialIntegration";
 
 const Social = () => {
+  // Initialize habit social integration (auto-creates posts on completions)
+  useHabitSocialIntegration();
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
@@ -28,8 +31,11 @@ const Social = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="feed" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 h-11">
+        <Tabs defaultValue="timeline" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 h-11">
+            <TabsTrigger value="timeline" className="text-xs sm:text-sm font-medium px-1">
+              TIMELINE
+            </TabsTrigger>
             <TabsTrigger value="feed" className="text-xs sm:text-sm font-medium px-1">
               FEED
             </TabsTrigger>
@@ -43,6 +49,10 @@ const Social = () => {
               FRIENDS
             </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="timeline" className="animate-fade-in">
+            <ActivityTimeline />
+          </TabsContent>
           
           <TabsContent value="feed" className="animate-fade-in">
             <MainFeed />

@@ -267,17 +267,69 @@ export const useSocialPosts = () => {
     }
   };
 
-  // Auto-create post from habit activity
+  // Auto-create post from habit activity with enhanced messaging
   const createHabitPost = async (habitName: string, habitType: string, streakCount: number = 0) => {
-    const content = `${streakCount > 0 ? `🔥 ${streakCount} day streak on` : 'Completed'} ${habitName}!`;
-    const isMillestone = streakCount > 0 && (streakCount % 7 === 0 || streakCount % 30 === 0 || streakCount >= 100);
+    // Generate milestone-aware content
+    const isMilestone = streakCount > 0 && 
+      ([7, 14, 21, 30, 50, 75, 100, 150, 200, 365, 500, 1000].includes(streakCount));
+    
+    const getMilestoneMessage = (name: string, streak: number): string => {
+      const messages = {
+        7: `One week strong! 💪 ${streak} days of ${name}`,
+        14: `Two weeks of consistency! 🔥 ${streak} days of ${name}`,
+        21: `Three weeks of building habits! ⭐ ${streak} days of ${name}`,
+        30: `One month milestone! 🏆 ${streak} days of ${name}`,
+        50: `50 days of dedication! 🎯 Amazing progress on ${name}`,
+        75: `75 days of consistency! 💎 You're crushing ${name}`,
+        100: `100 DAYS! 🎉 Triple digits for ${name}!`,
+        150: `150 days of pure dedication! 🚀 ${name} mastery`,
+        200: `200 days strong! 💪 ${name} has become second nature`,
+        365: `ONE FULL YEAR! 🎊 365 days of ${name} - incredible!`,
+        500: `500 days of excellence! 👑 ${name} legend status`,
+        1000: `1000 DAYS! 🏆 Ultimate ${name} master!`
+      };
+      
+      return messages[streak as keyof typeof messages] || `${streak} days of ${name}! 🔥`;
+    };
+
+    const getRegularMessage = (name: string, streak: number): string => {
+      const messages = [
+        `Crushed another ${name} session! 💪`,
+        `${name} complete! Keeping the momentum going 🔥`,
+        `Another day, another ${name} win! ⭐`,
+        `${name} ✅ - consistency is key!`,
+        `Locked in another ${name} session! 🎯`,
+        `${name} done! Small wins add up 📈`,
+        `Daily ${name} complete! Building that habit 🏗️`,
+        `${name} in the books! 📚`,
+        `Another step forward with ${name}! 👏`,
+        `${name} accomplished! Progress over perfection 💯`
+      ];
+
+      const baseMessage = messages[Math.floor(Math.random() * messages.length)];
+      
+      if (streak > 1) {
+        return `${baseMessage} (${streak} day streak!)`;
+      }
+      
+      return baseMessage;
+    };
+
+    const content = isMilestone 
+      ? getMilestoneMessage(habitName, streakCount)
+      : getRegularMessage(habitName, streakCount);
+
+    const caption = isMilestone 
+      ? `Every day counts! This milestone represents dedication, consistency, and the power of small actions. Here's to the next chapter! 🌟`
+      : null;
     
     return createPost({
       habit_name: habitName,
       habit_type: habitType,
       content,
+      caption,
       streak_count: streakCount,
-      is_milestone: isMillestone,
+      is_milestone: isMilestone,
     });
   };
 
