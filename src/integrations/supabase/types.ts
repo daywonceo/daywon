@@ -358,7 +358,7 @@ export type Database = {
         Row: {
           activity_date: string
           created_at: string
-          habit_id: string | null
+          habit_id: string
           habit_name: string
           id: string
           status: string
@@ -368,7 +368,7 @@ export type Database = {
         Insert: {
           activity_date: string
           created_at?: string
-          habit_id?: string | null
+          habit_id: string
           habit_name: string
           id?: string
           status: string
@@ -378,7 +378,7 @@ export type Database = {
         Update: {
           activity_date?: string
           created_at?: string
-          habit_id?: string | null
+          habit_id?: string
           habit_name?: string
           id?: string
           status?: string
@@ -424,6 +424,7 @@ export type Database = {
           activity_date: string
           caption: string | null
           created_at: string | null
+          habit_id: string | null
           habit_name: string
           id: string
           is_shared: boolean | null
@@ -435,6 +436,7 @@ export type Database = {
           activity_date: string
           caption?: string | null
           created_at?: string | null
+          habit_id?: string | null
           habit_name: string
           id?: string
           is_shared?: boolean | null
@@ -446,6 +448,7 @@ export type Database = {
           activity_date?: string
           caption?: string | null
           created_at?: string | null
+          habit_id?: string | null
           habit_name?: string
           id?: string
           is_shared?: boolean | null
