@@ -44,6 +44,206 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_chat: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          id: string
+          message: string
+          message_type: string | null
+          team_id: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          id?: string
+          message: string
+          message_type?: string | null
+          team_id?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          message_type?: string | null
+          team_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_chat_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_chat_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_participants: {
+        Row: {
+          challenge_id: string
+          current_progress: number | null
+          id: string
+          joined_at: string
+          last_progress_update: string | null
+          status: string | null
+          team_id: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          current_progress?: number | null
+          id?: string
+          joined_at?: string
+          last_progress_update?: string | null
+          status?: string | null
+          team_id?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          current_progress?: number | null
+          id?: string
+          joined_at?: string
+          last_progress_update?: string | null
+          status?: string | null
+          team_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_participants_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_team"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_teams: {
+        Row: {
+          captain_id: string
+          challenge_id: string
+          created_at: string
+          current_members: number | null
+          description: string | null
+          id: string
+          name: string
+          total_progress: number | null
+          updated_at: string
+        }
+        Insert: {
+          captain_id: string
+          challenge_id: string
+          created_at?: string
+          current_members?: number | null
+          description?: string | null
+          id?: string
+          name: string
+          total_progress?: number | null
+          updated_at?: string
+        }
+        Update: {
+          captain_id?: string
+          challenge_id?: string
+          created_at?: string
+          current_members?: number | null
+          description?: string | null
+          id?: string
+          name?: string
+          total_progress?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_teams_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string
+          creator_id: string
+          description: string
+          end_date: string
+          entry_requirements: Json | null
+          id: string
+          is_team_based: boolean | null
+          max_participants: number | null
+          max_team_size: number | null
+          prizes: Json | null
+          rules: string | null
+          start_date: string
+          status: string | null
+          target_unit: string | null
+          target_value: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          challenge_type: string
+          created_at?: string
+          creator_id: string
+          description: string
+          end_date: string
+          entry_requirements?: Json | null
+          id?: string
+          is_team_based?: boolean | null
+          max_participants?: number | null
+          max_team_size?: number | null
+          prizes?: Json | null
+          rules?: string | null
+          start_date: string
+          status?: string | null
+          target_unit?: string | null
+          target_value?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string
+          creator_id?: string
+          description?: string
+          end_date?: string
+          entry_requirements?: Json | null
+          id?: string
+          is_team_based?: boolean | null
+          max_participants?: number | null
+          max_team_size?: number | null
+          prizes?: Json | null
+          rules?: string | null
+          start_date?: string
+          status?: string | null
+          target_unit?: string | null
+          target_value?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exercise_logs: {
         Row: {
           created_at: string
