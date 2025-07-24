@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Lightbulb, TrendingUp, Heart, Zap } from "lucide-react";
+import { Settings, Lightbulb, TrendingUp, Heart, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import { useActivityPreferences } from "@/hooks/useActivityPreferences";
 import { useActivityRecommendations } from "@/hooks/useActivityRecommendations";
 import EnhancedActivityCard from "./EnhancedActivityCard";
@@ -13,9 +13,24 @@ import { useToast } from "@/components/ui/use-toast";
 
 const BoredTab = () => {
   const [activeTab, setActiveTab] = useState("discover");
+  const [expandedTabs, setExpandedTabs] = useState({
+    discover: false,
+    recommended: false,
+    favorites: false,
+    progress: false,
+    progressInProgress: false,
+    progressCompleted: false
+  });
   const { preferences, isLoading } = useActivityPreferences();
   const { recommendations, getRandomActivity, getTopRecommendations } = useActivityRecommendations(preferences);
   const { toast } = useToast();
+
+  const toggleExpanded = (tab: string) => {
+    setExpandedTabs(prev => ({
+      ...prev,
+      [tab]: !prev[tab as keyof typeof prev]
+    }));
+  };
 
   const handleStartActivity = (activityId: string) => {
     // This could integrate with habit tracking or other systems
@@ -116,7 +131,7 @@ const BoredTab = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Explore All Activities</h4>
             <div className="grid gap-6">
-              {ENHANCED_ACTIVITIES.map((activity) => (
+              {(expandedTabs.discover ? ENHANCED_ACTIVITIES : ENHANCED_ACTIVITIES.slice(0, 3)).map((activity) => (
                 <EnhancedActivityCard
                   key={activity.id}
                   activity={activity}
@@ -124,6 +139,27 @@ const BoredTab = () => {
                 />
               ))}
             </div>
+            {ENHANCED_ACTIVITIES.length > 3 && (
+              <div className="text-center mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => toggleExpanded('discover')}
+                  className="flex items-center gap-2"
+                >
+                  {expandedTabs.discover ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      Show More ({ENHANCED_ACTIVITIES.length - 3} more)
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -143,7 +179,7 @@ const BoredTab = () => {
             )}
 
             <div className="grid gap-6">
-              {getTopRecommendations(10).map((activity) => (
+              {(expandedTabs.recommended ? getTopRecommendations(10) : getTopRecommendations(3)).map((activity) => (
                 <EnhancedActivityCard
                   key={activity.id}
                   activity={activity}
@@ -151,6 +187,27 @@ const BoredTab = () => {
                 />
               ))}
             </div>
+            {getTopRecommendations(10).length > 3 && (
+              <div className="text-center mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => toggleExpanded('recommended')}
+                  className="flex items-center gap-2"
+                >
+                  {expandedTabs.recommended ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      Show More ({getTopRecommendations(10).length - 3} more)
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
             
             {recommendations.length === 0 && (
               <div className="text-center py-12">
@@ -172,7 +229,7 @@ const BoredTab = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Your Favorite Activities</h4>
             <div className="grid gap-6">
-              {preferences.favoriteActivities.map((activityId) => {
+              {(expandedTabs.favorites ? preferences.favoriteActivities : preferences.favoriteActivities.slice(0, 3)).map((activityId) => {
                 const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
                 return activity ? (
                   <EnhancedActivityCard
@@ -183,6 +240,27 @@ const BoredTab = () => {
                 ) : null;
               })}
             </div>
+            {preferences.favoriteActivities.length > 3 && (
+              <div className="text-center mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => toggleExpanded('favorites')}
+                  className="flex items-center gap-2"
+                >
+                  {expandedTabs.favorites ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      Show More ({preferences.favoriteActivities.length - 3} more)
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
             
             {preferences.favoriteActivities.length === 0 && (
               <div className="text-center py-12">
@@ -204,7 +282,7 @@ const BoredTab = () => {
               <div className="mb-8">
                 <h5 className="font-medium mb-3 text-blue-600 dark:text-blue-400">Currently Working On</h5>
                 <div className="grid gap-4">
-                  {preferences.inProgressActivities.map((activityId) => {
+                  {(expandedTabs.progressInProgress ? preferences.inProgressActivities : preferences.inProgressActivities.slice(0, 3)).map((activityId) => {
                     const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
                     return activity ? (
                       <EnhancedActivityCard
@@ -215,6 +293,28 @@ const BoredTab = () => {
                     ) : null;
                   })}
                 </div>
+                {preferences.inProgressActivities.length > 3 && (
+                  <div className="text-center mt-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleExpanded('progressInProgress')}
+                      className="flex items-center gap-2"
+                    >
+                      {expandedTabs.progressInProgress ? (
+                        <>
+                          <ChevronUp className="w-4 h-4" />
+                          Show Less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4" />
+                          Show More ({preferences.inProgressActivities.length - 3} more)
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -223,7 +323,7 @@ const BoredTab = () => {
               <div>
                 <h5 className="font-medium mb-3 text-green-600 dark:text-green-400">Completed Activities</h5>
                 <div className="grid gap-4">
-                  {preferences.completedActivities.map((activityId) => {
+                  {(expandedTabs.progressCompleted ? preferences.completedActivities : preferences.completedActivities.slice(0, 3)).map((activityId) => {
                     const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
                     return activity ? (
                       <EnhancedActivityCard
@@ -234,6 +334,28 @@ const BoredTab = () => {
                     ) : null;
                   })}
                 </div>
+                {preferences.completedActivities.length > 3 && (
+                  <div className="text-center mt-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleExpanded('progressCompleted')}
+                      className="flex items-center gap-2"
+                    >
+                      {expandedTabs.progressCompleted ? (
+                        <>
+                          <ChevronUp className="w-4 h-4" />
+                          Show Less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4" />
+                          Show More ({preferences.completedActivities.length - 3} more)
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
