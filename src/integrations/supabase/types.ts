@@ -217,37 +217,91 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      post_reactions: {
         Row: {
           created_at: string
+          id: string
+          post_id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          reaction_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
           email: string | null
           focus_areas: string[] | null
           id: string
+          last_active: string | null
           onboarding_complete: boolean | null
           reminder_opt_in: boolean | null
           reminder_time: string | null
+          status: string | null
           updated_at: string
           user_intent: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          display_name?: string | null
           email?: string | null
           focus_areas?: string[] | null
           id: string
+          last_active?: string | null
           onboarding_complete?: boolean | null
           reminder_opt_in?: boolean | null
           reminder_time?: string | null
+          status?: string | null
           updated_at?: string
           user_intent?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          display_name?: string | null
           email?: string | null
           focus_areas?: string[] | null
           id?: string
+          last_active?: string | null
           onboarding_complete?: boolean | null
           reminder_opt_in?: boolean | null
           reminder_time?: string | null
+          status?: string | null
           updated_at?: string
           user_intent?: string | null
         }
@@ -388,6 +442,53 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          caption: string | null
+          content: string
+          created_at: string
+          habit_name: string
+          habit_type: string | null
+          id: string
+          is_milestone: boolean | null
+          streak_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          content: string
+          created_at?: string
+          habit_name: string
+          habit_type?: string | null
+          id?: string
+          is_milestone?: boolean | null
+          streak_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          content?: string
+          created_at?: string
+          habit_name?: string
+          habit_type?: string | null
+          id?: string
+          is_milestone?: boolean | null
+          streak_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_habit_scores: {
         Row: {
           consistency_rate: number | null
@@ -507,6 +608,48 @@ export type Database = {
           verse_reference?: string | null
         }
         Relationships: []
+      }
+      user_relationships: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_relationships_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_relationships_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_top_habits: {
         Row: {

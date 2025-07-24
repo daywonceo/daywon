@@ -45,7 +45,7 @@ const Social = () => {
           </TabsList>
           
           <TabsContent value="feed" className="animate-fade-in">
-            <MainFeed feedPosts={feedPosts} />
+            <MainFeed />
           </TabsContent>
           
           <TabsContent value="ranks" className="animate-fade-in">
@@ -57,7 +57,7 @@ const Social = () => {
           </TabsContent>
           
           <TabsContent value="friends" className="animate-fade-in">
-            <FriendList friends={friends} />
+            <FriendList />
           </TabsContent>
         </Tabs>
       </main>
