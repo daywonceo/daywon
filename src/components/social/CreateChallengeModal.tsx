@@ -151,11 +151,11 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-0">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <Trophy className="text-purple-600" size={20} />
-            <span>Create New Challenge</span>
+          <DialogTitle className="flex items-center space-x-2 text-lg">
+            <Trophy className="text-purple-600" size={18} />
+            <span>Create Challenge</span>
           </DialogTitle>
         </DialogHeader>
 

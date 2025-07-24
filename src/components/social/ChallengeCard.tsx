@@ -110,30 +110,30 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
         </p>
         
         {/* Challenge Details */}
-        <div className="grid grid-cols-2 gap-3 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">
           <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
-            <Target size={14} />
-            <span>
+            <Target size={12} />
+            <span className="text-xs">
               {challenge.target_value} {challenge.target_unit}
             </span>
           </div>
           
           <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
-            <Users size={14} />
-            <span>
+            <Users size={12} />
+            <span className="text-xs">
               {challenge.participant_count || 0}
-              {challenge.max_participants && ` / ${challenge.max_participants}`} participants
+              {challenge.max_participants && ` / ${challenge.max_participants}`}
             </span>
           </div>
           
           <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
-            <Calendar size={14} />
-            <span>{format(startDate, 'MMM d')}</span>
+            <Calendar size={12} />
+            <span className="text-xs">{format(startDate, 'MMM d')}</span>
           </div>
           
           <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
-            <Clock size={14} />
-            <span>{format(endDate, 'MMM d')}</span>
+            <Clock size={12} />
+            <span className="text-xs">{format(endDate, 'MMM d')}</span>
           </div>
         </div>
 
@@ -171,12 +171,12 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
         )}
         
         {/* Action buttons */}
-        <div className="flex space-x-2 pt-2">
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onViewDetails(challenge.id)}
-            className="flex-1"
+            className="flex-1 h-9 text-xs"
           >
             View Details
           </Button>
@@ -187,7 +187,7 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
               size="sm"
               onClick={() => onLeave(challenge.id)}
               disabled={loading}
-              className="flex-1"
+              className="flex-1 h-9 text-xs"
             >
               {loading ? 'Leaving...' : 'Leave'}
             </Button>
@@ -196,7 +196,7 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
               size="sm"
               onClick={() => onJoin(challenge.id)}
               disabled={loading || isExpired || (challenge.max_participants && (challenge.participant_count || 0) >= challenge.max_participants)}
-              className="flex-1"
+              className="flex-1 h-9 text-xs"
             >
               {loading ? 'Joining...' : 'Join'}
             </Button>

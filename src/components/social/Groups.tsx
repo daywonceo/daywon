@@ -38,31 +38,31 @@ const Groups = () => {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 rounded-lg p-1">
+      <div className="flex items-center justify-between gap-2 px-2">
+        <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 rounded-lg p-1 flex-1 max-w-sm">
           {(['challenges', 'manage', 'teams'] as const).map((tab) => (
             <Button
               key={tab}
               variant={activeTab === tab ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setActiveTab(tab)}
-              className="capitalize"
+              className="capitalize flex-1 text-xs px-2 py-1 h-8"
             >
-              {tab === 'challenges' && <Trophy size={16} className="mr-1" />}
-              {tab === 'manage' && <Settings size={16} className="mr-1" />}
-              {tab === 'teams' && <Users size={16} className="mr-1" />}
-              {tab}
+              {tab === 'challenges' && <Trophy size={14} className="mr-1" />}
+              {tab === 'manage' && <Settings size={14} className="mr-1" />}
+              {tab === 'teams' && <Users size={14} className="mr-1" />}
+              <span className="hidden sm:inline">{tab}</span>
             </Button>
           ))}
         </div>
         
         <Button 
           size="sm" 
-          className="bg-purple-600 hover:bg-purple-700"
+          className="bg-purple-600 hover:bg-purple-700 px-3 py-1 h-8"
           onClick={() => setShowCreateModal(true)}
         >
-          <Plus size={16} className="mr-1" />
-          Create
+          <Plus size={14} className="mr-1" />
+          <span className="hidden sm:inline">Create</span>
         </Button>
       </div>
 
@@ -92,7 +92,7 @@ const Groups = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {challenges.map((challenge) => (
                 <ChallengeCard
                   key={challenge.id}
