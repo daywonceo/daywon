@@ -10,8 +10,8 @@ export interface UserTimeWindow {
  * Calculate the appropriate time window for habit statistics based on user's account creation date
  * 
  * Rules:
- * - If user has been on app < 1 year: use account creation date as start
- * - If user has been on app >= 1 year: use rolling 365-day window from current date
+ * - Each timeframe shows data strictly for its defined range (7, 30, or 365 days)
+ * - Exception: If user hasn't reached the full period since account creation, use account creation date as start
  */
 export const getUserTimeWindow = async (timeframe: "week" | "month" | "year"): Promise<UserTimeWindow> => {
   try {
@@ -20,29 +20,21 @@ export const getUserTimeWindow = async (timeframe: "week" | "month" | "year"): P
     if (!user || !user.created_at) {
       // Fallback to standard timeframe if no user data
       const now = new Date();
-      let startDate: Date;
+      let daysInPeriod: number;
       
       switch (timeframe) {
-        case "week":
-          startDate = new Date(now);
-          startDate.setDate(now.getDate() - 7);
-          break;
-        case "month":
-          startDate = new Date(now);
-          startDate.setMonth(now.getMonth() - 1);
-          break;
-        case "year":
-          startDate = new Date(now);
-          startDate.setFullYear(now.getFullYear() - 1);
-          break;
+        case "week": daysInPeriod = 7; break;
+        case "month": daysInPeriod = 30; break;
+        case "year": daysInPeriod = 365; break;
       }
       
-      const totalDaysAvailable = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const startDate = new Date(now);
+      startDate.setDate(now.getDate() - daysInPeriod);
       
       return {
         startDate,
         isNewUser: false,
-        totalDaysAvailable
+        totalDaysAvailable: daysInPeriod
       };
     }
 
@@ -50,42 +42,34 @@ export const getUserTimeWindow = async (timeframe: "week" | "month" | "year"): P
     const accountCreationDate = new Date(user.created_at);
     const daysSinceCreation = Math.floor((now.getTime() - accountCreationDate.getTime()) / (1000 * 60 * 60 * 24));
     
-    // If user has been on the app for less than 1 year (365 days)
-    const isNewUser = daysSinceCreation < 365;
+    // Determine days for this timeframe
+    let daysInPeriod: number;
+    switch (timeframe) {
+      case "week": daysInPeriod = 7; break;
+      case "month": daysInPeriod = 30; break;
+      case "year": daysInPeriod = 365; break;
+    }
+    
+    // Check if user has been on app long enough for full period
+    const hasFullPeriod = daysSinceCreation >= daysInPeriod;
     
     let startDate: Date;
+    let totalDaysAvailable: number;
     
-    if (isNewUser) {
-      // For new users: always start from account creation date, regardless of timeframe
-      startDate = accountCreationDate;
+    if (hasFullPeriod) {
+      // User has been on app long enough - use full period
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - daysInPeriod);
+      totalDaysAvailable = daysInPeriod;
     } else {
-      // For established users: use standard rolling windows
-      switch (timeframe) {
-        case "week":
-          startDate = new Date(now);
-          startDate.setDate(now.getDate() - 7);
-          break;
-        case "month":
-          startDate = new Date(now);
-          startDate.setMonth(now.getMonth() - 1);
-          break;
-        case "year":
-          startDate = new Date(now);
-          startDate.setFullYear(now.getFullYear() - 1);
-          break;
-      }
-    }
-    
-    // Ensure start date is never before account creation
-    if (startDate < accountCreationDate) {
+      // User hasn't been on app for full period - start from account creation
       startDate = accountCreationDate;
+      totalDaysAvailable = daysSinceCreation + 1; // +1 to include today
     }
-    
-    const totalDaysAvailable = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     
     return {
       startDate,
-      isNewUser,
+      isNewUser: !hasFullPeriod,
       totalDaysAvailable
     };
     
@@ -94,29 +78,21 @@ export const getUserTimeWindow = async (timeframe: "week" | "month" | "year"): P
     
     // Fallback to standard calculation
     const now = new Date();
-    let startDate: Date;
+    let daysInPeriod: number;
     
     switch (timeframe) {
-      case "week":
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate = new Date(now);
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate = new Date(now);
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
+      case "week": daysInPeriod = 7; break;
+      case "month": daysInPeriod = 30; break;
+      case "year": daysInPeriod = 365; break;
     }
     
-    const totalDaysAvailable = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const startDate = new Date(now);
+    startDate.setDate(now.getDate() - daysInPeriod);
     
     return {
       startDate,
       isNewUser: false,
-      totalDaysAvailable
+      totalDaysAvailable: daysInPeriod
     };
   }
 };
@@ -141,66 +117,54 @@ export const getUserTimeWindowSync = (timeframe: "week" | "month" | "year"): Use
   
   if (!accountCreationDate) {
     // Fallback to standard timeframe calculation
-    let startDate: Date;
+    let daysInPeriod: number;
     
     switch (timeframe) {
-      case "week":
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate = new Date(now);
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate = new Date(now);
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
+      case "week": daysInPeriod = 7; break;
+      case "month": daysInPeriod = 30; break;
+      case "year": daysInPeriod = 365; break;
     }
     
-    const totalDaysAvailable = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const startDate = new Date(now);
+    startDate.setDate(now.getDate() - daysInPeriod);
     
     return {
       startDate,
       isNewUser: false,
-      totalDaysAvailable
+      totalDaysAvailable: daysInPeriod
     };
   }
   
   const daysSinceCreation = Math.floor((now.getTime() - accountCreationDate.getTime()) / (1000 * 60 * 60 * 24));
-  const isNewUser = daysSinceCreation < 365;
+  
+  // Determine days for this timeframe
+  let daysInPeriod: number;
+  switch (timeframe) {
+    case "week": daysInPeriod = 7; break;
+    case "month": daysInPeriod = 30; break;
+    case "year": daysInPeriod = 365; break;
+  }
+  
+  // Check if user has been on app long enough for full period
+  const hasFullPeriod = daysSinceCreation >= daysInPeriod;
   
   let startDate: Date;
+  let totalDaysAvailable: number;
   
-  if (isNewUser) {
-    startDate = accountCreationDate;
+  if (hasFullPeriod) {
+    // User has been on app long enough - use full period
+    startDate = new Date(now);
+    startDate.setDate(now.getDate() - daysInPeriod);
+    totalDaysAvailable = daysInPeriod;
   } else {
-    switch (timeframe) {
-      case "week":
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate = new Date(now);
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate = new Date(now);
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-    }
-  }
-  
-  // Ensure start date is never before account creation
-  if (startDate < accountCreationDate) {
+    // User hasn't been on app for full period - start from account creation
     startDate = accountCreationDate;
+    totalDaysAvailable = daysSinceCreation + 1; // +1 to include today
   }
-  
-  const totalDaysAvailable = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   
   return {
     startDate,
-    isNewUser,
+    isNewUser: !hasFullPeriod,
     totalDaysAvailable
   };
 };
