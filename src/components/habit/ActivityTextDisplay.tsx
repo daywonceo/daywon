@@ -59,26 +59,26 @@ const ActivityTextDisplay: React.FC<ActivityTextDisplayProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center group space-y-1 min-w-0">
-      <div className="flex items-center min-w-0 relative">
+      <div className="flex items-center min-w-0 relative w-full">
         <div 
           onClick={() => onToggleEditMode(activityIndex)}
-          className="cursor-pointer hover:bg-muted/30 rounded px-2 py-1 border-b border-dotted border-muted-foreground/30 hover:border-muted-foreground/50 transition-all min-w-0 flex-1"
+          className="cursor-pointer hover:bg-muted/30 active:bg-muted/50 rounded-md px-3 py-2 border-b border-dotted border-muted-foreground/30 hover:border-muted-foreground/50 transition-all min-w-0 flex-1 touch-manipulation"
         >
-          <p className="text-xs sm:text-sm font-semibold text-green-800/90 tracking-wide truncate">
+          <p className="text-sm sm:text-sm font-semibold text-green-800/90 tracking-wide truncate text-center">
             {isCustomText ? activity.text : displayText}
           </p>
           {!isCustomText && (
-            <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-0.5">
+            <p className="text-xs sm:text-xs text-muted-foreground/60 mt-1 text-center">
               {placeholderText}
             </p>
           )}
         </div>
         <button
           onClick={() => onToggleEditMode(activityIndex)}
-          className="ml-1 text-green-700/60 hover:text-green-900 transition-colors flex-shrink-0"
+          className="ml-2 p-2 text-green-700/60 hover:text-green-900 active:text-green-900 transition-colors flex-shrink-0 touch-manipulation rounded-md hover:bg-muted/30"
         >
-          <Edit size={14} className="sm:hidden" />
-          <Edit size={16} className="hidden sm:block" />
+          <Edit size={16} className="sm:hidden" />
+          <Edit size={18} className="hidden sm:block" />
         </button>
       </div>
     </div>
