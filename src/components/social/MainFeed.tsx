@@ -8,6 +8,7 @@ import { Heart, MessageCircle, Send, Filter, ThumbsUp, Flame, Star } from "lucid
 import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import CreatePostModal from "./CreatePostModal";
 
 interface MainFeedProps {}
 
@@ -68,6 +69,11 @@ const MainFeed = ({}: MainFeedProps) => {
         <p className="text-sm text-gray-600 dark:text-gray-400">Celebrate wins with your community!</p>
       </div>
 
+      {/* Create Post Section */}
+      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <CreatePostModal />
+      </div>
+
       {/* Posts */}
       <div className="space-y-4">
         {loading ? (
@@ -104,7 +110,15 @@ const MainFeed = ({}: MainFeedProps) => {
                         <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">{timeAgo}</span>
                       </div>
-                      {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
+                      <div className="flex items-center gap-2">
+                        {post.habit_name ? (
+                          getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)
+                        ) : (
+                          <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-0 text-xs font-medium">
+                            💭 Shared
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
 

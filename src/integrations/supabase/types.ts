@@ -810,7 +810,7 @@ export type Database = {
           caption: string | null
           content: string
           created_at: string
-          habit_name: string
+          habit_name: string | null
           habit_type: string | null
           id: string
           is_milestone: boolean | null
@@ -822,7 +822,7 @@ export type Database = {
           caption?: string | null
           content: string
           created_at?: string
-          habit_name: string
+          habit_name?: string | null
           habit_type?: string | null
           id?: string
           is_milestone?: boolean | null
@@ -834,7 +834,7 @@ export type Database = {
           caption?: string | null
           content?: string
           created_at?: string
-          habit_name?: string
+          habit_name?: string | null
           habit_type?: string | null
           id?: string
           is_milestone?: boolean | null
