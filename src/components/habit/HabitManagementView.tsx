@@ -11,7 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "@/components/habit/HabitFormDialog";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
-import AllTimeHabitsModal from "@/components/habit/AllTimeHabitsModal";
+
 import { capitalizeHabitName } from "@/lib/utils";
 import { recordHabitActivity, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
 import { recordHabitActivityV2 } from "@/utils/habitActivityV2";
@@ -44,7 +44,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
   const { duplicateGroups, mergeDuplicateHabits, checkForDuplicate } = useHabitDeduplication();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
-  const [showAllTimeHabits, setShowAllTimeHabits] = useState(false);
+  
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("today");
@@ -394,16 +394,6 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                 Merge {duplicateGroups.length} Duplicates
               </Button>
             )}
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAllTimeHabits(true)}
-              className="flex items-center gap-1"
-            >
-              <History className="h-4 w-4" />
-              All-Time
-            </Button>
           </div>
           
           {/* Duplicate Warning */}
@@ -627,10 +617,6 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         open={showHabitForm}
         onOpenChange={setShowHabitForm}
         habitToEdit={habitToEdit}
-      />
-      <AllTimeHabitsModal
-        open={showAllTimeHabits}
-        onOpenChange={setShowAllTimeHabits}
       />
     </div>
   );
