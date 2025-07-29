@@ -58,20 +58,20 @@ const ActivityTextDisplay: React.FC<ActivityTextDisplayProps> = ({
   const placeholderText = activityIndex === 0 ? "Tap to add notes..." : "Add notes...";
 
   return (
-    <div className="flex flex-col items-center justify-center min-w-0 w-full">
+    <div className="flex flex-col justify-center min-w-0 w-full">
       <div 
         onClick={() => onToggleEditMode(activityIndex)}
         className="cursor-pointer hover:bg-muted/20 active:bg-muted/30 rounded px-2 py-2 transition-all min-w-0 w-full touch-manipulation group"
       >
-        <p className="text-xs font-semibold text-foreground text-center leading-tight">
+        <p className="text-sm font-semibold text-green-800 text-left leading-tight">
           {isCustomText ? activity.text : displayText}
         </p>
         {!isCustomText && (
-          <p className="text-[9px] text-muted-foreground/50 mt-0.5 text-center">
+          <p className="text-[9px] text-muted-foreground/50 mt-0.5 text-left">
             {placeholderText}
           </p>
         )}
-        <Edit size={10} className="mx-auto mt-1 text-muted-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <Edit size={10} className="mt-1 text-muted-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>
   );
