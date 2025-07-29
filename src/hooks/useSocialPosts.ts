@@ -38,6 +38,7 @@ export interface CreatePostData {
   habit_type?: string;
   content: string;
   caption?: string;
+  photo_url?: string;
   streak_count?: number;
   is_milestone?: boolean;
 }
