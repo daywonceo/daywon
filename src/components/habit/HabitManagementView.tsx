@@ -17,7 +17,7 @@ import { recordHabitActivity, loadHabitActivitiesFromDatabase } from "@/utils/ha
 import { recordHabitActivityV2 } from "@/utils/habitActivityV2";
 import { hapticSuccess } from "@/utils/haptics";
 import { Check, Plus as PlusIcon, Flame, Target } from "lucide-react";
-import { calculateStreakForDate } from "@/utils/habitTracking";
+import { calculateStreakForDateV2 } from "@/utils/habitTracking";
 import { format, subDays, startOfDay, isSameDay } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -332,7 +332,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
   };
 
   const getStreakForHabit = (habitName: string): number => {
-    return calculateStreakForDate(habitName, new Date());
+    return calculateStreakForDateV2(habitName, new Date());
   };
 
   const getFilteredHabits = () => {
@@ -348,7 +348,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-      <Card className="w-full max-w-6xl max-h-[90vh] mx-4 flex flex-col">
+      <Card className="w-full max-w-6xl max-h-[90vh] mx-4 flex flex-col overflow-hidden">{/* Added overflow-hidden */}
         <CardHeader className="flex-shrink-0 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -428,7 +428,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
           )}
         </CardHeader>
         
-        <CardContent className="flex-grow overflow-hidden p-0">
+        <CardContent className="flex-grow overflow-hidden p-0">{/* Added overflow-hidden */}
           <Tabs defaultValue="today" className="h-full flex flex-col">
             <div className="px-6">
               <TabsList className="grid w-full grid-cols-2">
@@ -443,7 +443,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
               </TabsList>
             </div>
             
-            <TabsContent value="today" className="flex-grow overflow-y-auto px-6 mt-4">
+            <TabsContent value="today" className="flex-grow overflow-y-auto px-6 mt-4 max-h-[calc(90vh-280px)]">{/* Added max-height */}
               {/* Filter Controls */}
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="h-4 w-4 text-gray-500" />
@@ -564,7 +564,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
               )}
             </TabsContent>
             
-            <TabsContent value="catchup" className="flex-grow overflow-y-auto px-6 mt-4">
+            <TabsContent value="catchup" className="flex-grow overflow-y-auto px-6 mt-4 max-h-[calc(90vh-280px)]">{/* Added max-height */}
               {catchUpLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
