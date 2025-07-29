@@ -64,9 +64,25 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
         
         // Create entries for all user habits, even if not in database
         const completeActivities = userHabits.map(habitName => {
-          const existingActivity = dayActivities.find(a => a.habit_name.toLowerCase() === habitName.toLowerCase());
-          const habitRecord = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
-          return existingActivity || {
+          // Find existing activity by habit name (case insensitive)
+          const existingActivity = dayActivities.find(a => 
+            a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
+          );
+          const habitRecord = habits?.find(h => 
+            h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
+          );
+          
+          if (existingActivity) {
+            return {
+              id: existingActivity.id,
+              habit_id: existingActivity.habit_id,
+              habit_name: existingActivity.habit_name,
+              activity_date: existingActivity.activity_date,
+              status: existingActivity.status as 'completed' | 'failed' | 'empty'
+            };
+          }
+          
+          return {
             habit_id: habitRecord?.id,
             habit_name: habitName,
             activity_date: dateStr,
@@ -93,9 +109,13 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
   const toggleHabitStatus = async (dateStr: string, habitName: string) => {
     if (!user) return;
 
-    const currentActivity = activities[dateStr]?.find(a => a.habit_name.toLowerCase() === habitName.toLowerCase());
+    const currentActivity = activities[dateStr]?.find(a => 
+      a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
+    );
     const newStatus = currentActivity?.status === 'completed' ? 'empty' : 'completed';
-    const habitRecord = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
+    const habitRecord = habits?.find(h => 
+      h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
+    );
 
     if (!habitRecord) {
       toast({
@@ -116,18 +136,37 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
         
         if (error) throw error;
       } else if (newStatus === 'completed') {
-        // Create new activity with habit_id
-        const { error } = await supabase
+        // Check if a record already exists before creating
+        const { data: existingRecord } = await supabase
           .from('habit_activities')
-          .insert({
-            user_id: user.id,
-            habit_id: habitRecord.id,
-            habit_name: habitName,
-            activity_date: dateStr,
-            status: newStatus
-          });
-        
-        if (error) throw error;
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('habit_id', habitRecord.id)
+          .eq('activity_date', dateStr)
+          .maybeSingle();
+
+        if (existingRecord) {
+          // Update the existing record
+          const { error } = await supabase
+            .from('habit_activities')
+            .update({ status: newStatus })
+            .eq('id', existingRecord.id);
+          
+          if (error) throw error;
+        } else {
+          // Create new activity with habit_id
+          const { error } = await supabase
+            .from('habit_activities')
+            .insert({
+              user_id: user.id,
+              habit_id: habitRecord.id,
+              habit_name: habitName,
+              activity_date: dateStr,
+              status: newStatus
+            });
+          
+          if (error) throw error;
+        }
       }
 
       // Update local state
