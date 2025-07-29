@@ -131,7 +131,7 @@ const Index = () => {
   // If not loaded, fall back to previously used or fixed habits.
   const activityHabits = topHabits && topHabits.length === 3
     ? topHabits
-    : ["WORKOUT", "DEVOTIONS", "READ"];
+    : ["Workout", "Devotions", "Read"];
 
   // Get all active habit names for sections that need to show all habits
   const allActiveHabitNames = allHabits?.filter(h => h.status === 'active').map(h => h.name) || [];

@@ -13,7 +13,7 @@ export interface ProgressPeriod {
   previousTotalPossible: number;
 }
 
-export const useHabitProgress = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
+export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions", "Read"]) => {
   const progressData = useMemo(() => {
     const activities = getHabitActivitiesV2();
     const now = new Date();

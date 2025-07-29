@@ -34,7 +34,7 @@ const Profile = () => {
     longestStreak: {
       days: 84
     },
-    mostConsistentHabit: "WORKOUT",
+    mostConsistentHabit: "Workout",
     bestFriends: [
       { name: "Sarah Chen", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", topHabit: "Reading" },
       { name: "Mike Johnson", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", topHabit: "Running" },

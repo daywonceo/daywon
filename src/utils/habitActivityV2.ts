@@ -39,9 +39,9 @@ const findOrCreateHabitId = async (habitName: string): Promise<string | null> =>
 // Get category for default habits
 const getHabitCategory = (habitName: string): string => {
   const categoryMap: Record<string, string> = {
-    'WORKOUT': 'Health & Fitness',
-    'DEVOTIONS': 'Spiritual',
-    'READ': 'Personal Development',
+    'Workout': 'Health & Fitness',
+    'Devotions': 'Spiritual',
+    'Read': 'Personal Development',
     'Sleep 8 Hours': 'Health & Fitness',
     'Drink Water': 'Health & Fitness',
     'Meditate': 'Mindfulness'

@@ -5,8 +5,8 @@ import { saveOfflineData, getOfflineData } from "./offlineStorage";
 export const initializeDefaultHabits = (): string[] => {
   const offlineData = getOfflineData();
   
-  // Set our fixed habits
-  const defaultCategories = ["WORKOUT", "DEVOTIONS", "READ"];
+  // Set our fixed habits (updated to proper case)
+  const defaultCategories = ["Workout", "Devotions", "Read"];
   
   // Only save if no categories exist or they don't match our fixed ones
   if (!offlineData.habitCategories || 

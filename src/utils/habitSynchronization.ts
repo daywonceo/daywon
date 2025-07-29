@@ -234,7 +234,7 @@ export const processEndOfDayHabits = (): void => {
     
     // Get all active habits (this requires loading from another source, like the habits list)
     // For this implementation, we'll just consider the default habits
-    const activeHabits = ["WORKOUT", "DEVOTIONS", "READ"];
+    const activeHabits = ["Workout", "Devotions", "Read"];
     
     // For each active habit, check if there's an activity for yesterday
     let changesDetected = false;

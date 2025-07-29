@@ -14,7 +14,7 @@ export interface DayActivity {
   isEditing: boolean;
 }
 
-const DEFAULT_HABITS = ["WORKOUT", "DEVOTIONS", "READ"];
+const DEFAULT_HABITS = ["Workout", "Devotions", "Read"];
 
 export const useHabitActivities = (habitList?: string[]) => {
   const [activities, setActivities] = useState<DayActivity[]>([]);

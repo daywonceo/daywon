@@ -4,7 +4,7 @@ import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
 import { calculateStreakForDateV2, calculateOverallLongestStreakV2 } from '@/utils/habitStreaksV2';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
-export const useHabitStats = (userHabits: string[] = ["WORKOUT", "DEVOTIONS", "READ"]) => {
+export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "Read"]) => {
   const stats = useMemo(() => {
     const now = new Date();
     const activities = getHabitActivitiesV2();

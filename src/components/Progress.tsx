@@ -44,7 +44,7 @@ const Progress = ({ userHabits }: ProgressProps) => {
 
   const handleDownloadReport = async () => {
     try {
-      await generateHabitReport(userHabits || ["WORKOUT", "DEVOTIONS", "READ"]);
+      await generateHabitReport(userHabits || ["Workout", "Devotions", "Read"]);
       toast({
         title: "Report Downloaded",
         description: "Your habit progress report has been downloaded successfully.",
