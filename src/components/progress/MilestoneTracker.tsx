@@ -18,18 +18,18 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         <div className="flex items-center gap-2 mb-3">
           <Flame className="h-5 w-5 text-blue-500" />
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Longest Current Streak
+            Longest Streak Ever
           </h3>
         </div>
         
         <div className="space-y-3">
           <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
-            {formatStreakNumber(streakStats.bestStreak)} days
+            {formatStreakNumber(streakStats.longestStreak)} days
           </p>
           
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            {streakStats.bestStreakHabit ? (
-              <>Your best current streak is <span className="font-semibold">{streakStats.bestStreakHabit}</span></>
+            {streakStats.longestStreakHabit ? (
+              <>Your longest streak ever was <span className="font-semibold">{streakStats.longestStreakHabit}</span></>
             ) : (
               "Start completing habits to build your first streak!"
             )}
