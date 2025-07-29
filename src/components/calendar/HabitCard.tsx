@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Check } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { Habit } from '@/hooks/useHabits';
-import { recordHabitActivity } from '@/utils/habitActivity';
+import { recordHabitActivityV2 } from '@/utils/habitActivityV2';
 import { hapticSuccess } from '@/utils/haptics';
 import { capitalizeHabitName } from '@/lib/utils';
 
@@ -25,8 +25,14 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
     
     const handleToggleComplete = () => {
         const newStatus = isCompletedToday ? 'empty' : 'completed';
-        recordHabitActivity(habit.name, newStatus, new Date());
+        recordHabitActivityV2(habit.name, newStatus, new Date());
         hapticSuccess();
+        
+        // Dispatch event for RecentActivities to listen to
+        window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+            detail: { category: habit.name, status: newStatus, date: new Date().toISOString().split('T')[0] } 
+        }));
+        
         onUpdate();
     };
 
