@@ -94,15 +94,31 @@ export const synchronizeHabits = async (forceSync = false): Promise<boolean> => 
       console.log(`Syncing ${pendingUploads.length} local activities to server`);
       
       for (const activity of pendingUploads) {
+        // First, find or create the habit ID using the database function
+        const { data: habitId, error: habitError } = await supabase
+          .rpc('find_or_create_habit', {
+            p_user_id: user.id,
+            p_name: activity.habitName,
+            p_description: null,
+            p_category: null
+          });
+          
+        if (habitError || !habitId) {
+          console.error("Failed to find/create habit:", habitError);
+          continue;
+        }
+        
+        // Now upload the activity with the proper habit_id
         const { error } = await supabase
           .from('habit_activities')
           .upsert({
             user_id: user.id,
+            habit_id: habitId,
             habit_name: activity.habitName,
             activity_date: activity.date,
             status: activity.status
           }, {
-            onConflict: 'user_id,habit_name,activity_date'
+            onConflict: 'user_id,habit_id,activity_date'
           });
           
         if (error) {
