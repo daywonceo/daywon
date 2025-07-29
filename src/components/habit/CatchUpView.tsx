@@ -113,70 +113,27 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
       a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
     );
     const newStatus = currentActivity?.status === 'completed' ? 'empty' : 'completed';
-    const habitRecord = habits?.find(h => 
-      h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
-    );
-
-    if (!habitRecord) {
-      toast({
-        title: "Habit not found",
-        description: "Could not find the habit record. Please try refreshing.",
-        variant: "destructive"
-      });
-      return;
-    }
 
     try {
-      if (currentActivity?.id) {
-        // Update existing activity
-        const { error } = await supabase
-          .from('habit_activities')
-          .update({ status: newStatus })
-          .eq('id', currentActivity.id);
-        
-        if (error) throw error;
-      } else if (newStatus === 'completed') {
-        // Check if a record already exists before creating
-        const { data: existingRecord } = await supabase
-          .from('habit_activities')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('habit_id', habitRecord.id)
-          .eq('activity_date', dateStr)
-          .maybeSingle();
+      // Use the V2 system for consistency with RecentActivities
+      const { recordHabitActivityV2 } = await import('@/utils/habitActivityV2');
+      const activityDate = new Date(dateStr + 'T00:00:00');
+      
+      await recordHabitActivityV2(habitName, newStatus, activityDate);
 
-        if (existingRecord) {
-          // Update the existing record
-          const { error } = await supabase
-            .from('habit_activities')
-            .update({ status: newStatus })
-            .eq('id', existingRecord.id);
-          
-          if (error) throw error;
-        } else {
-          // Create new activity with habit_id
-          const { error } = await supabase
-            .from('habit_activities')
-            .insert({
-              user_id: user.id,
-              habit_id: habitRecord.id,
-              habit_name: habitName,
-              activity_date: dateStr,
-              status: newStatus
-            });
-          
-          if (error) throw error;
-        }
-      }
-
-      // Update local state
+      // Update local state optimistically
       setActivities(prev => ({
         ...prev,
         [dateStr]: prev[dateStr].map(activity =>
-          activity.habit_name.toLowerCase() === habitName.toLowerCase()
-            ? { ...activity, status: newStatus, habit_id: habitRecord.id }
+          activity.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
+            ? { ...activity, status: newStatus }
             : activity
         )
+      }));
+
+      // Dispatch event for cross-component synchronization
+      window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+        detail: { category: habitName, status: newStatus, date: dateStr } 
       }));
 
       toast({
