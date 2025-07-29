@@ -64,11 +64,11 @@ const ActivityTextDisplay: React.FC<ActivityTextDisplayProps> = ({
           onClick={() => onToggleEditMode(activityIndex)}
           className="cursor-pointer hover:bg-muted/30 active:bg-muted/50 rounded-md px-3 py-2 border-b border-dotted border-muted-foreground/30 hover:border-muted-foreground/50 transition-all min-w-0 flex-1 touch-manipulation"
         >
-          <p className="text-sm sm:text-sm font-semibold text-green-800/90 tracking-wide truncate text-center">
+          <p className="text-base sm:text-sm font-bold text-foreground tracking-wide text-center leading-tight">
             {isCustomText ? activity.text : displayText}
           </p>
           {!isCustomText && (
-            <p className="text-xs sm:text-xs text-muted-foreground/60 mt-1 text-center">
+            <p className="text-sm sm:text-xs text-muted-foreground/70 mt-1 text-center">
               {placeholderText}
             </p>
           )}
