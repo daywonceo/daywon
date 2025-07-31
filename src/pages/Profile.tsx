@@ -34,8 +34,14 @@ const Profile = () => {
     }
   };
 
-  // Calculate habit score for weekly period
-  const weeklyHabitScore = calculateHabitScore('weekly');
+  // Calculate habit score for weekly period with fallback
+  const weeklyHabitScore = calculateHabitScore('weekly') || {
+    totalScore: 0,
+    consistencyRate: 0,
+    streakScore: 0,
+    varietyScore: 0,
+    recencyScore: 0
+  };
   
   // Get real profile data
   const profile = {
