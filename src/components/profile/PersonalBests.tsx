@@ -24,7 +24,7 @@ const PersonalBests = ({ habitScore, mostConsistentHabit }: PersonalBestsProps) 
             <Trophy className="w-8 h-8 mx-auto mb-2 text-orange-500" />
             <h4 className="text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">HABIT SCORE</h4>
             <p className="text-2xl font-bold text-orange-600">{Math.round(habitScore.totalScore)}</p>
-            <p className="text-xs text-gray-500">WEEKLY</p>
+            <p className="text-xs text-gray-500">MONTHLY</p>
           </CardContent>
         </Card>
         

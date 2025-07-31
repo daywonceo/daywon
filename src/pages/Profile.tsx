@@ -34,8 +34,8 @@ const Profile = () => {
     }
   };
 
-  // Calculate habit score for weekly period with fallback
-  const weeklyHabitScore = calculateHabitScore('weekly') || {
+  // Calculate habit score for monthly period with fallback
+  const monthlyHabitScore = calculateHabitScore('monthly') || {
     totalScore: 0,
     consistencyRate: 0,
     streakScore: 0,
@@ -48,7 +48,7 @@ const Profile = () => {
     name: currentUserProfile?.display_name || currentUserProfile?.email || "User",
     avatar: currentUserProfile?.avatar_url || "/lovable-uploads/dba09bea-3695-42d9-b2ba-6da163dee57a.png",
     friendCount: friends.length,
-    habitScore: weeklyHabitScore,
+    habitScore: monthlyHabitScore,
     mostConsistentHabit: streakStats.longestStreakHabit || "No habits yet",
     bestFriends: friends.slice(0, 3).map(friend => ({
       name: friend.display_name || friend.email || "Friend",
