@@ -54,31 +54,19 @@ const ActivityTextDisplay: React.FC<ActivityTextDisplayProps> = ({
   }
 
   const displayText = getMobileText(activity.text, activityIndex);
-  const isCustomText = activity.text !== displayText;
-  const placeholderText = activityIndex === 0 ? "Tap to add notes..." : "Add notes...";
 
   return (
     <div className="flex flex-col items-center justify-center group space-y-1 min-w-0">
-      <div className="flex items-center min-w-0 relative">
-        <div 
-          onClick={() => onToggleEditMode(activityIndex)}
-          className="cursor-pointer hover:bg-muted/30 rounded px-2 py-1 border-b border-dotted border-muted-foreground/30 hover:border-muted-foreground/50 transition-all min-w-0 flex-1"
-        >
-          <p className="text-xs sm:text-sm font-semibold text-green-800/90 tracking-wide truncate">
-            {isCustomText ? activity.text : displayText}
-          </p>
-          {!isCustomText && (
-            <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-0.5">
-              {placeholderText}
-            </p>
-          )}
-        </div>
+      <div className="flex items-center min-w-0">
+        <p className="text-xs sm:text-sm font-semibold text-green-800/90 tracking-wide truncate">
+          {displayText}
+        </p>
         <button
           onClick={() => onToggleEditMode(activityIndex)}
-          className="ml-1 text-green-700/60 hover:text-green-900 transition-colors flex-shrink-0"
+          className="ml-1 text-green-700 hover:text-green-900 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
         >
-          <Edit size={14} className="sm:hidden" />
-          <Edit size={16} className="hidden sm:block" />
+          <Edit size={10} className="sm:hidden" />
+          <Edit size={12} className="hidden sm:block" />
         </button>
       </div>
     </div>
