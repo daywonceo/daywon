@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import SignUpScreen from "./SignUpScreen";
 import WelcomeScreen from "./WelcomeScreen";
 import MissionCanvasScreen from "./MissionCanvasScreen";
@@ -25,6 +27,7 @@ interface OnboardingFlowProps {
 }
 
 const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     focusAreas: [],
@@ -56,6 +59,11 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
   const handleComplete = () => {
     onComplete(onboardingData);
+  };
+
+  const handleExitOnboarding = () => {
+    // Navigate to the home page
+    navigate('/');
   };
 
   const renderCurrentScreen = () => {
@@ -125,11 +133,23 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         />
       </div>
 
-      {/* Step Indicator */}
-      <div className="flex justify-center pt-4 pb-2">
+      {/* Header with Step Indicator and Exit Button */}
+      <div className="flex justify-between items-center pt-4 pb-2 px-4">
+        <div className="flex-1" />
         <Badge variant="outline" className="text-sm">
           Step {currentStep + 1} of {totalSteps}
         </Badge>
+        <div className="flex-1 flex justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExitOnboarding}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            <X className="w-4 h-4 mr-1" />
+            Exit
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}
