@@ -63,8 +63,8 @@ const ActivityTextDisplay: React.FC<ActivityTextDisplayProps> = ({
         onClick={() => onToggleEditMode(activityIndex)}
         className="cursor-pointer hover:bg-muted/20 active:bg-muted/30 rounded px-2 py-1 transition-all min-w-0 w-full touch-manipulation group flex flex-col justify-center"
       >
-        <p className="text-sm font-semibold text-green-800 text-left leading-tight">
-          {isCustomText ? activity.text : displayText}
+        <p className="text-sm font-semibold text-green-800 text-left leading-tight uppercase">
+          {isCustomText ? activity.text : displayText.toUpperCase()}
         </p>
         {!isCustomText && (
           <p className="text-[9px] text-muted-foreground/50 text-left">
