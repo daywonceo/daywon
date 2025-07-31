@@ -58,20 +58,28 @@ const ActivityTextDisplay: React.FC<ActivityTextDisplayProps> = ({
   const placeholderText = activityIndex === 0 ? "Tap to add notes..." : "Add notes...";
 
   return (
-    <div className="flex items-center justify-start min-w-0 w-full h-12 sm:h-16">
-      <div 
-        onClick={() => onToggleEditMode(activityIndex)}
-        className="cursor-pointer hover:bg-muted/20 active:bg-muted/30 rounded px-2 py-1 transition-all min-w-0 w-full touch-manipulation group flex flex-col justify-center"
-      >
-        <p className="text-sm font-semibold text-green-800 text-left leading-tight uppercase">
-          {isCustomText ? activity.text : displayText}
-        </p>
-        {!isCustomText && (
-          <p className="text-[9px] text-muted-foreground/50 text-left">
-            {placeholderText}
+    <div className="flex flex-col items-center justify-center group space-y-1 min-w-0">
+      <div className="flex items-center min-w-0 relative">
+        <div 
+          onClick={() => onToggleEditMode(activityIndex)}
+          className="cursor-pointer hover:bg-muted/30 rounded px-2 py-1 border-b border-dotted border-muted-foreground/30 hover:border-muted-foreground/50 transition-all min-w-0 flex-1"
+        >
+          <p className="text-xs sm:text-sm font-semibold text-green-800/90 tracking-wide truncate">
+            {isCustomText ? activity.text : displayText}
           </p>
-        )}
-        <Edit size={10} className="mt-0.5 text-muted-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+          {!isCustomText && (
+            <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-0.5">
+              {placeholderText}
+            </p>
+          )}
+        </div>
+        <button
+          onClick={() => onToggleEditMode(activityIndex)}
+          className="ml-1 text-green-700/60 hover:text-green-900 transition-colors flex-shrink-0"
+        >
+          <Edit size={14} className="sm:hidden" />
+          <Edit size={16} className="hidden sm:block" />
+        </button>
       </div>
     </div>
   );
