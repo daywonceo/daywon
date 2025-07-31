@@ -17,12 +17,12 @@ export const useLoginLogic = () => {
   const { signUp, signIn, signInWithGoogle, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (user) {
-      navigate('/', { replace: true });
-    }
-  }, [user, navigate]);
+  // Redirect if already authenticated - TEMPORARILY DISABLED FOR EDITING
+  // useEffect(() => {
+  //   if (user) {
+  //     navigate('/', { replace: true });
+  //   }
+  // }, [user, navigate]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
