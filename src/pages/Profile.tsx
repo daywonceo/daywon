@@ -11,11 +11,19 @@ import MembershipMilestone from "@/components/profile/MembershipMilestone";
 import ConnectedApps from "@/components/profile/ConnectedApps";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSocialProfiles } from "@/hooks/useSocialProfiles";
+import { useHabitStats } from "@/hooks/useHabitStats";
+import { useHabitScoring } from "@/hooks/useHabitScoring";
+import { useFriends } from "@/hooks/useFriends";
 import { toast } from "sonner";
 
 const Profile = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { signOut, session } = useAuth();
+  const { currentUserProfile } = useSocialProfiles();
+  const { streakStats, todayStats } = useHabitStats();
+  const { calculateHabitScore } = useHabitScoring();
+  const { friends } = useFriends();
   
   const handleSignOut = async () => {
     try {
@@ -25,24 +33,25 @@ const Profile = () => {
       toast.error("Failed to sign out");
     }
   };
+
+  // Calculate habit score for weekly period
+  const weeklyHabitScore = calculateHabitScore('weekly');
   
-  // Sample profile data
+  // Get real profile data
   const profile = {
-    name: "NATE RODGERS",
-    avatar: "/lovable-uploads/dba09bea-3695-42d9-b2ba-6da163dee57a.png",
-    friendCount: 35,
-    longestStreak: {
-      days: 84
-    },
-    mostConsistentHabit: "Workout",
-    bestFriends: [
-      { name: "Sarah Chen", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", topHabit: "Reading" },
-      { name: "Mike Johnson", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", topHabit: "Running" },
-      { name: "Emma Davis", avatar: "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png", topHabit: "Meditation" }
-    ],
-    daysActive: 301,
-    totalHabitsCompleted: 1247,
-    weeklyGoalCompletion: 89
+    name: currentUserProfile?.display_name || currentUserProfile?.email || "User",
+    avatar: currentUserProfile?.avatar_url || "/lovable-uploads/dba09bea-3695-42d9-b2ba-6da163dee57a.png",
+    friendCount: friends.length,
+    habitScore: weeklyHabitScore,
+    mostConsistentHabit: streakStats.longestStreakHabit || "No habits yet",
+    bestFriends: friends.slice(0, 3).map(friend => ({
+      name: friend.display_name || friend.email || "Friend",
+      avatar: friend.avatar_url || "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
+      topHabit: "Active"
+    })),
+    daysActive: Math.floor((new Date().getTime() - new Date(currentUserProfile?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24)),
+    totalHabitsCompleted: todayStats.completedCount,
+    weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100)
   };
 
   return (
@@ -60,7 +69,7 @@ const Profile = () => {
         <ProfileHeader profile={profile} />
         
         <PersonalBests 
-          longestStreak={profile.longestStreak}
+          habitScore={profile.habitScore}
           mostConsistentHabit={profile.mostConsistentHabit}
         />
         
