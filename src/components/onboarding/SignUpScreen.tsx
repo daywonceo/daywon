@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserPlus, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { UserPlus, Eye, EyeOff, Mail, Lock, User, AtSign, Check, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUsernameValidation } from "@/hooks/useUsernameValidation";
 import { toast } from "sonner";
 
 interface SignUpScreenProps {
@@ -15,6 +16,7 @@ interface SignUpScreenProps {
 }
 
 const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,9 +26,22 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { signUp } = useAuth();
+  const { username, setUsername, isChecking, isAvailable, error: usernameError, suggestions } = useUsernameValidation(displayName);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
+
+    if (!displayName.trim()) {
+      newErrors.displayName = "Display name is required";
+    }
+
+    if (!username) {
+      newErrors.username = "Username is required";
+    } else if (usernameError) {
+      newErrors.username = usernameError;
+    } else if (isAvailable === false) {
+      newErrors.username = "Username is not available";
+    }
 
     if (!email) {
       newErrors.email = "Email is required";
@@ -51,10 +66,10 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
   };
 
   const handleSignUp = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || isChecking || isAvailable === false) return;
 
     setIsLoading(true);
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, displayName.trim(), username);
 
     if (error) {
       console.error("Sign up error:", error);
@@ -90,6 +105,81 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
         
         <CardContent className="space-y-6">
           <div className="space-y-4">
+            {/* Display Name Field */}
+            <div className="space-y-2">
+              <Label htmlFor="displayName" className="text-sm font-medium">
+                Display Name
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="displayName"
+                  type="text"
+                  placeholder="Enter your display name"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className={cn(
+                    "pl-10",
+                    errors.displayName && "border-red-500 focus-visible:ring-red-500"
+                  )}
+                />
+              </div>
+              {errors.displayName && (
+                <p className="text-sm text-red-500">{errors.displayName}</p>
+              )}
+            </div>
+
+            {/* Username Field */}
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-sm font-medium">
+                Username
+              </Label>
+              <div className="relative">
+                <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Choose a username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className={cn(
+                    "pl-10 pr-10",
+                    usernameError && "border-red-500 focus-visible:ring-red-500",
+                    isAvailable === true && "border-green-500 focus-visible:ring-green-500"
+                  )}
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  {isChecking ? (
+                    <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                  ) : isAvailable === true ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : isAvailable === false ? (
+                    <X className="w-4 h-4 text-red-500" />
+                  ) : null}
+                </div>
+              </div>
+              {usernameError && (
+                <p className="text-sm text-red-500">{usernameError}</p>
+              )}
+              {suggestions.length > 0 && usernameError && (
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mb-1">Suggestions:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {suggestions.slice(0, 3).map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => setUsername(suggestion)}
+                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
@@ -180,8 +270,8 @@ const SignUpScreen = ({ onNext, onSkip }: SignUpScreenProps) => {
           <div className="space-y-3">
             <Button 
               onClick={handleSignUp}
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              disabled={isLoading || isChecking || isAvailable === false || !isAvailable}
+              className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
               size="lg"
             >
               {isLoading ? "Creating Account..." : "Create Account"}
