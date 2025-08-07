@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import SignUpScreen from "./SignUpScreen";
 import WelcomeScreen from "./WelcomeScreen";
 import MissionCanvasScreen from "./MissionCanvasScreen";
+import CadenceSelectionScreen from "./CadenceSelectionScreen";
 import PickFocusScreen from "./PickFocusScreen";
 import NotificationScreen from "./NotificationScreen";
 import IntentScreen from "./IntentScreen";
@@ -20,6 +21,7 @@ export interface OnboardingData {
     reminderTime: string;
   };
   intent: string;
+  cadence: string;
 }
 
 interface OnboardingFlowProps {
@@ -32,10 +34,11 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     focusAreas: [],
     notifications: { enabled: false, reminderTime: "09:00" },
-    intent: ""
+    intent: "",
+    cadence: ""
   });
 
-  const totalSteps = 7;
+  const totalSteps = 8;
 
   const updateData = (key: keyof OnboardingData, value: any) => {
     setOnboardingData(prev => ({ ...prev, [key]: value }));
@@ -82,6 +85,16 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         );
       case 3:
         return (
+          <CadenceSelectionScreen
+            selectedCadence={onboardingData.cadence}
+            onCadenceChange={(cadence) => updateData('cadence', cadence)}
+            onNext={nextStep}
+            onBack={prevStep}
+            onSkip={skipToEnd}
+          />
+        );
+      case 4:
+        return (
           <PickFocusScreen
             selectedAreas={onboardingData.focusAreas}
             onSelectionChange={(areas) => updateData('focusAreas', areas)}
@@ -90,7 +103,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 4:
+      case 5:
         return (
           <NotificationScreen
             preferences={onboardingData.notifications}
@@ -100,7 +113,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 5:
+      case 6:
         return (
           <IntentScreen
             intent={onboardingData.intent}
@@ -110,7 +123,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 6:
+      case 7:
         return (
           <FinalScreen
             onComplete={handleComplete}
