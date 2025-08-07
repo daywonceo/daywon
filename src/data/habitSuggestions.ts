@@ -4,6 +4,11 @@ export interface HabitSuggestion {
   reasoning: string;
 }
 
+export interface CadencePrompt {
+  motivational: string;
+  reflective: string;
+}
+
 export interface CadenceFocusMapping {
   [cadence: string]: {
     [focusArea: string]: HabitSuggestion;
@@ -121,6 +126,26 @@ export const HABIT_SUGGESTIONS: CadenceFocusMapping = {
   }
 };
 
+// Prompts for each cadence type
+export const CADENCE_PROMPTS: { [key: string]: CadencePrompt } = {
+  week: {
+    motivational: "Stack one small win. That's it.",
+    reflective: "Did this habit help you feel more in control this week?"
+  },
+  month: {
+    motivational: "Show up for 30 days. See what sticks.",
+    reflective: "What did I learn about myself this month?"
+  },
+  season: {
+    motivational: "Grow slowly. Sustainably. Season by season.",
+    reflective: "What rhythms helped me feel grounded this season?"
+  },
+  ongoing: {
+    motivational: "Build the identity you want to carry.",
+    reflective: "Is this habit becoming part of who I am?"
+  }
+};
+
 // Map focus area IDs from PickFocusScreen to our suggestion categories
 const FOCUS_AREA_MAPPING: { [key: string]: string } = {
   move: 'Physical',
@@ -134,6 +159,10 @@ const FOCUS_AREA_MAPPING: { [key: string]: string } = {
 export const getHabitSuggestion = (cadence: string, focusAreaId: string): HabitSuggestion | null => {
   const mappedFocusArea = FOCUS_AREA_MAPPING[focusAreaId] || 'Mental';
   return HABIT_SUGGESTIONS[cadence]?.[mappedFocusArea] || null;
+};
+
+export const getCadencePrompt = (cadence: string): CadencePrompt => {
+  return CADENCE_PROMPTS[cadence] || CADENCE_PROMPTS.week;
 };
 
 export const getDefaultHabitSuggestion = (): HabitSuggestion => {

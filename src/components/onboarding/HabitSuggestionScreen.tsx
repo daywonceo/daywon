@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { CheckCircle, Lightbulb, ArrowRight } from "lucide-react";
-import { getHabitSuggestion, getDefaultHabitSuggestion } from "@/data/habitSuggestions";
+import { CheckCircle, Lightbulb, ArrowRight, Heart } from "lucide-react";
+import { getHabitSuggestion, getDefaultHabitSuggestion, getCadencePrompt } from "@/data/habitSuggestions";
 
 interface HabitSuggestionScreenProps {
   selectedCadence: string;
@@ -22,12 +22,15 @@ const HabitSuggestionScreen = ({
   onSkip 
 }: HabitSuggestionScreenProps) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [showReflective, setShowReflective] = useState(false);
 
   // Get suggestion based on cadence and first focus area
   const primaryFocusArea = selectedFocusAreas[0];
   const suggestion = primaryFocusArea 
     ? getHabitSuggestion(selectedCadence, primaryFocusArea)
     : getDefaultHabitSuggestion();
+  
+  const cadencePrompt = getCadencePrompt(selectedCadence);
 
   if (!suggestion) {
     return null;
@@ -89,6 +92,31 @@ const HabitSuggestionScreen = ({
                     <span className="italic">{suggestion.reasoning}</span>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Motivational Prompt */}
+          <Card className="border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <Heart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
+                  Your mindset for this journey
+                </span>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-medium text-blue-900 dark:text-blue-100 mb-3">
+                  {showReflective ? cadencePrompt.reflective : cadencePrompt.motivational}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReflective(!showReflective)}
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-xs"
+                >
+                  {showReflective ? "Show motivation" : "Show reflection"}
+                </Button>
               </div>
             </CardContent>
           </Card>
