@@ -6,6 +6,7 @@ import { ChevronLeft, Sparkles, Target, Bell, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OnboardingData } from "./OnboardingFlow";
 import { supabase } from "@/integrations/supabase/client";
+import { getHabitSuggestion, getDefaultHabitSuggestion } from "@/data/habitSuggestions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -61,6 +62,44 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
 
   const confettiColors = ['🎉', '🌟', '✨', '🎊', '💫'];
 
+  // Get the suggested habit based on their selections
+  const primaryFocusArea = data.focusAreas[0];
+  const suggestion = primaryFocusArea && data.cadence
+    ? getHabitSuggestion(data.cadence, primaryFocusArea)
+    : getDefaultHabitSuggestion();
+
+  const getCadenceDisplayName = (cadence: string) => {
+    const names: { [key: string]: string } = {
+      week: "1-week",
+      month: "1-month", 
+      season: "seasonal",
+      ongoing: "ongoing"
+    };
+    return names[cadence] || cadence;
+  };
+
+  const getFocusAreaDisplayName = (focusArea: string) => {
+    const names: { [key: string]: string } = {
+      move: "physical",
+      sleep: "physical",
+      nutrition: "physical",
+      mindfulness: "mental",
+      learning: "mental",
+      custom: "personal"
+    };
+    return names[focusArea] || focusArea;
+  };
+
+  const getAffirmation = (cadence: string) => {
+    const affirmations: { [key: string]: string } = {
+      week: "You've already won today by showing up.",
+      month: "Let's build momentum — one day at a time.",
+      season: "Slow growth is still growth. This is your Day One.",
+      ongoing: "You've already won today. This is your Day One."
+    };
+    return affirmations[cadence] || "This is your Day One.";
+  };
+
   return (
     <div className="w-full max-w-md mx-auto relative">
       {/* Confetti Animation */}
@@ -103,62 +142,36 @@ const FinalScreen = ({ onComplete, onBack, data }: FinalScreenProps) => {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <p className="text-center text-gray-600 dark:text-gray-400 leading-relaxed">
-            You've taken the first step towards building meaningful habits. Here's what you've set up:
-          </p>
-          
-          {/* Summary */}
-          <div className="space-y-4">
-            {data.focusAreas.length > 0 && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    Focus Areas
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {data.focusAreas.map(area => (
-                    <Badge key={area} variant="outline" className="text-xs">
-                      {area}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {data.notifications.enabled && (
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Bell className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                    Notifications Enabled
-                  </span>
-                </div>
-                <div className="text-xs text-green-600 dark:text-green-400">
-                  Daily reminders at {data.notifications.reminderTime}
-                </div>
-              </div>
-            )}
-            
-            {data.intent && (
-              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-800 dark:text-purple-200">
-                    Your Why
-                  </span>
-                </div>
-                <p className="text-sm text-purple-700 dark:text-purple-300 italic">
-                  "{data.intent}"
+          {/* Personalized Confirmation Message */}
+          {data.cadence && primaryFocusArea && suggestion && (
+            <div className="text-center space-y-4">
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                You've chosen a <span className="font-semibold text-green-600 dark:text-green-400">
+                  {getCadenceDisplayName(data.cadence)}
+                </span> focus on <span className="font-semibold text-blue-600 dark:text-blue-400">
+                  {getFocusAreaDisplayName(primaryFocusArea)}
+                </span> habits.
+              </p>
+              
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                <p className="text-gray-800 dark:text-gray-200 mb-2">
+                  You'll start with:
+                </p>
+                <p className="text-lg font-medium text-gray-900 dark:text-white">
+                  "{suggestion.habit}"
                 </p>
               </div>
-            )}
-          </div>
+              
+              <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
+                {getAffirmation(data.cadence)}
+              </p>
+            </div>
+          )}
           
+          {/* Note about flexibility */}
           <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Remember: Progress, not perfection. You've got this! 💪
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              You can always change your cadence or focus area later if your needs shift.
             </p>
           </div>
           
