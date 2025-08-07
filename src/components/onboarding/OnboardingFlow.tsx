@@ -10,6 +10,7 @@ import WelcomeScreen from "./WelcomeScreen";
 import MissionCanvasScreen from "./MissionCanvasScreen";
 import CadenceSelectionScreen from "./CadenceSelectionScreen";
 import PickFocusScreen from "./PickFocusScreen";
+import HabitSuggestionScreen from "./HabitSuggestionScreen";
 import NotificationScreen from "./NotificationScreen";
 import IntentScreen from "./IntentScreen";
 import FinalScreen from "./FinalScreen";
@@ -38,7 +39,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     cadence: ""
   });
 
-  const totalSteps = 8;
+  const totalSteps = 9;
 
   const updateData = (key: keyof OnboardingData, value: any) => {
     setOnboardingData(prev => ({ ...prev, [key]: value }));
@@ -105,6 +106,16 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         );
       case 5:
         return (
+          <HabitSuggestionScreen
+            selectedCadence={onboardingData.cadence}
+            selectedFocusAreas={onboardingData.focusAreas}
+            onNext={nextStep}
+            onBack={prevStep}
+            onSkip={skipToEnd}
+          />
+        );
+      case 6:
+        return (
           <NotificationScreen
             preferences={onboardingData.notifications}
             onPreferencesChange={(prefs) => updateData('notifications', prefs)}
@@ -113,7 +124,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 6:
+      case 7:
         return (
           <IntentScreen
             intent={onboardingData.intent}
@@ -123,7 +134,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onSkip={skipToEnd}
           />
         );
-      case 7:
+      case 8:
         return (
           <FinalScreen
             onComplete={handleComplete}
