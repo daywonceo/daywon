@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { ChefHat, StickyNote, ChevronRight } from 'lucide-react';
 
 const MealPlannerTab: React.FC = () => {
   const [goals, setGoals] = useState('Fat loss');
@@ -60,34 +61,34 @@ const MealPlannerTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-white dark:bg-gray-800/50">
+      <Card className="animate-fade-in">
         <CardHeader>
           <CardTitle>Smart Meal Planner</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <label className="block text-xs mb-1">Goals</label>
+            <label className="block text-sm text-muted-foreground mb-1">Goals</label>
             <Input value={goals} onChange={(e) => setGoals(e.target.value)} placeholder="e.g., Lean bulk, fat loss" />
           </div>
           <div>
-            <label className="block text-xs mb-1">Preferences</label>
+            <label className="block text-sm text-muted-foreground mb-1">Preferences</label>
             <Textarea value={preferences} onChange={(e) => setPreferences(e.target.value)} placeholder="e.g., High protein, lactose free, quick prep" />
           </div>
           <div>
-            <label className="block text-xs mb-1">Calories Target (optional)</label>
+            <label className="block text-sm text-muted-foreground mb-1">Calories Target (optional)</label>
             <Input type="number" value={calories} onChange={(e) => setCalories(e.target.value ? Number(e.target.value) : '')} placeholder="e.g., 2000" />
           </div>
-          <div className="flex gap-2">
-            <Button onClick={generate} disabled={loading}>{loading ? 'Generating…' : 'Generate / Regenerate'}</Button>
-            <Button variant="outline" onClick={exportToNotes} disabled={!plan}>Export to Notes</Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button onClick={generate} disabled={loading} className="w-full sm:w-auto">{loading ? 'Generating…' : (<><ChefHat className="mr-2 h-4 w-4" /> Generate plan</>)}</Button>
+            <Button variant="outline" onClick={exportToNotes} disabled={!plan} className="w-full sm:w-auto"><StickyNote className="mr-2 h-4 w-4" /> Export to Notes</Button>
           </div>
         </CardContent>
       </Card>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {plan && (
-        <Card className="bg-white dark:bg-gray-800/50">
+        <Card className="animate-fade-in">
           <CardHeader>
             <CardTitle>{plan.title || `Meal Plan – Week of ${plan.plan_start}`}</CardTitle>
           </CardHeader>
@@ -95,13 +96,13 @@ const MealPlannerTab: React.FC = () => {
             <div className="space-y-3">
               {(plan.meals || []).map((day: any) => (
                 <div key={day.date} className="border rounded p-3">
-                  <div className="font-semibold mb-2">{day.date}</div>
+                  <div className="text-sm text-muted-foreground mb-2 font-medium">{day.date}</div>
                   <ul className="space-y-2">
                     {(day.meals || []).map((m: any, idx: number) => (
                       <li key={idx}>
                         <button
                           onClick={() => { setSelectedMeal(m); setShowMeal(true); }}
-                          className="w-full text-left rounded-md p-2 hover:bg-gray-50 dark:hover:bg-gray-800/70 transition"
+                          className="w-full text-left rounded-lg p-3 hover:bg-accent transition focus:outline-none focus:ring-2 focus:ring-primary"
                           aria-label={`View details for ${m.name}`}
                         >
                           <div className="flex items-center justify-between gap-3">
@@ -114,7 +115,7 @@ const MealPlannerTab: React.FC = () => {
                                 <Badge variant="outline">F {m.macros?.fat_g ?? '?'}g</Badge>
                               </div>
                             </div>
-                            <span className="text-xs text-gray-500 shrink-0">Tap for details</span>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                           </div>
                         </button>
                       </li>
@@ -128,7 +129,7 @@ const MealPlannerTab: React.FC = () => {
       )}
 
       <Dialog open={showMeal} onOpenChange={setShowMeal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md sm:max-w-lg w-[calc(100vw-2rem)]">
           <DialogHeader>
             <DialogTitle>{selectedMeal?.name}</DialogTitle>
             <DialogDescription>
@@ -137,26 +138,26 @@ const MealPlannerTab: React.FC = () => {
           </DialogHeader>
           {selectedMeal && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="rounded bg-gray-50 dark:bg-gray-800/50 p-2">
-                  <div className="text-xs text-gray-500">Calories</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+                <div className="rounded-md bg-muted p-2">
+                  <div className="text-xs text-muted-foreground">Calories</div>
                   <div className="font-medium">{selectedMeal.macros?.calories ?? '?'}</div>
                 </div>
-                <div className="rounded bg-gray-50 dark:bg-gray-800/50 p-2">
-                  <div className="text-xs text-gray-500">Protein</div>
+                <div className="rounded-md bg-muted p-2">
+                  <div className="text-xs text-muted-foreground">Protein</div>
                   <div className="font-medium">{selectedMeal.macros?.protein_g ?? '?'} g</div>
                 </div>
-                <div className="rounded bg-gray-50 dark:bg-gray-800/50 p-2">
-                  <div className="text-xs text-gray-500">Carbs</div>
+                <div className="rounded-md bg-muted p-2">
+                  <div className="text-xs text-muted-foreground">Carbs</div>
                   <div className="font-medium">{selectedMeal.macros?.carbs_g ?? '?'} g</div>
                 </div>
-                <div className="rounded bg-gray-50 dark:bg-gray-800/50 p-2">
-                  <div className="text-xs text-gray-500">Fat</div>
+                <div className="rounded-md bg-muted p-2">
+                  <div className="text-xs text-muted-foreground">Fat</div>
                   <div className="font-medium">{selectedMeal.macros?.fat_g ?? '?'} g</div>
                 </div>
               </div>
               <div>
-                <div className="text-xs mb-1 text-gray-500">Ingredients</div>
+                <div className="text-xs mb-1 text-muted-foreground">Ingredients</div>
                 <ul className="list-disc pl-5 text-sm space-y-1">
                   {(selectedMeal.ingredients || []).map((ing: string, i: number) => (
                     <li key={i}>{ing}</li>
@@ -169,7 +170,7 @@ const MealPlannerTab: React.FC = () => {
                     href={selectedMeal.instructions_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm underline text-blue-600 dark:text-blue-400"
+                    className="text-sm underline text-primary"
                   >
                     View cooking instructions
                   </a>
