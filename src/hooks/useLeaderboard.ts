@@ -46,57 +46,35 @@ export const useLeaderboard = (period: 'weekly' | 'monthly' | 'yearly' = 'monthl
 
       const latestPeriod = periodsData[0].period_start;
 
-      // Fetch leaderboard data for the latest period
-      const { data: scoresData, error: scoresError } = await supabase
-        .from('user_habit_scores')
-        .select(`
-          user_id,
-          total_score,
-          consistency_rate,
-          streak_score,
-          variety_score,
-          recency_score,
-          period_start,
-          period_end
-        `)
-        .eq('score_period', period)
-        .eq('period_start', latestPeriod)
-        .order('total_score', { ascending: false });
+      // Use anonymized leaderboard function for enhanced privacy
+      const { data: anonymizedData, error: leaderboardError } = await supabase
+        .rpc('get_anonymized_leaderboard', { score_period_param: period });
 
-      if (scoresError) {
-        console.error('Error fetching scores:', scoresError);
+      if (leaderboardError) {
+        console.error('Error fetching anonymized leaderboard:', leaderboardError);
         return;
       }
 
-      // Get user profiles for display names (no email access)
-      const userIds = scoresData?.map(score => score.user_id) || [];
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('id, display_name')
-        .in('id', userIds);
-
-      // Create leaderboard entries with rankings
-      const leaderboardEntries: LeaderboardEntry[] = (scoresData || []).map((score, index) => {
-        const profile = profilesData?.find(p => p.id === score.user_id);
+      // Create anonymized leaderboard entries (no user identification for privacy)
+      const leaderboardEntries: LeaderboardEntry[] = (anonymizedData || []).map((score) => {
         return {
-          userId: score.user_id,
-          displayName: profile?.display_name || 'Unknown User',
+          userId: 'anonymous', // Privacy: Don't expose user IDs
+          displayName: `Rank #${score.rank_position}`, // Anonymized display
           totalScore: score.total_score,
           consistencyRate: score.consistency_rate,
-          streakScore: score.streak_score,
-          varietyScore: score.variety_score,
-          recencyScore: score.recency_score,
-          rankPosition: index + 1,
-          periodStart: score.period_start,
-          periodEnd: score.period_end
+          streakScore: 0, // Not exposed in anonymized view for privacy
+          varietyScore: 0, // Not exposed in anonymized view for privacy
+          recencyScore: 0, // Not exposed in anonymized view for privacy
+          rankPosition: score.rank_position,
+          periodStart: '',
+          periodEnd: ''
         };
       });
 
       setLeaderboard(leaderboardEntries);
 
-      // Find current user's rank
-      const currentUserRank = leaderboardEntries.find(entry => entry.userId === user?.id);
-      setUserRank(currentUserRank || null);
+      // For privacy, don't show current user's rank in public leaderboard
+      setUserRank(null);
 
     } finally {
       setIsLoading(false);
