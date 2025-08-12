@@ -1146,6 +1146,15 @@ export type Database = {
         }
         Returns: string
       }
+      get_anonymized_leaderboard: {
+        Args: { score_period_param?: string }
+        Returns: {
+          rank_position: number
+          total_score: number
+          consistency_rate: number
+          score_period: string
+        }[]
+      }
       get_connected_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
