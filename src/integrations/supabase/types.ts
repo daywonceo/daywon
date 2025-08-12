@@ -1129,6 +1129,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      discover_potential_friends: {
+        Args: { search_query?: string }
+        Returns: {
+          id: string
+          display_name: string
+          avatar_url: string
+        }[]
+      }
       find_or_create_habit: {
         Args: {
           p_user_id: string
@@ -1137,6 +1145,18 @@ export type Database = {
           p_category?: string
         }
         Returns: string
+      }
+      get_connected_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          display_name: string
+          avatar_url: string
+          bio: string
+          status: string
+          last_active: string
+          created_at: string
+        }[]
       }
       get_public_profiles: {
         Args: Record<PropertyKey, never>
@@ -1157,6 +1177,18 @@ export type Database = {
           p_merge_habit_ids: string[]
         }
         Returns: undefined
+      }
+      search_connected_profiles: {
+        Args: { search_query: string }
+        Returns: {
+          id: string
+          display_name: string
+          avatar_url: string
+          bio: string
+          status: string
+          last_active: string
+          created_at: string
+        }[]
       }
       search_public_profiles: {
         Args: { search_query: string }

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,15 +27,19 @@ const FriendList = ({}: FriendListProps) => {
     removeFriend,
   } = useFriends();
   
-  const { profiles, loading: profilesLoading } = useSocialProfiles();
+  const { profiles, discoverProfiles, loading: profilesLoading } = useSocialProfiles();
+  const [potentialFriends, setPotentialFriends] = useState<any[]>([]);
   
-  // Filter profiles for discovery (exclude current user, friends, and pending requests)
-  const discoverProfiles = profiles.filter(profile => {
-    const isFriend = friends.some(f => f.id === profile.id);
-    const isPending = pendingRequests.some(p => p.id === profile.id);
-    const isSent = sentRequests.some(s => s.id === profile.id);
-    return !isFriend && !isPending && !isSent;
-  });
+  // Load potential friends for discovery
+  useEffect(() => {
+    if (activeTab === 'discover') {
+      const loadPotentialFriends = async () => {
+        const discovered = await discoverProfiles(searchTerm || undefined);
+        setPotentialFriends(discovered);
+      };
+      loadPotentialFriends();
+    }
+  }, [activeTab, searchTerm, discoverProfiles]);
   
   // Filter based on active tab
   const getFilteredItems = () => {
@@ -46,7 +50,7 @@ const FriendList = ({}: FriendListProps) => {
     } else if (activeTab === 'pending') {
       items = pendingRequests;
     } else {
-      items = discoverProfiles;
+      items = potentialFriends;
     }
     
     return items.filter(item => {

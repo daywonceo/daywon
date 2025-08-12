@@ -49,7 +49,7 @@ export const useSocialProfiles = () => {
   const fetchProfiles = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.rpc('get_public_profiles');
+      const { data, error } = await supabase.rpc('get_connected_profiles');
 
       if (error) throw error;
       setProfiles(data || []);
@@ -132,7 +132,7 @@ export const useSocialProfiles = () => {
   // Search profiles by display name only (no email search)
   const searchProfiles = async (query: string) => {
     try {
-      const { data, error } = await supabase.rpc('search_public_profiles', { 
+      const { data, error } = await supabase.rpc('search_connected_profiles', { 
         search_query: query 
       });
 
@@ -140,6 +140,21 @@ export const useSocialProfiles = () => {
       return data || [];
     } catch (error) {
       console.error('Error searching profiles:', error);
+      return [];
+    }
+  };
+
+  // Discover potential friends (very limited data for privacy)
+  const discoverProfiles = async (query?: string) => {
+    try {
+      const { data, error } = await supabase.rpc('discover_potential_friends', { 
+        search_query: query || null
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error discovering profiles:', error);
       return [];
     }
   };
@@ -190,6 +205,7 @@ export const useSocialProfiles = () => {
     updateProfile,
     updateStatus,
     searchProfiles,
+    discoverProfiles,
     getProfileById,
     refetch: () => {
       fetchCurrentUserProfile();
