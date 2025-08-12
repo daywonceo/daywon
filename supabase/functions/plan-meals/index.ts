@@ -115,45 +115,106 @@ User goals: ${JSON.stringify(goals)}\nPreferences: ${JSON.stringify(preferences)
       }
     }
 
-    // If we still don't have a plan, make a minimal fallback
     if (!planJson) {
+      const mealTemplates = [
+        {
+          name: 'Greek Yogurt Parfait',
+          meal_type: 'breakfast',
+          ingredients: ['greek yogurt', 'berries', 'granola', 'honey'],
+          macros: { calories: 350, protein_g: 25, carbs_g: 45, fat_g: 8 },
+          instructions_url: 'https://www.allrecipes.com/recipe/greek-yogurt-parfait/',
+        },
+        {
+          name: 'Veggie Omelet',
+          meal_type: 'breakfast',
+          ingredients: ['eggs', 'spinach', 'tomato', 'onion', 'olive oil'],
+          macros: { calories: 400, protein_g: 24, carbs_g: 6, fat_g: 30 },
+          instructions_url: 'https://www.delish.com/cooking/recipe-ideas/a23364607/how-to-make-omelet/',
+        },
+        {
+          name: 'Chicken Burrito Bowl',
+          meal_type: 'lunch',
+          ingredients: ['chicken breast', 'brown rice', 'black beans', 'corn', 'salsa'],
+          macros: { calories: 600, protein_g: 40, carbs_g: 60, fat_g: 18 },
+          instructions_url: 'https://www.foodnetwork.com/recipes/chicken-burrito-bowl-5311421',
+        },
+        {
+          name: 'Turkey Avocado Sandwich',
+          meal_type: 'lunch',
+          ingredients: ['whole grain bread', 'turkey slices', 'avocado', 'lettuce', 'tomato'],
+          macros: { calories: 550, protein_g: 32, carbs_g: 45, fat_g: 24 },
+          instructions_url: 'https://www.loveandlemons.com/avocado-sandwich/',
+        },
+        {
+          name: 'Salmon, Rice & Broccoli',
+          meal_type: 'dinner',
+          ingredients: ['salmon', 'jasmine rice', 'broccoli', 'soy sauce'],
+          macros: { calories: 650, protein_g: 35, carbs_g: 60, fat_g: 25 },
+          instructions_url: 'https://www.bbcgoodfood.com/recipes/salmon-rice-broccoli',
+        },
+        {
+          name: 'Beef Stir-Fry',
+          meal_type: 'dinner',
+          ingredients: ['beef strips', 'mixed vegetables', 'soy sauce', 'garlic', 'ginger'],
+          macros: { calories: 650, protein_g: 40, carbs_g: 50, fat_g: 28 },
+          instructions_url: 'https://www.allrecipes.com/recipe/228823/quick-beef-stir-fry/',
+        },
+        {
+          name: 'Apple with Peanut Butter',
+          meal_type: 'snack',
+          ingredients: ['apple', 'peanut butter'],
+          macros: { calories: 250, protein_g: 8, carbs_g: 22, fat_g: 14 },
+          instructions_url: 'https://www.eatingwell.com/recipe/276923/apple-with-peanut-butter/',
+        },
+        {
+          name: 'Protein Shake',
+          meal_type: 'snack',
+          ingredients: ['whey protein', 'banana', 'almond milk'],
+          macros: { calories: 220, protein_g: 30, carbs_g: 8, fat_g: 4 },
+          instructions_url: 'https://www.healthline.com/nutrition/protein-shake-recipes',
+        },
+      ];
+
+      const pickMealsForDay = (i: number) => {
+        // Rotate within categories to ensure variety and no exact repeats
+        return [
+          mealTemplates[i % 2],           // breakfast
+          mealTemplates[2 + (i % 2)],     // lunch
+          mealTemplates[4 + (i % 2)],     // dinner
+          mealTemplates[6 + (i % 2)],     // snack
+        ];
+      };
+
       const days = Array.from({ length: 7 }).map((_, i) => {
         const d = new Date(start);
         d.setDate(start.getDate() + i);
         const date = toISODate(d);
-        return {
-          date,
-          meals: [
-            {
-              name: 'Oatmeal with Berries',
-              ingredients: ['rolled oats', 'berries', 'milk or water', 'honey'],
-              macros: { calories: 350, protein_g: 12, carbs_g: 55, fat_g: 8 },
-              instructions_url: null,
-            },
-            {
-              name: 'Grilled Chicken Salad',
-              ingredients: ['chicken breast', 'mixed greens', 'olive oil', 'lemon'],
-              macros: { calories: 500, protein_g: 35, carbs_g: 20, fat_g: 25 },
-              instructions_url: null,
-            },
-            {
-              name: 'Salmon, Rice & Broccoli',
-              ingredients: ['salmon', 'rice', 'broccoli', 'soy sauce'],
-              macros: { calories: 650, protein_g: 35, carbs_g: 60, fat_g: 25 },
-              instructions_url: null,
-            },
-          ],
-          totals: { calories: 1500, protein_g: 82, carbs_g: 135, fat_g: 58 },
-        };
+        const meals = pickMealsForDay(i);
+        const totals = meals.reduce(
+          (acc, m) => ({
+            calories: acc.calories + (m.macros?.calories || 0),
+            protein_g: acc.protein_g + (m.macros?.protein_g || 0),
+            carbs_g: acc.carbs_g + (m.macros?.carbs_g || 0),
+            fat_g: acc.fat_g + (m.macros?.fat_g || 0),
+          }),
+          { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 }
+        );
+        return { date, meals, totals };
       });
+
       planJson = {
         plan_start,
         plan_end,
         days,
         shopping_list: [
-          { item: 'chicken breast', quantity: 7, unit: 'servings', category: 'protein' },
+          { item: 'chicken breast', quantity: 4, unit: 'servings', category: 'protein' },
+          { item: 'salmon', quantity: 3, unit: 'servings', category: 'protein' },
           { item: 'rice', quantity: 7, unit: 'cups', category: 'grains' },
           { item: 'broccoli', quantity: 7, unit: 'cups', category: 'produce' },
+          { item: 'eggs', quantity: 12, unit: 'count', category: 'protein' },
+          { item: 'greek yogurt', quantity: 7, unit: 'cups', category: 'dairy' },
+          { item: 'oats', quantity: 4, unit: 'cups', category: 'grains' },
+          { item: 'mixed vegetables', quantity: 5, unit: 'cups', category: 'produce' },
         ],
       };
     }
