@@ -45,13 +45,13 @@ const Profile = () => {
   
   // Get real profile data
   const profile = {
-    name: currentUserProfile?.display_name || currentUserProfile?.email || "User",
+    name: currentUserProfile?.display_name || "User",
     avatar: currentUserProfile?.avatar_url || "/lovable-uploads/dba09bea-3695-42d9-b2ba-6da163dee57a.png",
     friendCount: friends.length,
     habitScore: monthlyHabitScore,
     mostConsistentHabit: streakStats.longestStreakHabit || "No habits yet",
     bestFriends: friends.slice(0, 3).map(friend => ({
-      name: friend.display_name || friend.email || "Friend",
+      name: friend.display_name || "Friend",
       avatar: friend.avatar_url || "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
       topHabit: "Active"
     })),

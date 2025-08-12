@@ -50,7 +50,7 @@ const FriendList = ({}: FriendListProps) => {
     }
     
     return items.filter(item => {
-      const name = item.display_name || item.email || '';
+      const name = item.display_name || '';
       return name.toLowerCase().includes(searchTerm.toLowerCase());
     });
   };
@@ -149,7 +149,7 @@ const FriendList = ({}: FriendListProps) => {
         ) : (
           filteredItems.map(item => {
             const isProfile = 'created_at' in item;
-            const displayName = isProfile ? (item.display_name || item.email) : (item.display_name || item.email);
+            const displayName = item.display_name || 'Unknown User';
             const avatarUrl = isProfile ? item.avatar_url : item.avatar_url;
             const status = isProfile ? item.status : item.status;
             

@@ -14,7 +14,6 @@ export interface FriendRelationship {
 export interface Friend {
   id: string;
   display_name: string | null;
-  email: string;
   avatar_url: string | null;
   status: 'online' | 'away' | 'offline';
   last_active: string;
@@ -47,7 +46,6 @@ export const useFriends = () => {
           profiles!user_relationships_following_id_fkey(
             id,
             display_name,
-            email,
             avatar_url,
             status,
             last_active
@@ -69,7 +67,6 @@ export const useFriends = () => {
           profiles!user_relationships_follower_id_fkey(
             id,
             display_name,
-            email,
             avatar_url,
             status,
             last_active
@@ -91,7 +88,6 @@ export const useFriends = () => {
           profiles!user_relationships_following_id_fkey(
             id,
             display_name,
-            email,
             avatar_url,
             status,
             last_active
@@ -106,7 +102,6 @@ export const useFriends = () => {
       const formattedFriends = acceptedFriends?.map(rel => ({
         id: (rel.profiles as any).id,
         display_name: (rel.profiles as any).display_name,
-        email: (rel.profiles as any).email,
         avatar_url: (rel.profiles as any).avatar_url,
         status: (rel.profiles as any).status,
         last_active: (rel.profiles as any).last_active,
@@ -116,7 +111,6 @@ export const useFriends = () => {
       const formattedPending = pendingFriends?.map(rel => ({
         id: (rel.profiles as any).id,
         display_name: (rel.profiles as any).display_name,
-        email: (rel.profiles as any).email,
         avatar_url: (rel.profiles as any).avatar_url,
         status: (rel.profiles as any).status,
         last_active: (rel.profiles as any).last_active,
@@ -126,7 +120,6 @@ export const useFriends = () => {
       const formattedSent = sentFriends?.map(rel => ({
         id: (rel.profiles as any).id,
         display_name: (rel.profiles as any).display_name,
-        email: (rel.profiles as any).email,
         avatar_url: (rel.profiles as any).avatar_url,
         status: (rel.profiles as any).status,
         last_active: (rel.profiles as any).last_active,

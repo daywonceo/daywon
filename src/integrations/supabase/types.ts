@@ -1138,6 +1138,18 @@ export type Database = {
         }
         Returns: string
       }
+      get_public_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          display_name: string
+          avatar_url: string
+          bio: string
+          status: string
+          last_active: string
+          created_at: string
+        }[]
+      }
       merge_duplicate_habits: {
         Args: {
           p_user_id: string
@@ -1145,6 +1157,18 @@ export type Database = {
           p_merge_habit_ids: string[]
         }
         Returns: undefined
+      }
+      search_public_profiles: {
+        Args: { search_query: string }
+        Returns: {
+          id: string
+          display_name: string
+          avatar_url: string
+          bio: string
+          status: string
+          last_active: string
+          created_at: string
+        }[]
       }
     }
     Enums: {

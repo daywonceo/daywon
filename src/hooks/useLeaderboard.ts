@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface LeaderboardEntry {
   userId: string;
-  email?: string;
+  displayName?: string;
   totalScore: number;
   consistencyRate: number;
   streakScore: number;
@@ -68,11 +68,11 @@ export const useLeaderboard = (period: 'weekly' | 'monthly' | 'yearly' = 'monthl
         return;
       }
 
-      // Get user profiles for email addresses
+      // Get user profiles for display names (no email access)
       const userIds = scoresData?.map(score => score.user_id) || [];
       const { data: profilesData } = await supabase
         .from('profiles')
-        .select('id, email')
+        .select('id, display_name')
         .in('id', userIds);
 
       // Create leaderboard entries with rankings
@@ -80,7 +80,7 @@ export const useLeaderboard = (period: 'weekly' | 'monthly' | 'yearly' = 'monthl
         const profile = profilesData?.find(p => p.id === score.user_id);
         return {
           userId: score.user_id,
-          email: profile?.email || 'Unknown User',
+          displayName: profile?.display_name || 'Unknown User',
           totalScore: score.total_score,
           consistencyRate: score.consistency_rate,
           streakScore: score.streak_score,

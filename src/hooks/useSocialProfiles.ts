@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export interface UserProfile {
   id: string;
-  email: string;
+  email?: string; // Only available for current user's own profile
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
@@ -45,14 +45,11 @@ export const useSocialProfiles = () => {
     }
   };
 
-  // Fetch all user profiles (for friend discovery, leaderboards, etc.)
+  // Fetch connected friends' profiles (without email addresses)
   const fetchProfiles = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('last_active', { ascending: false });
+      const { data, error } = await supabase.rpc('get_public_profiles');
 
       if (error) throw error;
       setProfiles(data || []);
@@ -132,14 +129,12 @@ export const useSocialProfiles = () => {
     }
   };
 
-  // Search profiles
+  // Search profiles by display name only (no email search)
   const searchProfiles = async (query: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .or(`display_name.ilike.%${query}%,email.ilike.%${query}%`)
-        .order('last_active', { ascending: false });
+      const { data, error } = await supabase.rpc('search_public_profiles', { 
+        search_query: query 
+      });
 
       if (error) throw error;
       return data || [];
@@ -149,12 +144,12 @@ export const useSocialProfiles = () => {
     }
   };
 
-  // Get profile by ID
+  // Get profile by ID (limited to friends or own profile)
   const getProfileById = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, display_name, avatar_url, bio, status, last_active, created_at')
         .eq('id', userId)
         .single();
 
