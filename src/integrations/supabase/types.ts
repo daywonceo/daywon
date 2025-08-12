@@ -488,6 +488,54 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_plans: {
+        Row: {
+          created_at: string
+          goals: Json | null
+          id: string
+          meals: Json
+          plan_end: string
+          plan_start: string
+          preferences: Json | null
+          shopping_list: Json
+          status: string
+          title: string | null
+          total_daily_targets: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          goals?: Json | null
+          id?: string
+          meals: Json
+          plan_end: string
+          plan_start: string
+          preferences?: Json | null
+          shopping_list: Json
+          status?: string
+          title?: string | null
+          total_daily_targets?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          goals?: Json | null
+          id?: string
+          meals?: Json
+          plan_end?: string
+          plan_start?: string
+          preferences?: Json | null
+          shopping_list?: Json
+          status?: string
+          title?: string | null
+          total_daily_targets?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           actor_id: string
@@ -1041,6 +1089,39 @@ export type Database = {
           month?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_summaries: {
+        Row: {
+          created_at: string
+          id: string
+          metrics: Json | null
+          summary_text: string
+          updated_at: string
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          summary_text: string
+          updated_at?: string
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          summary_text?: string
+          updated_at?: string
+          user_id?: string
+          week_end?: string
+          week_start?: string
         }
         Relationships: []
       }

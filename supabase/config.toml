@@ -1,0 +1,7 @@
+project_id = "ncjbvdbkulnekwsjzicq"
+
+[functions.generate-weekly-summary]
+verify_jwt = true
+
+[functions.plan-meals]
+verify_jwt = true

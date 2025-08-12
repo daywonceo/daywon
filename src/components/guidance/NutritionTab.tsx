@@ -1,17 +1,11 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Utensils, Clock, Users, ArrowLeft, Heart } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
-import RecipeList from "./RecipeList";
-import { useRecipeData } from "./useRecipeData";
-import NutritionCategoryGrid from "./NutritionCategoryGrid";
-import NutritionRecipeResults from "./NutritionRecipeResults";
 import SavedRecipesTab from "./SavedRecipesTab";
 import NutritionTabContent from "./NutritionTabContent";
+import MealPlannerTab from "./MealPlannerTab";
 
 const NutritionTab = () => {
   const [showSavedRecipes, setShowSavedRecipes] = useState(false);
@@ -20,7 +14,6 @@ const NutritionTab = () => {
     setShowSavedRecipes(false);
   };
 
-  // If saved recipes view is active
   if (showSavedRecipes) {
     return (
       <div className="animate-fade-in">
@@ -47,9 +40,18 @@ const NutritionTab = () => {
   }
 
   return (
-    <NutritionTabContent 
-      onShowSavedRecipes={() => setShowSavedRecipes(true)}
-    />
+    <Tabs defaultValue="browse" className="w-full">
+      <TabsList className="grid w-full grid-cols-2 mb-6 h-12">
+        <TabsTrigger value="browse">Browse</TabsTrigger>
+        <TabsTrigger value="planner">Planner</TabsTrigger>
+      </TabsList>
+      <TabsContent value="browse">
+        <NutritionTabContent onShowSavedRecipes={() => setShowSavedRecipes(true)} />
+      </TabsContent>
+      <TabsContent value="planner">
+        <MealPlannerTab />
+      </TabsContent>
+    </Tabs>
   );
 };
 

@@ -23,6 +23,7 @@ import HabitGallery from "@/components/habit/HabitGallery";
 import CompletionRateCard from "@/components/progress/CompletionRateCard";
 import MilestoneTracker from "@/components/progress/MilestoneTracker";
 import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard";
+import WeeklySummaryCard from "@/components/progress/WeeklySummaryCard";
 import { useAutomaticDeduplication } from "@/hooks/useAutomaticDeduplication";
 import { useHabitSystemTransition } from "@/hooks/useHabitSystemTransition";
 import HabitManagementView from "@/components/habit/HabitManagementView";
@@ -150,6 +151,7 @@ const Index = () => {
 
           {/* New Progress Components */}
           <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-8 sm:mb-12">
+            <WeeklySummaryCard />
             <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
             <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
             <DailyEncouragementCard />
