@@ -4,21 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHabits } from "@/hooks/useHabits";
 import { useUserHabits } from "@/hooks/useUserHabits";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { capitalizeHabitName } from "@/lib/utils";
+import { HABIT_TEMPLATES, getHabitTemplatesByCategory } from "@/data/habitTemplates";
 import FrequencySelectionScreen, { type HabitFrequency } from "./FrequencySelectionScreen";
 
-const SAMPLE_HABITS = [
-  "Read for 30 minutes",
-  "Workout", 
-  "Meditate",
-  "Drink 8 glasses of water",
-  "Write in journal",
-  "Take a walk"
-];
+const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
 export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
@@ -29,12 +25,17 @@ export default function SimpleOnboardingFlow() {
   const [currentHabitIndex, setCurrentHabitIndex] = useState(0);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const handleHabitToggle = (habit: string) => {
+  const filteredHabits = selectedCategory === 'all' 
+    ? HABIT_TEMPLATES 
+    : getHabitTemplatesByCategory(selectedCategory);
+
+  const handleHabitToggle = (habitName: string) => {
     setSelectedHabits(prev => 
-      prev.includes(habit) 
-        ? prev.filter(h => h !== habit)
-        : [...prev, habit]
+      prev.includes(habitName) 
+        ? prev.filter(h => h !== habitName)
+        : [...prev, habitName]
     );
   };
 
@@ -66,10 +67,11 @@ export default function SimpleOnboardingFlow() {
     setIsLoading(true);
     try {
       for (const habitName of selectedHabits) {
+        const habitTemplate = HABIT_TEMPLATES.find(h => h.name === habitName);
         const habit = await addHabit({
           name: habitName,
-          description: null,
-          category: 'Personal',
+          description: habitTemplate?.description || null,
+          category: habitTemplate?.category || 'Personal',
           status: 'active',
           default_tracking_type: 'DAILY'
         });
@@ -139,7 +141,7 @@ export default function SimpleOnboardingFlow() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6">
       <Card>
         <CardHeader>
           <CardTitle>Choose Your Habits</CardTitle>
@@ -147,17 +149,51 @@ export default function SimpleOnboardingFlow() {
             Select the habits you'd like to track. You'll configure frequencies next.
           </p>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {SAMPLE_HABITS.map((habit) => (
+        <CardContent className="space-y-6">
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={selectedCategory === 'all' ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory('all')}
+            >
+              All Habits
+            </Button>
+            {CATEGORIES.map((category) => (
               <Button
-                key={habit}
-                variant={selectedHabits.includes(habit) ? "default" : "outline"}
-                onClick={() => handleHabitToggle(habit)}
-                className="justify-start h-auto p-4"
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
               >
-                {habit}
+                {category}
               </Button>
+            ))}
+          </div>
+          {/* Habits Grid - Matching HabitItem layout */}
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {filteredHabits.map((habitTemplate) => (
+              <div
+                key={habitTemplate.id}
+                onClick={() => handleHabitToggle(habitTemplate.name)}
+                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                  selectedHabits.includes(habitTemplate.name)
+                    ? 'bg-primary/10 border-2 border-primary'
+                    : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent'
+                }`}
+              >
+                <div className="flex flex-col gap-1">
+                  <p className="font-semibold text-gray-800 dark:text-gray-200">
+                    {capitalizeHabitName(habitTemplate.name)}
+                  </p>
+                  <Badge variant="secondary">{habitTemplate.category}</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  {selectedHabits.includes(habitTemplate.name) && (
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                  )}
+                </div>
+              </div>
             ))}
           </div>
 
@@ -165,11 +201,25 @@ export default function SimpleOnboardingFlow() {
             <div className="pt-4 border-t">
               <Label>Selected habits:</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {selectedHabits.map((habit) => (
-                  <Badge key={habit} variant="secondary">
-                    {habit}
-                  </Badge>
-                ))}
+                {selectedHabits.map((habitName) => {
+                  const habitTemplate = HABIT_TEMPLATES.find(h => h.name === habitName);
+                  return (
+                    <Badge key={habitName} variant="secondary" className="flex items-center gap-1">
+                      {capitalizeHabitName(habitName)}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 ml-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleHabitToggle(habitName);
+                        }}
+                      >
+                        ×
+                      </Button>
+                    </Badge>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -183,7 +233,7 @@ export default function SimpleOnboardingFlow() {
                 }
               }}
               disabled={selectedHabits.length === 0 || isLoading}
-              className="flex-1"
+              className="flex-1 min-h-[48px]"
             >
               {isLoading ? "Setting up..." : "Configure Frequencies"}
             </Button>
