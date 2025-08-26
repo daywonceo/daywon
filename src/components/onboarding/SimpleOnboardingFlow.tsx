@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import DailyReminderScreen, { type DailyReminderSettings } from "./DailyReminder
 import ConfirmationScreen from "./ConfirmationScreen";
 import { analytics } from "@/utils/analytics";
 import { OnboardingValidator } from "@/utils/onboardingValidator";
+import { useOnboardingPersistence } from "@/hooks/useOnboardingPersistence";
 
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
@@ -27,6 +28,7 @@ export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
   const { addHabit } = useHabits();
   const { createUserHabit } = useUserHabits();
+  const { saveDraft, loadDraft, clearDraft } = useOnboardingPersistence();
   const [onboardingStartTime] = useState(Date.now());
   const [step, setStep] = useState<'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('select');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
@@ -37,6 +39,34 @@ export default function SimpleOnboardingFlow() {
   const [currentDailySettings, setCurrentDailySettings] = useState<DailyReminderSettings | null>(null);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  // Load saved draft on mount
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setSelectedHabits(draft.selectedHabits || []);
+      setHabitFrequencies(draft.habitFrequencies || {});
+      setSelectedCategory(draft.selectedCategory || 'all');
+    }
+  }, []);
+
+  // Save draft whenever state changes
+  useEffect(() => {
+    const draft = {
+      selectedHabits,
+      habitFrequencies,
+      selectedCategory,
+      step: step === 'complete' ? 'select' : step, // Don't restore complete state
+    };
+    saveDraft(draft);
+  }, [selectedHabits, habitFrequencies, selectedCategory, step]);
+
+  // Clear draft on completion
+  useEffect(() => {
+    if (step === 'complete') {
+      clearDraft();
+    }
+  }, [step]);
 
   const filteredHabits = selectedCategory === 'all' 
     ? HABIT_TEMPLATES 
@@ -476,7 +506,7 @@ export default function SimpleOnboardingFlow() {
 
       {/* Sticky Continue Button */}
       {selectedHabits.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t">
+        <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background/95 backdrop-blur border-t">
           <div className="max-w-4xl mx-auto">
             <Button 
               onClick={handleContinueToConfirm}

@@ -119,8 +119,8 @@ export default function DayPickerScreen({
                     variant={isSelected ? "default" : "outline"}
                     onClick={() => handleDayToggle(day.value)}
                     className={cn(
-                      "min-h-[48px] text-base font-medium transition-all",
-                      isSelected && "ring-2 ring-primary ring-offset-2"
+                      "min-h-[48px] min-w-[48px] text-base font-medium transition-all",
+                      isSelected && "ring-2 ring-primary ring-offset-1"
                     )}
                   >
                     {day.label}
@@ -226,19 +226,19 @@ export default function DayPickerScreen({
       </Card>
 
       {/* Sticky Continue Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t">
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background/95 backdrop-blur border-t">
         <div className="max-w-2xl mx-auto flex gap-4">
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={onBack}
-            className="flex-1 min-h-[48px]"
+            className="flex-1 min-h-[48px] text-muted-foreground"
           >
             Back
           </Button>
           <Button 
             onClick={handleNext}
             disabled={selectedDays.length === 0}
-            className="flex-1 min-h-[48px]"
+            className="flex-1 min-h-[48px] text-lg font-medium"
           >
             Continue
           </Button>

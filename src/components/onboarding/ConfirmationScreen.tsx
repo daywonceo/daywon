@@ -162,12 +162,12 @@ export default function ConfirmationScreen({
       )}
 
       {/* Sticky Action Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t">
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background/95 backdrop-blur border-t">
         <div className="max-w-2xl mx-auto flex gap-4">
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={onBack}
-            className="flex-1 min-h-[48px]"
+            className="flex-1 min-h-[48px] text-muted-foreground"
             disabled={isCreating}
           >
             Back

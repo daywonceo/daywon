@@ -154,18 +154,20 @@ export default function TargetSettingsScreen({
                 size="icon"
                 onClick={() => handleTargetChange(targetCount - 1)}
                 disabled={targetCount <= 1}
+                className="min-h-[48px] min-w-[48px]"
               >
-                <Minus className="h-4 w-4" />
+                <Minus className="h-5 w-5" />
               </Button>
-              <span className="text-2xl font-bold min-w-[3rem] text-center">
+              <span className="text-3xl font-bold min-w-[4rem] text-center">
                 {targetCount}
               </span>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => handleTargetChange(targetCount + 1)}
+                className="min-h-[48px] min-w-[48px]"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -193,6 +195,7 @@ export default function TargetSettingsScreen({
                         variant={minRestDays === days ? "default" : "outline"}
                         size="sm"
                         onClick={() => setMinRestDays(days)}
+                        className="min-h-[44px] min-w-[44px]"
                       >
                         {days}
                       </Button>
@@ -276,18 +279,18 @@ export default function TargetSettingsScreen({
         </CardContent>
       </Card>
 
-      <div className="flex gap-4 mt-6">
+      <div className="flex gap-4 mt-6 pb-4">
         <Button 
-          variant="outline" 
+          variant="ghost" 
           onClick={onBack}
-          className="flex-1 min-h-[48px]"
+          className="flex-1 min-h-[48px] text-muted-foreground"
         >
           Back
         </Button>
         <Button 
           onClick={handleNext}
           disabled={targetCount < 1}
-          className="flex-1 min-h-[48px]"
+          className="flex-1 min-h-[48px] text-lg font-medium"
         >
           Continue
         </Button>

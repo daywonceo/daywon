@@ -178,17 +178,17 @@ export default function DailyReminderScreen({
         </CardContent>
       </Card>
 
-      <div className="flex gap-4 mt-6">
+      <div className="flex gap-4 mt-6 pb-4">
         <Button 
-          variant="outline" 
+          variant="ghost" 
           onClick={onBack}
-          className="flex-1 min-h-[48px]"
+          className="flex-1 min-h-[48px] text-muted-foreground"
         >
           Back
         </Button>
         <Button 
           onClick={handleNext}
-          className="flex-1 min-h-[48px]"
+          className="flex-1 min-h-[48px] text-lg font-medium"
         >
           Continue
         </Button>

@@ -79,12 +79,12 @@ export default function FrequencyStyleSelector({
           
           return (
             <Label key={option.value} htmlFor={option.value} className="cursor-pointer">
-              <Card className={`min-h-[80px] transition-all duration-200 ${
+              <Card className={`min-h-[60px] transition-all duration-200 ${
                 isSelected 
-                  ? 'ring-2 ring-primary bg-primary/5' 
-                  : 'hover:bg-muted/50'
+                  ? 'ring-2 ring-primary bg-primary/5 border-primary' 
+                  : 'hover:bg-muted/50 border-border'
               }`}>
-                <CardContent className="flex items-center p-4 space-x-4">
+                <CardContent className="flex items-center p-4 space-x-4 min-h-[60px]">
                   <RadioGroupItem value={option.value} id={option.value} />
                   <div className="flex items-center space-x-3 flex-1">
                     <div className={`p-2 rounded-lg ${
@@ -106,18 +106,18 @@ export default function FrequencyStyleSelector({
         })}
       </RadioGroup>
 
-      <div className="flex gap-4 mt-8">
+      <div className="flex gap-4 mt-8 pb-4">
         <Button 
-          variant="outline" 
+          variant="ghost" 
           onClick={onBack}
-          className="flex-1 min-h-[48px]"
+          className="flex-1 min-h-[48px] text-muted-foreground"
         >
           Back
         </Button>
         <Button 
           onClick={handleNext}
           disabled={!selectedStyle}
-          className="flex-1 min-h-[48px]"
+          className="flex-1 min-h-[48px] text-lg font-medium"
         >
           Continue
         </Button>
