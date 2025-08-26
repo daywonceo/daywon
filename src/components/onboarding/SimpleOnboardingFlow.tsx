@@ -171,25 +171,25 @@ export default function SimpleOnboardingFlow() {
             ))}
           </div>
           {/* Habits Grid - Two columns layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
             {filteredHabits.map((habitTemplate) => (
               <div
                 key={habitTemplate.id}
                 onClick={() => handleHabitToggle(habitTemplate.name)}
-                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors text-sm ${
                   selectedHabits.includes(habitTemplate.name)
-                    ? 'bg-primary/10 border-2 border-primary'
-                    : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent'
+                    ? 'bg-primary/10 border border-primary'
+                    : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent'
                 }`}
               >
-                <div className="flex flex-col gap-1 flex-1">
-                  <p className="font-semibold text-gray-800 dark:text-gray-200">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 truncate">
                     {capitalizeHabitName(habitTemplate.name)}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center ml-1">
                   {selectedHabits.includes(habitTemplate.name) && (
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                    <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
                   )}
                 </div>
               </div>
