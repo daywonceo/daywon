@@ -13,6 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { capitalizeHabitName } from "@/lib/utils";
 import { HABIT_TEMPLATES, getHabitTemplatesByCategory } from "@/data/habitTemplates";
 import FrequencySelectionScreen, { type HabitFrequency } from "./FrequencySelectionScreen";
+import FrequencyStyleSelector, { type FrequencyStyle } from "./FrequencyStyleSelector";
 
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
@@ -20,9 +21,10 @@ export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
   const { addHabit } = useHabits();
   const { createUserHabit } = useUserHabits();
-  const [step, setStep] = useState<'select' | 'frequency' | 'confirm' | 'complete'>('select');
+  const [step, setStep] = useState<'select' | 'style' | 'frequency' | 'confirm' | 'complete'>('select');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
+  const [currentHabitStyle, setCurrentHabitStyle] = useState<FrequencyStyle | null>(null);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -40,9 +42,9 @@ export default function SimpleOnboardingFlow() {
         return rest;
       });
     } else {
-      // Add habit and go to frequency selection
+      // Add habit and go to frequency style selection
       setCurrentHabitForFrequency(habitName);
-      setStep('frequency');
+      setStep('style');
     }
   };
 
@@ -59,9 +61,19 @@ export default function SimpleOnboardingFlow() {
     setStep('select');
   };
 
-  const handleFrequencyBack = () => {
+  const handleStyleNext = (style: FrequencyStyle) => {
+    setCurrentHabitStyle(style);
+    setStep('frequency');
+  };
+
+  const handleStyleBack = () => {
     setCurrentHabitForFrequency('');
+    setCurrentHabitStyle(null);
     setStep('select');
+  };
+
+  const handleFrequencyBack = () => {
+    setStep('style');
   };
 
   const handleContinueToConfirm = () => {
@@ -116,6 +128,18 @@ export default function SimpleOnboardingFlow() {
       setIsLoading(false);
     }
   };
+
+  if (step === 'style') {
+    const habitTemplate = HABIT_TEMPLATES.find(h => h.name === currentHabitForFrequency);
+    return (
+      <FrequencyStyleSelector
+        habitName={currentHabitForFrequency}
+        habitCategory={habitTemplate?.category}
+        onNext={handleStyleNext}
+        onBack={handleStyleBack}
+      />
+    );
+  }
 
   if (step === 'frequency') {
     return (
