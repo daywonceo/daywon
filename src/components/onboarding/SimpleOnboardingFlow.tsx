@@ -14,6 +14,7 @@ import { capitalizeHabitName } from "@/lib/utils";
 import { HABIT_TEMPLATES, getHabitTemplatesByCategory } from "@/data/habitTemplates";
 import FrequencySelectionScreen, { type HabitFrequency } from "./FrequencySelectionScreen";
 import FrequencyStyleSelector, { type FrequencyStyle } from "./FrequencyStyleSelector";
+import TargetSettingsScreen, { type TargetSettings } from "./TargetSettingsScreen";
 
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
@@ -21,10 +22,11 @@ export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
   const { addHabit } = useHabits();
   const { createUserHabit } = useUserHabits();
-  const [step, setStep] = useState<'select' | 'style' | 'frequency' | 'confirm' | 'complete'>('select');
+  const [step, setStep] = useState<'select' | 'style' | 'targets' | 'frequency' | 'confirm' | 'complete'>('select');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
   const [currentHabitStyle, setCurrentHabitStyle] = useState<FrequencyStyle | null>(null);
+  const [currentTargetSettings, setCurrentTargetSettings] = useState<TargetSettings | null>(null);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -63,7 +65,32 @@ export default function SimpleOnboardingFlow() {
 
   const handleStyleNext = (style: FrequencyStyle) => {
     setCurrentHabitStyle(style);
-    setStep('frequency');
+    if (style === 'N_PER_PERIOD') {
+      setStep('targets');
+    } else {
+      setStep('frequency');
+    }
+  };
+
+  const handleTargetsNext = (settings: TargetSettings) => {
+    setCurrentTargetSettings(settings);
+    // Convert target settings to HabitFrequency format
+    const frequency: HabitFrequency = {
+      type: 'N_PER_PERIOD',
+      period: settings.period,
+      targetCount: settings.targetCount,
+      minRestDays: settings.minRestDays,
+      timeWindowStart: settings.timeWindowStart,
+      timeWindowEnd: settings.timeWindowEnd,
+      reminderTime: settings.reminderTime,
+      reminderChannel: settings.reminderChannel,
+    };
+    handleFrequencyNext(frequency);
+  };
+
+  const handleTargetsBack = () => {
+    setCurrentTargetSettings(null);
+    setStep('style');
   };
 
   const handleStyleBack = () => {
@@ -137,6 +164,18 @@ export default function SimpleOnboardingFlow() {
         habitCategory={habitTemplate?.category}
         onNext={handleStyleNext}
         onBack={handleStyleBack}
+      />
+    );
+  }
+
+  if (step === 'targets') {
+    const habitTemplate = HABIT_TEMPLATES.find(h => h.name === currentHabitForFrequency);
+    return (
+      <TargetSettingsScreen
+        habitName={currentHabitForFrequency}
+        habitCategory={habitTemplate?.category}
+        onNext={handleTargetsNext}
+        onBack={handleTargetsBack}
       />
     );
   }

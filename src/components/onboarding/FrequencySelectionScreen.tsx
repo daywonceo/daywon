@@ -15,6 +15,11 @@ export interface HabitFrequency {
   period?: Period;
   targetCount?: number;
   selectedDays?: number[];
+  minRestDays?: number;
+  timeWindowStart?: string;
+  timeWindowEnd?: string;
+  reminderTime?: string;
+  reminderChannel?: 'push' | 'email' | 'off';
 }
 
 interface FrequencySelectionScreenProps {
