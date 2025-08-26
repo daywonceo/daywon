@@ -17,6 +17,7 @@ import FrequencyStyleSelector, { type FrequencyStyle } from "./FrequencyStyleSel
 import TargetSettingsScreen, { type TargetSettings } from "./TargetSettingsScreen";
 import DayPickerScreen, { type DayPickerSettings } from "./DayPickerScreen";
 import DailyReminderScreen, { type DailyReminderSettings } from "./DailyReminderScreen";
+import ConfirmationScreen from "./ConfirmationScreen";
 
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
@@ -32,7 +33,6 @@ export default function SimpleOnboardingFlow() {
   const [currentDaySettings, setCurrentDaySettings] = useState<DayPickerSettings | null>(null);
   const [currentDailySettings, setCurrentDailySettings] = useState<DailyReminderSettings | null>(null);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const filteredHabits = selectedCategory === 'all' 
@@ -152,52 +152,111 @@ export default function SimpleOnboardingFlow() {
     setStep('confirm');
   };
 
+  const handleEditHabit = (habitName: string) => {
+    setCurrentHabitForFrequency(habitName);
+    // Determine which step to go to based on frequency type
+    const frequency = habitFrequencies[habitName];
+    if (frequency?.type === 'N_PER_PERIOD') {
+      setStep('targets');
+    } else if (frequency?.type === 'SELECTED_DAYS') {
+      setStep('days');
+    } else if (frequency?.type === 'DAILY') {
+      setStep('daily');
+    } else {
+      setStep('style');
+    }
+  };
+
+  const handleRemoveHabit = (habitName: string) => {
+    setSelectedHabits(prev => prev.filter(h => h !== habitName));
+    setHabitFrequencies(prev => {
+      const { [habitName]: removed, ...rest } = prev;
+      return rest;
+    });
+  };
+
   const completeSetup = async () => {
-    if (!user) return;
+    if (!user) throw new Error('User not authenticated');
     
-    setIsLoading(true);
+    // Use a transaction to ensure all habits are created atomically
+    const errors: string[] = [];
+    const createdHabits: string[] = [];
+
     try {
       for (const habitName of selectedHabits) {
-        const habitTemplate = HABIT_TEMPLATES.find(h => h.name === habitName);
-        const habit = await addHabit({
-          name: habitName,
-          description: habitTemplate?.description || null,
-          category: habitTemplate?.category || 'Personal',
-          status: 'active',
-          default_tracking_type: 'DAILY'
-        });
+        try {
+          const habitTemplate = HABIT_TEMPLATES.find(h => h.name === habitName);
+          const frequency = habitFrequencies[habitName] || { type: 'DAILY' };
 
-        const frequency = habitFrequencies[habitName] || { type: 'DAILY' };
-        
-        await createUserHabit({
-          habit_id: habit.id,
-          tracking_type: frequency.type,
-          period: frequency.period,
-          target_count: frequency.targetCount,
-          selected_days: frequency.selectedDays,
-        });
+          // First, create the habit (or get existing one)
+          const habit = await addHabit({
+            name: habitName,
+            description: habitTemplate?.description || null,
+            category: habitTemplate?.category || 'Personal',
+            status: 'active',
+            default_tracking_type: frequency.type
+          });
+
+          // Check if user already has this exact configuration to avoid duplicates
+          const existingUserHabit = await supabase
+            .from('user_habits')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('habit_id', habit.id)
+            .eq('tracking_type', frequency.type)
+            .eq('is_active', true)
+            .maybeSingle();
+
+          if (!existingUserHabit.data) {
+            // Create new user habit configuration
+            await createUserHabit({
+              habit_id: habit.id,
+              tracking_type: frequency.type,
+              period: frequency.period,
+              target_count: frequency.targetCount,
+              selected_days: frequency.selectedDays,
+              min_rest_days: frequency.minRestDays,
+              time_window_start: frequency.timeWindowStart,
+              time_window_end: frequency.timeWindowEnd,
+              reminder_time: frequency.reminderTime,
+              reminder_channel: frequency.reminderChannel ? [frequency.reminderChannel] : [],
+            });
+          }
+
+          createdHabits.push(habitName);
+        } catch (error) {
+          console.error(`Error creating habit ${habitName}:`, error);
+          errors.push(habitName);
+        }
       }
 
-      await supabase
-        .from('profiles')
-        .update({ onboarding_complete: true })
-        .eq('id', user.id);
+      // Update profile to mark onboarding as complete
+      if (createdHabits.length > 0) {
+        await supabase
+          .from('profiles')
+          .update({ onboarding_complete: true })
+          .eq('id', user.id);
+      }
 
-      setStep('complete');
-      
-      toast({
-        title: "Setup complete!",
-        description: "Your habits have been configured successfully.",
-      });
+      if (errors.length === 0) {
+        setStep('complete');
+        toast({
+          title: "You're set!",
+          description: `Your ${createdHabits.length} habit${createdHabits.length === 1 ? '' : 's'} ${createdHabits.length === 1 ? 'is' : 'are'} ready to track.`,
+        });
+      } else if (createdHabits.length > 0) {
+        toast({
+          title: "Partially complete",
+          description: `${createdHabits.length} habits created. ${errors.length} failed - please try again.`,
+          variant: "destructive",
+        });
+        throw new Error(`Failed to create: ${errors.join(', ')}`);
+      } else {
+        throw new Error('Failed to create any habits');
+      }
     } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to complete setup. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Setup error:', error);
+      throw error;
     }
   };
 
@@ -257,68 +316,14 @@ export default function SimpleOnboardingFlow() {
 
   if (step === 'confirm') {
     return (
-      <div className="max-w-2xl mx-auto p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Confirm Your Habits</CardTitle>
-            <p className="text-muted-foreground">
-              Review your selected habits and their frequencies before we set them up.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              {selectedHabits.map((habitName) => {
-                const frequency = habitFrequencies[habitName];
-                const habitTemplate = HABIT_TEMPLATES.find(h => h.name === habitName);
-                let frequencyText = 'Daily';
-                
-                if (frequency?.type === 'N_PER_PERIOD') {
-                  frequencyText = `${frequency.targetCount} times per ${frequency.period?.toLowerCase()}`;
-                } else if (frequency?.type === 'SELECTED_DAYS') {
-                  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                  const selectedDayNames = frequency.selectedDays?.map(d => dayNames[d]).join(', ') || '';
-                  frequencyText = `${selectedDayNames}`;
-                }
-
-                return (
-                  <div key={habitName} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{capitalizeHabitName(habitName)}</p>
-                      <p className="text-sm text-muted-foreground">{frequencyText}</p>
-                      <Badge variant="outline" className="mt-1">{habitTemplate?.category}</Badge>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleHabitToggle(habitName)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setStep('select')}
-                className="flex-1"
-              >
-                Back to Selection
-              </Button>
-              <Button 
-                onClick={completeSetup}
-                disabled={selectedHabits.length === 0 || isLoading}
-                className="flex-1"
-              >
-                {isLoading ? "Setting up..." : "Complete Setup"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <ConfirmationScreen
+        selectedHabits={selectedHabits}
+        habitFrequencies={habitFrequencies}
+        onEdit={handleEditHabit}
+        onRemove={handleRemoveHabit}
+        onConfirm={completeSetup}
+        onBack={() => setStep('select')}
+      />
     );
   }
 
