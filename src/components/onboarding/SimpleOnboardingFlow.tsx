@@ -176,18 +176,18 @@ export default function SimpleOnboardingFlow() {
               <div
                 key={habitTemplate.id}
                 onClick={() => handleHabitToggle(habitTemplate.name)}
-                className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors text-sm ${
+                className={`flex items-start justify-between p-2 rounded-md cursor-pointer transition-colors text-sm min-h-[3rem] ${
                   selectedHabits.includes(habitTemplate.name)
                     ? 'bg-primary/10 border border-primary'
                     : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent'
                 }`}
               >
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-800 dark:text-gray-200 truncate">
+                <div className="flex-1 min-w-0 pr-1">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 leading-tight break-words">
                     {capitalizeHabitName(habitTemplate.name)}
                   </p>
                 </div>
-                <div className="flex items-center ml-1">
+                <div className="flex items-start pt-0.5">
                   {selectedHabits.includes(habitTemplate.name) && (
                     <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
                   )}
