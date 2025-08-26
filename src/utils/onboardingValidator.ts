@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 // QA and validation utilities for onboarding
 export class OnboardingValidator {
   // Assert no duplicate user_habits for same habit_id + identical config
-  static async assertNoDuplicateUserHabits(userId: string, habitId: string, config: any) {
+  static async assertNoDuplicateUserHabits(userId: string, habitId: string, config: any): Promise<{ shouldCreate: boolean; existingUserHabit?: any }> {
     const { data: existingHabits, error } = await supabase
       .from('user_habits')
       .select('*')
@@ -15,26 +15,32 @@ export class OnboardingValidator {
       throw new Error(`Failed to check for duplicate habits: ${error.message}`);
     }
 
-    // Check for identical configurations
+    // Check for identical configurations with normalized comparison
+    const normalizeArray = (arr: any[]) => arr ? [...arr].sort() : [];
+    
     const duplicates = existingHabits?.filter(habit => 
       habit.tracking_type === config.tracking_type &&
       habit.period === config.period &&
       habit.target_count === config.target_count &&
-      JSON.stringify(habit.selected_days?.sort()) === JSON.stringify(config.selected_days?.sort()) &&
-      habit.min_rest_days === config.min_rest_days
+      JSON.stringify(normalizeArray(habit.selected_days)) === JSON.stringify(normalizeArray(config.selected_days)) &&
+      habit.min_rest_days === config.min_rest_days &&
+      habit.time_window_start === config.time_window_start &&
+      habit.time_window_end === config.time_window_end &&
+      habit.reminder_time === config.reminder_time &&
+      JSON.stringify(normalizeArray(habit.reminder_channel)) === JSON.stringify(normalizeArray(config.reminder_channel))
     ) || [];
 
     if (duplicates.length > 0) {
-      console.warn('🚨 QA Alert: Duplicate user habit configuration detected', {
+      console.log('✅ QA: Found existing identical user habit, reusing', {
         userId,
         habitId,
-        existingConfig: duplicates[0],
-        newConfig: config,
+        existingUserHabitId: duplicates[0].id,
+        config,
       });
-      return false; // Don't create duplicate
+      return { shouldCreate: false, existingUserHabit: duplicates[0] };
     }
 
-    return true; // Safe to create
+    return { shouldCreate: true };
   }
 
   // Assert all new records have valid IDs and timestamps

@@ -255,20 +255,26 @@ export default function SimpleOnboardingFlow() {
             reminder_channel: frequency.reminderChannel ? [frequency.reminderChannel] : [],
           };
 
-          // QA: Check for duplicates before creating
-          const shouldCreate = await OnboardingValidator.assertNoDuplicateUserHabits(
+          // QA: Check for duplicates before creating (idempotency)
+          const { shouldCreate, existingUserHabit } = await OnboardingValidator.assertNoDuplicateUserHabits(
             user.id, 
             habit.id, 
             userHabitConfig
           );
 
+          let userHabitResult;
           if (shouldCreate) {
-            const userHabit = await createUserHabit(userHabitConfig);
+            // Create new user habit with validated config
+            userHabitResult = await createUserHabit(userHabitConfig);
             
             // QA: Validate user habit record
-            OnboardingValidator.validateHabitRecord(userHabit, 'user_habit');
-            createdUserHabits.push(userHabit);
+            OnboardingValidator.validateHabitRecord(userHabitResult, 'user_habit');
+          } else {
+            // Reuse existing identical configuration
+            userHabitResult = existingUserHabit;
           }
+          
+          createdUserHabits.push(userHabitResult);
 
           createdHabits.push(habitName);
         } catch (error) {
