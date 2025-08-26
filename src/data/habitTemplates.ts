@@ -48,9 +48,9 @@ export const HABIT_TEMPLATES: HabitTemplate[] = [
   // Relational habits
   { id: 'relational-family-time', name: 'Family Time', category: 'Relational' },
   { id: 'relational-call-loved-one', name: 'Call a Loved One', category: 'Relational' },
+  { id: 'relational-practice-active-listening', name: 'Practice active listening today', category: 'Relational' },
   { id: 'relational-send-thoughtful-message', name: 'Send a thoughtful message to someone', category: 'Relational' },
-  { id: 'relational-schedule-catchup', name: 'Schedule a catch-up with a friend', category: 'Relational' },
-  { id: 'relational-practice-active-listening', name: 'Practice active listening today', category: 'Relational' }
+  { id: 'relational-schedule-catchup', name: 'Schedule a catch-up with a friend', category: 'Relational' }
 ];
 
 export const getHabitTemplatesByCategory = (category?: string): HabitTemplate[] => {
