@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { CalendarDays, Target, Calendar } from "lucide-react";
+import { analytics } from "@/utils/analytics";
 
 export type FrequencyStyle = 'DAILY' | 'N_PER_PERIOD' | 'SELECTED_DAYS';
 
@@ -31,6 +32,8 @@ export default function FrequencyStyleSelector({
 
   const handleNext = () => {
     if (selectedStyle) {
+      // Track analytics
+      analytics.trackFrequencyStyleSelected(selectedStyle, habitCategory);
       onNext(selectedStyle);
     }
   };

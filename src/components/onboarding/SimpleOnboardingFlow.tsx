@@ -18,6 +18,8 @@ import TargetSettingsScreen, { type TargetSettings } from "./TargetSettingsScree
 import DayPickerScreen, { type DayPickerSettings } from "./DayPickerScreen";
 import DailyReminderScreen, { type DailyReminderSettings } from "./DailyReminderScreen";
 import ConfirmationScreen from "./ConfirmationScreen";
+import { analytics } from "@/utils/analytics";
+import { OnboardingValidator } from "@/utils/onboardingValidator";
 
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
@@ -25,6 +27,7 @@ export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
   const { addHabit } = useHabits();
   const { createUserHabit } = useUserHabits();
+  const [onboardingStartTime] = useState(Date.now());
   const [step, setStep] = useState<'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('select');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
@@ -178,9 +181,11 @@ export default function SimpleOnboardingFlow() {
   const completeSetup = async () => {
     if (!user) throw new Error('User not authenticated');
     
-    // Use a transaction to ensure all habits are created atomically
     const errors: string[] = [];
     const createdHabits: string[] = [];
+    const createdUserHabits: any[] = [];
+    const habitCategories: string[] = [];
+    const frequencyTypes: string[] = [];
 
     try {
       for (const habitName of selectedHabits) {
@@ -188,7 +193,13 @@ export default function SimpleOnboardingFlow() {
           const habitTemplate = HABIT_TEMPLATES.find(h => h.name === habitName);
           const frequency = habitFrequencies[habitName] || { type: 'DAILY' };
 
-          // First, create the habit (or get existing one)
+          // Track analytics - collect data for batch tracking
+          if (habitTemplate?.category) {
+            habitCategories.push(habitTemplate.category);
+          }
+          frequencyTypes.push(frequency.type);
+
+          // Create the habit (or get existing one)
           const habit = await addHabit({
             name: habitName,
             description: habitTemplate?.description || null,
@@ -197,30 +208,36 @@ export default function SimpleOnboardingFlow() {
             default_tracking_type: frequency.type
           });
 
-          // Check if user already has this exact configuration to avoid duplicates
-          const existingUserHabit = await supabase
-            .from('user_habits')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('habit_id', habit.id)
-            .eq('tracking_type', frequency.type)
-            .eq('is_active', true)
-            .maybeSingle();
+          // QA: Validate habit record
+          OnboardingValidator.validateHabitRecord(habit, 'habit');
 
-          if (!existingUserHabit.data) {
-            // Create new user habit configuration
-            await createUserHabit({
-              habit_id: habit.id,
-              tracking_type: frequency.type,
-              period: frequency.period,
-              target_count: frequency.targetCount,
-              selected_days: frequency.selectedDays,
-              min_rest_days: frequency.minRestDays,
-              time_window_start: frequency.timeWindowStart,
-              time_window_end: frequency.timeWindowEnd,
-              reminder_time: frequency.reminderTime,
-              reminder_channel: frequency.reminderChannel ? [frequency.reminderChannel] : [],
-            });
+          // Build user habit config
+          const userHabitConfig = {
+            habit_id: habit.id,
+            tracking_type: frequency.type,
+            period: frequency.period,
+            target_count: frequency.targetCount,
+            selected_days: frequency.selectedDays,
+            min_rest_days: frequency.minRestDays,
+            time_window_start: frequency.timeWindowStart,
+            time_window_end: frequency.timeWindowEnd,
+            reminder_time: frequency.reminderTime,
+            reminder_channel: frequency.reminderChannel ? [frequency.reminderChannel] : [],
+          };
+
+          // QA: Check for duplicates before creating
+          const shouldCreate = await OnboardingValidator.assertNoDuplicateUserHabits(
+            user.id, 
+            habit.id, 
+            userHabitConfig
+          );
+
+          if (shouldCreate) {
+            const userHabit = await createUserHabit(userHabitConfig);
+            
+            // QA: Validate user habit record
+            OnboardingValidator.validateHabitRecord(userHabit, 'user_habit');
+            createdUserHabits.push(userHabit);
           }
 
           createdHabits.push(habitName);
@@ -236,6 +253,20 @@ export default function SimpleOnboardingFlow() {
           .from('profiles')
           .update({ onboarding_complete: true })
           .eq('id', user.id);
+
+        // Track analytics for successful completion
+        const totalTimeSeconds = Math.round((Date.now() - onboardingStartTime) / 1000);
+        
+        analytics.trackHabitsCreated(
+          createdHabits.length,
+          [...new Set(habitCategories)], // Unique categories
+          [...new Set(frequencyTypes)] // Unique frequency types
+        );
+        
+        analytics.trackOnboardingComplete(createdHabits.length, totalTimeSeconds);
+
+        // QA: Log summary
+        OnboardingValidator.logOnboardingQASummary(createdHabits, createdUserHabits);
       }
 
       if (errors.length === 0) {

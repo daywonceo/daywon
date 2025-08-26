@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ChevronDown, Minus, Plus, Clock, Calendar } from "lucide-react";
+import { analytics } from "@/utils/analytics";
 
 export interface TargetSettings {
   period: 'WEEK' | 'MONTH';
@@ -61,6 +62,19 @@ export default function TargetSettingsScreen({
       ...(timeWindowStart && timeWindowEnd && { timeWindowStart, timeWindowEnd }),
       ...(reminderTime && reminderChannel !== 'off' && { reminderTime }),
     };
+
+    // Track analytics
+    analytics.trackTargetConfigured(
+      period,
+      targetCount,
+      minRestDays > 0,
+      !!(timeWindowStart && timeWindowEnd)
+    );
+    
+    if (reminderChannel !== 'off') {
+      analytics.trackReminderSet(reminderChannel, !!reminderTime);
+    }
+
     onNext(settings);
   };
 

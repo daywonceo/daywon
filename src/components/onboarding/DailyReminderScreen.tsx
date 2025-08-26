@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Clock, Bell } from "lucide-react";
+import { analytics } from "@/utils/analytics";
 
 export interface DailyReminderSettings {
   timeWindowStart?: string;
@@ -38,6 +39,12 @@ export default function DailyReminderScreen({
       ...(timeWindowStart && timeWindowEnd && { timeWindowStart, timeWindowEnd }),
       ...(reminderTime && reminderChannel !== 'off' && { reminderTime }),
     };
+
+    // Track analytics
+    if (reminderChannel !== 'off') {
+      analytics.trackReminderSet(reminderChannel, !!reminderTime);
+    }
+
     onNext(settings);
   };
 

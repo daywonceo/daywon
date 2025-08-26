@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { analytics } from "@/utils/analytics";
 
 export interface DayPickerSettings {
   selectedDays: number[];
@@ -60,6 +61,12 @@ export default function DayPickerScreen({
       ...(timeWindowStart && timeWindowEnd && { timeWindowStart, timeWindowEnd }),
       ...(reminderTime && reminderChannel !== 'off' && { reminderTime }),
     };
+
+    // Track analytics
+    if (reminderChannel !== 'off') {
+      analytics.trackReminderSet(reminderChannel, !!reminderTime);
+    }
+
     onNext(settings);
   };
 
