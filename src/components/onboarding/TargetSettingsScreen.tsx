@@ -95,9 +95,9 @@ export default function TargetSettingsScreen({
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center mb-2">Set your target</h2>
+        <h2 className="text-2xl font-bold text-center mb-2">Aim for a count</h2>
         <p className="text-muted-foreground text-center">
-          How often do you want to do <span className="font-medium">"{habitName}"</span>?
+          Hit it your way.
         </p>
       </div>
 

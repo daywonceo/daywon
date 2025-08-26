@@ -96,9 +96,9 @@ export default function DayPickerScreen({
   return (
     <div className="max-w-2xl mx-auto p-4 pb-24">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center mb-2">Choose your days</h2>
+        <h2 className="text-2xl font-bold text-center mb-2">Lock in the rhythm that works</h2>
         <p className="text-muted-foreground text-center">
-          Which days do you want to do <span className="font-medium">"{habitName}"</span>?
+          Choose your days.
         </p>
       </div>
 

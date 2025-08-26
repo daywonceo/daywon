@@ -363,11 +363,11 @@ export default function SimpleOnboardingFlow() {
       <div className="max-w-md mx-auto p-6 text-center">
         <Card>
           <CardHeader>
-            <CardTitle>🎉 You're all set!</CardTitle>
+            <CardTitle>You're all set</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              Your habits have been configured with flexible frequencies. Start tracking your progress!
+              Your habits are ready. Time to make progress.
             </p>
             <Button onClick={() => window.location.reload()}>
               Continue to App
@@ -382,9 +382,9 @@ export default function SimpleOnboardingFlow() {
     <div className="max-w-4xl mx-auto p-4 pb-20"> {/* Added bottom padding for sticky button */}
       <Card>
         <CardHeader>
-          <CardTitle>Choose Your Habits</CardTitle>
+          <CardTitle>Choose your habits</CardTitle>
           <p className="text-muted-foreground">
-            Tap a habit to select it and configure its frequency. You can always modify these later.
+            Tap a habit to set it up. Start with what matters most.
           </p>
         </CardHeader>
         <CardContent className="space-y-6">

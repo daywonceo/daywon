@@ -45,7 +45,7 @@ export default function ConfirmationScreen({
         break;
       case 'SELECTED_DAYS':
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const selectedDayNames = frequency.selectedDays?.map(d => dayNames[d]).join('/') || '';
+        const selectedDayNames = frequency.selectedDays?.map(d => dayNames[d]).join(' • ') || '';
         summary = selectedDayNames;
         break;
     }
@@ -97,9 +97,9 @@ export default function ConfirmationScreen({
   return (
     <div className="max-w-2xl mx-auto p-4 pb-24">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center mb-2">Review your habits</h2>
+        <h2 className="text-2xl font-bold text-center mb-2">Ready to start</h2>
         <p className="text-muted-foreground text-center">
-          Your {selectedHabits.length} habit{selectedHabits.length === 1 ? '' : 's'} are ready to go. Review and confirm to get started.
+          Your plan is set. Track your progress from day one.
         </p>
       </div>
 
@@ -155,7 +155,7 @@ export default function ConfirmationScreen({
         <Card>
           <CardContent className="p-8 text-center">
             <p className="text-muted-foreground">
-              No habits selected. Go back to choose some habits to get started.
+              Go back to choose some habits.
             </p>
           </CardContent>
         </Card>

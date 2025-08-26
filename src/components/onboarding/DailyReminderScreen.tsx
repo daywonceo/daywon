@@ -80,9 +80,9 @@ export default function DailyReminderScreen({
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center mb-2">Daily habit setup</h2>
+        <h2 className="text-2xl font-bold text-center mb-2">Show up daily</h2>
         <p className="text-muted-foreground text-center">
-          You'll do <span className="font-medium">"{habitName}"</span> every day. Let's set up optional reminders.
+          We can remind you when it helps.
         </p>
       </div>
 

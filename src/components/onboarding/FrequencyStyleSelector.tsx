@@ -62,9 +62,9 @@ export default function FrequencyStyleSelector({
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center mb-2">Choose frequency style</h2>
+        <h2 className="text-2xl font-bold text-center mb-2">Pick the pace that fits your life</h2>
         <p className="text-muted-foreground text-center">
-          How would you like to track <span className="font-medium">"{habitName}"</span>?
+          You can change this anytime.
         </p>
       </div>
 
