@@ -16,6 +16,7 @@ import FrequencySelectionScreen, { type HabitFrequency } from "./FrequencySelect
 import FrequencyStyleSelector, { type FrequencyStyle } from "./FrequencyStyleSelector";
 import TargetSettingsScreen, { type TargetSettings } from "./TargetSettingsScreen";
 import DayPickerScreen, { type DayPickerSettings } from "./DayPickerScreen";
+import DailyReminderScreen, { type DailyReminderSettings } from "./DailyReminderScreen";
 
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
@@ -23,12 +24,13 @@ export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
   const { addHabit } = useHabits();
   const { createUserHabit } = useUserHabits();
-  const [step, setStep] = useState<'select' | 'style' | 'targets' | 'days' | 'frequency' | 'confirm' | 'complete'>('select');
+  const [step, setStep] = useState<'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('select');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
   const [currentHabitStyle, setCurrentHabitStyle] = useState<FrequencyStyle | null>(null);
   const [currentTargetSettings, setCurrentTargetSettings] = useState<TargetSettings | null>(null);
   const [currentDaySettings, setCurrentDaySettings] = useState<DayPickerSettings | null>(null);
+  const [currentDailySettings, setCurrentDailySettings] = useState<DailyReminderSettings | null>(null);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -71,6 +73,8 @@ export default function SimpleOnboardingFlow() {
       setStep('targets');
     } else if (style === 'SELECTED_DAYS') {
       setStep('days');
+    } else if (style === 'DAILY') {
+      setStep('daily');
     } else {
       setStep('frequency');
     }
@@ -113,6 +117,24 @@ export default function SimpleOnboardingFlow() {
 
   const handleDaysBack = () => {
     setCurrentDaySettings(null);
+    setStep('style');
+  };
+
+  const handleDailyNext = (settings: DailyReminderSettings) => {
+    setCurrentDailySettings(settings);
+    // Convert daily settings to HabitFrequency format
+    const frequency: HabitFrequency = {
+      type: 'DAILY',
+      timeWindowStart: settings.timeWindowStart,
+      timeWindowEnd: settings.timeWindowEnd,
+      reminderTime: settings.reminderTime,
+      reminderChannel: settings.reminderChannel,
+    };
+    handleFrequencyNext(frequency);
+  };
+
+  const handleDailyBack = () => {
+    setCurrentDailySettings(null);
     setStep('style');
   };
 
@@ -209,6 +231,16 @@ export default function SimpleOnboardingFlow() {
         habitName={currentHabitForFrequency}
         onNext={handleDaysNext}
         onBack={handleDaysBack}
+      />
+    );
+  }
+
+  if (step === 'daily') {
+    return (
+      <DailyReminderScreen
+        habitName={currentHabitForFrequency}
+        onNext={handleDailyNext}
+        onBack={handleDailyBack}
       />
     );
   }
