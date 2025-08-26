@@ -22,7 +22,7 @@ import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
 import { useState, useEffect } from "react";
-import OnboardingFlow, { OnboardingData } from "./components/onboarding/OnboardingFlow";
+import SimpleOnboardingFlow from "./components/onboarding/SimpleOnboardingFlow";
 import { useAuth } from "./contexts/AuthContext";
 import { useAppTimeTracking } from "./hooks/useAppTimeTracking";
 import { useAppSessions } from "./hooks/useAppSessions";
@@ -104,12 +104,11 @@ const AppContent: React.FC = () => {
     }
   }, [user, loading]);
 
-  const handleOnboardingComplete = (data: OnboardingData) => {
-    console.log('Onboarding completed with data:', data);
+  const handleOnboardingComplete = () => {
+    console.log('Onboarding completed');
     
     // Save onboarding data to localStorage
     localStorage.setItem('onboardingCompleted', 'true');
-    localStorage.setItem('onboardingData', JSON.stringify(data));
     
     // Hide onboarding and show main app
     setShowOnboarding(false);
@@ -136,7 +135,7 @@ const AppContent: React.FC = () => {
 
   // Show onboarding only if explicitly requested
   if (showOnboarding) {
-    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+    return <SimpleOnboardingFlow />;
   }
 
   return (

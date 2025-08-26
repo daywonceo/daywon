@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -419,6 +419,41 @@ export type Database = {
         }
         Relationships: []
       }
+      habit_events: {
+        Row: {
+          created_at: string
+          id: string
+          occurred_at: string
+          source: string | null
+          user_habit_id: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          occurred_at?: string
+          source?: string | null
+          user_habit_id: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          occurred_at?: string
+          source?: string | null
+          user_habit_id?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "habit_events_user_habit_id_fkey"
+            columns: ["user_habit_id"]
+            isOneToOne: false
+            referencedRelation: "user_habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       habit_photos: {
         Row: {
           activity_date: string
@@ -462,6 +497,7 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          default_tracking_type: string | null
           description: string | null
           id: string
           name: string
@@ -471,6 +507,7 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string
+          default_tracking_type?: string | null
           description?: string | null
           id?: string
           name: string
@@ -480,6 +517,7 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
+          default_tracking_type?: string | null
           description?: string | null
           id?: string
           name?: string
@@ -951,6 +989,71 @@ export type Database = {
         }
         Relationships: []
       }
+      user_habits: {
+        Row: {
+          created_at: string
+          habit_id: string
+          id: string
+          is_active: boolean
+          min_rest_days: number | null
+          period: string | null
+          reminder_channel: string[] | null
+          reminder_time: string | null
+          selected_days: number[] | null
+          start_date: string
+          target_count: number | null
+          time_window_end: string | null
+          time_window_start: string | null
+          tracking_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          habit_id: string
+          id?: string
+          is_active?: boolean
+          min_rest_days?: number | null
+          period?: string | null
+          reminder_channel?: string[] | null
+          reminder_time?: string | null
+          selected_days?: number[] | null
+          start_date?: string
+          target_count?: number | null
+          time_window_end?: string | null
+          time_window_start?: string | null
+          tracking_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          habit_id?: string
+          id?: string
+          is_active?: boolean
+          min_rest_days?: number | null
+          period?: string | null
+          reminder_channel?: string[] | null
+          reminder_time?: string | null
+          selected_days?: number[] | null
+          start_date?: string
+          target_count?: number | null
+          time_window_end?: string | null
+          time_window_start?: string | null
+          tracking_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_habits_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_progress: {
         Row: {
           created_at: string
@@ -1210,86 +1313,100 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_habit_streak: {
+        Args: { p_as_of_date?: string; p_user_habit_id: string }
+        Returns: number
+      }
       discover_potential_friends: {
         Args: { search_query?: string }
         Returns: {
-          id: string
-          display_name: string
           avatar_url: string
+          display_name: string
+          id: string
         }[]
       }
       find_or_create_habit: {
         Args: {
-          p_user_id: string
-          p_name: string
-          p_description?: string
           p_category?: string
+          p_description?: string
+          p_name: string
+          p_user_id: string
         }
         Returns: string
       }
       get_anonymized_leaderboard: {
         Args: { score_period_param?: string }
         Returns: {
-          rank_position: number
-          total_score: number
           consistency_rate: number
+          rank_position: number
           score_period: string
+          total_score: number
         }[]
       }
       get_connected_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
-          display_name: string
           avatar_url: string
           bio: string
-          status: string
-          last_active: string
           created_at: string
+          display_name: string
+          id: string
+          last_active: string
+          status: string
         }[]
       }
       get_public_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
-          display_name: string
           avatar_url: string
           bio: string
-          status: string
-          last_active: string
           created_at: string
+          display_name: string
+          id: string
+          last_active: string
+          status: string
+        }[]
+      }
+      get_weekly_habit_summary: {
+        Args: { p_user_id: string; p_week_start?: string }
+        Returns: {
+          completed_count: number
+          completion_rate: number
+          habit_name: string
+          target_count: number
+          target_description: string
         }[]
       }
       merge_duplicate_habits: {
         Args: {
-          p_user_id: string
           p_keep_habit_id: string
           p_merge_habit_ids: string[]
+          p_user_id: string
         }
         Returns: undefined
       }
       search_connected_profiles: {
         Args: { search_query: string }
         Returns: {
-          id: string
-          display_name: string
           avatar_url: string
           bio: string
-          status: string
-          last_active: string
           created_at: string
+          display_name: string
+          id: string
+          last_active: string
+          status: string
         }[]
       }
       search_public_profiles: {
         Args: { search_query: string }
         Returns: {
-          id: string
-          display_name: string
           avatar_url: string
           bio: string
-          status: string
-          last_active: string
           created_at: string
+          display_name: string
+          id: string
+          last_active: string
+          status: string
         }[]
       }
     }

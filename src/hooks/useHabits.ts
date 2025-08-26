@@ -7,7 +7,9 @@ import { getHabitActivities, isHabitRecentlyActiveSync, loadHabitActivitiesFromD
 import { findDuplicateHabit } from "@/utils/habitDeduplication";
 
 export type Habit = Tables<'habits'>;
-export type NewHabit = Omit<Habit, 'id' | 'created_at' | 'user_id'>;
+export type NewHabit = Omit<Habit, 'id' | 'created_at' | 'user_id'> & {
+  default_tracking_type?: string;
+};
 
 async function fetchHabits(userId: string) {
   const { data, error } = await supabase

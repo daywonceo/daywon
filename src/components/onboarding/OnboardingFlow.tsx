@@ -1,187 +1,276 @@
+import { useAuth } from "@/contexts/AuthContext";
+import { useHabits } from "@/hooks/useHabits";
+import { useUserHabits } from "@/hooks/useUserHabits";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import SignUpScreen from "./SignUpScreen";
 import WelcomeScreen from "./WelcomeScreen";
-import MissionCanvasScreen from "./MissionCanvasScreen";
-import CadenceSelectionScreen from "./CadenceSelectionScreen";
-import PickFocusScreen from "./PickFocusScreen";
-import HabitSuggestionScreen from "./HabitSuggestionScreen";
-import NotificationScreen from "./NotificationScreen";
+import SignUpScreen from "./SignUpScreen";
 import IntentScreen from "./IntentScreen";
+import PickFocusScreen from "./PickFocusScreen";
+import ChooseHabitsScreen from "./ChooseHabitsScreen";
+import CadenceSelectionScreen from "./CadenceSelectionScreen";
+import HabitSuggestionScreen from "./HabitSuggestionScreen";
+import FrequencySelectionScreen, { type HabitFrequency } from "./FrequencySelectionScreen";
+import NotificationScreen from "./NotificationScreen";
+import MissionScreen from "./MissionScreen";
+import MissionCanvasScreen from "./MissionCanvasScreen";
+import CanvasGrowthScreen from "./CanvasGrowthScreen";
 import FinalScreen from "./FinalScreen";
 
-export interface OnboardingData {
-  focusAreas: string[];
-  notifications: {
-    enabled: boolean;
-    reminderTime: string;
-  };
-  intent: string;
-  cadence: string;
-}
-
-interface OnboardingFlowProps {
-  onComplete: (data: OnboardingData) => void;
-}
-
-const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
-  const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-    focusAreas: [],
-    notifications: { enabled: false, reminderTime: "09:00" },
-    intent: "",
-    cadence: ""
+export default function OnboardingFlow() {
+  const { user } = useAuth();
+  const { addHabit } = useHabits();
+  const { createUserHabit } = useUserHabits();
+  const [currentStep, setCurrentStep] = useState(() => {
+    return localStorage.getItem('onboarding_step') || 'welcome';
   });
+  
+  const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
+  const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
+  const [currentHabitIndex, setCurrentHabitIndex] = useState(0);
+  const [cadence, setCadence] = useState<string>("");
+  const [userIntent, setUserIntent] = useState<string>("");
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
+  const [reminderTime, setReminderTime] = useState<string>("09:00");
+  const [reminderOptIn, setReminderOptIn] = useState<boolean>(false);
+  const [mission, setMission] = useState<string>("");
 
-  const totalSteps = 9;
+  useEffect(() => {
+    localStorage.setItem('onboarding_step', currentStep);
+  }, [currentStep]);
 
-  const updateData = (key: keyof OnboardingData, value: any) => {
-    setOnboardingData(prev => ({ ...prev, [key]: value }));
-  };
-
-  const nextStep = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const skipToEnd = () => {
-    onComplete(onboardingData);
-  };
-
-  const handleComplete = () => {
-    onComplete(onboardingData);
-  };
-
-  const handleExitOnboarding = () => {
-    // Navigate to the home page
-    navigate('/');
-  };
-
-  const renderCurrentScreen = () => {
+  const handleNext = () => {
     switch (currentStep) {
-      case 0:
-        return <SignUpScreen onNext={nextStep} onSkip={skipToEnd} />;
-      case 1:
-        return <WelcomeScreen onNext={nextStep} onSkip={skipToEnd} />;
-      case 2:
-        return (
-          <MissionCanvasScreen
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 3:
-        return (
-          <CadenceSelectionScreen
-            selectedCadence={onboardingData.cadence}
-            onCadenceChange={(cadence) => updateData('cadence', cadence)}
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 4:
-        return (
-          <PickFocusScreen
-            selectedAreas={onboardingData.focusAreas}
-            onSelectionChange={(areas) => updateData('focusAreas', areas)}
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 5:
-        return (
-          <HabitSuggestionScreen
-            selectedCadence={onboardingData.cadence}
-            selectedFocusAreas={onboardingData.focusAreas}
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 6:
-        return (
-          <NotificationScreen
-            preferences={onboardingData.notifications}
-            onPreferencesChange={(prefs) => updateData('notifications', prefs)}
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 7:
-        return (
-          <IntentScreen
-            intent={onboardingData.intent}
-            onIntentChange={(intent) => updateData('intent', intent)}
-            onNext={nextStep}
-            onBack={prevStep}
-            onSkip={skipToEnd}
-          />
-        );
-      case 8:
-        return (
-          <FinalScreen
-            onComplete={handleComplete}
-            onBack={prevStep}
-            data={onboardingData}
-          />
-        );
+      case "welcome":
+        setCurrentStep("signup");
+        break;
       default:
-        return null;
+        break;
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-200 dark:bg-gray-700 h-1">
-        <div 
-          className="h-1 bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300 ease-out"
-          style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-        />
-      </div>
+  const handleBack = () => {
+    switch (currentStep) {
+      case "signup":
+        setCurrentStep("welcome");
+        break;
+      case "intent":
+        setCurrentStep("signup");
+        break;
+      case "focus":
+        setCurrentStep("intent");
+        break;
+      case "choose-habits":
+        setCurrentStep("focus");
+        break;
+      case "frequency":
+        if (currentHabitIndex > 0) {
+          setCurrentHabitIndex(currentHabitIndex - 1);
+        } else {
+          setCurrentStep("choose-habits");
+        }
+        break;
+      case "cadence":
+        setCurrentStep("frequency");
+        break;
+      case "habit-suggestion":
+        setCurrentStep("cadence");
+        break;
+      case "notification":
+        setCurrentStep("habit-suggestion");
+        break;
+      case "mission":
+        setCurrentStep("notification");
+        break;
+      case "mission-canvas":
+        setCurrentStep("mission");
+        break;
+      case "canvas-growth":
+        setCurrentStep("mission-canvas");
+        break;
+      default:
+        break;
+    }
+  };
 
-      {/* Header with Step Indicator and Exit Button */}
-      <div className="flex justify-between items-center pt-4 pb-2 px-4">
-        <div className="flex-1" />
-        <Badge variant="outline" className="text-sm">
-          Step {currentStep + 1} of {totalSteps}
-        </Badge>
-        <div className="flex-1 flex justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleExitOnboarding}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            <X className="w-4 h-4 mr-1" />
-            Exit
-          </Button>
-        </div>
-      </div>
+  const handleIntent = (intent: string) => {
+    setUserIntent(intent);
+    setCurrentStep("focus");
+  };
 
-      {/* Main Content */}
-      <div className="flex-grow flex items-center justify-center p-4">
-        {renderCurrentScreen()}
-      </div>
-    </div>
-  );
-};
+  const handleFocus = (focus: string[]) => {
+    setFocusAreas(focus);
+    setCurrentStep("choose-habits");
+  };
 
-export default OnboardingFlow;
+  const handleChooseHabits = (habits: string[]) => {
+    setSelectedHabits(habits);
+    setCurrentHabitIndex(0);
+    setCurrentStep("frequency");
+  };
+
+  const handleFrequencySelection = (frequency: HabitFrequency) => {
+    const currentHabit = selectedHabits[currentHabitIndex];
+    setHabitFrequencies(prev => ({
+      ...prev,
+      [currentHabit]: frequency
+    }));
+
+    if (currentHabitIndex < selectedHabits.length - 1) {
+      setCurrentHabitIndex(currentHabitIndex + 1);
+    } else {
+      setCurrentStep("cadence");
+    }
+  };
+
+  const handleFrequencyBack = () => {
+    if (currentHabitIndex > 0) {
+      setCurrentHabitIndex(currentHabitIndex - 1);
+    } else {
+      setCurrentStep("choose-habits");
+    }
+  };
+
+  const handleCadence = (selectedCadence: string) => {
+    setCadence(selectedCadence);
+    setCurrentStep("habit-suggestion");
+  };
+
+  const handleHabitSuggestion = () => {
+    setCurrentStep("notification");
+  };
+
+  const handleNotification = (optIn: boolean, time: string) => {
+    setReminderOptIn(optIn);
+    setReminderTime(time);
+    setCurrentStep("mission");
+  };
+
+  const handleMission = (missionText: string) => {
+    setMission(missionText);
+    setCurrentStep("mission-canvas");
+  };
+
+  const handleMissionCanvas = () => {
+    setCurrentStep("canvas-growth");
+  };
+
+  const handleCanvasGrowth = async () => {
+    await completeOnboarding();
+  };
+
+  const getHabitCategory = (habitName: string): string => {
+    const categoryMap: Record<string, string> = {
+      'Workout': 'Health & Fitness',
+      'Devotions': 'Spiritual',
+      'Read': 'Personal Development',
+      'Sleep 8 Hours': 'Health & Fitness',
+      'Drink Water': 'Health & Fitness',
+      'Meditate': 'Mindfulness'
+    };
+    return categoryMap[habitName] || 'Personal';
+  };
+
+  const completeOnboarding = async () => {
+    if (!user) return;
+
+    try {
+      console.log('Creating habits with frequencies:', habitFrequencies);
+      console.log('Selected habits:', selectedHabits);
+      
+      for (const habitName of selectedHabits) {
+        // Create the base habit first
+        const habit = await addHabit({
+          name: habitName,
+          description: null,
+          category: getHabitCategory(habitName),
+          status: 'active',
+          default_tracking_type: 'DAILY'
+        });
+
+        // Get the frequency configuration for this habit
+        const frequency = habitFrequencies[habitName] || { type: 'DAILY' };
+
+        // Create the user-specific habit configuration
+        await createUserHabit({
+          habit_id: habit.id,
+          tracking_type: frequency.type,
+          period: frequency.period,
+          target_count: frequency.targetCount,
+          selected_days: frequency.selectedDays,
+          reminder_time: reminderTime,
+          reminder_channel: reminderOptIn ? ['push'] : [],
+        });
+      }
+
+      await supabase
+        .from('profiles')
+        .update({ 
+          onboarding_complete: true,
+          reminder_opt_in: reminderOptIn,
+          reminder_time: reminderTime,
+          user_intent: userIntent,
+          focus_areas: focusAreas
+        })
+        .eq('id', user?.id);
+
+      localStorage.setItem('onboarding_complete', 'true');
+      localStorage.setItem('selectedHabits', JSON.stringify(selectedHabits));
+      setCurrentStep("final");
+      
+      toast({
+        title: "Welcome to DayWon!",
+        description: "Your habits have been set up successfully.",
+      });
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete onboarding. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (!user) {
+    switch (currentStep) {
+      case "welcome":
+        return <WelcomeScreen onNext={handleNext} />;
+      case "signup":
+        return <SignUpScreen onNext={handleNext} onBack={handleBack} />;
+      case "intent":
+        return <IntentScreen onNext={handleIntent} onBack={handleBack} />;
+      case "focus":
+        return <PickFocusScreen onNext={handleFocus} onBack={handleBack} />;
+      case "choose-habits":
+        return <ChooseHabitsScreen onNext={handleChooseHabits} onBack={handleBack} focusAreas={focusAreas} />;
+      case "frequency":
+        return (
+          <FrequencySelectionScreen 
+            habitName={selectedHabits[currentHabitIndex]}
+            onNext={handleFrequencySelection}
+            onBack={handleFrequencyBack}
+          />
+        );
+      case "cadence":
+        return <CadenceSelectionScreen onNext={handleCadence} onBack={() => setCurrentStep("frequency")} />;
+      case "habit-suggestion":
+        return <HabitSuggestionScreen onNext={handleHabitSuggestion} onBack={handleBack} />;
+      case "notification":
+        return <NotificationScreen onNext={handleNotification} onBack={handleBack} />;
+      case "mission":
+        return <MissionScreen onNext={handleMission} onBack={handleBack} />;
+      case "mission-canvas":
+        return <MissionCanvasScreen onNext={handleMissionCanvas} onBack={handleBack} />;
+      case "canvas-growth":
+        return <CanvasGrowthScreen onNext={handleCanvasGrowth} onBack={handleBack} />;
+      case "final":
+        return <FinalScreen />;
+      default:
+        return <WelcomeScreen onNext={handleNext} />;
+    }
+  }
+
+  return null;
+}

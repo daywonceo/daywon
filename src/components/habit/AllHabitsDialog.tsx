@@ -109,7 +109,8 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
         name: habitName,
         status: "active",
         category: getHabitCategory(habitName),
-        description: null
+        description: null,
+        default_tracking_type: "DAILY"
       });
       toast({ title: `${capitalizeHabitName(habitName)} added!` });
     } catch (error) {

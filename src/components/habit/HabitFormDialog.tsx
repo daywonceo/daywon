@@ -70,6 +70,7 @@ const HabitFormDialog: React.FC<HabitFormDialogProps> = ({ open, onOpenChange, h
           description,
           category,
           status: "active",
+          default_tracking_type: "DAILY"
         });
         toast({ title: "Habit added!" });
       }

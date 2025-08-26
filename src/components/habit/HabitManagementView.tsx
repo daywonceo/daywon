@@ -309,7 +309,8 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         name: habitName,
         status: "active",
         category: getHabitCategory(habitName),
-        description: null
+        description: null,
+        default_tracking_type: "DAILY"
       });
       toast({ title: `${capitalizeHabitName(habitName)} added!` });
       await handleRefresh();
