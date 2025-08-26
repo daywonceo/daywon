@@ -4,11 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Sparkles, Target, Bell, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { OnboardingData } from "./OnboardingFlow";
+// Remove unused import
 import { supabase } from "@/integrations/supabase/client";
 import { getHabitSuggestion, getDefaultHabitSuggestion } from "@/data/habitSuggestions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+
+interface OnboardingData {
+  focusAreas: string[];
+  cadence: string;
+}
 
 interface FinalScreenProps {
   onComplete: () => void;
