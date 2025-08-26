@@ -170,8 +170,8 @@ export default function SimpleOnboardingFlow() {
               </Button>
             ))}
           </div>
-          {/* Habits Grid - Matching HabitItem layout */}
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          {/* Habits Grid - Two columns layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
             {filteredHabits.map((habitTemplate) => (
               <div
                 key={habitTemplate.id}
@@ -182,11 +182,10 @@ export default function SimpleOnboardingFlow() {
                     : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-transparent'
                 }`}
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 flex-1">
                   <p className="font-semibold text-gray-800 dark:text-gray-200">
                     {capitalizeHabitName(habitTemplate.name)}
                   </p>
-                  <Badge variant="secondary">{habitTemplate.category}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
                   {selectedHabits.includes(habitTemplate.name) && (
