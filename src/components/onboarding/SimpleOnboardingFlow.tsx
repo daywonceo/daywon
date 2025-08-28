@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -213,7 +214,7 @@ export default function SimpleOnboardingFlow() {
     
     const errors: string[] = [];
     const createdHabits: string[] = [];
-    const createdUserHabits: any[] = [];
+    const processedUserHabits: any[] = [];
     const habitCategories: string[] = [];
     const frequencyTypes: string[] = [];
 
@@ -272,13 +273,13 @@ export default function SimpleOnboardingFlow() {
           } else {
             // Reuse existing identical configuration
             userHabitResult = existingUserHabit;
+            console.log(`✅ Reusing existing user habit for ${habitName}`);
           }
           
-          createdUserHabits.push(userHabitResult);
-
+          processedUserHabits.push(userHabitResult);
           createdHabits.push(habitName);
         } catch (error) {
-          console.error(`Error creating habit ${habitName}:`, error);
+          console.error(`Error processing habit ${habitName}:`, error);
           errors.push(habitName);
         }
       }
@@ -302,7 +303,7 @@ export default function SimpleOnboardingFlow() {
         analytics.trackOnboardingComplete(createdHabits.length, totalTimeSeconds);
 
         // QA: Log summary
-        OnboardingValidator.logOnboardingQASummary(createdHabits, createdUserHabits);
+        OnboardingValidator.logOnboardingQASummary(createdHabits, processedUserHabits);
       }
 
       if (errors.length === 0) {
