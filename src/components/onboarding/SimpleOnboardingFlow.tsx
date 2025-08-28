@@ -510,8 +510,8 @@ export default function SimpleOnboardingFlow() {
         </CardContent>
       </Card>
 
-      {/* Sticky Continue Button */}
-      {selectedHabits.length > 0 && (
+      {/* Sticky Continue Button - Only show when all habits have frequency configs */}
+      {selectedHabits.length > 0 && selectedHabits.every(habit => habitFrequencies[habit]) && (
         <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background/95 backdrop-blur border-t">
           <div className="max-w-4xl mx-auto">
             <Button 
