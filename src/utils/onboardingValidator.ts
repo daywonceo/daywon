@@ -2,8 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 // QA and validation utilities for onboarding
 export class OnboardingValidator {
-  // Assert no duplicate user_habits for same habit_id + identical config
-  static async assertNoDuplicateUserHabits(userId: string, habitId: string, config: any): Promise<{ shouldCreate: boolean; existingUserHabit?: any }> {
+  // Assert no duplicate user_habits for same habit_id
+  static async assertNoDuplicateUserHabits(userId: string, habitId: string, config: any): Promise<{ shouldCreate: boolean; existingUserHabit?: any; shouldUpdate?: boolean }> {
     const { data: existingHabits, error } = await supabase
       .from('user_habits')
       .select('*')
@@ -15,29 +15,47 @@ export class OnboardingValidator {
       throw new Error(`Failed to check for duplicate habits: ${error.message}`);
     }
 
-    // Check for identical configurations with normalized comparison
-    const normalizeArray = (arr: any[]) => arr ? [...arr].sort() : [];
-    
-    const duplicates = existingHabits?.filter(habit => 
-      habit.tracking_type === config.tracking_type &&
-      habit.period === config.period &&
-      habit.target_count === config.target_count &&
-      JSON.stringify(normalizeArray(habit.selected_days)) === JSON.stringify(normalizeArray(config.selected_days)) &&
-      habit.min_rest_days === config.min_rest_days &&
-      habit.time_window_start === config.time_window_start &&
-      habit.time_window_end === config.time_window_end &&
-      habit.reminder_time === config.reminder_time &&
-      JSON.stringify(normalizeArray(habit.reminder_channel)) === JSON.stringify(normalizeArray(config.reminder_channel))
-    ) || [];
+    // If ANY user_habit exists for this user_id + habit_id, we cannot create another due to unique constraint
+    if (existingHabits && existingHabits.length > 0) {
+      const existingHabit = existingHabits[0];
+      
+      // Check if the existing habit has identical configuration
+      const normalizeArray = (arr: any[]) => arr ? [...arr].sort() : [];
+      
+      const isIdenticalConfig = 
+        existingHabit.tracking_type === config.tracking_type &&
+        existingHabit.period === config.period &&
+        existingHabit.target_count === config.target_count &&
+        JSON.stringify(normalizeArray(existingHabit.selected_days)) === JSON.stringify(normalizeArray(config.selected_days)) &&
+        existingHabit.min_rest_days === config.min_rest_days &&
+        existingHabit.time_window_start === config.time_window_start &&
+        existingHabit.time_window_end === config.time_window_end &&
+        existingHabit.reminder_time === config.reminder_time &&
+        JSON.stringify(normalizeArray(existingHabit.reminder_channel)) === JSON.stringify(normalizeArray(config.reminder_channel));
 
-    if (duplicates.length > 0) {
-      console.log('✅ QA: Found existing identical user habit, reusing', {
-        userId,
-        habitId,
-        existingUserHabitId: duplicates[0].id,
-        config,
-      });
-      return { shouldCreate: false, existingUserHabit: duplicates[0] };
+      if (isIdenticalConfig) {
+        console.log('✅ QA: Found existing identical user habit, reusing', {
+          userId,
+          habitId,
+          existingUserHabitId: existingHabit.id,
+          config,
+        });
+        return { shouldCreate: false, existingUserHabit: existingHabit };
+      } else {
+        console.log('⚠️ QA: Found existing user habit with different config, updating', {
+          userId,
+          habitId,
+          existingUserHabitId: existingHabit.id,
+          existingConfig: {
+            tracking_type: existingHabit.tracking_type,
+            period: existingHabit.period,
+            target_count: existingHabit.target_count,
+            selected_days: existingHabit.selected_days,
+          },
+          newConfig: config,
+        });
+        return { shouldCreate: false, existingUserHabit: existingHabit, shouldUpdate: true };
+      }
     }
 
     return { shouldCreate: true };

@@ -28,7 +28,7 @@ const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relation
 export default function SimpleOnboardingFlow() {
   const { user } = useAuth();
   const { addHabit } = useHabits();
-  const { createUserHabit } = useUserHabits();
+  const { createUserHabit, updateUserHabit } = useUserHabits();
   const { saveDraft, loadDraft, clearDraft } = useOnboardingPersistence();
   const [onboardingStartTime] = useState(Date.now());
   const [step, setStep] = useState<'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('select');
@@ -257,22 +257,29 @@ export default function SimpleOnboardingFlow() {
           };
 
           // QA: Check for duplicates before creating (idempotency)
-          const { shouldCreate, existingUserHabit } = await OnboardingValidator.assertNoDuplicateUserHabits(
+          const validationResult = await OnboardingValidator.assertNoDuplicateUserHabits(
             user.id, 
             habit.id, 
             userHabitConfig
           );
 
           let userHabitResult;
-          if (shouldCreate) {
+          if (validationResult.shouldCreate) {
             // Create new user habit with validated config
             userHabitResult = await createUserHabit(userHabitConfig);
             
             // QA: Validate user habit record
             OnboardingValidator.validateHabitRecord(userHabitResult, 'user_habit');
+          } else if (validationResult.shouldUpdate) {
+            // Update existing user habit with new configuration
+            userHabitResult = await updateUserHabit({ 
+              id: validationResult.existingUserHabit.id, 
+              updates: userHabitConfig 
+            });
+            console.log(`✅ Updated existing user habit for ${habitName}`);
           } else {
             // Reuse existing identical configuration
-            userHabitResult = existingUserHabit;
+            userHabitResult = validationResult.existingUserHabit;
             console.log(`✅ Reusing existing user habit for ${habitName}`);
           }
           
