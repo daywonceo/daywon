@@ -98,8 +98,10 @@ const AppContent: React.FC = () => {
     
     // Check if onboarding should be shown
     if (user && !loading) {
+      // Check both localStorage and current route
       const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-      const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
+      const isOnboardingRoute = window.location.pathname === '/onboarding';
+      const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false' || isOnboardingRoute;
       setShowOnboarding(shouldShowOnboarding);
     }
   }, [user, loading]);
