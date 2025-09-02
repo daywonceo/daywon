@@ -427,28 +427,26 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
           </div>
           
           {/* Actions Row */}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-3">
             <Button
               variant="outline"
-              size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="flex items-center gap-1"
+              className="flex items-center justify-center gap-2 h-11 text-base font-medium"
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             
             {duplicateGroups.length > 0 && (
               <Button
                 variant="outline"
-                size="sm"
                 onClick={handleMergeDuplicates}
                 disabled={isMerging}
-                className="flex items-center gap-1 bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
+                className="flex items-center justify-center gap-2 h-11 text-base font-medium bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
               >
-                <Merge className={`h-4 w-4 ${isMerging ? 'animate-spin' : ''}`} />
-                Merge {duplicateGroups.length} Duplicates
+                <Merge className={`h-5 w-5 ${isMerging ? 'animate-spin' : ''}`} />
+                Merge {duplicateGroups.length} Duplicate{duplicateGroups.length > 1 ? 's' : ''}
               </Button>
             )}
           </div>
@@ -477,32 +475,32 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         
         <CardContent className="flex-grow overflow-hidden p-0">{/* Added overflow-hidden */}
           <Tabs defaultValue="today" className="h-full flex flex-col">
-            <div className="px-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="today" className="flex items-center gap-2">
+            <div className="px-4 sm:px-6">
+              <TabsList className="grid w-full grid-cols-3 h-12">
+                <TabsTrigger value="today" className="flex items-center gap-2 text-sm font-medium">
                   <List className="h-4 w-4" />
-                  Today
+                  <span className="hidden sm:inline">Today</span>
                 </TabsTrigger>
-                <TabsTrigger value="catchup" className="flex items-center gap-2">
+                <TabsTrigger value="catchup" className="flex items-center gap-2 text-sm font-medium">
                   <Calendar className="h-4 w-4" />
-                  Catch Up
+                  <span className="hidden sm:inline">Catch Up</span>
                 </TabsTrigger>
-                <TabsTrigger value="manage" className="flex items-center gap-2">
+                <TabsTrigger value="manage" className="flex items-center gap-2 text-sm font-medium">
                   <Settings className="h-4 w-4" />
-                  Manage
+                  <span className="hidden sm:inline">Manage</span>
                 </TabsTrigger>
               </TabsList>
             </div>
             
-            <TabsContent value="today" className="flex-grow overflow-y-auto px-6 mt-4 max-h-[calc(90vh-280px)]">{/* Added max-height */}
+            <TabsContent value="today" className="flex-grow overflow-y-auto px-4 sm:px-6 mt-4 max-h-[calc(90vh-280px)]">
               {/* Filter Controls */}
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="h-4 w-4 text-gray-500" />
+              <div className="flex items-center gap-3 mb-6">
+                <Calendar className="h-5 w-5 text-gray-500" />
                 <Select value={filterPeriod} onValueChange={(value: FilterPeriod) => setFilterPeriod(value)}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-full sm:w-40 h-11">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background border shadow-lg z-50">
                     <SelectItem value="today">Today</SelectItem>
                     <SelectItem value="week">This Week</SelectItem>
                     <SelectItem value="month">This Month</SelectItem>
@@ -535,7 +533,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6">
                   {getFilteredHabits().map((habit) => {
                     const isCompleted = habitStatuses[habit.name] || false;
                     const streak = getStreakForHabit(habit.name);
@@ -545,10 +543,10 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                         key={habit.id} 
                         className="relative overflow-hidden transition-all duration-200 hover:shadow-lg border-2 hover:border-primary/20"
                       >
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
-                              <CardTitle className="text-lg font-bold truncate">
+                              <CardTitle className="text-lg sm:text-xl font-bold truncate">
                                 {capitalizeHabitName(habit.name)}
                               </CardTitle>
                               {habit.category && (
@@ -556,44 +554,40 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                               )}
                             </div>
                             <Button
-                              size="sm"
                               variant="ghost"
                               onClick={() => openEditForm(habit)}
-                              className="flex-shrink-0 p-1 h-8 w-8"
+                              className="flex-shrink-0 p-2 h-10 w-10 text-lg"
                             >
                               ⚙️
                             </Button>
                           </div>
                         </CardHeader>
                         
-                        <CardContent className="pt-0">
+                        <CardContent className="pt-0 space-y-4">
                           {/* Indicators */}
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {streak > 0 && (
-                                <div className="flex items-center gap-1 text-orange-600">
-                                  <Flame className="h-4 w-4" />
-                                  <span className="text-sm font-semibold">{streak}</span>
-                                </div>
-                              )}
-                              {isCompleted && (
-                                <div className="flex items-center gap-1 text-green-600">
-                                  <Check className="h-4 w-4" />
-                                  <span className="text-sm">Done!</span>
-                                </div>
-                              )}
-                            </div>
+                          <div className="flex items-center gap-4">
+                            {streak > 0 && (
+                              <div className="flex items-center gap-2 text-orange-600">
+                                <Flame className="h-5 w-5" />
+                                <span className="text-base font-semibold">{streak} day streak</span>
+                              </div>
+                            )}
+                            {isCompleted && (
+                              <div className="flex items-center gap-2 text-green-600">
+                                <Check className="h-5 w-5" />
+                                <span className="text-base font-medium">Done!</span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Completion Button */}
                           <Button
                             onClick={() => handleToggleComplete(habit)}
-                            className={`w-full transition-all duration-200 ${
+                            className={`w-full h-12 text-base font-medium transition-all duration-200 ${
                               isCompleted 
                                 ? 'bg-green-500 hover:bg-green-600 text-white' 
                                 : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border-2 border-dashed border-gray-300'
                             }`}
-                            size="lg"
                           >
                             {isCompleted ? (
                               <>
@@ -615,14 +609,14 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
               )}
             </TabsContent>
             
-            <TabsContent value="catchup" className="flex-grow overflow-y-auto px-6 mt-4 max-h-[calc(90vh-280px)]">{/* Added max-height */}
+            <TabsContent value="catchup" className="flex-grow overflow-y-auto px-4 sm:px-6 mt-4 max-h-[calc(90vh-280px)]">
               {catchUpLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
                 <div className="space-y-4 pb-6">
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm sm:text-base text-muted-foreground mb-6">
                     Life gets busy. Let's catch up on the past week together!
                   </p>
                   
@@ -632,31 +626,30 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                     const isToday = isSameDay(date, new Date());
                     
                     return (
-                      <div key={dateStr} className="border rounded-lg p-4 space-y-3">
+                      <div key={dateStr} className="border-2 rounded-xl p-4 sm:p-5 space-y-4 bg-card">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-base">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-semibold text-base sm:text-lg">
                               {format(date, 'EEEE, MMM d')}
                             </h3>
                             {isToday && (
-                              <Badge variant="secondary" className="text-xs">Today</Badge>
+                              <Badge variant="secondary" className="text-xs font-medium">Today</Badge>
                             )}
                           </div>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm sm:text-base text-muted-foreground font-medium">
                             {dayActivities.filter(a => a.status === 'completed').length}/{dayActivities.length}
                           </span>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 gap-3">
                           {dayActivities.map(activity => (
                             <Button
                               key={activity.habit_name}
                               variant={activity.status === 'completed' ? 'default' : 'outline'}
-                              size="sm"
                               onClick={() => toggleCatchUpHabitStatus(dateStr, activity.habit_name)}
-                              className="justify-start h-10"
+                              className="justify-start h-12 text-base font-medium"
                             >
-                              <CheckCircle2 className={`mr-2 h-4 w-4 ${
+                              <CheckCircle2 className={`mr-3 h-5 w-5 ${
                                 activity.status === 'completed' ? 'text-white' : 'text-muted-foreground'
                               }`} />
                               {activity.habit_name}
@@ -670,39 +663,36 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
               )}
             </TabsContent>
 
-            <TabsContent value="manage" className="flex-grow overflow-y-auto px-6 mt-4 max-h-[calc(90vh-280px)]">
+            <TabsContent value="manage" className="flex-grow overflow-y-auto px-4 sm:px-6 mt-4 max-h-[calc(90vh-280px)]">
               <div className="space-y-6">
-                <div className="text-sm text-muted-foreground mb-4">
+                <div className="text-sm sm:text-base text-muted-foreground mb-6">
                   Manage your habits: edit details, archive completed habits, or permanently delete them.
                 </div>
 
                 {/* Filter Chips */}
-                <div className="flex gap-2 mb-6">
+                <div className="flex flex-col sm:flex-row gap-3 mb-6">
                   <Button
                     variant={habitFilter === 'active' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setHabitFilter('active')}
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 h-11 text-base font-medium"
                   >
-                    <CheckCircle2 className="h-4 w-4" />
+                    <CheckCircle2 className="h-5 w-5" />
                     Active ({habits?.filter(h => !h.archived_at && !h.ended_at).length || 0})
                   </Button>
                   <Button
                     variant={habitFilter === 'ended' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setHabitFilter('ended')}
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 h-11 text-base font-medium"
                   >
-                    <Target className="h-4 w-4" />
+                    <Target className="h-5 w-5" />
                     Ended ({habits?.filter(h => !h.archived_at && h.ended_at).length || 0})
                   </Button>
                   <Button
                     variant={habitFilter === 'trash' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setHabitFilter('trash')}
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 h-11 text-base font-medium"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-5 w-5" />
                     Trash ({habits?.filter(h => h.archived_at).length || 0})
                   </Button>
                 </div>
@@ -799,10 +789,9 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                           <div className="text-sm text-red-700">
                             Need to stop tracking a habit? Use these options:
                           </div>
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-col sm:flex-row gap-3">
                             <Button
                               variant="outline"
-                              size="sm"
                               onClick={() => {
                                 const activeHabit = habits?.find(h => h.status === 'active' && !h.ended_at && !h.archived_at);
                                 if (activeHabit) {
@@ -813,13 +802,12 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                                   toast({ title: "No active habits to end", variant: "destructive" });
                                 }
                               }}
-                              className="text-orange-700 border-orange-300 hover:bg-orange-50"
+                              className="text-orange-700 border-orange-300 hover:bg-orange-50 h-11 text-base font-medium"
                             >
                               End a Habit (Keep History)
                             </Button>
                             <Button
                               variant="outline"
-                              size="sm"
                               onClick={() => {
                                 const activeHabit = habits?.find(h => h.status === 'active' && !h.ended_at && !h.archived_at);
                                 if (activeHabit) {
@@ -830,7 +818,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                                   toast({ title: "No active habits to archive", variant: "destructive" });
                                 }
                               }}
-                              className="text-blue-700 border-blue-300 hover:bg-blue-50"
+                              className="text-blue-700 border-blue-300 hover:bg-blue-50 h-11 text-base font-medium"
                             >
                               Archive a Habit
                             </Button>
