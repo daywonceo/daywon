@@ -1323,6 +1323,10 @@ export type Database = {
         Args: { p_as_of_date?: string; p_user_habit_id: string }
         Returns: number
       }
+      delete_habit_forever: {
+        Args: { p_habit: string }
+        Returns: undefined
+      }
       discover_potential_friends: {
         Args: { search_query?: string }
         Returns: {
@@ -1330,6 +1334,10 @@ export type Database = {
           display_name: string
           id: string
         }[]
+      }
+      end_habit_today: {
+        Args: { p_habit: string }
+        Returns: undefined
       }
       find_or_create_habit: {
         Args: {
@@ -1389,6 +1397,10 @@ export type Database = {
           p_merge_habit_ids: string[]
           p_user_id: string
         }
+        Returns: undefined
+      }
+      resume_habit: {
+        Args: { p_habit: string }
         Returns: undefined
       }
       search_connected_profiles: {
