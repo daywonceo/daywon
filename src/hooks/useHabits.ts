@@ -7,8 +7,10 @@ import { getHabitActivities, isHabitRecentlyActiveSync, loadHabitActivitiesFromD
 import { findDuplicateHabit } from "@/utils/habitDeduplication";
 
 export type Habit = Tables<'habits'>;
-export type NewHabit = Omit<Habit, 'id' | 'created_at' | 'user_id'> & {
+export type NewHabit = Omit<Habit, 'id' | 'created_at' | 'user_id' | 'archived_at' | 'ended_at'> & {
   default_tracking_type?: string;
+  archived_at?: string | null;
+  ended_at?: string | null;
 };
 
 async function fetchHabits(userId: string) {
@@ -65,6 +67,48 @@ async function deleteHabit(habitId: string) {
         .eq('id', habitId);
 
     if (error) throw error;
+}
+
+async function endHabit(habitId: string) {
+    const { data, error } = await supabase
+        .from('habits')
+        .update({ ended_at: new Date().toISOString() })
+        .eq('id', habitId)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+
+async function archiveHabit(habitId: string) {
+    const { data, error } = await supabase
+        .from('habits')
+        .update({ 
+            archived_at: new Date().toISOString(),
+            status: 'archived'
+        })
+        .eq('id', habitId)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+
+async function unarchiveHabit(habitId: string) {
+    const { data, error } = await supabase
+        .from('habits')
+        .update({ 
+            archived_at: null,
+            status: 'active'
+        })
+        .eq('id', habitId)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
 }
 
 // Ensure all tracked habits are visible in the database
@@ -190,6 +234,27 @@ export function useHabits() {
     },
   });
 
+  const endMutation = useMutation({
+    mutationFn: (habitId: string) => endHabit(habitId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
+  const archiveMutation = useMutation({
+    mutationFn: (habitId: string) => archiveHabit(habitId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
+  const unarchiveMutation = useMutation({
+    mutationFn: (habitId: string) => unarchiveHabit(habitId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
   const refreshHabits = async () => {
     if (user?.id) {
       await ensureTrackedHabitsVisible(user.id);
@@ -204,6 +269,9 @@ export function useHabits() {
     addHabit: addMutation.mutateAsync,
     updateHabit: updateMutation.mutateAsync,
     deleteHabit: deleteMutation.mutateAsync,
+    endHabit: endMutation.mutateAsync,
+    archiveHabit: archiveMutation.mutateAsync,
+    unarchiveHabit: unarchiveMutation.mutateAsync,
     ensureTrackedHabitsVisible: () => user && ensureTrackedHabitsVisible(user.id),
     refreshHabits,
   };

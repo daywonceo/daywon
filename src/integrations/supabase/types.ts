@@ -495,30 +495,36 @@ export type Database = {
       }
       habits: {
         Row: {
+          archived_at: string | null
           category: string | null
           created_at: string
           default_tracking_type: string | null
           description: string | null
+          ended_at: string | null
           id: string
           name: string
           status: string
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           category?: string | null
           created_at?: string
           default_tracking_type?: string | null
           description?: string | null
+          ended_at?: string | null
           id?: string
           name: string
           status?: string
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           category?: string | null
           created_at?: string
           default_tracking_type?: string | null
           description?: string | null
+          ended_at?: string | null
           id?: string
           name?: string
           status?: string

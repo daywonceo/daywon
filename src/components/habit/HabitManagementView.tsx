@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Calendar, Plus, RefreshCw, History, Merge, List, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Calendar, Plus, RefreshCw, History, Merge, List, CheckCircle2, Settings, Trash2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +11,8 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "@/components/habit/HabitFormDialog";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
+import HabitList from "@/components/habit/HabitList";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 import { capitalizeHabitName } from "@/lib/utils";
 import { recordHabitActivity, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
@@ -40,7 +42,7 @@ interface HabitActivity {
 
 const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewProps) => {
   const { user } = useAuth();
-  const { habits, isLoading, updateHabit, deleteHabit, refreshHabits, addHabit } = useHabits();
+  const { habits, isLoading, updateHabit, deleteHabit, endHabit, archiveHabit, unarchiveHabit, refreshHabits, addHabit } = useHabits();
   const { duplicateGroups, mergeDuplicateHabits, checkForDuplicate } = useHabitDeduplication();
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
@@ -53,6 +55,11 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
   // Catch up specific state
   const [catchUpActivities, setCatchUpActivities] = useState<Record<string, HabitActivity[]>>({});
   const [catchUpLoading, setCatchUpLoading] = useState(false);
+
+  // Delete/Archive dialog state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
+  const [deleteAction, setDeleteAction] = useState<'delete' | 'end' | 'archive'>('delete');
 
   // Generate past 7 days for catch up view
   const past7Days = Array.from({ length: 7 }, (_, i) => {
@@ -422,7 +429,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         <CardContent className="flex-grow overflow-hidden p-0">{/* Added overflow-hidden */}
           <Tabs defaultValue="today" className="h-full flex flex-col">
             <div className="px-6">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="today" className="flex items-center gap-2">
                   <List className="h-4 w-4" />
                   Today
@@ -430,6 +437,10 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                 <TabsTrigger value="catchup" className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   Catch Up
+                </TabsTrigger>
+                <TabsTrigger value="manage" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Manage
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -609,6 +620,149 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                 </div>
               )}
             </TabsContent>
+
+            <TabsContent value="manage" className="flex-grow overflow-y-auto px-6 mt-4 max-h-[calc(90vh-280px)]">
+              <div className="space-y-6">
+                <div className="text-sm text-muted-foreground mb-4">
+                  Manage your habits: edit details, archive completed habits, or permanently delete them.
+                </div>
+
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Active Habits */}
+                    <HabitList
+                      title="Active Habits"
+                      habits={habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at) || []}
+                      emptyMessage="No active habits found. Add a habit to get started!"
+                      onEdit={openEditForm}
+                      onToggleArchive={(habit) => {
+                        setHabitToDelete(habit);
+                        setDeleteAction('archive');
+                        setShowDeleteDialog(true);
+                      }}
+                      onDelete={(habitId) => {
+                        const habit = habits?.find(h => h.id === habitId);
+                        if (habit) {
+                          setHabitToDelete(habit);
+                          setDeleteAction('delete');
+                          setShowDeleteDialog(true);
+                        }
+                      }}
+                    />
+
+                    {/* Archived Habits */}
+                    {habits?.some(h => h.archived_at && !h.ended_at) && (
+                      <HabitList
+                        title="Archived Habits"
+                        habits={habits?.filter(h => h.archived_at && !h.ended_at) || []}
+                        emptyMessage="No archived habits."
+                        onEdit={openEditForm}
+                        onToggleArchive={(habit) => {
+                          // Unarchive habit
+                          unarchiveHabit(habit.id)
+                            .then(() => {
+                              toast({ title: `${capitalizeHabitName(habit.name)} unarchived!` });
+                              refreshHabits();
+                            })
+                            .catch((error) => {
+                              console.error('Error unarchiving habit:', error);
+                              toast({ title: "Error unarchiving habit", variant: "destructive" });
+                            });
+                        }}
+                        onDelete={(habitId) => {
+                          const habit = habits?.find(h => h.id === habitId);
+                          if (habit) {
+                            setHabitToDelete(habit);
+                            setDeleteAction('delete');
+                            setShowDeleteDialog(true);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Ended Habits */}
+                    {habits?.some(h => h.ended_at) && (
+                      <HabitList
+                        title="Ended Habits"
+                        habits={habits?.filter(h => h.ended_at) || []}
+                        emptyMessage="No ended habits."
+                        onEdit={openEditForm}
+                        onToggleArchive={(habit) => {
+                          setHabitToDelete(habit);
+                          setDeleteAction('archive');
+                          setShowDeleteDialog(true);
+                        }}
+                        onDelete={(habitId) => {
+                          const habit = habits?.find(h => h.id === habitId);
+                          if (habit) {
+                            setHabitToDelete(habit);
+                            setDeleteAction('delete');
+                            setShowDeleteDialog(true);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Quick Actions */}
+                    <Card className="bg-red-50 border-red-200">
+                      <CardHeader>
+                        <CardTitle className="text-red-800 flex items-center gap-2">
+                          <AlertTriangle className="h-5 w-5" />
+                          Quick Actions
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="text-sm text-red-700">
+                          Need to stop tracking a habit? Use these options:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const activeHabit = habits?.find(h => h.status === 'active' && !h.ended_at && !h.archived_at);
+                              if (activeHabit) {
+                                setHabitToDelete(activeHabit);
+                                setDeleteAction('end');
+                                setShowDeleteDialog(true);
+                              } else {
+                                toast({ title: "No active habits to end", variant: "destructive" });
+                              }
+                            }}
+                            className="text-orange-700 border-orange-300 hover:bg-orange-50"
+                          >
+                            End a Habit (Keep History)
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const activeHabit = habits?.find(h => h.status === 'active' && !h.ended_at && !h.archived_at);
+                              if (activeHabit) {
+                                setHabitToDelete(activeHabit);
+                                setDeleteAction('archive');
+                                setShowDeleteDialog(true);
+                              } else {
+                                toast({ title: "No active habits to archive", variant: "destructive" });
+                              }
+                            }}
+                            className="text-blue-700 border-blue-300 hover:bg-blue-50"
+                          >
+                            Archive a Habit
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -619,6 +773,79 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         onOpenChange={setShowHabitForm}
         habitToEdit={habitToEdit}
       />
+
+      {/* Delete/Archive/End Habit Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              {deleteAction === 'delete' ? 'Delete Habit' : 
+               deleteAction === 'end' ? 'End Habit' : 'Archive Habit'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteAction === 'delete' ? (
+                <>
+                  Are you sure you want to permanently delete <strong>{habitToDelete?.name}</strong>? 
+                  This will remove all history and cannot be undone.
+                </>
+              ) : deleteAction === 'end' ? (
+                <>
+                  Are you sure you want to end <strong>{habitToDelete?.name}</strong>? 
+                  This will stop future tracking but keep all your history.
+                </>
+              ) : (
+                <>
+                  Are you sure you want to archive <strong>{habitToDelete?.name}</strong>? 
+                  You can unarchive it later if needed.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowDeleteDialog(false);
+              setHabitToDelete(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!habitToDelete) return;
+                
+                try {
+                  if (deleteAction === 'delete') {
+                    await deleteHabit(habitToDelete.id);
+                    toast({ title: `${capitalizeHabitName(habitToDelete.name)} deleted permanently.` });
+                  } else if (deleteAction === 'end') {
+                    await endHabit(habitToDelete.id);
+                    toast({ title: `${capitalizeHabitName(habitToDelete.name)} ended. History preserved.` });
+                  } else if (deleteAction === 'archive') {
+                    await archiveHabit(habitToDelete.id);
+                    toast({ title: `${capitalizeHabitName(habitToDelete.name)} archived.` });
+                  }
+                  
+                  await refreshHabits();
+                  setShowDeleteDialog(false);
+                  setHabitToDelete(null);
+                } catch (error) {
+                  console.error(`Error ${deleteAction}ing habit:`, error);
+                  toast({ 
+                    title: `Error ${deleteAction}ing habit`, 
+                    variant: "destructive" 
+                  });
+                }
+              }}
+              className={deleteAction === 'delete' ? 'bg-red-600 hover:bg-red-700' : 
+                        deleteAction === 'end' ? 'bg-orange-600 hover:bg-orange-700' : 
+                        'bg-blue-600 hover:bg-blue-700'}
+            >
+              {deleteAction === 'delete' ? 'Delete Permanently' : 
+               deleteAction === 'end' ? 'End Habit' : 'Archive Habit'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
