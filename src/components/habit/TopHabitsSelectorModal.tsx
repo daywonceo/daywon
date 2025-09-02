@@ -67,12 +67,14 @@ const TopHabitsSelectorModal: React.FC<TopHabitsSelectorModalProps> = ({
             <Button
               key={habit}
               variant={selected.includes(habit) ? "secondary" : "outline"}
-              className={`w-full py-2 rounded font-medium ${selected.includes(habit) ? "bg-green-600 text-white" : ""}`}
+              className={`w-full h-auto min-h-[48px] py-2 px-2 rounded font-medium text-xs leading-tight text-center whitespace-normal ${selected.includes(habit) ? "bg-green-600 text-white" : ""}`}
               onClick={() => toggleHabit(habit)}
               disabled={saving}
             >
-              {habit}
-              {selected.includes(habit) && <span className="ml-2">✔️</span>}
+              <span className="block">
+                {habit}
+                {selected.includes(habit) && <span className="ml-1">✔️</span>}
+              </span>
             </Button>
           ))}
         </div>
