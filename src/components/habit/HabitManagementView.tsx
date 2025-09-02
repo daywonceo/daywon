@@ -126,7 +126,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         .gte('activity_date', format(past7Days[0], 'yyyy-MM-dd'))
         .lte('activity_date', format(past7Days[past7Days.length - 1], 'yyyy-MM-dd'))
         .is('habits.archived_at', null)
-        .or(`habits.ended_at.is.null,habits.ended_at.gte.${new Date().toISOString().split('T')[0]}`);
+        .or('habits.ended_at.is.null,habits.ended_at.gte.' + new Date().toISOString().split('T')[0]);
 
       if (error) throw error;
 
