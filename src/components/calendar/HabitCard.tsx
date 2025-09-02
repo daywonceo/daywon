@@ -1,14 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import HabitActivityGraph from './HabitActivityGraph';
 import { Button } from '@/components/ui/button';
-import { Plus, Check } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Plus, Check, MoreVertical } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { Habit } from '@/hooks/useHabits';
 import { recordHabitActivityV2 } from '@/utils/habitActivityV2';
 import { hapticSuccess } from '@/utils/haptics';
 import { capitalizeHabitName } from '@/lib/utils';
+import HabitRemovalModal from '@/components/habit/HabitRemovalModal';
 
 type Color = 'green' | 'purple' | 'red' | 'orange' | 'blue';
 
@@ -22,6 +24,7 @@ interface HabitCardProps {
 }
 
 const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, onUpdate }: HabitCardProps) => {
+    const [isRemovalModalOpen, setIsRemovalModalOpen] = useState(false);
     
     const handleToggleComplete = () => {
         const newStatus = isCompletedToday ? 'empty' : 'completed';
@@ -46,13 +49,34 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
                     <CardTitle className="text-base sm:text-lg font-bold">{capitalizeHabitName(habit.name)}</CardTitle>
                     {habit.description && <CardDescription className="text-xs sm:text-sm text-gray-500 mt-1">{habit.description}</CardDescription>}
                 </div>
-                <Button size="icon" variant="ghost" className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 ${isCompletedToday ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`} onClick={handleToggleComplete}>
-                    {isCompletedToday ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="icon" variant="ghost" className="w-8 h-8 text-gray-500 hover:text-gray-700">
+                                <MoreVertical className="w-4 h-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setIsRemovalModalOpen(true)}>
+                                Remove...
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button size="icon" variant="ghost" className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 ${isCompletedToday ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`} onClick={handleToggleComplete}>
+                        {isCompletedToday ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                    </Button>
+                </div>
             </CardHeader>
             <CardContent className="p-4 pt-0">
                 <HabitActivityGraph activityData={activityData} color={color} />
             </CardContent>
+            
+            <HabitRemovalModal
+                habit={habit}
+                isOpen={isRemovalModalOpen}
+                onClose={() => setIsRemovalModalOpen(false)}
+                onSuccess={onUpdate}
+            />
         </Card>
     );
 };
