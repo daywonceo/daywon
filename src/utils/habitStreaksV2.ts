@@ -9,7 +9,7 @@ export const formatStreakNumber = (streak: number): string => {
 };
 
 // Calculate streak for a specific habit_id on a specific date - V2 using habit_id
-export const calculateStreakForDateV2 = (habitId: string, targetDate: Date): number => {
+export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habitEndDate?: string | null): number => {
   try {
     const activities = getHabitActivitiesV2();
     const targetDateStr = targetDate.toISOString().split('T')[0];
@@ -32,8 +32,18 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date): num
     let streak = 0;
     let currentDate = new Date(targetDate);
     
+    // If habit has ended, cap the streak calculation at the end date
+    const endDate = habitEndDate ? new Date(habitEndDate) : null;
+    
     while (true) {
       const currentDateStr = currentDate.toISOString().split('T')[0];
+      
+      // Stop counting if we've gone before the habit's end date
+      if (endDate && currentDate < endDate) {
+        console.log(`Reached habit end date ${habitEndDate}, stopping streak count at: ${streak}`);
+        break;
+      }
+      
       const activity = habitActivities.find(a => a.date === currentDateStr);
       
       console.log(`Checking date ${currentDateStr}:`, activity);

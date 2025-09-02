@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import HabitActivityGraph from './HabitActivityGraph';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Plus, Check, MoreVertical } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
@@ -27,6 +28,14 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
     const [isRemovalModalOpen, setIsRemovalModalOpen] = useState(false);
     
     const handleToggleComplete = () => {
+        // Disable logging for future dates when habit is ended
+        const today = new Date().toISOString().split('T')[0];
+        const endedDate = habit.ended_at ? new Date(habit.ended_at).toISOString().split('T')[0] : null;
+        
+        if (endedDate && today > endedDate) {
+            return; // Don't allow logging for future dates after end
+        }
+        
         const newStatus = isCompletedToday ? 'empty' : 'completed';
         recordHabitActivityV2(habit.name, newStatus, new Date());
         hapticSuccess();
@@ -46,7 +55,14 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="flex-1">
-                    <CardTitle className="text-base sm:text-lg font-bold">{capitalizeHabitName(habit.name)}</CardTitle>
+                    <div className="flex items-center gap-2">
+                        <CardTitle className="text-base sm:text-lg font-bold">{capitalizeHabitName(habit.name)}</CardTitle>
+                        {habit.ended_at && (
+                            <Badge variant="secondary" className="text-xs bg-gray-200 text-gray-600">
+                                Ended
+                            </Badge>
+                        )}
+                    </div>
                     {habit.description && <CardDescription className="text-xs sm:text-sm text-gray-500 mt-1">{habit.description}</CardDescription>}
                 </div>
                 <div className="flex items-center gap-2">

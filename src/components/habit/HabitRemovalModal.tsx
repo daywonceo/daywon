@@ -155,33 +155,33 @@ const HabitRemovalModal: React.FC<HabitRemovalModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md h-[90vh] sm:h-auto flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Remove habit</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 flex-grow overflow-y-auto">
           <RadioGroup value={removalType} onValueChange={(value) => setRemovalType(value as RemovalType)}>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
+            <div className="space-y-6 sm:space-y-4">
+              <div className="flex items-start space-x-3 p-4 sm:p-3 rounded-lg border-2 border-transparent data-[state=checked]:border-primary cursor-pointer" onClick={() => setRemovalType('end')}>
                 <RadioGroupItem value="end" id="end" className="mt-1" />
-                <div className="space-y-1">
-                  <Label htmlFor="end" className="font-medium">
+                <div className="space-y-1 flex-1">
+                  <Label htmlFor="end" className="font-medium text-lg sm:text-base cursor-pointer">
                     End today (recommended)
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base sm:text-sm text-muted-foreground">
                     Stops future reminders. You can still Catch Up on missed days through today.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3">
+              <div className="flex items-start space-x-3 p-4 sm:p-3 rounded-lg border-2 border-transparent data-[state=checked]:border-primary cursor-pointer" onClick={() => setRemovalType('delete')}>
                 <RadioGroupItem value="delete" id="delete" className="mt-1" />
-                <div className="space-y-1">
-                  <Label htmlFor="delete" className="font-medium">
+                <div className="space-y-1 flex-1">
+                  <Label htmlFor="delete" className="font-medium text-lg sm:text-base cursor-pointer">
                     Delete forever
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base sm:text-sm text-muted-foreground">
                     Permanently removes this habit and all logs.
                   </p>
                 </div>
@@ -190,8 +190,8 @@ const HabitRemovalModal: React.FC<HabitRemovalModalProps> = ({
           </RadioGroup>
 
           {removalType === 'delete' && (
-            <div className="space-y-2">
-              <Label htmlFor="confirmation" className="text-sm font-medium">
+            <div className="space-y-2 px-1">
+              <Label htmlFor="confirmation" className="text-base sm:text-sm font-medium">
                 Type the habit name to confirm
               </Label>
               <Input
@@ -200,20 +200,26 @@ const HabitRemovalModal: React.FC<HabitRemovalModalProps> = ({
                 placeholder={habit?.name || ''}
                 value={confirmationText}
                 onChange={(e) => setConfirmationText(e.target.value)}
-                className="font-mono text-sm"
+                className="font-mono text-base sm:text-sm h-12 sm:h-10"
               />
             </div>
           )}
         </div>
 
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
+        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-2 flex-shrink-0 pt-4">
+          <Button 
+            variant="outline" 
+            onClick={handleClose} 
+            disabled={isLoading}
+            className="h-12 sm:h-10 text-base sm:text-sm order-2 sm:order-1"
+          >
             Cancel
           </Button>
           <Button 
             onClick={handleContinue} 
             disabled={!canContinue || isLoading}
             variant={removalType === 'delete' ? 'destructive' : 'default'}
+            className="h-12 sm:h-10 text-base sm:text-sm order-1 sm:order-2"
           >
             {isLoading ? 'Processing...' : 'Continue'}
           </Button>

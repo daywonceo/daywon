@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSocialPosts } from './useSocialPosts';
 import { calculateStreakForDateV2 } from '@/utils/habitStreaksV2';
+import { useHabits } from '@/hooks/useHabits';
 import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
 
 interface HabitCompletionEvent extends CustomEvent {
@@ -12,6 +13,7 @@ interface HabitCompletionEvent extends CustomEvent {
 }
 
 export const useHabitSocialIntegration = () => {
+  const { habits } = useHabits();
   const { createHabitPost } = useSocialPosts();
 
   // Determine if completion is a milestone
@@ -131,7 +133,8 @@ export const useHabitSocialIntegration = () => {
         return;
       }
       
-      const streak = calculateStreakForDateV2(habitActivity.habitId, completionDate);
+      const habit = habits?.find(h => h.name.toLowerCase() === category.toLowerCase());
+      const streak = calculateStreakForDateV2(habitActivity.habitId, completionDate, habit?.ended_at);
       
       console.log(`Habit completed: ${category}, streak: ${streak}`);
 
@@ -185,7 +188,8 @@ export const useHabitSocialIntegration = () => {
         throw new Error(`No habit_id found for ${habitName}`);
       }
       
-      const streak = calculateStreakForDateV2(habitActivity.habitId, targetDate);
+      const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
+      const streak = calculateStreakForDateV2(habitActivity.habitId, targetDate, habit?.ended_at);
       
       if (streak === 0) {
         throw new Error('Cannot share milestone for incomplete habit');
@@ -227,8 +231,9 @@ export const useHabitSocialIntegration = () => {
     });
     
     return Array.from(habitGroups.values()).map(({ habitName, habitId }) => {
+      const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
       const streak = habitId 
-        ? calculateStreakForDateV2(habitId, today)
+        ? calculateStreakForDateV2(habitId, today, habit?.ended_at)
         : 0; // Fallback for legacy data without habit_id
       return {
         habitName,

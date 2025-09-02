@@ -7,6 +7,7 @@ import StreakRecoveryDialog from "./StreakRecoveryDialog";
 import ClickableDate from "./ClickableDate";
 import HabitStatusBox from "./HabitStatusBox";
 import ActivityTextDisplay from "./ActivityTextDisplay";
+import { useHabits } from "@/hooks/useHabits";
 
 interface HabitActivityRowProps {
   activity: DayActivity;
@@ -31,6 +32,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   toggleEditMode,
   updateActivityText,
 }) => {
+  const { habits } = useHabits();
   const [recoveryDialog, setRecoveryDialog] = useState<{
     isOpen: boolean;
     habitName: string;
@@ -134,17 +136,23 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
       </div>
       
       {/* Habit status boxes */}
-      {activity.categories.map((category) => (
-        <HabitStatusBox
-          key={`${activityIndex}-${category}`}
-          category={category}
-          status={activity.statuses[category]}
-          activityIndex={activityIndex}
-          activityDate={activityDate}
-          activeHabit={activeHabit}
-          onStatusToggle={handleStatusToggle}
-        />
-      ))}
+      {activity.categories.map((category) => {
+        // Find the habit data for this category
+        const habit = habits?.find(h => h.name.toLowerCase() === category.toLowerCase());
+        
+        return (
+          <HabitStatusBox
+            key={`${activityIndex}-${category}`}
+            category={category}
+            status={activity.statuses[category]}
+            activityIndex={activityIndex}
+            activityDate={activityDate}
+            activeHabit={activeHabit}
+            onStatusToggle={handleStatusToggle}
+            habit={habit ? { id: habit.id, ended_at: habit.ended_at } : undefined}
+          />
+        );
+      })}
 
       {/* Streak Recovery Dialog */}
       <StreakRecoveryDialog

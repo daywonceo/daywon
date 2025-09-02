@@ -14,6 +14,7 @@ interface HabitStatusBoxProps {
   activityDate: Date;
   activeHabit: string | null;
   onStatusToggle: (dayIndex: number, category: string) => void;
+  habit?: { id: string; ended_at?: string | null }; // Add habit prop for end date
 }
 
 const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
@@ -23,6 +24,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   activityDate,
   activeHabit,
   onStatusToggle,
+  habit
 }) => {
   const [streak, setStreak] = useState(0);
 
@@ -40,13 +42,13 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
         const habitActivity = activities.find(a => a.habitName === category && a.habitId);
         
         if (habitActivity?.habitId) {
-          let currentStreak = calculateStreakForDateV2(habitActivity.habitId, activityDate);
+          let currentStreak = calculateStreakForDateV2(habitActivity.habitId, activityDate, habit?.ended_at);
 
           // Check for recovery that might restore the streak
           if (hasRecentRecovery(category, activityDate)) {
             const previousDayDate = new Date(activityDate);
             previousDayDate.setDate(previousDayDate.getDate() - 1);
-            const previousStreak = calculateStreakForDateV2(habitActivity.habitId, previousDayDate);
+            const previousStreak = calculateStreakForDateV2(habitActivity.habitId, previousDayDate, habit?.ended_at);
             if (previousStreak > currentStreak) {
               currentStreak = previousStreak + 1; // Restore the streak
             }
