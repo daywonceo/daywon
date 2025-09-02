@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ import { useOnboardingPersistence } from "@/hooks/useOnboardingPersistence";
 const CATEGORIES = ['Physical', 'Mental', 'Professional', 'Financial', 'Relational'] as const;
 
 export default function SimpleOnboardingFlow() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { addHabit } = useHabits();
   const { createUserHabit, updateUserHabit } = useUserHabits();
@@ -436,7 +438,10 @@ export default function SimpleOnboardingFlow() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => window.location.href = '/'}
+              onClick={() => {
+                localStorage.setItem('onboardingCompleted', 'true');
+                navigate('/');
+              }}
             >
               Exit
             </Button>
