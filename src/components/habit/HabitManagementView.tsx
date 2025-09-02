@@ -116,17 +116,13 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
     
     setCatchUpLoading(true);
     try {
+      // Get habit activities for the past 7 days
       const { data, error } = await supabase
         .from('habit_activities')
-        .select(`
-          *,
-          habits!inner(ended_at, archived_at)
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .gte('activity_date', format(past7Days[0], 'yyyy-MM-dd'))
-        .lte('activity_date', format(past7Days[past7Days.length - 1], 'yyyy-MM-dd'))
-        .is('habits.archived_at', null)
-        .or('habits.ended_at.is.null,habits.ended_at.gte.' + new Date().toISOString().split('T')[0]);
+        .lte('activity_date', format(past7Days[past7Days.length - 1], 'yyyy-MM-dd'));
 
       if (error) throw error;
 

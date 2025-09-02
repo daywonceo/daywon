@@ -13,6 +13,7 @@ interface CatchUpViewProps {
   open: boolean;
   onClose: () => void;
   userHabits: string[];
+  allHabits: Array<{id: string, name: string, archived_at: string | null, ended_at: string | null}>;
 }
 
 interface HabitActivity {
@@ -23,11 +24,10 @@ interface HabitActivity {
   status: 'completed' | 'failed' | 'empty';
 }
 
-const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
+const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps) => {
   const [activities, setActivities] = useState<Record<string, HabitActivity[]>>({});
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const { habits } = useHabits();
 
   // Generate past 7 days
   const past7Days = Array.from({ length: 7 }, (_, i) => {
@@ -62,8 +62,8 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
         const dateStr = format(date, 'yyyy-MM-dd');
         const dayActivities = data?.filter(activity => activity.activity_date === dateStr) || [];
         
-        // Create entries for all active habits, not just userHabits
-        const activeHabitsForDate = habits?.filter(habit => {
+        // Create entries for all active habits passed from parent
+        const activeHabitsForDate = allHabits.filter(habit => {
           // Apply the same logic: not archived and not ended before this date
           if (habit.archived_at) return false; // Skip archived habits
           
@@ -71,7 +71,7 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
           
           // Include if not ended, or if ended on or after this date
           return !habitEndDate || habitEndDate >= date;
-        }) || [];
+        });
 
         const completeActivities = activeHabitsForDate.map(habit => {
           // Find existing activity by habit name (case insensitive)
