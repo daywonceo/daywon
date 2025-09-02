@@ -62,14 +62,21 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
         const dateStr = format(date, 'yyyy-MM-dd');
         const dayActivities = data?.filter(activity => activity.activity_date === dateStr) || [];
         
-        // Create entries for all user habits, even if not in database
-        const completeActivities = userHabits.map(habitName => {
+        // Create entries for all active habits, not just userHabits
+        const activeHabitsForDate = habits?.filter(habit => {
+          // Apply the same logic: not archived and not ended before this date
+          if (habit.archived_at) return false; // Skip archived habits
+          
+          const habitEndDate = habit.ended_at ? new Date(habit.ended_at) : null;
+          
+          // Include if not ended, or if ended on or after this date
+          return !habitEndDate || habitEndDate >= date;
+        }) || [];
+
+        const completeActivities = activeHabitsForDate.map(habit => {
           // Find existing activity by habit name (case insensitive)
           const existingActivity = dayActivities.find(a => 
-            a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
-          );
-          const habitRecord = habits?.find(h => 
-            h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
+            a.habit_name.toLowerCase().trim() === habit.name.toLowerCase().trim()
           );
           
           if (existingActivity) {
@@ -83,8 +90,8 @@ const CatchUpView = ({ open, onClose, userHabits }: CatchUpViewProps) => {
           }
           
           return {
-            habit_id: habitRecord?.id,
-            habit_name: habitName,
+            habit_id: habit.id,
+            habit_name: habit.name,
             activity_date: dateStr,
             status: 'empty' as const
           };

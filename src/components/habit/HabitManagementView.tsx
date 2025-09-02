@@ -150,27 +150,22 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
           return activity.activity_date === dateStr && meetsEndDateCriteria;
         }) || [];
         
-        // Create entries for all user habits that meet the catch-up criteria for this date
-        const completeActivities = userHabits
-          .filter(habitName => {
-            // Apply the same logic: archived_at IS NULL AND (ended_at IS NULL OR ended_at::date >= current_date)
-            const habit = habits?.find(h => 
-              h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
-            );
-            if (habit?.archived_at) return false; // Skip archived habits
-            
-            const habitEndDate = habit?.ended_at ? new Date(habit.ended_at) : null;
-            
-            // Include if not ended, or if ended on or after this date
-            return !habitEndDate || habitEndDate >= date;
-          })
-          .map(habitName => {
+        // Create entries for all active habits that meet the catch-up criteria for this date
+        const activeHabitsForDate = habits?.filter(habit => {
+          // Apply the same logic: archived_at IS NULL AND (ended_at IS NULL OR ended_at::date >= current_date)
+          if (habit.archived_at) return false; // Skip archived habits
+          
+          const habitEndDate = habit.ended_at ? new Date(habit.ended_at) : null;
+          
+          // Include if not ended, or if ended on or after this date
+          return !habitEndDate || habitEndDate >= date;
+        }) || [];
+
+        const completeActivities = activeHabitsForDate
+          .map(habit => {
             // Find existing activity by habit name (case insensitive)
             const existingActivity = dayActivities.find(a => 
-              a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
-            );
-            const habitRecord = habits?.find(h => 
-              h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
+              a.habit_name.toLowerCase().trim() === habit.name.toLowerCase().trim()
             );
             
             if (existingActivity) {
@@ -184,8 +179,8 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
             }
             
             return {
-              habit_id: habitRecord?.id,
-              habit_name: habitName,
+              habit_id: habit.id,
+              habit_name: habit.name,
               activity_date: dateStr,
               status: 'empty' as const
             };
