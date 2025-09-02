@@ -426,10 +426,21 @@ export default function SimpleOnboardingFlow() {
     <div className="max-w-4xl mx-auto p-4 pb-20"> {/* Added bottom padding for sticky button */}
       <Card>
         <CardHeader>
-          <CardTitle>Choose your habits</CardTitle>
-          <p className="text-muted-foreground">
-            Tap a habit to set it up. Start with what matters most.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Choose your habits</CardTitle>
+              <p className="text-muted-foreground">
+                Tap a habit to set it up. Start with what matters most.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/'}
+            >
+              Exit
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Category Filter */}
