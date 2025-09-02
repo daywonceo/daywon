@@ -124,7 +124,9 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
         `)
         .eq('user_id', user.id)
         .gte('activity_date', format(past7Days[0], 'yyyy-MM-dd'))
-        .lte('activity_date', format(past7Days[past7Days.length - 1], 'yyyy-MM-dd'));
+        .lte('activity_date', format(past7Days[past7Days.length - 1], 'yyyy-MM-dd'))
+        .is('habits.archived_at', null)
+        .or(`habits.ended_at.is.null,habits.ended_at.gte.${new Date().toISOString().split('T')[0]}`);
 
       if (error) throw error;
 
@@ -134,22 +136,33 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
       past7Days.forEach(date => {
         const dateStr = format(date, 'yyyy-MM-dd');
         const dayActivities = data?.filter(activity => {
-          // Only include activities for habits that weren't ended before this date
+          // Only include activities for habits that meet the catch-up criteria:
+          // archived_at IS NULL AND (ended_at IS NULL OR ended_at::date >= activity_date)
           const habit = habits?.find(h => h.id === activity.habit_id);
-          const wasEndedBeforeDate = habit?.ended_at && new Date(habit.ended_at) <= date;
+          if (habit?.archived_at) return false; // Skip archived habits
           
-          return activity.activity_date === dateStr && !wasEndedBeforeDate;
+          const activityDate = new Date(activity.activity_date);
+          const habitEndDate = habit?.ended_at ? new Date(habit.ended_at) : null;
+          
+          // Include if not ended, or if ended on or after the activity date
+          const meetsEndDateCriteria = !habitEndDate || habitEndDate >= activityDate;
+          
+          return activity.activity_date === dateStr && meetsEndDateCriteria;
         }) || [];
         
-        // Create entries for all user habits that weren't ended before this date
+        // Create entries for all user habits that meet the catch-up criteria for this date
         const completeActivities = userHabits
           .filter(habitName => {
-            // Only include habits that weren't ended before this date
+            // Apply the same logic: archived_at IS NULL AND (ended_at IS NULL OR ended_at::date >= current_date)
             const habit = habits?.find(h => 
               h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
             );
-            const wasEndedBeforeDate = habit?.ended_at && new Date(habit.ended_at) <= date;
-            return !wasEndedBeforeDate;
+            if (habit?.archived_at) return false; // Skip archived habits
+            
+            const habitEndDate = habit?.ended_at ? new Date(habit.ended_at) : null;
+            
+            // Include if not ended, or if ended on or after this date
+            return !habitEndDate || habitEndDate >= date;
           })
           .map(habitName => {
             // Find existing activity by habit name (case insensitive)
