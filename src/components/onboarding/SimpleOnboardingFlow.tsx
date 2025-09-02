@@ -439,8 +439,9 @@ export default function SimpleOnboardingFlow() {
               variant="outline" 
               size="sm"
               onClick={() => {
+                console.log('Exit button clicked');
                 localStorage.setItem('onboardingCompleted', 'true');
-                navigate('/');
+                window.location.href = '/';
               }}
             >
               Exit
