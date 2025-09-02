@@ -133,7 +133,7 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Show onboarding only if explicitly requested
+  // Show onboarding only if explicitly requested or if accessing /onboarding route
   if (showOnboarding) {
     return <SimpleOnboardingFlow />;
   }
@@ -147,7 +147,7 @@ const AppContent: React.FC = () => {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/guidance" element={<Guidance />} />
         <Route path="/premium" element={<GoPremium />} />
-        <Route path="/onboarding" element={<GoOnboarding />} />
+        <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/saved-quotes" element={<SavedQuotes />} />
