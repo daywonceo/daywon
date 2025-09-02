@@ -63,8 +63,8 @@ const AllHabitsDialog: React.FC<AllHabitsDialogProps> = ({ open, onOpenChange })
   };
 
   const { activeHabits, archivedHabits } = useMemo(() => {
-    const active = habits?.filter(h => h.status === 'active') ?? [];
-    const archived = habits?.filter(h => h.status === 'archived') ?? [];
+    const active = habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at) ?? [];
+    const archived = habits?.filter(h => h.status === 'archived' || h.archived_at) ?? [];
     return { activeHabits: active, archivedHabits: archived };
   }, [habits]);
 

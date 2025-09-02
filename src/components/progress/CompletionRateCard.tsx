@@ -13,8 +13,8 @@ interface CompletionRateCardProps {
 const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) => {
   const { habits } = useHabits();
   
-  // Use all active habits instead of just the default ones
-  const activeHabitNames = userHabits || habits?.filter(h => h.status === 'active').map(h => h.name) || [];
+  // Use all active habits instead of just the default ones (exclude ended and archived)
+  const activeHabitNames = userHabits || habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
   
   const { weeklyStats } = useHabitStats(activeHabitNames);
 

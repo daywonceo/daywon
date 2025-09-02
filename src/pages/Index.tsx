@@ -134,8 +134,8 @@ const Index = () => {
     ? topHabits
     : ["Workout", "Devotions", "Read"];
 
-  // Get all active habit names for sections that need to show all habits
-  const allActiveHabitNames = allHabits?.filter(h => h.status === 'active').map(h => h.name) || [];
+  // Get all active habit names for sections that need to show all habits (not ended or archived)
+  const allActiveHabitNames = allHabits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50/50 via-white to-blue-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">

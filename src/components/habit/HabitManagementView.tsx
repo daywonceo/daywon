@@ -70,7 +70,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
   }).reverse();
 
   const activeHabits = useMemo(() => {
-    return habits?.filter(h => h.status === 'active') ?? [];
+    return habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at) ?? [];
   }, [habits]);
 
   // Filter habits based on selected filter
@@ -118,47 +118,65 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
     try {
       const { data, error } = await supabase
         .from('habit_activities')
-        .select('*')
+        .select(`
+          *,
+          habits!inner(ended_at, archived_at)
+        `)
         .eq('user_id', user.id)
         .gte('activity_date', format(past7Days[0], 'yyyy-MM-dd'))
         .lte('activity_date', format(past7Days[past7Days.length - 1], 'yyyy-MM-dd'));
 
       if (error) throw error;
 
-      // Group activities by date
+      // Group activities by date, filtering out habits that were ended before the activity date
       const groupedActivities: Record<string, HabitActivity[]> = {};
       
       past7Days.forEach(date => {
         const dateStr = format(date, 'yyyy-MM-dd');
-        const dayActivities = data?.filter(activity => activity.activity_date === dateStr) || [];
+        const dayActivities = data?.filter(activity => {
+          // Only include activities for habits that weren't ended before this date
+          const habit = habits?.find(h => h.id === activity.habit_id);
+          const wasEndedBeforeDate = habit?.ended_at && new Date(habit.ended_at) <= date;
+          
+          return activity.activity_date === dateStr && !wasEndedBeforeDate;
+        }) || [];
         
-        // Create entries for all user habits, even if not in database
-        const completeActivities = userHabits.map(habitName => {
-          // Find existing activity by habit name (case insensitive)
-          const existingActivity = dayActivities.find(a => 
-            a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
-          );
-          const habitRecord = habits?.find(h => 
-            h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
-          );
-          
-          if (existingActivity) {
+        // Create entries for all user habits that weren't ended before this date
+        const completeActivities = userHabits
+          .filter(habitName => {
+            // Only include habits that weren't ended before this date
+            const habit = habits?.find(h => 
+              h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
+            );
+            const wasEndedBeforeDate = habit?.ended_at && new Date(habit.ended_at) <= date;
+            return !wasEndedBeforeDate;
+          })
+          .map(habitName => {
+            // Find existing activity by habit name (case insensitive)
+            const existingActivity = dayActivities.find(a => 
+              a.habit_name.toLowerCase().trim() === habitName.toLowerCase().trim()
+            );
+            const habitRecord = habits?.find(h => 
+              h.name.toLowerCase().trim() === habitName.toLowerCase().trim()
+            );
+            
+            if (existingActivity) {
+              return {
+                id: existingActivity.id,
+                habit_id: existingActivity.habit_id,
+                habit_name: existingActivity.habit_name,
+                activity_date: existingActivity.activity_date,
+                status: existingActivity.status as 'completed' | 'failed' | 'empty'
+              };
+            }
+            
             return {
-              id: existingActivity.id,
-              habit_id: existingActivity.habit_id,
-              habit_name: existingActivity.habit_name,
-              activity_date: existingActivity.activity_date,
-              status: existingActivity.status as 'completed' | 'failed' | 'empty'
+              habit_id: habitRecord?.id,
+              habit_name: habitName,
+              activity_date: dateStr,
+              status: 'empty' as const
             };
-          }
-          
-          return {
-            habit_id: habitRecord?.id,
-            habit_name: habitName,
-            activity_date: dateStr,
-            status: 'empty' as const
-          };
-        });
+          });
         
         groupedActivities[dateStr] = completeActivities;
       });

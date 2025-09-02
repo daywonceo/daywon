@@ -64,13 +64,18 @@ async function computeMetrics(supabase: any, userId: string, week_start: string,
     ? Math.max(...prs.map((p: any) => Number(p.weight_increase_percent || 0)))
     : 0;
 
-  // Habit activities
+  // Habit activities - only include habits that weren't ended before the week
   const { data: habits, error: habitsErr } = await supabase
     .from('habit_activities')
-    .select('activity_date, habit_id')
+    .select(`
+      activity_date, 
+      habit_id,
+      habits!inner(ended_at)
+    `)
     .gte('activity_date', week_start)
     .lte('activity_date', week_end)
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .or(`habits.ended_at.is.null,habits.ended_at.gt.${week_end}`);
   if (habitsErr) throw habitsErr;
   const active_days = new Set((habits || []).map((h: any) => h.activity_date)).size;
   const habits_logged = new Set((habits || []).map((h: any) => h.habit_id)).size;

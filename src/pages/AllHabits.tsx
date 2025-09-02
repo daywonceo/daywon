@@ -24,8 +24,8 @@ const AllHabits = () => {
   const navigate = useNavigate();
   const { habits } = useHabits();
   
-  // Get all active habit names
-  const allActiveHabitNames = habits?.filter(h => h.status === 'active').map(h => h.name) || [];
+  // Get all active habit names (not ended or archived)
+  const allActiveHabitNames = habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50/50 via-white to-blue-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200">
