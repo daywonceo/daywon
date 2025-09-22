@@ -212,9 +212,9 @@ const Index = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={triggerEndOfDayProcessing}
+                onClick={() => triggerEndOfDayProcessing(7)}
                 className="text-xs px-2 py-1.5 h-8 opacity-50 hover:opacity-100"
-                title="Trigger end-of-day processing (Dev only)"
+                title="Trigger end-of-day processing for last 7 days (Dev only)"
               >
                 🌙
               </Button>

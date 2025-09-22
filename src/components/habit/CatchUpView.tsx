@@ -41,6 +41,27 @@ const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps)
     }
   }, [open, user]);
 
+  // Listen for habit data updates and refresh
+  useEffect(() => {
+    const handleDataUpdate = () => {
+      if (open && user) {
+        console.log('Habit data updated, refreshing catch-up view...');
+        loadActivities();
+      }
+    };
+    
+    // Listen for data update events
+    window.addEventListener('habitEndOfDayProcessedV2', handleDataUpdate);
+    window.addEventListener('habitDataUpdatedV2', handleDataUpdate);
+    window.addEventListener('habitDataSyncedV2', handleDataUpdate);
+    
+    return () => {
+      window.removeEventListener('habitEndOfDayProcessedV2', handleDataUpdate);
+      window.removeEventListener('habitDataUpdatedV2', handleDataUpdate);
+      window.removeEventListener('habitDataSyncedV2', handleDataUpdate);
+    };
+  }, [open, user]);
+
   const loadActivities = async () => {
     if (!user) return;
     

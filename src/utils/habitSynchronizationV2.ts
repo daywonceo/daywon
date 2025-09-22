@@ -334,9 +334,9 @@ export const forceSyncFromServerV2 = async (): Promise<boolean> => {
 };
 
 // Mark uncompleted habits as failed at end of day - V2 version
-export const processEndOfDayHabitsV2 = async (): Promise<void> => {
+export const processEndOfDayHabitsV2 = async (daysToProcess: number = 7): Promise<void> => {
   try {
-    console.log('🌙 Processing end-of-day habits (V2)...');
+    console.log(`🌙 Processing end-of-day habits for the last ${daysToProcess} days (V2)...`);
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -344,28 +344,33 @@ export const processEndOfDayHabitsV2 = async (): Promise<void> => {
       return;
     }
 
-    // Get the current date in YYYY-MM-DD format
-    const today = new Date();
+    // Get the current date and time
+    const now = new Date();
     
-    // Check if we need to process yesterday's habits
-    // If it's after midnight but before the day boundary (e.g., 4 AM),
-    // we consider it part of the previous day
-    const processDate = new Date(today);
-    if (today.getHours() < DAY_BOUNDARY_HOUR) {
-      processDate.setDate(processDate.getDate() - 1);
+    // Process all days from yesterday going back the specified number of days
+    const datesToProcess: string[] = [];
+    for (let daysBack = 1; daysBack <= daysToProcess; daysBack++) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - daysBack);
+      
+      // Skip future dates and today (we only process completed days)
+      if (date >= now) continue;
+      
+      const dateStr = date.toISOString().split('T')[0];
+      datesToProcess.push(dateStr);
     }
     
-    // Process habits for date that just ended
-    const yesterday = new Date(processDate);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    if (datesToProcess.length === 0) {
+      console.log('📅 No past dates to process');
+      return;
+    }
     
-    console.log(`📅 Processing habits for date: ${yesterdayStr}`);
+    console.log(`📅 Processing habits for dates: ${datesToProcess.join(', ')}`);
     
     // Get all active habits from the database
     const { data: activeHabits, error: habitsError } = await supabase
       .from('habits')
-      .select('id, name')
+      .select('id, name, created_at')
       .eq('user_id', user.id)
       .eq('status', 'active')
       .is('ended_at', null)
@@ -389,53 +394,74 @@ export const processEndOfDayHabitsV2 = async (): Promise<void> => {
     console.log(`💾 Current local activities count: ${activities.length}`);
     
     let changesDetected = false;
-    let processedCount = 0;
+    let totalProcessedCount = 0;
+    const processedByDate: Record<string, number> = {};
     
-    // For each active habit, check if there's an activity for yesterday
-    for (const habit of activeHabits) {
-      const yesterdayActivity = activities.find(
-        a => a.habitId === habit.id && a.date === yesterdayStr
-      );
+    // Process each date
+    for (const dateStr of datesToProcess) {
+      let dateProcessedCount = 0;
       
-      console.log(`🔍 Checking habit "${habit.name}" (${habit.id}) for ${yesterdayStr}:`, 
-        yesterdayActivity ? `Found: ${yesterdayActivity.status}` : 'Not found');
-      
-      // If no activity or status is empty, mark as "failed"
-      if (!yesterdayActivity || yesterdayActivity.status === "empty") {
-        // Create a failed activity entry
-        const newActivity: HabitActivityV2 = {
-          id: `local-${habit.id}-${yesterdayStr}-${Date.now()}`,
-          date: yesterdayStr,
-          habitId: habit.id,
-          habitName: habit.name,
-          status: "failed"
-        };
+      // For each active habit, check if there's an activity for this date
+      for (const habit of activeHabits) {
+        // Check if the habit existed on this date (don't mark habits as failed before they were created)
+        const habitCreatedDate = new Date(habit.created_at);
+        const processDate = new Date(dateStr);
         
-        // Remove any existing entry for this habit and date first
-        const existingIndex = activities.findIndex(
-          a => a.habitId === habit.id && a.date === yesterdayStr
-        );
-        
-        if (existingIndex >= 0) {
-          activities[existingIndex] = newActivity;
-        } else {
-          activities.push(newActivity);
+        if (processDate < habitCreatedDate) {
+          console.log(`⏭️ Skipping habit "${habit.name}" for ${dateStr} (habit created later: ${habit.created_at})`);
+          continue;
         }
         
-        changesDetected = true;
-        processedCount++;
+        const existingActivity = activities.find(
+          a => a.habitId === habit.id && a.date === dateStr
+        );
         
-        console.log(`❌ Marked habit "${habit.name}" (${habit.id}) as failed for ${yesterdayStr}`);
-      } else if (yesterdayActivity.status === "completed") {
-        console.log(`✅ Habit "${habit.name}" was already completed for ${yesterdayStr}`);
-      } else if (yesterdayActivity.status === "failed") {
-        console.log(`❌ Habit "${habit.name}" was already failed for ${yesterdayStr}`);
+        console.log(`🔍 Checking habit "${habit.name}" (${habit.id}) for ${dateStr}:`, 
+          existingActivity ? `Found: ${existingActivity.status}` : 'Not found');
+        
+        // If no activity or status is empty, mark as "failed"
+        if (!existingActivity || existingActivity.status === "empty") {
+          // Create a failed activity entry
+          const newActivity: HabitActivityV2 = {
+            id: `local-${habit.id}-${dateStr}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            date: dateStr,
+            habitId: habit.id,
+            habitName: habit.name,
+            status: "failed"
+          };
+          
+          // Remove any existing entry for this habit and date first
+          const existingIndex = activities.findIndex(
+            a => a.habitId === habit.id && a.date === dateStr
+          );
+          
+          if (existingIndex >= 0) {
+            activities[existingIndex] = newActivity;
+          } else {
+            activities.push(newActivity);
+          }
+          
+          changesDetected = true;
+          dateProcessedCount++;
+          totalProcessedCount++;
+          
+          console.log(`❌ Marked habit "${habit.name}" (${habit.id}) as failed for ${dateStr}`);
+        } else if (existingActivity.status === "completed") {
+          console.log(`✅ Habit "${habit.name}" was already completed for ${dateStr}`);
+        } else if (existingActivity.status === "failed") {
+          console.log(`❌ Habit "${habit.name}" was already failed for ${dateStr}`);
+        }
+      }
+      
+      processedByDate[dateStr] = dateProcessedCount;
+      if (dateProcessedCount > 0) {
+        console.log(`📅 ${dateStr}: Marked ${dateProcessedCount} habits as failed`);
       }
     }
     
     // Save changes if any were made
     if (changesDetected) {
-      console.log(`💾 Saving ${processedCount} habit changes to local storage...`);
+      console.log(`💾 Saving ${totalProcessedCount} habit changes across ${Object.keys(processedByDate).filter(date => processedByDate[date] > 0).length} dates to local storage...`);
       saveOfflineData({ habitActivitiesV2: activities });
       
       // Clear streak caches since we've updated data
@@ -453,12 +479,21 @@ export const processEndOfDayHabitsV2 = async (): Promise<void> => {
       
       // Notify the application that data has changed
       window.dispatchEvent(new CustomEvent('habitEndOfDayProcessedV2', {
-        detail: { date: yesterdayStr, habitsProcessed: processedCount, totalHabits: activeHabits.length }
+        detail: { 
+          datesProcessed: datesToProcess,
+          habitsProcessed: totalProcessedCount, 
+          totalHabits: activeHabits.length,
+          processedByDate 
+        }
       }));
       
-      console.log(`✅ End-of-day processing complete: ${processedCount} habits marked as failed for ${yesterdayStr}`);
+      // Also dispatch a general data update event for UI refresh
+      window.dispatchEvent(new CustomEvent('habitDataUpdatedV2'));
+      
+      console.log(`✅ End-of-day processing complete: ${totalProcessedCount} habits marked as failed across ${datesToProcess.length} dates`);
+      console.log('📊 Summary by date:', processedByDate);
     } else {
-      console.log(`✨ No changes needed for end-of-day processing (${yesterdayStr})`);
+      console.log(`✨ No changes needed for end-of-day processing (${datesToProcess.join(', ')})`);
     }
   } catch (error) {
     console.error("❌ Failed to process end-of-day habits (V2):", error);

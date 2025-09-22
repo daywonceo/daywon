@@ -59,8 +59,8 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
         // Initialize synchronization
         const cleanup = initHabitSyncV2();
         
-        // Process end-of-day habits
-        processEndOfDayHabitsV2();
+        // Process end-of-day habits for the last 7 days (not just yesterday)
+        processEndOfDayHabitsV2(7);
         
         // Also run end-of-day processing when a new day starts
         const midnightCheck = setInterval(() => {
@@ -68,7 +68,7 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
           // Run at the start of each new day (midnight to 1 AM)
           if (now.getHours() === 0 && now.getMinutes() < 5) {
             console.log('New day detected, processing end-of-day habits...');
-            processEndOfDayHabitsV2();
+            processEndOfDayHabitsV2(7);
           }
         }, 300000); // Check every 5 minutes instead of every minute for better performance
         
@@ -79,7 +79,7 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
           
           if (!lastCheck || lastCheck !== today) {
             console.log('App focused on new day, processing end-of-day habits...');
-            processEndOfDayHabitsV2();
+            processEndOfDayHabitsV2(7);
             localStorage.setItem('lastEndOfDayCheck', today);
           }
         };

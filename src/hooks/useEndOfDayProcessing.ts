@@ -4,15 +4,17 @@ import { toast } from './use-toast';
 export const useEndOfDayProcessing = () => {
   useEffect(() => {
     const handleEndOfDayProcessed = (event: CustomEvent) => {
-      const { date, habitsProcessed, totalHabits } = event.detail;
-      console.log(`End-of-day processing completed for ${date}: ${habitsProcessed}/${totalHabits} habits processed`);
+      const { datesProcessed, habitsProcessed, totalHabits, processedByDate } = event.detail;
+      console.log(`End-of-day processing completed for ${datesProcessed.length} dates: ${habitsProcessed}/${totalHabits} habits processed`);
       
       if (habitsProcessed > 0) {
+        const datesWithChanges = Object.keys(processedByDate).filter(date => processedByDate[date] > 0);
+        
         // Show a toast to let users know habits were auto-marked
         toast({
-          title: "Day completed",
-          description: `${habitsProcessed} incomplete habit${habitsProcessed !== 1 ? 's' : ''} marked as failed`,
-          duration: 4000,
+          title: "Past days completed",
+          description: `${habitsProcessed} incomplete habit${habitsProcessed !== 1 ? 's' : ''} marked as failed across ${datesWithChanges.length} date${datesWithChanges.length !== 1 ? 's' : ''}`,
+          duration: 5000,
         });
       }
     };
@@ -26,13 +28,13 @@ export const useEndOfDayProcessing = () => {
   }, []);
 
   // Manual trigger for end-of-day processing (useful for testing)
-  const triggerEndOfDayProcessing = async () => {
+  const triggerEndOfDayProcessing = async (daysToProcess: number = 7) => {
     try {
       const { processEndOfDayHabitsV2 } = await import('@/utils/habitSynchronizationV2');
-      await processEndOfDayHabitsV2();
+      await processEndOfDayHabitsV2(daysToProcess);
       toast({
         title: "Processing complete",
-        description: "End-of-day habit processing triggered manually",
+        description: `End-of-day habit processing triggered for last ${daysToProcess} days`,
         duration: 3000,
       });
     } catch (error) {
