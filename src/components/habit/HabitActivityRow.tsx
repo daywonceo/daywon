@@ -114,7 +114,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   }, [recoveryDialog.habitName, toggleStatus]);
 
   return (
-    <>
+    <React.Fragment key={`activity-row-${activityIndex}`}>
       {/* Day number - simplified without photo upload capability */}
       <div className="flex items-center justify-center w-full">
         <ClickableDate
@@ -162,7 +162,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
         streakCount={recoveryDialog.streakCount}
         onRecoveryComplete={handleRecoveryComplete}
       />
-    </>
+    </React.Fragment>
   );
 };
 
