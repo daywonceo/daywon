@@ -26,6 +26,7 @@ import SimpleOnboardingFlow from "./components/onboarding/SimpleOnboardingFlow";
 import { useAuth } from "./contexts/AuthContext";
 import { useAppTimeTracking } from "./hooks/useAppTimeTracking";
 import { useAppSessions } from "./hooks/useAppSessions";
+import { useAuthErrorHandler } from "./hooks/useAuthErrorHandler";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,9 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
   const { sessionTime, sectionTimes } = useAppTimeTracking();
   const { saveSession } = useAppSessions();
   const { user } = useAuth();
+  
+  // Add auth error handling
+  useAuthErrorHandler();
   
   // Initialize habit synchronization
   useEffect(() => {

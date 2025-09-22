@@ -8,8 +8,9 @@ import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "Read"]) => {
   const { habits } = useHabits();
   const stats = useMemo(() => {
-    const now = new Date();
-    const activities = getHabitActivitiesV2();
+    try {
+      const now = new Date();
+      const activities = getHabitActivitiesV2();
     
     // Get user-aware time window for weekly stats (7 days or since account creation)
     const { startDate: weekStartDate, totalDaysAvailable: weekDays } = getUserTimeWindowSync("week");
@@ -91,24 +92,46 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
       return !!activity;
     }).length;
     
-    return {
-      weeklyStats: {
-        completedCount,
-        totalPossible,
-        percentage: weeklyCompletionRate
-      },
-      streakStats: {
-        bestStreak,
-        bestStreakHabit,
-        currentStreaks,
-        longestStreak,
-        longestStreakHabit
-      },
-      todayStats: {
-        completedCount: todayCompletedCount,
-        totalHabits: userHabits.length
-      }
-    };
+      return {
+        weeklyStats: {
+          completedCount,
+          totalPossible,
+          percentage: weeklyCompletionRate
+        },
+        streakStats: {
+          bestStreak,
+          bestStreakHabit,
+          currentStreaks,
+          longestStreak,
+          longestStreakHabit
+        },
+        todayStats: {
+          completedCount: todayCompletedCount,
+          totalHabits: userHabits.length
+        }
+      };
+    } catch (error) {
+      console.error('Error calculating habit stats:', error);
+      // Return default stats on error
+      return {
+        weeklyStats: {
+          completedCount: 0,
+          totalPossible: 0,
+          percentage: 0
+        },
+        streakStats: {
+          bestStreak: 0,
+          bestStreakHabit: '',
+          currentStreaks: [],
+          longestStreak: 0,
+          longestStreakHabit: ''
+        },
+        todayStats: {
+          completedCount: 0,
+          totalHabits: userHabits.length
+        }
+      };
+    }
   }, [userHabits.join(','), habits]);
 
   return stats;

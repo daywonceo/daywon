@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { saveOfflineData, getOfflineData } from "./offlineStorage";
 import { toast } from "@/hooks/use-toast";
 import { HabitActivityV2 } from "./habitActivityV2";
+import { clearStreakCaches } from "./habitStreaksV2";
 
 // Define constants for synchronization
 const SYNC_INTERVAL = 60 * 1000; // 1 minute
@@ -171,6 +172,9 @@ export const synchronizeHabitsV2 = async (forceSync = false): Promise<boolean> =
         saveOfflineData({ habitActivitiesV2: mergedActivities });
         console.log("Updated local storage with synchronized activities (V2)");
         
+        // Clear streak caches when data is synchronized
+        clearStreakCaches();
+        
         // Notify the application that data has changed
         window.dispatchEvent(new CustomEvent('habitDataSyncedV2', {
           detail: { count: serverActivities.length }
@@ -234,6 +238,9 @@ export const recordHabitActivityWithSyncV2 = async (
     
     // Save to local storage immediately
     saveOfflineData({ habitActivitiesV2: activities });
+    
+    // Clear streak caches when habit data is updated
+    clearStreakCaches();
     
     // Dispatch event for UI updates
     window.dispatchEvent(new CustomEvent('habitStatusChangedV2', { 

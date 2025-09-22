@@ -57,18 +57,28 @@ const Index = () => {
   // Initialize V2 habit system with backend ID handling
   useHabitSystemTransition();
 
-  // Auto-refresh data when app becomes visible or gains focus
+  // Auto-refresh data when app becomes visible or gains focus (with throttling)
   useEffect(() => {
+    let throttleTimer: NodeJS.Timeout | null = null;
+    
+    const throttledRefresh = () => {
+      if (throttleTimer) return; // Already pending
+      
+      throttleTimer = setTimeout(() => {
+        console.log('App became visible/focused, refreshing data...');
+        setRefreshTrigger(prev => prev + 1);
+        throttleTimer = null;
+      }, 2000); // Throttle to max once every 2 seconds
+    };
+
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('App became visible, refreshing data...');
-        setRefreshTrigger(prev => prev + 1);
+        throttledRefresh();
       }
     };
 
     const handleFocus = () => {
-      console.log('App gained focus, refreshing data...');
-      setRefreshTrigger(prev => prev + 1);
+      throttledRefresh();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -77,6 +87,9 @@ const Index = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
+      if (throttleTimer) {
+        clearTimeout(throttleTimer);
+      }
     };
   }, []);
 

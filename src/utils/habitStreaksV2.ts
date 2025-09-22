@@ -8,13 +8,35 @@ export const formatStreakNumber = (streak: number): string => {
   return `${(streak / 1000000).toFixed(1).replace('.0', '')}M`;
 };
 
+// Simple cache to avoid redundant calculations
+const streakCache = new Map<string, { result: number; timestamp: number }>();
+const CACHE_DURATION = 30000; // 30 seconds
+
+// Clear caches when data is updated
+export const clearStreakCaches = () => {
+  streakCache.clear();
+  longestStreakCache.clear();
+};
+
 // Calculate streak for a specific habit_id on a specific date - V2 using habit_id
 export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habitEndDate?: string | null): number => {
   try {
-    const activities = getHabitActivitiesV2();
     const targetDateStr = targetDate.toISOString().split('T')[0];
+    const cacheKey = `${habitId}-${targetDateStr}-${habitEndDate || 'no-end'}`;
     
-    console.log(`Calculating streak for habit_id ${habitId} on ${targetDateStr}`);
+    // Check cache first
+    const cached = streakCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.result;
+    }
+    
+    // Only log in development mode to reduce production noise
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      console.log(`Calculating streak for habit_id ${habitId} on ${targetDateStr}`);
+    }
+    
+    const activities = getHabitActivitiesV2();
     
     // Filter activities for this habit_id, sorted by date (newest first)
     const habitActivities = activities
@@ -24,8 +46,12 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habi
     // Check if the target date was completed
     const targetActivity = habitActivities.find(activity => activity.date === targetDateStr);
     if (!targetActivity || targetActivity.status !== 'completed') {
-      console.log(`Target date ${targetDateStr} not completed for habit_id ${habitId}`);
-      return 0;
+      if (isDev) {
+        console.log(`Target date ${targetDateStr} not completed for habit_id ${habitId}`);
+      }
+      const result = 0;
+      streakCache.set(cacheKey, { result, timestamp: Date.now() });
+      return result;
     }
     
     // Count consecutive days backwards from target date
@@ -40,35 +66,34 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habi
       
       // Stop counting if we've gone before the habit's end date
       if (endDate && currentDate < endDate) {
-        console.log(`Reached habit end date ${habitEndDate}, stopping streak count at: ${streak}`);
+        if (isDev) {
+          console.log(`Reached habit end date ${habitEndDate}, stopping streak count at: ${streak}`);
+        }
         break;
       }
       
       const activity = habitActivities.find(a => a.date === currentDateStr);
       
-      console.log(`Checking date ${currentDateStr}:`, activity);
-      
       if (activity && activity.status === 'completed') {
         streak++;
-        console.log(`Day ${currentDateStr} completed, streak now: ${streak}`);
         // Move to previous day
         currentDate.setDate(currentDate.getDate() - 1);
       } else if (activity && activity.status === 'failed') {
         // Check if there's a recovery for this failed day using habitName for compatibility
         if (hasRecentRecovery(activity.habitName, currentDate)) {
           streak++;
-          console.log(`Day ${currentDateStr} failed but recovered, streak now: ${streak}`);
           currentDate.setDate(currentDate.getDate() - 1);
           continue;
         }
         // Failed day breaks the streak (unless recovered)
-        console.log(`Day ${currentDateStr} failed, breaking streak at: ${streak}`);
+        if (isDev) {
+          console.log(`Day ${currentDateStr} failed, breaking streak at: ${streak}`);
+        }
         break;
       } else {
         // Check if the date is in the future (this shouldn't break the streak)
         const now = new Date();
         if (currentDate > now) {
-          console.log(`Date ${currentDateStr} is in the future, continuing streak check`);
           currentDate.setDate(currentDate.getDate() - 1);
           continue;
         }
@@ -85,26 +110,37 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habi
           // Otherwise, treat unchecked as incomplete
           const currentHour = now.getHours();
           if (currentHour < 23) { // Allow until 11 PM
-            console.log(`Today (${todayStr}) has no activity yet but it's still early, continuing streak check`);
+            if (isDev) {
+              console.log(`Today (${todayStr}) has no activity yet but it's still early, continuing streak check`);
+            }
             currentDate.setDate(currentDate.getDate() - 1);
             continue;
           }
         }
         
         // No activity recorded (empty) or past day without completion - this breaks the streak
-        console.log(`Day ${currentDateStr} has no completion, breaking streak at: ${streak}`);
+        if (isDev) {
+          console.log(`Day ${currentDateStr} has no completion, breaking streak at: ${streak}`);
+        }
         break;
       }
       
       // Safety check to prevent infinite loops - but allow for very long streaks
       const daysDiff = Math.floor((targetDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
       if (daysDiff > 3650) { // Allow up to 10 years of streaks
-        console.log(`Safety break at ${daysDiff} days - very long streak detected`);
+        if (isDev) {
+          console.log(`Safety break at ${daysDiff} days - very long streak detected`);
+        }
         break;
       }
     }
     
-    console.log(`Final streak for habit_id ${habitId}: ${streak}`);
+    // Cache the result
+    streakCache.set(cacheKey, { result: streak, timestamp: Date.now() });
+    
+    if (isDev) {
+      console.log(`Final streak for habit_id ${habitId}: ${streak}`);
+    }
     return streak;
   } catch (error) {
     console.error("Error calculating streak for date:", error);
@@ -112,9 +148,18 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habi
   }
 };
 
+// Cache for longest streaks to avoid repeated calculations
+const longestStreakCache = new Map<string, { result: number; timestamp: number }>();
+
 // Calculate the longest streak ever achieved for a habit_id - V2 using habit_id
 export const calculateLongestStreakV2 = (habitId: string): number => {
   try {
+    // Check cache first
+    const cached = longestStreakCache.get(habitId);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.result;
+    }
+
     const activities = getHabitActivitiesV2();
     
     // Filter and sort activities for this habit_id
@@ -122,7 +167,10 @@ export const calculateLongestStreakV2 = (habitId: string): number => {
       .filter(activity => activity.habitId === habitId && activity.status === 'completed')
       .sort((a, b) => a.date.localeCompare(b.date));
     
-    if (habitActivities.length === 0) return 0;
+    if (habitActivities.length === 0) {
+      longestStreakCache.set(habitId, { result: 0, timestamp: Date.now() });
+      return 0;
+    }
     
     let longestStreak = 0;
     let currentStreak = 0;
@@ -153,7 +201,13 @@ export const calculateLongestStreakV2 = (habitId: string): number => {
     // Don't forget to check the final streak
     longestStreak = Math.max(longestStreak, currentStreak);
     
-    console.log(`Longest streak for habit_id ${habitId}: ${longestStreak}`);
+    // Cache the result
+    longestStreakCache.set(habitId, { result: longestStreak, timestamp: Date.now() });
+    
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      console.log(`Longest streak for habit_id ${habitId}: ${longestStreak}`);
+    }
     return longestStreak;
   } catch (error) {
     console.error("Error calculating longest streak:", error);
