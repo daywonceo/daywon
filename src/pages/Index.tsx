@@ -26,6 +26,7 @@ import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard
 import WeeklySummaryCard from "@/components/progress/WeeklySummaryCard";
 import { useAutomaticDeduplication } from "@/hooks/useAutomaticDeduplication";
 import { useHabitSystemTransition } from "@/hooks/useHabitSystemTransition";
+import { useEndOfDayProcessing } from "@/hooks/useEndOfDayProcessing";
 import HabitManagementView from "@/components/habit/HabitManagementView";
 
 const Index = () => {
@@ -56,6 +57,9 @@ const Index = () => {
   
   // Initialize V2 habit system with backend ID handling
   useHabitSystemTransition();
+  
+  // Listen for end-of-day processing events
+  const { triggerEndOfDayProcessing } = useEndOfDayProcessing();
 
   // Auto-refresh data when app becomes visible or gains focus (with throttling)
   useEffect(() => {
@@ -191,6 +195,7 @@ const Index = () => {
 
           <div className="flex justify-between items-center mb-4 sm:mb-6">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
+          <div className="flex gap-2">
             <Button 
               variant="outline" 
               size="sm"
@@ -201,6 +206,20 @@ const Index = () => {
               <span className="hidden sm:inline">Manage Habits</span>
               <span className="sm:hidden">Manage</span>
             </Button>
+            
+            {/* Development-only end-of-day trigger button */}
+            {process.env.NODE_ENV === 'development' && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={triggerEndOfDayProcessing}
+                className="text-xs px-2 py-1.5 h-8 opacity-50 hover:opacity-100"
+                title="Trigger end-of-day processing (Dev only)"
+              >
+                🌙
+              </Button>
+            )}
+          </div>
           </div>
 
           <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />

@@ -332,3 +332,135 @@ export const forceSyncFromServerV2 = async (): Promise<boolean> => {
     return false;
   }
 };
+
+// Mark uncompleted habits as failed at end of day - V2 version
+export const processEndOfDayHabitsV2 = async (): Promise<void> => {
+  try {
+    console.log('🌙 Processing end-of-day habits (V2)...');
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.log('❌ No user logged in, skipping end-of-day processing');
+      return;
+    }
+
+    // Get the current date in YYYY-MM-DD format
+    const today = new Date();
+    
+    // Check if we need to process yesterday's habits
+    // If it's after midnight but before the day boundary (e.g., 4 AM),
+    // we consider it part of the previous day
+    const processDate = new Date(today);
+    if (today.getHours() < DAY_BOUNDARY_HOUR) {
+      processDate.setDate(processDate.getDate() - 1);
+    }
+    
+    // Process habits for date that just ended
+    const yesterday = new Date(processDate);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    console.log(`📅 Processing habits for date: ${yesterdayStr}`);
+    
+    // Get all active habits from the database
+    const { data: activeHabits, error: habitsError } = await supabase
+      .from('habits')
+      .select('id, name')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .is('ended_at', null)
+      .is('archived_at', null);
+
+    if (habitsError) {
+      console.error('❌ Failed to fetch active habits:', habitsError);
+      return;
+    }
+
+    if (!activeHabits || activeHabits.length === 0) {
+      console.log('📝 No active habits found');
+      return;
+    }
+
+    console.log(`📋 Found ${activeHabits.length} active habits:`, activeHabits.map(h => h.name).join(', '));
+
+    const offlineData = getOfflineData();
+    const activities = offlineData.habitActivitiesV2 || [];
+    
+    console.log(`💾 Current local activities count: ${activities.length}`);
+    
+    let changesDetected = false;
+    let processedCount = 0;
+    
+    // For each active habit, check if there's an activity for yesterday
+    for (const habit of activeHabits) {
+      const yesterdayActivity = activities.find(
+        a => a.habitId === habit.id && a.date === yesterdayStr
+      );
+      
+      console.log(`🔍 Checking habit "${habit.name}" (${habit.id}) for ${yesterdayStr}:`, 
+        yesterdayActivity ? `Found: ${yesterdayActivity.status}` : 'Not found');
+      
+      // If no activity or status is empty, mark as "failed"
+      if (!yesterdayActivity || yesterdayActivity.status === "empty") {
+        // Create a failed activity entry
+        const newActivity: HabitActivityV2 = {
+          id: `local-${habit.id}-${yesterdayStr}-${Date.now()}`,
+          date: yesterdayStr,
+          habitId: habit.id,
+          habitName: habit.name,
+          status: "failed"
+        };
+        
+        // Remove any existing entry for this habit and date first
+        const existingIndex = activities.findIndex(
+          a => a.habitId === habit.id && a.date === yesterdayStr
+        );
+        
+        if (existingIndex >= 0) {
+          activities[existingIndex] = newActivity;
+        } else {
+          activities.push(newActivity);
+        }
+        
+        changesDetected = true;
+        processedCount++;
+        
+        console.log(`❌ Marked habit "${habit.name}" (${habit.id}) as failed for ${yesterdayStr}`);
+      } else if (yesterdayActivity.status === "completed") {
+        console.log(`✅ Habit "${habit.name}" was already completed for ${yesterdayStr}`);
+      } else if (yesterdayActivity.status === "failed") {
+        console.log(`❌ Habit "${habit.name}" was already failed for ${yesterdayStr}`);
+      }
+    }
+    
+    // Save changes if any were made
+    if (changesDetected) {
+      console.log(`💾 Saving ${processedCount} habit changes to local storage...`);
+      saveOfflineData({ habitActivitiesV2: activities });
+      
+      // Clear streak caches since we've updated data
+      clearStreakCaches();
+      
+      // Try to sync the failed activities to the server
+      if (navigator.onLine) {
+        console.log('🔄 Syncing end-of-day changes to server...');
+        synchronizeHabitsV2(true).catch(error => {
+          console.error('❌ Failed to sync end-of-day changes:', error);
+        });
+      } else {
+        console.log('📡 Offline - changes will sync when connection is restored');
+      }
+      
+      // Notify the application that data has changed
+      window.dispatchEvent(new CustomEvent('habitEndOfDayProcessedV2', {
+        detail: { date: yesterdayStr, habitsProcessed: processedCount, totalHabits: activeHabits.length }
+      }));
+      
+      console.log(`✅ End-of-day processing complete: ${processedCount} habits marked as failed for ${yesterdayStr}`);
+    } else {
+      console.log(`✨ No changes needed for end-of-day processing (${yesterdayStr})`);
+    }
+  } catch (error) {
+    console.error("❌ Failed to process end-of-day habits (V2):", error);
+  }
+};

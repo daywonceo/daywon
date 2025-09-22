@@ -52,28 +52,44 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     // Only initialize sync if user is logged in
     if (user) {
-      // Dynamically import to avoid circular dependencies
-      import('./utils/habitSynchronization').then(({ initHabitSync, processEndOfDayHabits }) => {
-        console.log('Initializing habit synchronization system');
+      // Use the V2 synchronization system
+      import('./utils/habitSynchronizationV2').then(({ initHabitSyncV2, processEndOfDayHabitsV2 }) => {
+        console.log('Initializing habit synchronization system (V2)');
         
         // Initialize synchronization
-        const cleanup = initHabitSync();
+        const cleanup = initHabitSyncV2();
         
         // Process end-of-day habits
-        processEndOfDayHabits();
+        processEndOfDayHabitsV2();
         
         // Also run end-of-day processing when a new day starts
         const midnightCheck = setInterval(() => {
           const now = new Date();
-          // Run at the start of each new day (midnight)
-          if (now.getHours() === 0 && now.getMinutes() === 0) {
-            processEndOfDayHabits();
+          // Run at the start of each new day (midnight to 1 AM)
+          if (now.getHours() === 0 && now.getMinutes() < 5) {
+            console.log('New day detected, processing end-of-day habits...');
+            processEndOfDayHabitsV2();
           }
-        }, 60000); // Check every minute
+        }, 300000); // Check every 5 minutes instead of every minute for better performance
+        
+        // Also check when app regains focus (user opens app on new day)
+        const handleFocus = () => {
+          const lastCheck = localStorage.getItem('lastEndOfDayCheck');
+          const today = new Date().toISOString().split('T')[0];
+          
+          if (!lastCheck || lastCheck !== today) {
+            console.log('App focused on new day, processing end-of-day habits...');
+            processEndOfDayHabitsV2();
+            localStorage.setItem('lastEndOfDayCheck', today);
+          }
+        };
+        
+        window.addEventListener('focus', handleFocus);
         
         return () => {
-          cleanup();
+          cleanup?.();
           clearInterval(midnightCheck);
+          window.removeEventListener('focus', handleFocus);
         };
       });
     }
