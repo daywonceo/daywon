@@ -152,11 +152,11 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* High Performance Habits */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-primary/10">
+              <div className="flex flex-col items-center gap-3 pb-3 border-b border-primary/10">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
                   <div className="w-4 h-4 border-2 border-white rounded-full"></div>
                 </div>
-                <div>
+                <div className="text-center">
                   <h3 className="font-semibold text-foreground">High Performance</h3>
                   <p className="text-xs text-muted-foreground">70%+ completion rate</p>
                 </div>
@@ -203,11 +203,11 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
             
             {/* Needs Attention Habits */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-red-200/50">
+              <div className="flex flex-col items-center gap-3 pb-3 border-b border-red-200/50">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
                   <div className="w-4 h-4 border-2 border-white rounded-full bg-white/20"></div>
                 </div>
-                <div>
+                <div className="text-center">
                   <h3 className="font-semibold text-foreground">Needs Focus</h3>
                   <p className="text-xs text-muted-foreground">Below 40% completion</p>
                 </div>
