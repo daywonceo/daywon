@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "@/hooks/use-toast";
-import SwipeableCard from "@/components/SwipeableCard";
+
 import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitCategories";
@@ -18,12 +18,12 @@ import { useNavigate } from "react-router-dom";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
 import { useHabits } from "@/hooks/useHabits";
 import TopHabitsSelectorModal from "@/components/habit/TopHabitsSelectorModal";
-import AllHabitsDialog from "@/components/habit/AllHabitsDialog";
+
 import HabitGallery from "@/components/habit/HabitGallery";
 import CompletionRateCard from "@/components/progress/CompletionRateCard";
 import MilestoneTracker from "@/components/progress/MilestoneTracker";
 import DailyEncouragementCard from "@/components/progress/DailyEncouragementCard";
-import WeeklySummaryCard from "@/components/progress/WeeklySummaryCard";
+
 import { useAutomaticDeduplication } from "@/hooks/useAutomaticDeduplication";
 import { useHabitSystemTransition } from "@/hooks/useHabitSystemTransition";
 import { useEndOfDayProcessing } from "@/hooks/useEndOfDayProcessing";
@@ -205,19 +205,6 @@ const Index = () => {
                 <List className="mr-2 h-4 w-4" />
                 <span className="sm:inline">Manage Habits</span>
               </Button>
-              
-              {/* Development-only end-of-day trigger button */}
-              {process.env.NODE_ENV === 'development' && (
-                <Button 
-                  variant="ghost" 
-                  size="icon-sm"
-                  onClick={() => triggerEndOfDayProcessing(7)}
-                  className="opacity-50 hover:opacity-100"
-                  title="Trigger end-of-day processing for last 7 days (Dev only)"
-                >
-                  <Calendar className="h-4 w-4" />
-                </Button>
-              )}
             </div>
           </div>
 

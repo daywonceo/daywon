@@ -15,8 +15,6 @@ import GoPremium from "./pages/GoPremium";
 import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
-import SavedQuotes from "./pages/SavedQuotes";
-import SpotifySuccess from "./pages/SpotifySuccess";
 import AllHabits from "./pages/AllHabits";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -172,7 +170,6 @@ const AppContent: React.FC = () => {
         <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/saved-quotes" element={<SavedQuotes />} />
         <Route path="/all-habits" element={<AllHabits />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
