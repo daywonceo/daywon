@@ -1,12 +1,12 @@
 // Export core functionality
 export { 
-  recordHabitActivityV2 as recordHabitActivity, 
-  getHabitActivitiesV2 as getHabitActivities, 
+  recordHabitActivity, 
+  getHabitActivities, 
   getHabitActivitiesByIdV2,
   getHabitActivitiesByNameV2,
-  loadHabitActivitiesFromDatabaseV2 as loadHabitActivitiesFromDatabase,
+  loadHabitActivitiesFromDatabase,
   migrateHabitActivitiesToV2,
-  type HabitActivityV2 as HabitActivity,
+  type HabitActivity,
   isHabitRecentlyActiveSyncV2 as isHabitRecentlyActiveSync
 } from "./habitActivity";
 export { calculateHabitStats, type HabitStats } from "./habitStats";

@@ -1,5 +1,5 @@
 
-import { getHabitActivitiesV2, HabitActivityV2 } from "./habitActivity";
+import { getHabitActivities, HabitActivity } from "./habitActivity";
 import { getUserTimeWindowSync } from "./userTimeWindow";
 
 export interface HabitStats {
@@ -15,7 +15,7 @@ export interface HabitStats {
 // Calculate habit statistics for the specified timeframe with automatic categorization using habit_id
 export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] } => {
   try {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     
     // Get user-aware time window based on account creation date
     const { startDate, totalDaysAvailable } = getUserTimeWindowSync(timeframe);
@@ -46,7 +46,7 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       });
       
       // Remove duplicates by date - keep the latest status for each date
-      const uniqueActivityMap = new Map<string, HabitActivityV2>();
+      const uniqueActivityMap = new Map<string, HabitActivity>();
       habitActivities.forEach(activity => {
         const existing = uniqueActivityMap.get(activity.date);
         // Keep the activity with the latest creation (activities are usually ordered by creation)

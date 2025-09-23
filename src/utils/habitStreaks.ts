@@ -1,4 +1,4 @@
-import { getHabitActivitiesV2, type HabitActivityV2 } from "./habitActivity";
+import { getHabitActivities, type HabitActivity } from "./habitActivity";
 import { hasRecentRecovery } from "./streakRecovery";
 
 // Format large numbers with appropriate suffixes (e.g., 1.2k, 1.5M)
@@ -36,7 +36,7 @@ export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habi
       console.log(`Calculating streak for habit_id ${habitId} on ${targetDateStr}`);
     }
     
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     
     // Filter activities for this habit_id, sorted by date (newest first)
     const habitActivities = activities
@@ -160,7 +160,7 @@ export const calculateLongestStreakV2 = (habitId: string): number => {
       return cached.result;
     }
 
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     
     // Filter and sort activities for this habit_id
     const habitActivities = activities
@@ -218,7 +218,7 @@ export const calculateLongestStreakV2 = (habitId: string): number => {
 // Calculate the overall longest streak across all habits - V2 using habit_id
 export const calculateOverallLongestStreakV2 = (): { streak: number; habitId: string; habitName: string } => {
   try {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const habitIds = [...new Set(activities.map(a => a.habitId))];
     
     let overallLongest = 0;
@@ -246,7 +246,7 @@ export const calculateOverallLongestStreakV2 = (): { streak: number; habitId: st
 // Backward compatibility wrapper that uses habit_id when available
 export const calculateStreakForDate = (habitName: string, targetDate: Date): number => {
   try {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     
     // Find the habit_id for this habitName
     const habitActivity = activities.find(a => a.habitName === habitName);
@@ -266,7 +266,7 @@ export const calculateStreakForDate = (habitName: string, targetDate: Date): num
 // Backward compatibility wrapper
 export const calculateLongestStreak = (habitName: string): number => {
   try {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     
     // Find the habit_id for this habitName
     const habitActivity = activities.find(a => a.habitName === habitName);

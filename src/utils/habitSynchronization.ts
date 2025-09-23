@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { saveOfflineData, getOfflineData } from "./offlineStorage";
 import { toast } from "@/hooks/use-toast";
-import { HabitActivityV2 } from "./habitActivity";
+import { HabitActivity } from "./habitActivity";
 import { clearStreakCaches } from "./habitStreaks";
 
 // Define constants for synchronization

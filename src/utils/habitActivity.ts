@@ -1,7 +1,7 @@
 import { saveOfflineData, getOfflineData } from "./offlineStorage";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface HabitActivityV2 {
+export interface HabitActivity {
   id: string;
   date: string; // ISO date string
   habitId: string; // UUID reference to habits table
@@ -50,7 +50,7 @@ const getHabitCategory = (habitName: string): string => {
 };
 
 // Record a habit activity using habit ID
-export const recordHabitActivityV2 = async (
+export const recordHabitActivity = async (
   habitName: string, 
   status: "completed" | "failed" | "empty", 
   date: Date = new Date()
@@ -75,7 +75,7 @@ export const recordHabitActivityV2 = async (
 };
 
 // Get all habit activities - updated format
-export const getHabitActivitiesV2 = (): HabitActivityV2[] => {
+export const getHabitActivities = (): HabitActivity[] => {
   const offlineData = getOfflineData();
   return offlineData.habitActivitiesV2 || [];
 };
@@ -111,7 +111,7 @@ export const migrateHabitActivitiesToV2 = async (): Promise<void> => {
     const habitNameToId = new Map(habits?.map(h => [h.name.toLowerCase().trim(), h.id]) || []);
 
     // Convert old activities to new format
-    const migratedActivities: HabitActivityV2[] = [];
+    const migratedActivities: HabitActivity[] = [];
 
     for (const oldActivity of oldActivities) {
       // Find habit ID using normalized name matching
@@ -148,7 +148,7 @@ export const migrateHabitActivitiesToV2 = async (): Promise<void> => {
 };
 
 // Load habit activities from database and sync with local storage
-export const loadHabitActivitiesFromDatabaseV2 = async (): Promise<HabitActivityV2[]> => {
+export const loadHabitActivitiesFromDatabase = async (): Promise<HabitActivity[]> => {
   try {
     // First migrate old data if needed
     await migrateHabitActivitiesToV2();
@@ -166,17 +166,17 @@ export const loadHabitActivitiesFromDatabaseV2 = async (): Promise<HabitActivity
     }
     
     // Return the current state from local storage (which will be updated if sync succeeded)
-    return getHabitActivitiesV2();
+    return getHabitActivities();
   } catch (error) {
     console.error("Failed to load activities from database (V2):", error);
     // Fallback to local storage
-    return getHabitActivitiesV2();
+    return getHabitActivities();
   }
 };
 
 // Check if habit has been completed in the last 30 days (using habit ID)
 export const isHabitRecentlyActiveV2 = async (habitId: string): Promise<boolean> => {
-  const activities = await loadHabitActivitiesFromDatabaseV2();
+  const activities = await loadHabitActivitiesFromDatabase();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
@@ -190,7 +190,7 @@ export const isHabitRecentlyActiveV2 = async (habitId: string): Promise<boolean>
 
 // Synchronous version for backward compatibility (using habit ID)
 export const isHabitRecentlyActiveSyncV2 = (habitId: string): boolean => {
-  const activities = getHabitActivitiesV2();
+  const activities = getHabitActivities();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
@@ -203,14 +203,14 @@ export const isHabitRecentlyActiveSyncV2 = (habitId: string): boolean => {
 };
 
 // Get activities for a specific habit by ID
-export const getHabitActivitiesByIdV2 = (habitId: string): HabitActivityV2[] => {
-  return getHabitActivitiesV2().filter(activity => activity.habitId === habitId);
+export const getHabitActivitiesByIdV2 = (habitId: string): HabitActivity[] => {
+  return getHabitActivities().filter(activity => activity.habitId === habitId);
 };
 
 // Get activities for a specific habit by name (for backward compatibility)
-export const getHabitActivitiesByNameV2 = (habitName: string): HabitActivityV2[] => {
+export const getHabitActivitiesByNameV2 = (habitName: string): HabitActivity[] => {
   const normalizedName = habitName.toLowerCase().trim();
-  return getHabitActivitiesV2().filter(activity => 
+  return getHabitActivities().filter(activity => 
     activity.habitName.toLowerCase().trim() === normalizedName
   );
 };
