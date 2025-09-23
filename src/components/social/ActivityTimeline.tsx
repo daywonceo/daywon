@@ -115,7 +115,8 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
     const IconComponent = config.icon;
 
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 border-2 border-blue-500 p-2 bg-blue-100">
+        <div className="text-xs text-blue-600 mb-1">DEBUG: Badge wrapper</div>
         <Badge className={`${config.color} border-0 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 hover-scale ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-2 animate-pulse' : ''}`}>
           <IconComponent size={12} className={config.iconColor} />
           {habitType.charAt(0).toUpperCase() + habitType.slice(1)}
@@ -283,7 +284,8 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               </span>
                             </div>
                             
-                            <div className="mb-4">
+                            <div style={{ marginBottom: '1rem', textAlign: 'left', border: '2px solid red', padding: '8px', backgroundColor: 'yellow' }}>
+                              <div style={{ fontSize: '10px', color: 'red', marginBottom: '4px' }}>DEBUG: Badge container with inline styles</div>
                               {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
                             </div>
                             
