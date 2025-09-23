@@ -33,10 +33,14 @@ export const UserMention = ({
         )}
         onClick={onClick}
       >
-        {displayName && (
-          <span className="font-semibold">{displayName}</span>
+        {displayName ? (
+          <>
+            <span className="font-semibold">{displayName}</span>
+            <span className="text-muted-foreground">@{username}</span>
+          </>
+        ) : (
+          <span className="text-muted-foreground">@{username}</span>
         )}
-        <span className="text-muted-foreground">@{username}</span>
       </span>
     );
   }
@@ -58,15 +62,21 @@ export const UserMention = ({
             {(displayName || username).charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        <div className="flex flex-col min-w-0">
-          {displayName && (
-            <span className="font-semibold text-sm text-foreground truncate">
-              {displayName}
+        <div className="flex items-center gap-1 min-w-0">
+          {displayName ? (
+            <>
+              <span className="font-semibold text-sm text-foreground truncate">
+                {displayName}
+              </span>
+              <span className="text-xs text-muted-foreground truncate">
+                @{username}
+              </span>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground truncate">
+              @{username}
             </span>
           )}
-          <span className="text-xs text-muted-foreground truncate">
-            @{username}
-          </span>
         </div>
       </div>
     );
@@ -90,14 +100,20 @@ export const UserMention = ({
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
-        {displayName && (
-          <div className="font-semibold text-foreground truncate">
-            {displayName}
+        {displayName ? (
+          <>
+            <div className="font-semibold text-foreground truncate">
+              {displayName}
+            </div>
+            <div className="text-sm text-muted-foreground truncate">
+              @{username}
+            </div>
+          </>
+        ) : (
+          <div className="text-sm text-muted-foreground truncate">
+            @{username}
           </div>
         )}
-        <div className="text-sm text-muted-foreground truncate">
-          @{username}
-        </div>
       </div>
     </div>
   );

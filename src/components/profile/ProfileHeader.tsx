@@ -7,6 +7,7 @@ import { Trophy, Users, Calendar } from "lucide-react";
 
 interface ProfileData {
   name: string;
+  username: string;
   avatar: string;
   friendCount: number;
   daysActive: number;
@@ -33,7 +34,10 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
             </div>
           </div>
           
-          <h2 className="text-xl font-bold mb-4">{profile.name}</h2>
+          <div className="mb-4">
+            <h2 className="text-xl font-bold">{profile.name}</h2>
+            <p className="text-muted-foreground">@{profile.username}</p>
+          </div>
           
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-4 w-full max-w-sm">

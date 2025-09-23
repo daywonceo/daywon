@@ -50,6 +50,7 @@ const Profile = () => {
   // Get real profile data
   const profile = {
     name: currentUserProfile?.display_name || "User",
+    username: currentUserProfile?.username || "user",
     avatar: currentUserProfile?.avatar_url || "/lovable-uploads/dba09bea-3695-42d9-b2ba-6da163dee57a.png",
     friendCount: friends.length,
     habitScore: monthlyHabitScore,
