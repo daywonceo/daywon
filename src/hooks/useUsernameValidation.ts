@@ -66,8 +66,10 @@ export const useUsernameValidation = (displayName: string = '', userId?: string)
         has_special_chars: /[._]/.test(value)
       });
 
-      const { data, error: rpcError } = await supabase.rpc('check_username_availability', {
-        username_input: value
+      // Use validate_username_enhanced directly to include current user context
+      const { data, error: rpcError } = await supabase.rpc('validate_username_enhanced', {
+        username_input: value,
+        user_id: (await supabase.auth.getUser()).data.user?.id || null
       });
 
       if (rpcError) {
@@ -79,6 +81,13 @@ export const useUsernameValidation = (displayName: string = '', userId?: string)
       }
 
       const result = data as { valid: boolean; error?: string; message?: string; suggestions?: string[] };
+      
+      console.log('Username validation result:', { 
+        username: value, 
+        result,
+        currentUser: (await supabase.auth.getUser()).data.user?.id 
+      });
+      
       setIsAvailable(result.valid);
       
       if (!result.valid) {

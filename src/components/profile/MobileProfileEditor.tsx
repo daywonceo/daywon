@@ -106,8 +106,9 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
       return;
     }
 
-    // Check username availability
-    if (isAvailable === false && username) {
+    // Check username availability only if username has actually changed
+    const hasUsernameChanged = username !== currentUserProfile?.username;
+    if (hasUsernameChanged && isAvailable === false && username) {
       toast({
         title: "Username not available",
         description: usernameError || "This username is not available. Please choose another one.",
