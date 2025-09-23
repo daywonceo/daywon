@@ -149,7 +149,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div className="flex items-center space-x-4">
@@ -242,11 +242,16 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
               </div>
 
               {/* Posts for this date */}
-              <div className="space-y-3 ml-5">
+              <div className="space-y-3 ml-5 mr-2">
                 {dayPosts.map((post) => {
                   const displayName = post.profiles.display_name || post.profiles.email;
                   const avatarUrl = post.profiles.avatar_url;
-                  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
+                  const postDate = new Date(post.created_at);
+                  const timeAgo = isToday(postDate) 
+                    ? format(postDate, 'h:mm a')
+                    : isYesterday(postDate)
+                    ? 'Yesterday'
+                    : format(postDate, 'MMM d');
                   
                   return (
                     <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden">
