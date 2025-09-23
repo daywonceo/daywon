@@ -23,7 +23,7 @@ const Header = () => {
   return (
     <SettingsProvider>
       <header 
-        className={`py-4 sm:py-6 px-4 sm:px-5 flex items-center justify-between max-w-3xl mx-auto w-full border-b border-green-100 dark:border-green-800 sticky bg-white dark:bg-gray-900 z-10 transition-all duration-300 ${show ? 'top-0' : '-top-24'}`}
+        className={`py-4 px-responsive flex items-center justify-between max-w-4xl mx-auto w-full border-b border-border glass sticky z-10 transition-all duration-300 ${show ? 'top-0' : '-top-24'}`}
       >
         <div className="flex-1 flex items-center">
           {!isMobile && (
@@ -40,8 +40,8 @@ const Header = () => {
           )}
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tighter flex items-center">
-          Day<span className="tracking-[-0.1em] text-green-700 dark:text-green-500">Won</span>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tighter flex items-center">
+          Day<span className="tracking-[-0.1em] text-primary">Won</span>
         </h1>
 
         <div className="flex-1 flex justify-end items-center space-x-1">
@@ -51,8 +51,8 @@ const Header = () => {
             trigger={
               <Button 
                 variant="outline" 
-                className="text-green-800 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900 rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0"
-                size="icon"
+                className="text-primary border-primary/20 hover:bg-primary/10 rounded-full"
+                size="icon-sm"
                 aria-label="Add Habit"
               >
                 <Plus size={isMobile ? 18 : 20} />

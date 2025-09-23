@@ -155,22 +155,24 @@ const Index = () => {
   const allActiveHabitNames = allHabits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50/50 via-white to-blue-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       <PullToRefresh onRefresh={handleRefresh}>
-        <main className="flex-grow px-4 sm:px-5 pb-24 pt-6 sm:pt-10 max-w-4xl mx-auto w-full">
-          <div className="text-center mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gray-800 dark:text-gray-100">
+        <main className="flex-grow px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               {getGreeting()}
             </h1>
-            <p className="text-md text-gray-500 dark:text-gray-400 mt-2">Ready to build some great habits?</p>
+            <p className="text-sm text-muted-foreground">Ready to build some great habits?</p>
           </div>
 
-          {/* New Progress Components */}
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-8 sm:mb-12">
+          {/* Progress Overview */}
+          <div className="grid grid-cols-1 gap-4 mb-8">
             <WeeklySummaryCard />
-            <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-            <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+              <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+            </div>
             <DailyEncouragementCard />
           </div>
 
@@ -193,33 +195,32 @@ const Index = () => {
             userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits}
           />
 
-          <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 tracking-tight">Recent Activity</h2>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowHabitManagement(true)}
-              className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-8 sm:h-9"
-            >
-              <List className="mr-1 sm:mr-2 h-3 sm:h-4 w-3 sm:w-4" />
-              <span className="hidden sm:inline">Manage Habits</span>
-              <span className="sm:hidden">Manage</span>
-            </Button>
-            
-            {/* Development-only end-of-day trigger button */}
-            {process.env.NODE_ENV === 'development' && (
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground">Recent Activity</h2>
+            <div className="flex gap-2">
               <Button 
-                variant="ghost" 
+                variant="outline" 
                 size="sm"
-                onClick={() => triggerEndOfDayProcessing(7)}
-                className="text-xs px-2 py-1.5 h-8 opacity-50 hover:opacity-100"
-                title="Trigger end-of-day processing for last 7 days (Dev only)"
+                onClick={() => setShowHabitManagement(true)}
+                className="flex-1 sm:flex-none"
               >
-                🌙
+                <List className="mr-2 h-4 w-4" />
+                <span className="sm:inline">Manage Habits</span>
               </Button>
-            )}
-          </div>
+              
+              {/* Development-only end-of-day trigger button */}
+              {process.env.NODE_ENV === 'development' && (
+                <Button 
+                  variant="ghost" 
+                  size="icon-sm"
+                  onClick={() => triggerEndOfDayProcessing(7)}
+                  className="opacity-50 hover:opacity-100"
+                  title="Trigger end-of-day processing for last 7 days (Dev only)"
+                >
+                  <Calendar className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
           <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />

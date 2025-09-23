@@ -56,23 +56,23 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
   }, [onHabitUpdate, refreshActivities]);
 
   return (
-    <Card className="mb-8 sm:mb-12 border-green-200 shadow-md">
-      <CardContent className="p-3 sm:p-6">
-        <div className="grid grid-cols-[auto_1fr_repeat(3,1fr)] gap-2 sm:gap-4 items-center">
+    <Card className="mb-8 shadow-sm border-border">
+      <CardContent className="p-responsive">
+        <div className="grid grid-cols-[auto_1fr_repeat(3,1fr)] gap-3 sm:gap-4 items-center">
           {/* Header row */}
           <div className="text-center">
-            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 block">
+            <span className="text-xs font-medium text-muted-foreground block">
               Day
             </span>
           </div>
           <div className="text-center min-w-0">
-            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 block truncate">
+            <span className="text-xs font-medium text-muted-foreground block truncate">
               Activity
             </span>
           </div>
           {userHabits.map((habit) => (
             <div key={habit} className="text-center min-w-0">
-              <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 block truncate">
+              <span className="text-xs font-medium text-muted-foreground block truncate">
                 {habit}
               </span>
             </div>

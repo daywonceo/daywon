@@ -39,16 +39,16 @@ const Footer = () => {
   };
   
   return (
-    <footer className="fixed bottom-0 left-0 right-0 border-t border-green-100 dark:border-green-800 bg-white dark:bg-gray-900 shadow-lg z-10">
-      <div className="max-w-3xl mx-auto flex items-center justify-between px-2 sm:px-8 py-1 sm:py-2">
+    <footer className="fixed bottom-0 left-0 right-0 border-t border-border glass shadow-lg z-10">
+      <div className="max-w-4xl mx-auto flex items-center justify-between px-2 sm:px-8 py-2">
         {tabs.map((tab) => (
           <button 
             key={tab.id}
             className={cn(
-              "flex flex-col items-center py-1 sm:py-2 px-3 sm:px-4 rounded-md transition-colors",
+              "flex flex-col items-center py-2 px-3 rounded-md interactive-subtle",
               activeTab === tab.id 
-                ? "text-green-700 dark:text-green-400" 
-                : "text-gray-500 dark:text-gray-400"
+                ? "text-primary bg-primary/10" 
+                : "text-muted-foreground hover:text-foreground"
             )}
             onClick={() => handleTabChange(tab.id, tab.path)}
           >
