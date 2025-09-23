@@ -58,21 +58,16 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
   return (
     <Card className="mb-8 shadow-sm border-border">
       <CardContent className="p-4 sm:p-6">
-        <div className="grid grid-cols-[auto_1fr_repeat(3,minmax(0,1fr))] gap-2 sm:gap-4 items-center">
+        <div className="grid grid-cols-[auto_repeat(3,1fr)] gap-3 sm:gap-6 items-center">
           {/* Header row */}
           <div className="text-center">
             <span className="text-xs font-medium text-muted-foreground block">
               Day
             </span>
           </div>
-          <div className="text-center">
-            <span className="text-xs font-medium text-muted-foreground block">
-              Activity
-            </span>
-          </div>
           {userHabits.map((habit) => (
-            <div key={habit} className="text-center px-1">
-              <span className="text-[10px] sm:text-xs font-medium text-muted-foreground block whitespace-nowrap overflow-hidden text-ellipsis">
+            <div key={habit} className="text-center px-2">
+              <span className="text-xs font-medium text-muted-foreground block whitespace-nowrap overflow-hidden text-ellipsis">
                 {habit}
               </span>
             </div>
@@ -86,10 +81,6 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                 {/* Day skeleton */}
                 <div className="flex items-center justify-center">
                   <Skeleton className="h-8 w-8 rounded-full" />
-                </div>
-                {/* Activity text skeleton */}
-                <div className="flex items-center justify-center">
-                  <Skeleton className="h-4 w-20" />
                 </div>
                 {/* Habit status boxes skeleton */}
                 {userHabits.map((_, habitIndex) => (

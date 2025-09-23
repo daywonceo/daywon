@@ -123,18 +123,6 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
         />
       </div>
       
-      {/* Activity description */}
-      <div className="flex items-center justify-center text-center min-w-0">
-        <ActivityTextDisplay
-          activity={activity}
-          activityIndex={activityIndex}
-          activities={activities}
-          setActivities={setActivities}
-          onToggleEditMode={toggleEditMode}
-          onUpdateActivityText={updateActivityText}
-        />
-      </div>
-      
       {/* Habit status boxes */}
       {activity.categories.map((category) => {
         // Find the habit data for this category
