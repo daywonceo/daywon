@@ -59,13 +59,13 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
       const filePath = `avatars/${currentUserProfile?.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('habit-photos')
+        .from('avatars')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('habit-photos')
+        .from('avatars')
         .getPublicUrl(filePath);
 
       await updateProfile({ avatar_url: publicUrl });
