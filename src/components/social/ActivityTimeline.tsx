@@ -260,11 +260,6 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                   return (
                     <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden mx-1 sm:mx-0">
                       <CardContent className="p-6">
-                        {/* Badge section - full width centered */}
-                        <div className="mb-4 flex justify-center">
-                          {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
-                        </div>
-                        
                         <div className="flex items-start space-x-4">
                           <div className="relative">
                             <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-gray-800 shadow-md">
@@ -286,6 +281,10 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                                 <Clock size={12} className="mr-1" />
                                 {timeAgo}
                               </span>
+                            </div>
+                            
+                            <div className="mb-4 -ml-4 -mr-6 flex justify-center">
+                              {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
                             </div>
                             
                             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4">
