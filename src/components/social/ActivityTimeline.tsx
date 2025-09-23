@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Filter, TrendingUp, Calendar, Users } from 'lucide-react';
+import { Filter, TrendingUp, Calendar, Activity, Target, Award, Zap, Book, Brain, Heart as HeartIcon, Utensils, User, Clock } from 'lucide-react';
 import { useSocialPosts } from '@/hooks/useSocialPosts';
 import CommentSection from './CommentSection';
 import ExtendedReactions from './ExtendedReactions';
@@ -74,24 +74,64 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
     if (!habitType) return null;
     
     const badgeConfig = {
-      fitness: { emoji: "💪", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" },
-      reading: { emoji: "📚", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
-      meditation: { emoji: "🧘‍♀️", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
-      spiritual: { emoji: "🙏", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" },
-      health: { emoji: "💧", color: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300" },
-      nutrition: { emoji: "🥗", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
-      personal: { emoji: "⭐", color: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300" },
+      fitness: { 
+        icon: Activity, 
+        color: "bg-gradient-to-r from-red-500 to-pink-500 text-white", 
+        iconColor: "text-white" 
+      },
+      reading: { 
+        icon: Book, 
+        color: "bg-gradient-to-r from-blue-500 to-cyan-500 text-white", 
+        iconColor: "text-white" 
+      },
+      meditation: { 
+        icon: Brain, 
+        color: "bg-gradient-to-r from-purple-500 to-indigo-500 text-white", 
+        iconColor: "text-white" 
+      },
+      spiritual: { 
+        icon: Target, 
+        color: "bg-gradient-to-r from-yellow-500 to-orange-500 text-white", 
+        iconColor: "text-white" 
+      },
+      health: { 
+        icon: HeartIcon, 
+        color: "bg-gradient-to-r from-cyan-500 to-blue-500 text-white", 
+        iconColor: "text-white" 
+      },
+      nutrition: { 
+        icon: Utensils, 
+        color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white", 
+        iconColor: "text-white" 
+      },
+      personal: { 
+        icon: User, 
+        color: "bg-gradient-to-r from-slate-500 to-gray-500 text-white", 
+        iconColor: "text-white" 
+      },
     };
 
     const config = badgeConfig[habitType as keyof typeof badgeConfig] || badgeConfig.personal;
+    const IconComponent = config.icon;
 
     return (
-      <Badge className={`${config.color} border-0 text-xs font-medium ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-1' : ''}`}>
-        {config.emoji} {habitType}
-        {streakCount && streakCount > 1 && (
-          <span className="ml-1 font-bold">{streakCount}</span>
+      <div className="flex items-center gap-2">
+        <Badge className={`${config.color} border-0 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 hover-scale ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-2 animate-pulse' : ''}`}>
+          <IconComponent size={12} className={config.iconColor} />
+          {habitType.charAt(0).toUpperCase() + habitType.slice(1)}
+          {streakCount && streakCount > 1 && (
+            <span className="ml-1 bg-black/20 px-1.5 py-0.5 rounded-full text-xs font-bold">
+              {streakCount}
+            </span>
+          )}
+        </Badge>
+        {isMilestone && (
+          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 border-0 text-xs font-bold px-2 py-1 animate-fade-in">
+            <Award size={10} className="mr-1" />
+            MILESTONE
+          </Badge>
         )}
-      </Badge>
+      </div>
     );
   };
 
@@ -111,49 +151,62 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-            <TrendingUp className="text-blue-600 dark:text-blue-400" size={18} />
+      <div className="flex items-center justify-between mb-8 animate-fade-in">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg hover-scale">
+              <TrendingUp className="text-white" size={20} />
+            </div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"></div>
           </div>
           <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               {showOnlyFriends ? 'Friends Activity' : 'Activity Timeline'}
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {showOnlyFriends ? 'See what your friends are achieving' : 'Latest habit completions and milestones'}
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {showOnlyFriends ? 'Track your friends\' achievements and progress' : 'Real-time updates from your community'}
             </p>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+      <div className="flex flex-wrap gap-3 mb-6 animate-fade-in">
+        <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
           {(['all', 'milestones', 'streaks'] as const).map((filterType) => (
             <Button
               key={filterType}
               variant={filter === filterType ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setFilter(filterType)}
-              className="text-xs px-3 py-1 h-7"
+              className={`text-xs px-4 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
+                filter === filterType 
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
-              {filterType === 'all' && <Filter size={12} className="mr-1" />}
+              {filterType === 'all' && <Filter size={12} className="mr-1.5" />}
+              {filterType === 'milestones' && <Award size={12} className="mr-1.5" />}
+              {filterType === 'streaks' && <Zap size={12} className="mr-1.5" />}
               {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
             </Button>
           ))}
         </div>
 
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
           {(['today', 'week', 'month', 'all'] as const).map((timeFilterType) => (
             <Button
               key={timeFilterType}
               variant={timeFilter === timeFilterType ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setTimeFilter(timeFilterType)}
-              className="text-xs px-3 py-1 h-7"
+              className={`text-xs px-4 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
+                timeFilter === timeFilterType 
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
-              <Calendar size={12} className="mr-1" />
+              <Clock size={12} className="mr-1.5" />
               {timeFilterType.charAt(0).toUpperCase() + timeFilterType.slice(1)}
             </Button>
           ))}
@@ -163,22 +216,29 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       {/* Timeline */}
       <div className="space-y-6">
         {Object.keys(groupedPosts).length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-gray-400 mb-2">📅</div>
-            <p className="text-sm text-gray-500">No activities found</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {showOnlyFriends ? 'Your friends haven\'t shared any activities yet' : 'Complete some habits to see them here!'}
+          <div className="text-center py-12 animate-fade-in">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="text-gray-400" size={24} />
+            </div>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No activities found</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+              {showOnlyFriends ? 'Your friends haven\'t shared any activities yet. Encourage them to start their journey!' : 'Complete some habits to see them here and inspire others!'}
             </p>
           </div>
         ) : (
           Object.entries(groupedPosts).map(([dateKey, dayPosts]) => (
             <div key={dateKey} className="space-y-3">
               {/* Date Header */}
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-white">{dateKey}</h3>
-                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">{dayPosts.length} activities</span>
+              <div className="flex items-center space-x-4 mb-4 animate-fade-in">
+                <div className="relative">
+                  <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-sm"></div>
+                  <div className="absolute inset-0 w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse opacity-50"></div>
+                </div>
+                <h3 className="font-bold text-base text-gray-900 dark:text-white">{dateKey}</h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"></div>
+                <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-0 text-xs font-medium">
+                  {dayPosts.length} {dayPosts.length === 1 ? 'activity' : 'activities'}
+                </Badge>
               </div>
 
               {/* Posts for this date */}
@@ -189,34 +249,42 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
                   
                   return (
-                    <Card key={post.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={displayName} />
-                            <AvatarFallback className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs font-semibold">
-                              {displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
+                    <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="flex items-start space-x-4">
+                          <div className="relative">
+                            <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-gray-800 shadow-md">
+                              <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={displayName} />
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-bold">
+                                {displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                          </div>
                           
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-2 mb-1">
-                              <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                            <div className="flex items-center space-x-3 mb-3">
+                              <span className="font-semibold text-base text-gray-900 dark:text-white truncate">
                                 {displayName}
                               </span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">{timeAgo}</span>
+                              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                              <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                                <Clock size={12} className="mr-1" />
+                                {timeAgo}
+                              </span>
                             </div>
                             
-                            <div className="mb-2">
+                            <div className="mb-4">
                               {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
                             </div>
                             
-                            <p className="text-sm text-gray-900 dark:text-white mb-2">{post.content}</p>
-                            
-                            {post.caption && (
-                              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{post.caption}</p>
-                            )}
+                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4">
+                              <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
+                              
+                              {post.caption && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400 italic border-l-2 border-gray-300 dark:border-gray-600 pl-3">{post.caption}</p>
+                              )}
+                            </div>
                             
                             {/* Extended reactions */}
                             <ExtendedReactions
@@ -224,13 +292,13 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               currentReaction={post.user_reaction}
                               reactionCounts={post.reaction_counts}
                               onReact={handleReaction}
-                              className="mb-3"
+                              className="mb-4"
                             />
                             
                             {/* Comments section */}
                             <CommentSection 
                               postId={post.id}
-                              className="mt-3"
+                              className="border-t border-gray-200 dark:border-gray-700 pt-4"
                             />
                           </div>
                         </div>
