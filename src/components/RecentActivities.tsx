@@ -72,7 +72,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
           </div>
           {userHabits.map((habit) => (
             <div key={habit} className="text-center px-1">
-              <span className="text-xs font-medium text-muted-foreground block break-words leading-tight">
+              <span className="text-[10px] sm:text-xs font-medium text-muted-foreground block whitespace-nowrap overflow-hidden text-ellipsis">
                 {habit}
               </span>
             </div>
