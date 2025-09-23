@@ -115,7 +115,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
     const IconComponent = config.icon;
 
     return (
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center gap-2">
         <Badge className={`${config.color} border-0 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 hover-scale ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-2 animate-pulse' : ''}`}>
           <IconComponent size={12} className={config.iconColor} />
           {habitType.charAt(0).toUpperCase() + habitType.slice(1)}
