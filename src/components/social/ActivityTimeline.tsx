@@ -171,45 +171,49 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-6 animate-fade-in">
-        <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
-          {(['all', 'milestones', 'streaks'] as const).map((filterType) => (
-            <Button
-              key={filterType}
-              variant={filter === filterType ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setFilter(filterType)}
-              className={`text-xs px-4 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
-                filter === filterType 
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              {filterType === 'all' && <Filter size={12} className="mr-1.5" />}
-              {filterType === 'milestones' && <Award size={12} className="mr-1.5" />}
-              {filterType === 'streaks' && <Zap size={12} className="mr-1.5" />}
-              {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-            </Button>
-          ))}
+      <div className="space-y-3 mb-6 animate-fade-in">
+        <div className="flex flex-wrap gap-2 w-full">
+          <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
+            {(['all', 'milestones', 'streaks'] as const).map((filterType) => (
+              <Button
+                key={filterType}
+                variant={filter === filterType ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setFilter(filterType)}
+                className={`text-xs px-3 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
+                  filter === filterType 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                {filterType === 'all' && <Filter size={12} className="mr-1" />}
+                {filterType === 'milestones' && <Award size={12} className="mr-1" />}
+                {filterType === 'streaks' && <Zap size={12} className="mr-1" />}
+                {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+              </Button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
-          {(['today', 'week', 'month', 'all'] as const).map((timeFilterType) => (
-            <Button
-              key={timeFilterType}
-              variant={timeFilter === timeFilterType ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setTimeFilter(timeFilterType)}
-              className={`text-xs px-4 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
-                timeFilter === timeFilterType 
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              <Clock size={12} className="mr-1.5" />
-              {timeFilterType.charAt(0).toUpperCase() + timeFilterType.slice(1)}
-            </Button>
-          ))}
+        <div className="flex flex-wrap gap-2 w-full">
+          <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
+            {(['today', 'week', 'month', 'all'] as const).map((timeFilterType) => (
+              <Button
+                key={timeFilterType}
+                variant={timeFilter === timeFilterType ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setTimeFilter(timeFilterType)}
+                className={`text-xs px-3 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
+                  timeFilter === timeFilterType 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Clock size={12} className="mr-1" />
+                {timeFilterType.charAt(0).toUpperCase() + timeFilterType.slice(1)}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
