@@ -755,13 +755,15 @@ export type Database = {
           focus_areas: string[] | null
           id: string
           last_active: string | null
+          name_changed_at: string | null
           onboarding_complete: boolean | null
           reminder_opt_in: boolean | null
           reminder_time: string | null
           status: string | null
           updated_at: string
           user_intent: string | null
-          username: string | null
+          username: string
+          username_history: Json | null
         }
         Insert: {
           avatar_url?: string | null
@@ -772,13 +774,15 @@ export type Database = {
           focus_areas?: string[] | null
           id: string
           last_active?: string | null
+          name_changed_at?: string | null
           onboarding_complete?: boolean | null
           reminder_opt_in?: boolean | null
           reminder_time?: string | null
           status?: string | null
           updated_at?: string
           user_intent?: string | null
-          username?: string | null
+          username: string
+          username_history?: Json | null
         }
         Update: {
           avatar_url?: string | null
@@ -789,13 +793,15 @@ export type Database = {
           focus_areas?: string[] | null
           id?: string
           last_active?: string | null
+          name_changed_at?: string | null
           onboarding_complete?: boolean | null
           reminder_opt_in?: boolean | null
           reminder_time?: string | null
           status?: string | null
           updated_at?: string
           user_intent?: string | null
-          username?: string | null
+          username?: string
+          username_history?: Json | null
         }
         Relationships: []
       }
@@ -1460,6 +1466,14 @@ export type Database = {
           last_active: string
           status: string
         }[]
+      }
+      update_username_with_history: {
+        Args: { new_username: string; user_id: string }
+        Returns: boolean
+      }
+      validate_username_format: {
+        Args: { username_input: string }
+        Returns: boolean
       }
     }
     Enums: {
