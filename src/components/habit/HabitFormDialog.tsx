@@ -21,7 +21,7 @@ const HabitFormDialog: React.FC<HabitFormDialogProps> = ({ open, onOpenChange, h
   const [category, setCategory] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const { addHabit, updateHabit } = useHabits();
-  const { checkForDuplicate } = useHabitDeduplication();
+  // Removed deduplication functionality
 
   useEffect(() => {
     if (habitToEdit) {
@@ -41,18 +41,7 @@ const HabitFormDialog: React.FC<HabitFormDialogProps> = ({ open, onOpenChange, h
       return;
     }
 
-    // Check for duplicates only when creating new habits (not editing)
-    if (!habitToEdit) {
-      const duplicate = checkForDuplicate(name.trim());
-      if (duplicate) {
-        toast({ 
-          title: "That habit already exists — try editing the existing one!",
-          description: `Found existing habit: "${duplicate.name}"`,
-          variant: "destructive" 
-        });
-        return;
-      }
-    }
+    // Removed duplicate check functionality
 
     setIsSaving(true);
     try {

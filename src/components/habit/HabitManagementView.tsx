@@ -43,7 +43,7 @@ interface HabitActivity {
 const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewProps) => {
   const { user } = useAuth();
   const { habits, isLoading, updateHabit, deleteHabit, endHabit, archiveHabit, unarchiveHabit, refreshHabits, addHabit } = useHabits();
-  const { duplicateGroups, mergeDuplicateHabits, checkForDuplicate } = useHabitDeduplication();
+  // Removed deduplication functionality
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
   
@@ -252,22 +252,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
     }
   };
 
-  const handleMergeDuplicates = async () => {
-    setIsMerging(true);
-    try {
-      const result = await mergeDuplicateHabits();
-      if (result.success) {
-        toast({ title: result.message });
-        await refreshHabits();
-      } else {
-        toast({ title: result.error, variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Error merging duplicates", variant: "destructive" });
-    } finally {
-      setIsMerging(false);
-    }
-  };
+  // Removed deduplication functionality
 
   const handleToggleComplete = async (habit: Habit) => {
     const isCurrentlyCompleted = habitStatuses[habit.name] || false;
@@ -339,17 +324,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
   };
 
   const handleHabitSelected = async (habitName: string) => {
-    // Check for duplicates before adding
-    const duplicate = checkForDuplicate(habitName);
-    if (duplicate) {
-      toast({ 
-        title: "That habit already exists — try editing the existing one!",
-        description: `Found existing habit: "${duplicate.name}"`,
-        variant: "destructive" 
-      });
-      return;
-    }
-
+    // Remove duplicate check - simplified approach
     try {
       await addHabit({
         name: habitName,
@@ -427,40 +402,8 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
               <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            
-            {duplicateGroups.length > 0 && (
-              <Button
-                variant="outline"
-                onClick={handleMergeDuplicates}
-                disabled={isMerging}
-                className="flex items-center justify-center gap-2 h-11 text-base font-medium bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
-              >
-                <Merge className={`h-5 w-5 ${isMerging ? 'animate-spin' : ''}`} />
-                Merge {duplicateGroups.length} Duplicate{duplicateGroups.length > 1 ? 's' : ''}
-              </Button>
-            )}
+            {/* Removed duplicate merge functionality */}
           </div>
-          
-          {/* Duplicate Warning */}
-          {duplicateGroups.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-              <h3 className="text-sm font-medium text-yellow-800 mb-2">
-                🔍 Duplicate Habits Found
-              </h3>
-              <p className="text-xs text-yellow-700 mb-3">
-                Found {duplicateGroups.length} groups of similar habits that can be merged:
-              </p>
-              <div className="space-y-2">
-                {duplicateGroups.map((group, index) => (
-                  <div key={index} className="text-xs text-yellow-700">
-                    <span className="font-medium">→ </span>
-                    {group.habits.map(h => h.name).join(', ')} 
-                    <span className="text-yellow-600"> → will become: "{group.preferredName}"</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </CardHeader>
         
         <CardContent className="flex-grow overflow-hidden p-0">{/* Added overflow-hidden */}

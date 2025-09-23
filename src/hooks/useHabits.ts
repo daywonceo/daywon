@@ -130,9 +130,9 @@ async function ensureTrackedHabitsVisible(userId: string) {
     
     // Find habits that need to be created (check for duplicates)
     const habitsToCreate = trackedHabits.filter(habitName => {
-      // Check if a similar habit already exists
-      // Removed deduplication check - const duplicate = findDuplicateHabit(habitName, existingHabits || []);
-      return !duplicate;
+      // Check if habit already exists by name
+      const existsAlready = existingHabits?.some(h => h.name.toLowerCase() === habitName.toLowerCase());
+      return !existsAlready;
     });
     
     console.log('Habits to create:', habitsToCreate);
