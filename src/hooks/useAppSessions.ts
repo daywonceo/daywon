@@ -83,42 +83,64 @@ export const useAppSessions = () => {
     return await getTodaySession(date);
   };
 
-  // Initialize today's session
-  useEffect(() => {
-    if (user) {
-      getTodaySession().then(setTodaySession);
-    }
-  }, [user]);
-
-  // Sync localStorage data with database periodically
+  // Initialize today's session with debouncing
   useEffect(() => {
     if (!user) return;
     
+    let timeoutId: NodeJS.Timeout;
+    
+    const loadSession = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        getTodaySession().then(setTodaySession);
+      }, 100); // Debounce by 100ms
+    };
+    
+    loadSession();
+    
+    return () => clearTimeout(timeoutId);
+  }, [user?.id]); // Only depend on user.id, not the entire user object
+
+  // Sync localStorage data with database periodically with better performance
+  useEffect(() => {
+    if (!user?.id) return;
+    
     const syncData = async () => {
       const stored = localStorage.getItem('appTimeSession');
-      if (stored) {
-        try {
-          const data = JSON.parse(stored);
-          const today = new Date().toISOString().split('T')[0];
+      if (!stored) return;
+      
+      try {
+        const data = JSON.parse(stored);
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Only sync if it's today's data and has meaningful time
+        if (data.date === today && data.totalTime >= 1) {
+          // Check if we already synced recently to avoid duplicate requests
+          const lastSyncKey = `lastSessionSync_${user.id}_${today}`;
+          const lastSync = localStorage.getItem(lastSyncKey);
+          const now = Date.now();
           
-          // Only sync if it's today's data and has meaningful time
-          if (data.date === today && data.totalTime >= 1) {
+          if (!lastSync || now - parseInt(lastSync) > 30000) { // 30 seconds
             await saveSession(data.totalTime, data.sections || {});
+            localStorage.setItem(lastSyncKey, now.toString());
           }
-        } catch (error) {
-          console.error('Error syncing session data:', error);
         }
+      } catch (error) {
+        console.error('Error syncing session data:', error);
       }
     };
     
-    // Sync immediately
-    syncData();
+    // Sync after a short delay to avoid immediate multiple calls
+    const initialTimeout = setTimeout(syncData, 2000);
     
-    // Sync every 5 minutes
+    // Sync every 5 minutes with improved interval management
     const interval = setInterval(syncData, 5 * 60 * 1000);
     
-    return () => clearInterval(interval);
-  }, [user]);
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, [user?.id]); // Only depend on user.id
 
   return {
     todaySession,

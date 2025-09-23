@@ -23,12 +23,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    let mounted = true;
+    
+    // Set up auth state listener FIRST with performance optimization
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
         console.log('Auth state changed:', event, session);
-        setSession(session);
-        setUser(session?.user ?? null);
+        
+        // Batch state updates to prevent multiple re-renders
+        const newUser = session?.user ?? null;
+        const hasUserChanged = user?.id !== newUser?.id;
+        const hasSessionChanged = session?.access_token !== session?.access_token;
+        
+        if (hasUserChanged || hasSessionChanged) {
+          setSession(session);
+          setUser(newUser);
+        }
+        
         setLoading(false);
         
         // Cache user creation date for habit calculations
@@ -45,26 +58,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // THEN check for existing session with deduplication
+    const sessionKey = 'initial_session_fetch';
+    const lastFetch = sessionStorage.getItem(sessionKey);
+    const now = Date.now();
+    
+    if (!lastFetch || now - parseInt(lastFetch) > 60000) { // 1 minute
+      sessionStorage.setItem(sessionKey, now.toString());
+      
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!mounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+        
+        // Cache user creation date for habit calculations
+        if (session?.user?.created_at) {
+          localStorage.setItem('user_creation_date', session.user.created_at);
+        }
+        
+        // Store Spotify tokens if available
+        if (session?.provider_token && session?.provider_refresh_token) {
+          localStorage.setItem('spotify_access_token', session.provider_token);
+          localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
+        }
+      }).catch(error => {
+        console.error('Error fetching session:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+    } else {
       setLoading(false);
-      
-      // Cache user creation date for habit calculations
-      if (session?.user?.created_at) {
-        localStorage.setItem('user_creation_date', session.user.created_at);
-      }
-      
-      // Store Spotify tokens if available
-      if (session?.provider_token && session?.provider_refresh_token) {
-        localStorage.setItem('spotify_access_token', session.provider_token);
-        localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
-      }
-    });
+    }
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []); // Remove user dependency to prevent infinite loops
 
   const signUp = async (email: string, password: string, displayName?: string, username?: string) => {
     const redirectUrl = `${window.location.origin}/`;

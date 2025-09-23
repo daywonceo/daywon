@@ -203,14 +203,24 @@ export function useHabits() {
     queryFn: async () => {
       if (!user?.id) return [];
       
-      // First ensure tracked habits are visible
-      await ensureTrackedHabitsVisible(user.id);
+      // Throttle ensureTrackedHabitsVisible to prevent excessive calls
+      const lastEnsureSync = localStorage.getItem(`lastEnsureSync_${user.id}`);
+      const now = Date.now();
+      
+      if (!lastEnsureSync || now - parseInt(lastEnsureSync) > 60000) { // 1 minute
+        await ensureTrackedHabitsVisible(user.id);
+        localStorage.setItem(`lastEnsureSync_${user.id}`, now.toString());
+      }
       
       // Then fetch all habits
       const data = await fetchHabits(user.id);
       return data;
     },
-    enabled: !!user,
+    enabled: !!user?.id,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false
   });
 
   const addMutation = useMutation({

@@ -41,14 +41,21 @@ export const useHabitActivities = (habitList?: string[]) => {
       // Format dates as YYYY-MM-DD strings
       const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
       
-      // Trigger sync before loading data using V2 system
-      try {
-        // Dynamically import to avoid circular dependencies
-        const { synchronizeHabitsV2 } = await import('@/utils/habitSynchronizationV2');
-        await synchronizeHabitsV2();
-      } catch (syncError) {
-        console.error("Failed to sync habit data:", syncError);
-        // Continue with local data even if sync fails
+      // Throttle sync to prevent excessive database calls
+      const now = Date.now();
+      const lastSync = parseInt(localStorage.getItem('lastHabitSync') || '0');
+      const syncThreshold = 30000; // 30 seconds
+      
+      if (now - lastSync > syncThreshold) {
+        try {
+          // Dynamically import to avoid circular dependencies
+          const { synchronizeHabitsV2 } = await import('@/utils/habitSynchronizationV2');
+          await synchronizeHabitsV2();
+          localStorage.setItem('lastHabitSync', now.toString());
+        } catch (syncError) {
+          console.error("Failed to sync habit data:", syncError);
+          // Continue with local data even if sync fails
+        }
       }
       
       // Get all habit activities from V2 system (uses habit_id)
@@ -110,7 +117,17 @@ export const useHabitActivities = (habitList?: string[]) => {
   }, [userHabits.join(',')]);
 
   const refreshActivities = useCallback(async () => {
+    const now = Date.now();
+    const lastRefresh = parseInt(localStorage.getItem('lastHabitRefresh') || '0');
+    const refreshThreshold = 5000; // 5 seconds
+    
+    if (now - lastRefresh < refreshThreshold) {
+      console.log('Skipping refresh - too recent');
+      return;
+    }
+    
     console.log('Refreshing activities and streak data...');
+    localStorage.setItem('lastHabitRefresh', now.toString());
     await loadActivities();
   }, [loadActivities]);
 
