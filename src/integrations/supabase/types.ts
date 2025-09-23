@@ -1471,6 +1471,16 @@ export type Database = {
           status: string
         }[]
       }
+      search_users_for_mentions: {
+        Args: { search_query: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          display_name: string
+          id: string
+          username: string
+        }[]
+      }
       update_username_enhanced: {
         Args: { new_username: string; user_id: string }
         Returns: Json
