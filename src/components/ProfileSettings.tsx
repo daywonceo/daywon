@@ -71,8 +71,10 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     setUsername,
     isAvailable,
     isChecking: isCheckingUsername,
+    error: usernameError,
+    errorCode,
     suggestions
-  } = useUsernameValidation(displayName);
+  } = useUsernameValidation(displayName, currentUserProfile?.id);
   
   const [habits, setHabits] = useState([
     { id: 1, name: "Morning Workout", active: true },
@@ -103,7 +105,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     if (isAvailable === false && username) {
       toast({
         title: "Username Not Available",
-        description: "This username is already taken. Please choose another one.",
+        description: usernameError || "This username is not available. Please choose another one.",
         variant: "destructive",
       });
       return;
@@ -111,18 +113,65 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
 
     setIsUpdating(true);
     try {
-      await updateProfile({
-        display_name: displayName.trim() || undefined,
-        username: username?.trim() || undefined,
-        bio: bio.trim() || undefined,
-      });
+      const updates: any = {};
+      
+      if (displayName.trim() !== currentUserProfile?.display_name) {
+        updates.display_name = displayName.trim() || undefined;
+      }
+      
+      if (bio.trim() !== currentUserProfile?.bio) {
+        updates.bio = bio.trim() || undefined;
+      }
+
+      // Handle username update with enhanced validation
+      if (username && username !== currentUserProfile?.username && isAvailable && currentUserProfile?.id) {
+        const { data, error: rpcError } = await supabase.rpc('update_username_enhanced', {
+          user_id: currentUserProfile.id,
+          new_username: username
+        });
+
+        if (rpcError) {
+          console.error('Username update error:', rpcError);
+          toast({
+            title: "Username Update Failed",
+            description: "Failed to update username. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const result = data as { success?: boolean; error?: string; message?: string };
+        if (!result.success) {
+          toast({
+            title: "Username Update Failed", 
+            description: result.message || "Failed to update username.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        toast({
+          title: "Username updated",
+          description: `Your username has been changed to @${username}`,
+        });
+      }
+      
+      // Update other profile fields if changed
+      if (Object.keys(updates).length > 0) {
+        await updateProfile(updates);
+      }
       
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated",
       });
     } catch (error) {
-      // Error is already handled in updateProfile
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -268,13 +317,30 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                   {isCheckingUsername && (
                     <p className="text-sm text-blue-600 mt-1">Checking availability...</p>
                   )}
-                  {username && isAvailable === false && (
-                    <p className="text-sm text-red-600 mt-1">This username is already taken</p>
+                  {usernameError && (
+                    <div className="mt-1 space-y-1">
+                      <p className="text-sm text-red-600">{usernameError}</p>
+                      {errorCode === 'USERNAME_RATE_LIMIT' && (
+                        <p className="text-xs text-gray-500">
+                          You can change your username again in 30 days.
+                        </p>
+                      )}
+                      {errorCode === 'USERNAME_RESERVED' && (
+                        <p className="text-xs text-gray-500">
+                          Try a different username that isn't reserved.
+                        </p>
+                      )}
+                      {errorCode === 'USERNAME_PROFANE' && (
+                        <p className="text-xs text-gray-500">
+                          Please choose a more appropriate username.
+                        </p>
+                      )}
+                    </div>
                   )}
-                  {username && isAvailable === true && (
-                    <p className="text-sm text-green-600 mt-1">Username is available!</p>
+                  {username && isAvailable === true && !usernameError && (
+                    <p className="text-sm text-green-600 mt-1">✓ Username is available!</p>
                   )}
-                  {suggestions.length > 0 && isAvailable === false && (
+                  {suggestions.length > 0 && (
                     <div className="mt-2">
                       <p className="text-sm text-gray-600 mb-1">Suggestions:</p>
                       <div className="flex flex-wrap gap-1">

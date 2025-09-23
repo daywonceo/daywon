@@ -7,14 +7,16 @@ interface UseUsernameValidationReturn {
   isChecking: boolean;
   isAvailable: boolean | null;
   error: string | null;
+  errorCode: string | null;
   suggestions: string[];
 }
 
-export const useUsernameValidation = (displayName: string = ''): UseUsernameValidationReturn => {
+export const useUsernameValidation = (displayName: string = '', userId?: string): UseUsernameValidationReturn => {
   const [username, setUsername] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   // Generate username suggestions based on display name
@@ -23,18 +25,18 @@ export const useUsernameValidation = (displayName: string = ''): UseUsernameVali
     
     const baseUsername = name
       .toLowerCase()
-      .replace(/[^a-z0-9]/g, '')
+      .replace(/[^a-z0-9._]/g, '')
       .slice(0, 12);
     
-    if (!baseUsername) return [];
+    if (!baseUsername || baseUsername.length < 3) return [];
     
     return [
       baseUsername,
       `${baseUsername}${Math.floor(Math.random() * 99) + 1}`,
-      `${baseUsername}${new Date().getFullYear()}`,
-      `${baseUsername}${Math.floor(Math.random() * 999) + 100}`,
-      `${baseUsername}_${Math.floor(Math.random() * 99) + 1}`
-    ];
+      `${baseUsername}.${new Date().getFullYear()}`,
+      `${baseUsername}_${Math.floor(Math.random() * 999) + 100}`,
+      `user_${baseUsername}`
+    ].filter(suggestion => suggestion.length >= 3 && suggestion.length <= 30);
   };
 
   // Auto-suggest username when display name changes
@@ -48,52 +50,46 @@ export const useUsernameValidation = (displayName: string = ''): UseUsernameVali
     }
   }, [displayName, username]);
 
-  // Validate username format
-  const validateUsernameFormat = (value: string): string | null => {
-    if (!value) return 'Username is required';
-    if (value.length < 3) return 'Username must be at least 3 characters';
-    if (value.length > 20) return 'Username must be 20 characters or less';
-    if (!/^[a-z0-9_]+$/.test(value)) return 'Username can only contain lowercase letters, numbers, and underscores';
-    if (value.startsWith('_') || value.endsWith('_')) return 'Username cannot start or end with underscore';
-    return null;
-  };
-
-  // Check username availability
+  // Check username availability using enhanced validation
   const checkAvailability = async (value: string) => {
     if (!value) return;
     
-    const formatError = validateUsernameFormat(value);
-    if (formatError) {
-      setError(formatError);
-      setIsAvailable(false);
-      return;
-    }
-
     setIsChecking(true);
     setError(null);
+    setErrorCode(null);
 
     try {
-      const { data, error: queryError } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('username', value.toLowerCase())
-        .maybeSingle();
+      const { data, error: rpcError } = await supabase.rpc('check_username_availability', {
+        username_input: value
+      });
 
-      if (queryError) {
+      if (rpcError) {
+        console.error('Username validation error:', rpcError);
         setError('Error checking username availability');
+        setErrorCode('VALIDATION_ERROR');
         setIsAvailable(false);
-      } else {
-        const available = !data;
-        setIsAvailable(available);
-        if (!available) {
-          setError('Username is already taken');
-          // Generate new suggestions when current username is taken
+        return;
+      }
+
+      const result = data as { valid: boolean; error?: string; message?: string };
+      setIsAvailable(result.valid);
+      
+      if (!result.valid) {
+        setError(result.message || 'Username is invalid');
+        setErrorCode(result.error || 'UNKNOWN_ERROR');
+        
+        // Generate new suggestions when current username is invalid
+        if (result.error === 'USERNAME_TAKEN' || result.error === 'USERNAME_INVALID') {
           const newSuggestions = generateSuggestions(displayName || value);
           setSuggestions(newSuggestions.filter(s => s !== value));
         }
+      } else {
+        setSuggestions([]);
       }
     } catch (err) {
+      console.error('Unexpected error:', err);
       setError('Error checking username availability');
+      setErrorCode('NETWORK_ERROR');
       setIsAvailable(false);
     } finally {
       setIsChecking(false);
@@ -116,8 +112,8 @@ export const useUsernameValidation = (displayName: string = ''): UseUsernameVali
   }, [username]);
 
   const handleSetUsername = (value: string) => {
-    // Convert to lowercase and remove invalid characters
-    const cleanValue = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    // Clean input but preserve dots - let server-side validation handle the rest
+    const cleanValue = value.toLowerCase().replace(/[^a-z0-9._]/g, '');
     setUsername(cleanValue);
   };
 
@@ -127,6 +123,7 @@ export const useUsernameValidation = (displayName: string = ''): UseUsernameVali
     isChecking,
     isAvailable,
     error,
+    errorCode,
     suggestions
   };
 };

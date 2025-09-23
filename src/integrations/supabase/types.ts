@@ -1363,6 +1363,10 @@ export type Database = {
         Args: { p_as_of_date?: string; p_user_habit_id: string }
         Returns: number
       }
+      check_username_availability: {
+        Args: { username_input: string }
+        Returns: Json
+      }
       delete_habit_forever: {
         Args: { p_habit: string }
         Returns: undefined
@@ -1467,9 +1471,17 @@ export type Database = {
           status: string
         }[]
       }
+      update_username_enhanced: {
+        Args: { new_username: string; user_id: string }
+        Returns: Json
+      }
       update_username_with_history: {
         Args: { new_username: string; user_id: string }
         Returns: boolean
+      }
+      validate_username_enhanced: {
+        Args: { user_id?: string; username_input: string }
+        Returns: Json
       }
       validate_username_format: {
         Args: { username_input: string }
