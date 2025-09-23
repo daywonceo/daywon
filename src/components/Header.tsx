@@ -2,12 +2,12 @@
 import { Plus, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 import HapticButton from "./HapticButton";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
   const isMobile = useIsMobile();
