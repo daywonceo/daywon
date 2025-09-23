@@ -172,7 +172,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
 
       {/* Filters */}
       <div className="space-y-3 mb-6 animate-fade-in">
-        <div className="flex flex-wrap gap-2 w-full">
+        <div className="flex flex-wrap gap-2 w-full justify-center">
           <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
             {(['all', 'milestones', 'streaks'] as const).map((filterType) => (
               <Button
@@ -195,7 +195,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 w-full">
+        <div className="flex flex-wrap gap-2 w-full justify-center">
           <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
             {(['today', 'week', 'month', 'all'] as const).map((timeFilterType) => (
               <Button
