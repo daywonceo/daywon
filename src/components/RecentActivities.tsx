@@ -57,22 +57,22 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
 
   return (
     <Card className="mb-8 shadow-sm border-border">
-      <CardContent className="p-responsive">
-        <div className="grid grid-cols-[auto_1fr_repeat(3,1fr)] gap-3 sm:gap-4 items-center">
+      <CardContent className="p-4 sm:p-6">
+        <div className="grid grid-cols-[auto_1fr_repeat(3,minmax(0,1fr))] gap-2 sm:gap-4 items-center">
           {/* Header row */}
           <div className="text-center">
             <span className="text-xs font-medium text-muted-foreground block">
               Day
             </span>
           </div>
-          <div className="text-center min-w-0">
-            <span className="text-xs font-medium text-muted-foreground block truncate">
+          <div className="text-center">
+            <span className="text-xs font-medium text-muted-foreground block">
               Activity
             </span>
           </div>
           {userHabits.map((habit) => (
-            <div key={habit} className="text-center min-w-0">
-              <span className="text-xs font-medium text-muted-foreground block truncate">
+            <div key={habit} className="text-center px-1">
+              <span className="text-xs font-medium text-muted-foreground block break-words leading-tight">
                 {habit}
               </span>
             </div>
