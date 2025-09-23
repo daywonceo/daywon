@@ -15,20 +15,20 @@ const Social = () => {
   // Initialize habit social integration (auto-creates posts on completions)
   useHabitSocialIntegration();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-3 sm:px-4 pb-20 pt-4 max-w-md sm:max-2xl mx-auto w-full">
+      <main className="flex-grow px-responsive pb-20 pt-4 max-w-4xl mx-auto w-full">
         {/* Header with Notifications */}
-        <div className="flex items-center justify-between mb-6 px-2">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex-1 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
               <span className="text-2xl">🌟</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               Connect & Grow
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs mx-auto">
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
               Share your journey and celebrate wins with your community
             </p>
           </div>
@@ -40,7 +40,7 @@ const Social = () => {
         </div>
 
         <Tabs defaultValue="timeline" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 h-11">
+          <TabsList className="grid w-full grid-cols-5 mb-6 glass border h-11">
             <TabsTrigger value="timeline" className="text-xs sm:text-sm font-medium px-1">
               TIMELINE
             </TabsTrigger>

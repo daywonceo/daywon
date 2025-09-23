@@ -61,36 +61,40 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-4 sm:px-5 pb-24 pt-4 sm:pt-6 max-w-3xl mx-auto w-full">
-        <div className="py-4 text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+      <main className="flex-grow px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
             Your Profile
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Track your progress and achievements</p>
+          <p className="text-sm text-muted-foreground mt-2">Track your progress and achievements</p>
         </div>
         
-        <ProfileHeader profile={profile} />
-        
-        <PersonalBests 
-          habitScore={profile.habitScore}
-          mostConsistentHabit={profile.mostConsistentHabit}
-        />
-        
-        <ShareMilestoneCard className="mb-6" />
-        
-        <BestFriends bestFriends={profile.bestFriends} />
-        
-        <ConnectedApps isSpotifyConnected={!!session?.provider_token} />
-        
-        <MembershipMilestone daysActive={profile.daysActive} />
-        
-        <ProfileActions 
-          onOpenSettings={() => setSettingsOpen(true)}
-          onSignOut={handleSignOut}
-        />
+        <div className="space-y-6">
+          <ProfileHeader profile={profile} />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <PersonalBests 
+              habitScore={profile.habitScore}
+              mostConsistentHabit={profile.mostConsistentHabit}
+            />
+            <ConnectedApps isSpotifyConnected={!!session?.provider_token} />
+          </div>
+          
+          <ShareMilestoneCard />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <BestFriends bestFriends={profile.bestFriends} />
+            <MembershipMilestone daysActive={profile.daysActive} />
+          </div>
+          
+          <ProfileActions 
+            onOpenSettings={() => setSettingsOpen(true)}
+            onSignOut={handleSignOut}
+          />
+        </div>
       </main>
       
       <Footer />

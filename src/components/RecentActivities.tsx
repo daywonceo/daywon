@@ -80,7 +80,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
 
           {/* Activity rows */}
           {isLoading ? (
-            // Loading skeleton for 3 days
+            // Enhanced loading skeleton
             Array.from({ length: 3 }).map((_, index) => (
               <React.Fragment key={`skeleton-${index}`}>
                 {/* Day skeleton */}
@@ -89,12 +89,12 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                 </div>
                 {/* Activity text skeleton */}
                 <div className="flex items-center justify-center">
-                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-20" />
                 </div>
                 {/* Habit status boxes skeleton */}
                 {userHabits.map((_, habitIndex) => (
                   <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center">
-                    <Skeleton className="h-8 w-8 rounded" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
                   </div>
                 ))}
               </React.Fragment>

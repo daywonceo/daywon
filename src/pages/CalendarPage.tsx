@@ -52,37 +52,37 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      {/* Hero Section - Mobile Optimized */}
-      <div className="relative overflow-hidden bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100">
-        <div className="absolute inset-0 bg-green-100/30 dark:bg-green-900/10"></div>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-primary/5 dark:bg-primary/10">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5"></div>
         
-        {/* Decorative elements - minimalist */}
-        <div className="absolute top-4 right-8 w-20 h-20 bg-green-200/20 dark:bg-green-800/20 rounded-full hidden sm:block"></div>
-        <div className="absolute bottom-4 left-8 w-16 h-16 bg-green-200/20 dark:bg-green-800/20 rounded-full hidden sm:block"></div>
+        {/* Decorative elements */}
+        <div className="absolute top-4 right-8 w-20 h-20 bg-primary/10 rounded-full hidden sm:block"></div>
+        <div className="absolute bottom-4 left-8 w-16 h-16 bg-accent/10 rounded-full hidden sm:block"></div>
         
-        <div className="relative px-4 sm:px-6 py-8 sm:py-12 max-w-4xl mx-auto w-full">
+        <div className="relative px-responsive py-8 max-w-4xl mx-auto w-full">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 bg-green-200/30 dark:bg-green-800/30 rounded-lg backdrop-blur-sm border border-green-300/20 dark:border-green-700/20">
-                <Calendar className="h-6 w-6 sm:h-7 sm:w-7 text-green-700 dark:text-green-300" />
+              <div className="p-3 bg-primary/10 rounded-lg backdrop-blur-sm border border-primary/20">
+                <Calendar className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
               </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                 Calendar
               </h1>
             </div>
-            <p className="text-center text-green-800/80 dark:text-green-200/80 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="text-center text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
               Track your journey and build lasting habits one day at a time
             </p>
           </div>
         </div>
       </div>
       
-      <main className="flex-grow px-4 sm:px-6 pb-20 pt-6 sm:pt-8 max-w-4xl mx-auto w-full">
+      <main className="flex-grow px-responsive pb-20 pt-6 max-w-4xl mx-auto w-full">
         {/* Calendar Header Card */}
-        <div className="bg-card rounded-xl sm:rounded-2xl shadow-sm border border-border p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="glass rounded-lg shadow-sm border p-responsive mb-6 animate-fade-in">
           <CalendarHeader
             title=""
             activeTab=""
@@ -95,10 +95,10 @@ const CalendarPage = () => {
         </div>
 
         {/* Calendar Card */}
-        <div className="bg-card rounded-xl sm:rounded-2xl shadow-sm border border-border p-4 sm:p-6 overflow-hidden">
+        <div className="glass rounded-lg shadow-sm border p-responsive overflow-hidden animate-fade-in">
           <div className="relative">
             {/* Calendar background decoration */}
-            <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-primary/5 rounded-full opacity-50 -translate-y-12 translate-x-12 sm:-translate-y-16 sm:translate-x-16 hidden sm:block"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full opacity-50 -translate-y-12 translate-x-12 hidden sm:block"></div>
             
             <CalendarView
               date={selectedDate}
