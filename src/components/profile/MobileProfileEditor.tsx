@@ -56,7 +56,7 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${currentUserProfile?.id}/${fileName}`;
+      const filePath = `${currentUserProfile?.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
