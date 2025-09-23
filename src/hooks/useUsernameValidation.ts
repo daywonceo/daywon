@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { trackEvent } from '@/utils/analytics';
 
 interface UseUsernameValidationReturn {
   username: string;
@@ -59,6 +60,12 @@ export const useUsernameValidation = (displayName: string = '', userId?: string)
     setErrorCode(null);
 
     try {
+      // Track username check analytics
+      trackEvent('profile.username_check', {
+        username_length: value.length,
+        has_special_chars: /[._]/.test(value)
+      });
+
       const { data, error: rpcError } = await supabase.rpc('check_username_availability', {
         username_input: value
       });
