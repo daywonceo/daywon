@@ -39,24 +39,26 @@ const Footer = () => {
   };
   
   return (
-    <footer className="fixed bottom-0 left-0 right-0 border-t border-border glass shadow-lg z-10">
-      <div className="max-w-4xl mx-auto flex items-center justify-between px-2 sm:px-8 py-2">
+    <footer className="fixed bottom-0 left-0 right-0 z-10 glass-card border-t">
+      <nav className="max-w-4xl mx-auto flex items-center justify-between px-2 sm:px-8 py-2" aria-label="Main navigation">
         {tabs.map((tab) => (
           <button 
             key={tab.id}
             className={cn(
-              "flex flex-col items-center py-2 px-3 rounded-md interactive-subtle",
+              "flex flex-col items-center py-2 px-3 rounded-md interactive-subtle focus-ring-enhanced",
               activeTab === tab.id 
-                ? "text-primary bg-primary/10" 
-                : "text-muted-foreground hover:text-foreground"
+                ? "text-primary bg-primary/10 shadow-sm" 
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
             )}
+            aria-label={`Navigate to ${tab.label}`}
+            aria-current={activeTab === tab.id ? "page" : undefined}
             onClick={() => handleTabChange(tab.id, tab.path)}
           >
             <tab.icon size={isMobile ? 20 : 24} />
             <span className="text-[10px] sm:text-xs mt-0.5 sm:mt-1">{tab.label}</span>
           </button>
         ))}
-      </div>
+      </nav>
     </footer>
   );
 };
