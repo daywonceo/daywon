@@ -154,11 +154,7 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
             </p>
           </div>
 
-          <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={handleClose} disabled={isSaving}>
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
+          <div className="flex justify-end">
             <Button 
               onClick={saveJournalEntry} 
               disabled={isSaving || isLoading || !journalText.trim()}
