@@ -7,10 +7,11 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Save, X } from 'lucide-react';
+import { Calendar, Save, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import PastEntriesModal from './PastEntriesModal';
 
 interface DailyJournalModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
   const [journalText, setJournalText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showPastEntries, setShowPastEntries] = useState(false);
 
   const dateStr = format(date, 'yyyy-MM-dd');
   const displayDate = format(date, 'EEEE, MMMM d, yyyy');
@@ -122,8 +124,21 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
     onClose();
   };
 
+  const handleEditEntry = (entryDate: Date, entryDay: number) => {
+    // Close past entries modal and open the specific entry for editing
+    setShowPastEntries(false);
+    // The parent component should handle opening the journal for the specific date
+    onClose();
+    // For now, we'll just show a toast since we need to update the parent logic
+    toast({
+      title: "Entry Selected",
+      description: `Selected entry for ${format(entryDate, 'MMM d, yyyy')}`,
+    });
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -154,7 +169,15 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
             </p>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex gap-2 justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPastEntries(true)}
+              disabled={isSaving || isLoading}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Past Entries
+            </Button>
             <Button 
               onClick={saveJournalEntry} 
               disabled={isSaving || isLoading || !journalText.trim()}
@@ -166,6 +189,13 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    <PastEntriesModal
+      isOpen={showPastEntries}
+      onClose={() => setShowPastEntries(false)}
+      onEditEntry={handleEditEntry}
+    />
+  </>
   );
 };
 
