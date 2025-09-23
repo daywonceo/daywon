@@ -102,10 +102,35 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   }, [currentUserProfile, open, setUsername]);
 
   const handleSaveProfile = async () => {
-    if (isAvailable === false && username) {
+    console.log('ProfileSettings - Save attempt:', {
+      displayName: displayName.trim(),
+      currentDisplayName: currentUserProfile?.display_name,
+      username,
+      currentUsername: currentUserProfile?.username,
+      isAvailable,
+      isCheckingUsername,
+      usernameError,
+      errorCode,
+      hasDisplayNameChanged: displayName.trim() !== currentUserProfile?.display_name,
+      hasUsernameChanged: username !== currentUserProfile?.username,
+      hasBioChanged: bio.trim() !== currentUserProfile?.bio
+    });
+
+    // Only validate username if it has changed
+    if (username !== currentUserProfile?.username && isAvailable === false && username) {
       toast({
         title: "Username Not Available",
         description: usernameError || "This username is not available. Please choose another one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Don't save if still checking username
+    if (isCheckingUsername) {
+      toast({
+        title: "Please wait",
+        description: "Still checking username availability",
         variant: "destructive",
       });
       return;
@@ -240,7 +265,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
               <h3 className="text-lg font-semibold">Edit Profile</h3>
               <Button 
                 onClick={handleSaveProfile} 
-                disabled={isUpdating}
+                disabled={isUpdating || isCheckingUsername}
                 className="bg-green-600 hover:bg-green-700"
               >
                 <Save className="w-4 h-4 mr-2" />
