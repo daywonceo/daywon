@@ -65,6 +65,14 @@ const Profile = () => {
     weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100)
   };
 
+  // Debug mobile editor state
+  console.log('Profile page state:', {
+    isMobile,
+    showMobileEditor,
+    shouldShowMobileEditor: isMobile && showMobileEditor,
+    currentUserProfile: !!currentUserProfile
+  });
+
   // Mobile Profile Editor
   if (isMobile && showMobileEditor) {
     return (
@@ -77,6 +85,10 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
+      {/* Debug info for user */}
+      <div className="bg-yellow-100 dark:bg-yellow-900 p-2 text-center text-sm">
+        Debug: {isMobile ? 'Mobile' : 'Desktop'} | Editor: {showMobileEditor ? 'Open' : 'Closed'} | Settings: {settingsOpen ? 'Open' : 'Closed'}
+      </div>
       <Header />
       
       <main className="flex-grow px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">

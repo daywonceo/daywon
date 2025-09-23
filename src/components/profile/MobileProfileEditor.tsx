@@ -388,6 +388,23 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
 
       {/* Sticky Bottom Actions */}
       <div className="border-t bg-card p-6 space-y-4">
+        {/* Debug save button state */}
+        {(() => {
+          const saveDisabled = isUpdating || isChecking || !displayName.trim() || displayName.length > 40;
+          console.log('Save button state:', {
+            saveDisabled,
+            isUpdating,
+            isChecking,
+            displayNameEmpty: !displayName.trim(),
+            displayNameTooLong: displayName.length > 40,
+            displayNameLength: displayName.length,
+            displayName,
+            isAvailable,
+            username,
+            currentUsername: currentUserProfile?.username
+          });
+          return null;
+        })()}
         <Button
           onClick={handleSave}
           disabled={isUpdating || isChecking || !displayName.trim() || displayName.length > 40}

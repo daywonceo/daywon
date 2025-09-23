@@ -74,7 +74,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     error: usernameError,
     errorCode,
     suggestions
-  } = useUsernameValidation(displayName, currentUserProfile?.id);
+  } = useUsernameValidation(displayName, currentUserProfile?.username);
   
   const [habits, setHabits] = useState([
     { id: 1, name: "Morning Workout", active: true },
