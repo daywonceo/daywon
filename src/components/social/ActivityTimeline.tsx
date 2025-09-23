@@ -291,7 +291,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
                               
                               {post.caption && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 italic border-l-2 border-gray-300 dark:border-gray-600 pl-3 text-left">{post.caption}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 italic text-center">{post.caption}</p>
                               )}
                             </div>
                             
