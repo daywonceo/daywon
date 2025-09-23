@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
-import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
-import { calculateStreakForDateV2, calculateOverallLongestStreakV2 } from '@/utils/habitStreaksV2';
+import { getHabitActivities } from '@/utils/habitActivity';
+import { calculateStreakForDate, calculateOverallLongestStreak } from '@/utils/habitStreaks';
 import { useHabits } from '@/hooks/useHabits';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
@@ -10,7 +10,7 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
   const stats = useMemo(() => {
     try {
       const now = new Date();
-      const activities = getHabitActivitiesV2();
+      const activities = getHabitActivities();
     
     // Get user-aware time window for weekly stats (7 days or since account creation)
     const { startDate: weekStartDate, totalDaysAvailable: weekDays } = getUserTimeWindowSync("week");
@@ -58,7 +58,7 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
       if (habitActivity?.habitId) {
         return {
           habit,
-          streak: calculateStreakForDateV2(habitActivity.habitId, now, habitRecord?.ended_at)
+          streak: calculateStreakForDate(habitActivity.habitId, now, habitRecord?.ended_at)
         };
       }
       // Fallback to name-based calculation
@@ -73,7 +73,7 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
     const bestStreakHabit = currentStreaks.find(s => s.streak === bestStreak)?.habit || '';
     
     // Calculate overall longest streak ever achieved using V2 system
-    const { streak: longestStreak, habitName: longestStreakHabit } = calculateOverallLongestStreakV2();
+    const { streak: longestStreak, habitName: longestStreakHabit } = calculateOverallLongestStreak();
     
     // Calculate total completed habits for today using habit_id when available
     const todayStr = now.toISOString().split('T')[0];

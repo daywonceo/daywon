@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useHabits, Habit } from "@/hooks/useHabits";
-import { useHabitDeduplication } from "@/hooks/useHabitDeduplication";
+// Removed deduplication functionality
 import { useNavigate } from "react-router-dom";
 import HabitManagementView from "@/components/habit/HabitManagementView";
 import { toast } from "@/hooks/use-toast";

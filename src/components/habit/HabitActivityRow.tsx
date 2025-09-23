@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from "react";
 import { DayActivity } from "@/hooks/useHabitActivities";
-import { calculateStreakForDateV2 } from "@/utils/habitStreaksV2";
+import { calculateStreakForDate } from "@/utils/habitStreaks";
 import { shouldShowRecoveryDialog } from "@/utils/streakRecovery";
 import StreakRecoveryDialog from "./StreakRecoveryDialog";
 import ClickableDate from "./ClickableDate";
@@ -68,13 +68,13 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
         // Handle recovery dialog for completed -> failed transition
         if (currentStatus === "completed") {
           // Use V2 system to calculate streak using habit_id
-          const { getHabitActivitiesV2 } = require('@/utils/habitActivityV2');
-          const activities = getHabitActivitiesV2();
+          const { getHabitActivities } = require('@/utils/habitActivity');
+          const activities = getHabitActivities();
           const habitActivity = activities.find(a => a.habitName === category && a.habitId);
           
           let currentStreak = 0;
           if (habitActivity?.habitId) {
-            currentStreak = calculateStreakForDateV2(habitActivity.habitId, activityDate);
+            currentStreak = calculateStreakForDate(habitActivity.habitId, activityDate);
           }
           
           if (shouldShowRecoveryDialog(category, currentStreak)) {

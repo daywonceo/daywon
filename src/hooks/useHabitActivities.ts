@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { recordHabitActivityV2, getHabitActivitiesV2, loadHabitActivitiesFromDatabaseV2 } from "@/utils/habitActivityV2";
+import { recordHabitActivity, getHabitActivities, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
 
@@ -49,8 +49,8 @@ export const useHabitActivities = (habitList?: string[]) => {
       if (now - lastSync > syncThreshold) {
         try {
           // Dynamically import to avoid circular dependencies
-          const { synchronizeHabitsV2 } = await import('@/utils/habitSynchronizationV2');
-          await synchronizeHabitsV2();
+          const { synchronizeHabits } = await import('@/utils/habitSynchronization');
+          await synchronizeHabits();
           localStorage.setItem('lastHabitSync', now.toString());
         } catch (syncError) {
           console.error("Failed to sync habit data:", syncError);
@@ -59,7 +59,7 @@ export const useHabitActivities = (habitList?: string[]) => {
       }
       
       // Get all habit activities from V2 system (uses habit_id)
-      const storedActivities = getHabitActivitiesV2();
+      const storedActivities = getHabitActivities();
       
       // Create activities for the past 3 days
       const newActivities = dates.map((date, index) => {
@@ -177,7 +177,7 @@ export const useHabitActivities = (habitList?: string[]) => {
       
       // Handle background operations asynchronously without affecting UI using V2 system
       Promise.resolve().then(() => {
-        recordHabitActivityV2(category, newStatus, date);
+        recordHabitActivity(category, newStatus, date);
         hapticSuccess();
       });
       

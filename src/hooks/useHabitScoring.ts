@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
-import { calculateStreakForDateV2 } from '@/utils/habitStreaksV2';
+import { getHabitActivities } from '@/utils/habitActivity';
+import { calculateStreakForDate } from '@/utils/habitStreaks';
 
 export interface HabitScore {
   userId: string;
@@ -57,7 +57,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateConsistencyRate = (period: 'weekly' | 'monthly' | 'yearly'): number => {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const now = new Date();
     
     let startDate: Date;
@@ -124,7 +124,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateStreakScore = (): number => {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const now = new Date();
 
     let maxWeightedStreak = 0;
@@ -143,7 +143,7 @@ export const useHabitScoring = () => {
 
     habitGroups.forEach(({ habitName, habitId }) => {
       const streak = habitId 
-        ? calculateStreakForDateV2(habitId, now)
+        ? calculateStreakForDate(habitId, now)
         : 0; // Fallback for legacy data without habit_id
       const multiplier = getHabitMultiplier(habitName);
       const weightedStreak = streak * multiplier;
@@ -158,7 +158,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateVarietyScore = (): number => {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const now = new Date();
     const weekAgo = new Date(now);
     weekAgo.setDate(now.getDate() - 7);
@@ -188,7 +188,7 @@ export const useHabitScoring = () => {
   };
 
   const calculateRecencyScore = (): number => {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const now = new Date();
     const weekAgo = new Date(now);
     weekAgo.setDate(now.getDate() - 7);

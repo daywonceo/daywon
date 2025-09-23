@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useSocialPosts } from './useSocialPosts';
-import { calculateStreakForDateV2 } from '@/utils/habitStreaksV2';
+import { calculateStreakForDate } from '@/utils/habitStreaks';
 import { useHabits } from '@/hooks/useHabits';
-import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
+import { getHabitActivities } from '@/utils/habitActivity';
 
 interface HabitCompletionEvent extends CustomEvent {
   detail: {
@@ -125,7 +125,7 @@ export const useHabitSocialIntegration = () => {
     try {
       // Calculate current streak for this completion using habit_id
       const completionDate = new Date(date);
-      const activities = getHabitActivitiesV2();
+      const activities = getHabitActivities();
       const habitActivity = activities.find(a => a.habitName === category && a.habitId);
       
       if (!habitActivity?.habitId) {
@@ -134,7 +134,7 @@ export const useHabitSocialIntegration = () => {
       }
       
       const habit = habits?.find(h => h.name.toLowerCase() === category.toLowerCase());
-      const streak = calculateStreakForDateV2(habitActivity.habitId, completionDate, habit?.ended_at);
+      const streak = calculateStreakForDate(habitActivity.habitId, completionDate, habit?.ended_at);
       
       console.log(`Habit completed: ${category}, streak: ${streak}`);
 
@@ -181,7 +181,7 @@ export const useHabitSocialIntegration = () => {
   const shareHabitMilestone = async (habitName: string, date?: Date) => {
     try {
       const targetDate = date || new Date();
-      const activities = getHabitActivitiesV2();
+      const activities = getHabitActivities();
       const habitActivity = activities.find(a => a.habitName === habitName && a.habitId);
       
       if (!habitActivity?.habitId) {
@@ -189,7 +189,7 @@ export const useHabitSocialIntegration = () => {
       }
       
       const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
-      const streak = calculateStreakForDateV2(habitActivity.habitId, targetDate, habit?.ended_at);
+      const streak = calculateStreakForDate(habitActivity.habitId, targetDate, habit?.ended_at);
       
       if (streak === 0) {
         throw new Error('Cannot share milestone for incomplete habit');
@@ -215,7 +215,7 @@ export const useHabitSocialIntegration = () => {
 
   // Get user's current streaks for sharing using habit_id
   const getCurrentStreaks = () => {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const today = new Date();
     
     // Group by habit_id when available, fallback to habit_name
@@ -233,7 +233,7 @@ export const useHabitSocialIntegration = () => {
     return Array.from(habitGroups.values()).map(({ habitName, habitId }) => {
       const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
       const streak = habitId 
-        ? calculateStreakForDateV2(habitId, today, habit?.ended_at)
+        ? calculateStreakForDate(habitId, today, habit?.ended_at)
         : 0; // Fallback for legacy data without habit_id
       return {
         habitName,

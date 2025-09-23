@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { getHabitActivities, isHabitRecentlyActiveSync, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
-import { findDuplicateHabit } from "@/utils/habitDeduplication";
+// Removed deduplication functionality
 
 export type Habit = Tables<'habits'>;
 export type NewHabit = Omit<Habit, 'id' | 'created_at' | 'user_id' | 'archived_at' | 'ended_at'> & {
@@ -131,7 +131,7 @@ async function ensureTrackedHabitsVisible(userId: string) {
     // Find habits that need to be created (check for duplicates)
     const habitsToCreate = trackedHabits.filter(habitName => {
       // Check if a similar habit already exists
-      const duplicate = findDuplicateHabit(habitName, existingHabits || []);
+      // Removed deduplication check - const duplicate = findDuplicateHabit(habitName, existingHabits || []);
       return !duplicate;
     });
     

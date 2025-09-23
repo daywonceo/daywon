@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useHabits, Habit } from "@/hooks/useHabits";
-import { useHabitDeduplication } from "@/hooks/useHabitDeduplication";
+// Removed deduplication functionality
 import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import HabitFormDialog from "@/components/habit/HabitFormDialog";
@@ -16,10 +16,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 import { capitalizeHabitName } from "@/lib/utils";
 import { recordHabitActivity, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
-import { recordHabitActivityV2 } from "@/utils/habitActivityV2";
 import { hapticSuccess } from "@/utils/haptics";
 import { Check, Plus as PlusIcon, Flame, Target } from "lucide-react";
-import { calculateStreakForDateV2 } from "@/utils/habitTracking";
+import { calculateStreakForDate } from "@/utils/habitTracking";
 import { format, subDays, startOfDay, isSameDay } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -308,7 +307,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
 
     try {
       const activityDate = new Date(dateStr + 'T00:00:00');
-      await recordHabitActivityV2(habitName, newStatus, activityDate);
+      await recordHabitActivity(habitName, newStatus, activityDate);
 
       // Update local state optimistically
       setCatchUpActivities(prev => ({
@@ -380,7 +379,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
   };
 
   const getStreakForHabit = (habitName: string): number => {
-    return calculateStreakForDateV2(habitName, new Date());
+    return calculateStreakForDate(habitName, new Date());
   };
 
   const getFilteredHabits = () => {

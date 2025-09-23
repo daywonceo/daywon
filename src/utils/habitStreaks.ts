@@ -19,7 +19,7 @@ export const clearStreakCaches = () => {
 };
 
 // Calculate streak for a specific habit_id on a specific date - V2 using habit_id
-export const calculateStreakForDateV2 = (habitId: string, targetDate: Date, habitEndDate?: string | null): number => {
+export const calculateStreakForDate = (habitId: string, targetDate: Date, habitEndDate?: string | null): number => {
   try {
     const targetDateStr = targetDate.toISOString().split('T')[0];
     const cacheKey = `${habitId}-${targetDateStr}-${habitEndDate || 'no-end'}`;
@@ -243,15 +243,15 @@ export const calculateOverallLongestStreakV2 = (): { streak: number; habitId: st
   }
 };
 
-// Backward compatibility wrapper that uses habit_id when available
-export const calculateStreakForDate = (habitName: string, targetDate: Date): number => {
+// Backward compatibility wrapper that uses habit_id when available  
+export const calculateStreakForDateByName = (habitName: string, targetDate: Date): number => {
   try {
     const activities = getHabitActivities();
     
     // Find the habit_id for this habitName
     const habitActivity = activities.find(a => a.habitName === habitName);
     if (habitActivity?.habitId) {
-      return calculateStreakForDateV2(habitActivity.habitId, targetDate);
+      return calculateStreakForDate(habitActivity.habitId, targetDate);
     }
     
     // Fallback to name-based calculation if no habit_id found

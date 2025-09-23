@@ -30,8 +30,8 @@ export const useEndOfDayProcessing = () => {
   // Manual trigger for end-of-day processing (useful for testing)
   const triggerEndOfDayProcessing = async (daysToProcess: number = 7) => {
     try {
-      const { processEndOfDayHabitsV2 } = await import('@/utils/habitSynchronizationV2');
-      await processEndOfDayHabitsV2(daysToProcess);
+      const { processEndOfDayHabits } = await import('@/utils/habitSynchronization');
+      await processEndOfDayHabits(daysToProcess);
       toast({
         title: "Processing complete",
         description: `End-of-day habit processing triggered for last ${daysToProcess} days`,

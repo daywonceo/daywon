@@ -189,7 +189,7 @@ export const isHabitRecentlyActiveV2 = async (habitId: string): Promise<boolean>
 };
 
 // Synchronous version for backward compatibility (using habit ID)
-export const isHabitRecentlyActiveSyncV2 = (habitId: string): boolean => {
+export const isHabitRecentlyActiveSync = (habitId: string): boolean => {
   const activities = getHabitActivities();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -203,12 +203,12 @@ export const isHabitRecentlyActiveSyncV2 = (habitId: string): boolean => {
 };
 
 // Get activities for a specific habit by ID
-export const getHabitActivitiesByIdV2 = (habitId: string): HabitActivity[] => {
+export const getHabitActivitiesById = (habitId: string): HabitActivity[] => {
   return getHabitActivities().filter(activity => activity.habitId === habitId);
 };
 
 // Get activities for a specific habit by name (for backward compatibility)
-export const getHabitActivitiesByNameV2 = (habitName: string): HabitActivity[] => {
+export const getHabitActivitiesByName = (habitName: string): HabitActivity[] => {
   const normalizedName = habitName.toLowerCase().trim();
   return getHabitActivities().filter(activity => 
     activity.habitName.toLowerCase().trim() === normalizedName

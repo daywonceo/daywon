@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useHabits, Habit } from "@/hooks/useHabits";
-import { useHabitDeduplication } from "@/hooks/useHabitDeduplication";
+// Removed deduplication functionality
 import { toast } from "@/hooks/use-toast";
 
 type HabitFormDialogProps = {

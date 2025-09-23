@@ -2,24 +2,24 @@
 export { 
   recordHabitActivity, 
   getHabitActivities, 
-  getHabitActivitiesByIdV2,
-  getHabitActivitiesByNameV2,
+  getHabitActivitiesById,
+  getHabitActivitiesByName,
   loadHabitActivitiesFromDatabase,
-  migrateHabitActivitiesToV2,
+  // migrateHabitActivitiesToV2 no longer needed,
   type HabitActivity,
-  isHabitRecentlyActiveSyncV2 as isHabitRecentlyActiveSync
+  isHabitRecentlyActiveSync
 } from "./habitActivity";
 export { calculateHabitStats, type HabitStats } from "./habitStats";
 export { 
-  calculateStreakForDateV2 as calculateStreakForDate, 
-  calculateLongestStreakV2 as calculateLongestStreak, 
-  calculateOverallLongestStreakV2 as calculateOverallLongestStreak,
+  calculateStreakForDate, 
+  calculateLongestStreak, 
+  calculateOverallLongestStreak,
   formatStreakNumber
 } from "./habitStreaks";
 export { initializeDefaultHabits, getHabitCategories } from "./habitCategories";
 export { 
-  initHabitSyncV2 as initHabitSync, 
-  synchronizeHabitsV2 as synchronizeHabits,
-  getSyncStatusV2 as getSyncStatus,
-  type SyncStatsV2 as SyncStats 
+  initHabitSync, 
+  synchronizeHabits,
+  getSyncStatus,
+  type SyncStats 
 } from "./habitSynchronization";

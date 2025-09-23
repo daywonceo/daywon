@@ -143,11 +143,11 @@ const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps)
     const newStatus = currentActivity?.status === 'completed' ? 'empty' : 'completed';
 
     try {
-      // Use the V2 system for consistency with RecentActivities
-      const { recordHabitActivityV2 } = await import('@/utils/habitActivityV2');
+      // Use the system for consistency with RecentActivities
+      const { recordHabitActivity } = await import('@/utils/habitActivity');
       const activityDate = new Date(dateStr + 'T00:00:00');
       
-      await recordHabitActivityV2(habitName, newStatus, activityDate);
+      await recordHabitActivity(habitName, newStatus, activityDate);
 
       // Update local state optimistically
       setActivities(prev => ({

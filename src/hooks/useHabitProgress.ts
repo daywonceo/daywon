@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { getHabitActivitiesV2 } from '@/utils/habitActivityV2';
+import { getHabitActivities } from '@/utils/habitActivity';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
 export interface ProgressPeriod {
@@ -15,7 +15,7 @@ export interface ProgressPeriod {
 
 export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions", "Read"]) => {
   const progressData = useMemo(() => {
-    const activities = getHabitActivitiesV2();
+    const activities = getHabitActivities();
     const now = new Date();
     
     // Helper function to get user-aware date range

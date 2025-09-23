@@ -9,7 +9,7 @@ const SYNC_INTERVAL = 60 * 1000; // 1 minute
 const LAST_SYNC_KEY_V2 = 'last_habit_sync_v2';
 const DAY_BOUNDARY_HOUR = 4; // 4 AM local time as day boundary
 
-export interface SyncStatsV2 {
+export interface SyncStats {
   lastSyncTime: Date | null;
   pendingChanges: number;
   syncInProgress: boolean;
@@ -17,7 +17,7 @@ export interface SyncStatsV2 {
 }
 
 // Track synchronization state
-let syncStateV2: SyncStatsV2 = {
+let syncState: SyncStats = {
   lastSyncTime: null,
   pendingChanges: 0,
   syncInProgress: false,
@@ -25,30 +25,30 @@ let syncStateV2: SyncStatsV2 = {
 };
 
 // Get the current status of synchronization
-export const getSyncStatusV2 = (): SyncStatsV2 => {
-  return { ...syncStateV2 };
+export const getSyncStatus = (): SyncStats => {
+  return { ...syncState };
 };
 
 // Initialize the sync system
-export const initHabitSyncV2 = () => {
+export const initHabitSync = () => {
   // Set up listeners for online status changes
   window.addEventListener('online', handleOnlineStatusChangeV2);
   
   // Start the sync interval
-  const interval = setInterval(synchronizeHabitsV2, SYNC_INTERVAL);
+  const interval = setInterval(synchronizeHabits, SYNC_INTERVAL);
   
   // Get last sync time from storage
   const lastSyncStr = localStorage.getItem(LAST_SYNC_KEY_V2);
   if (lastSyncStr) {
     try {
-      syncStateV2.lastSyncTime = new Date(JSON.parse(lastSyncStr));
+      syncState.lastSyncTime = new Date(JSON.parse(lastSyncStr));
     } catch (e) {
       console.error("Failed to parse last sync time V2", e);
     }
   }
   
   // Run an initial sync
-  synchronizeHabitsV2();
+  synchronizeHabits();
   
   // Return cleanup function
   return () => {
@@ -61,23 +61,23 @@ export const initHabitSyncV2 = () => {
 const handleOnlineStatusChangeV2 = () => {
   if (navigator.onLine) {
     console.log("Device is back online, triggering habit sync V2");
-    synchronizeHabitsV2();
+    synchronizeHabits();
   }
 };
 
 // Main synchronization function
-export const synchronizeHabitsV2 = async (forceSync = false): Promise<boolean> => {
+export const synchronizeHabits = async (forceSync = false): Promise<boolean> => {
   // Skip if offline or sync already in progress
-  if (!navigator.onLine || (syncStateV2.syncInProgress && !forceSync)) {
+  if (!navigator.onLine || (syncState.syncInProgress && !forceSync)) {
     return false;
   }
   
   try {
-    syncStateV2.syncInProgress = true;
+    syncState.syncInProgress = true;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      syncStateV2.syncInProgress = false;
+      syncState.syncInProgress = false;
       return false;
     }
     
@@ -119,7 +119,7 @@ export const synchronizeHabitsV2 = async (forceSync = false): Promise<boolean> =
     
     // 2. Pull server changes
     // Only get activities since last sync or last 30 days if no previous sync
-    const since = syncStateV2.lastSyncTime || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const since = syncState.lastSyncTime || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     
     const { data: serverActivities, error } = await supabase
       .from('habit_activities')
@@ -129,7 +129,7 @@ export const synchronizeHabitsV2 = async (forceSync = false): Promise<boolean> =
       
     if (error) {
       console.error("Failed to fetch server activities V2:", error);
-      syncStateV2.lastSyncStatus = 'error';
+      syncState.lastSyncStatus = 'error';
       return false;
     }
     
@@ -137,7 +137,7 @@ export const synchronizeHabitsV2 = async (forceSync = false): Promise<boolean> =
       console.log(`Retrieved ${serverActivities.length} activities from server (V2)`);
       
       // Convert server format to local format
-      const convertedActivities: HabitActivityV2[] = serverActivities.map(a => ({
+      const convertedActivities: HabitActivity[] = serverActivities.map(a => ({
         id: a.id,
         date: a.activity_date,
         habitId: a.habit_id,
@@ -183,20 +183,20 @@ export const synchronizeHabitsV2 = async (forceSync = false): Promise<boolean> =
     }
     
     // Update sync state
-    syncStateV2.lastSyncTime = new Date();
-    syncStateV2.lastSyncStatus = 'success';
-    syncStateV2.pendingChanges = pendingUploads.length - pendingUploads.filter(a => !a.id.includes('local-')).length;
+    syncState.lastSyncTime = new Date();
+    syncState.lastSyncStatus = 'success';
+    syncState.pendingChanges = pendingUploads.length - pendingUploads.filter(a => !a.id.includes('local-')).length;
     
     // Save last sync time
-    localStorage.setItem(LAST_SYNC_KEY_V2, JSON.stringify(syncStateV2.lastSyncTime));
+    localStorage.setItem(LAST_SYNC_KEY_V2, JSON.stringify(syncState.lastSyncTime));
     
     return true;
   } catch (error) {
     console.error("Habit synchronization failed (V2):", error);
-    syncStateV2.lastSyncStatus = 'error';
+    syncState.lastSyncStatus = 'error';
     return false;
   } finally {
-    syncStateV2.syncInProgress = false;
+    syncState.syncInProgress = false;
   }
 };
 
@@ -221,7 +221,7 @@ export const recordHabitActivityWithSyncV2 = async (
     );
     
     // Create or update the activity
-    const activity: HabitActivityV2 = {
+    const activity: HabitActivity = {
       id: localId,
       date: dateStr,
       habitId,
@@ -250,12 +250,12 @@ export const recordHabitActivityWithSyncV2 = async (
     // Try to sync immediately if online
     if (navigator.onLine) {
       // Attempt to sync with server in the background
-      synchronizeHabitsV2(true).catch(error => {
+      synchronizeHabits(true).catch(error => {
         console.error("Background sync failed (V2):", error);
       });
     } else {
       // Increase pending changes count
-      syncStateV2.pendingChanges++;
+      syncState.pendingChanges++;
       
       // Show offline toast
       toast({
@@ -299,7 +299,7 @@ export const forceSyncFromServerV2 = async (): Promise<boolean> => {
     
     if (serverActivities) {
       // Convert server format to local format
-      const convertedActivities: HabitActivityV2[] = serverActivities.map(a => ({
+      const convertedActivities: HabitActivity[] = serverActivities.map(a => ({
         id: a.id,
         date: a.activity_date,
         habitId: a.habit_id,
@@ -311,12 +311,12 @@ export const forceSyncFromServerV2 = async (): Promise<boolean> => {
       saveOfflineData({ habitActivitiesV2: convertedActivities });
       
       // Update sync state
-      syncStateV2.lastSyncTime = new Date();
-      syncStateV2.lastSyncStatus = 'success';
-      syncStateV2.pendingChanges = 0;
+      syncState.lastSyncTime = new Date();
+      syncState.lastSyncStatus = 'success';
+      syncState.pendingChanges = 0;
       
       // Save last sync time
-      localStorage.setItem(LAST_SYNC_KEY_V2, JSON.stringify(syncStateV2.lastSyncTime));
+      localStorage.setItem(LAST_SYNC_KEY_V2, JSON.stringify(syncState.lastSyncTime));
       
       // Notify the application that data has changed
       window.dispatchEvent(new CustomEvent('habitDataSyncedV2', {
@@ -334,7 +334,7 @@ export const forceSyncFromServerV2 = async (): Promise<boolean> => {
 };
 
 // Mark uncompleted habits as failed at end of day - V2 version
-export const processEndOfDayHabitsV2 = async (daysToProcess: number = 7): Promise<void> => {
+export const processEndOfDayHabits = async (daysToProcess: number = 7): Promise<void> => {
   try {
     console.log(`🌙 Processing end-of-day habits for the last ${daysToProcess} days (V2)...`);
     
@@ -422,7 +422,7 @@ export const processEndOfDayHabitsV2 = async (daysToProcess: number = 7): Promis
         // If no activity or status is empty, mark as "failed"
         if (!existingActivity || existingActivity.status === "empty") {
           // Create a failed activity entry
-          const newActivity: HabitActivityV2 = {
+          const newActivity: HabitActivity = {
             id: `local-${habit.id}-${dateStr}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             date: dateStr,
             habitId: habit.id,
@@ -470,7 +470,7 @@ export const processEndOfDayHabitsV2 = async (daysToProcess: number = 7): Promis
       // Try to sync the failed activities to the server
       if (navigator.onLine) {
         console.log('🔄 Syncing end-of-day changes to server...');
-        synchronizeHabitsV2(true).catch(error => {
+        synchronizeHabits(true).catch(error => {
           console.error('❌ Failed to sync end-of-day changes:', error);
         });
       } else {
