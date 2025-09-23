@@ -107,7 +107,7 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
                 </div>
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                   Performance Analytics
                 </h2>
                 <p className="text-xs text-muted-foreground">Track your habit consistency</p>
@@ -203,8 +203,8 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
             
             {/* Needs Attention Habits */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-orange-200/50">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-sm">
+              <div className="flex items-center gap-3 pb-3 border-b border-red-200/50">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
                   <div className="w-4 h-4 border-2 border-white rounded-full bg-white/20"></div>
                 </div>
                 <div>
@@ -225,25 +225,25 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
                   badHabits.map((habit) => (
                     <div 
                       key={habit.habitName} 
-                      className="group p-3 rounded-lg border border-orange-200/50 bg-gradient-to-r from-orange-50/50 to-red-50/30 hover:from-orange-100/50 hover:to-red-100/30 cursor-pointer transition-all duration-200 hover:border-orange-300/50 hover:shadow-sm"
+                      className="group p-3 rounded-lg border border-red-200/50 bg-gradient-to-r from-red-50/50 to-red-50/30 hover:from-red-100/50 hover:to-red-100/30 cursor-pointer transition-all duration-200 hover:border-red-300/50 hover:shadow-sm"
                       onClick={() => handleHabitClick(habit)}
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-orange-800 group-hover:text-orange-900">
+                        <span className="font-medium text-red-800 group-hover:text-red-900">
                           {capitalizeHabitName(habit.habitName)}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-orange-700">
+                          <span className="text-sm font-semibold text-red-700">
                             {formatScore(habit.completed, habit.total)}
                           </span>
-                          <div className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                          <div className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full">
                             {Math.round(habit.percentage)}%
                           </div>
                         </div>
                       </div>
                       <Progress 
                         value={habit.percentage} 
-                        className="h-2" 
+                        className="h-2 [&>div]:bg-gradient-to-r [&>div]:from-red-500 [&>div]:to-red-600" 
                       />
                     </div>
                   ))
