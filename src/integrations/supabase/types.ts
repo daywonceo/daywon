@@ -301,6 +301,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_journals: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          journal_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          journal_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          journal_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercise_logs: {
         Row: {
           created_at: string
