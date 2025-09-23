@@ -11,6 +11,7 @@ export interface UserProfile {
   status: 'online' | 'away' | 'offline';
   last_active: string;
   created_at: string;
+  username?: string | null;
 }
 
 export interface UpdateProfileData {
@@ -18,6 +19,7 @@ export interface UpdateProfileData {
   avatar_url?: string;
   bio?: string;
   status?: 'online' | 'away' | 'offline';
+  username?: string;
 }
 
 export const useSocialProfiles = () => {

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +18,15 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { capitalizeHabitName } from "@/lib/utils";
+import { useSocialProfiles } from "@/hooks/useSocialProfiles";
+import { useUsernameValidation } from "@/hooks/useUsernameValidation";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import {
   Settings,
   Target,
@@ -36,6 +43,9 @@ import {
   X,
   ChevronRight,
   ArrowLeft,
+  Camera,
+  User,
+  Save,
 } from "lucide-react";
 
 interface ProfileSettingsProps {
@@ -45,7 +55,25 @@ interface ProfileSettingsProps {
 
 const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   const isMobile = useIsMobile();
-  const [activeSection, setActiveSection] = useState("habits");
+  const [activeSection, setActiveSection] = useState("profile");
+  const { currentUserProfile, updateProfile } = useSocialProfiles();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Profile editing states
+  const [displayName, setDisplayName] = useState(currentUserProfile?.display_name || "");
+  const [bio, setBio] = useState(currentUserProfile?.bio || "");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  
+  // Username validation
+  const {
+    username,
+    setUsername,
+    isAvailable,
+    isChecking: isCheckingUsername,
+    suggestions
+  } = useUsernameValidation(displayName);
+  
   const [habits, setHabits] = useState([
     { id: 1, name: "Morning Workout", active: true },
     { id: 2, name: "Read 30 Minutes", active: true },
@@ -60,6 +88,84 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     friendActivity: true,
   });
 
+  // Update local state when profile changes
+  React.useEffect(() => {
+    if (currentUserProfile && open) {
+      setDisplayName(currentUserProfile.display_name || "");
+      setBio(currentUserProfile.bio || "");
+      if (currentUserProfile.username) {
+        setUsername(currentUserProfile.username);
+      }
+    }
+  }, [currentUserProfile, open, setUsername]);
+
+  const handleSaveProfile = async () => {
+    if (isAvailable === false && username) {
+      toast({
+        title: "Username Not Available",
+        description: "This username is already taken. Please choose another one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      await updateProfile({
+        display_name: displayName.trim() || undefined,
+        username: username?.trim() || undefined,
+        bio: bio.trim() || undefined,
+      });
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated",
+      });
+    } catch (error) {
+      // Error is already handled in updateProfile
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setAvatarUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${currentUserProfile?.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('habit-photos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('habit-photos')
+        .getPublicUrl(filePath);
+
+      await updateProfile({ avatar_url: publicUrl });
+      
+      toast({
+        title: "Profile picture updated",
+        description: "Your profile picture has been successfully updated",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload profile picture",
+        variant: "destructive",
+      });
+    } finally {
+    setAvatarUploading(false);
+    }
+  };
+
   const toggleHabit = (id: number) => {
     setHabits(habits.map(habit => 
       habit.id === id ? { ...habit, active: !habit.active } : habit
@@ -67,6 +173,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   };
 
   const menuItems = [
+    { id: "profile", label: "Edit Profile", icon: User },
     { id: "habits", label: "Adjust Habits", icon: Target },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "privacy", label: "Privacy & Security", icon: Shield },
@@ -77,6 +184,134 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
 
   const renderContent = () => {
     switch (activeSection) {
+      case "profile":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Edit Profile</h3>
+              <Button 
+                onClick={handleSaveProfile} 
+                disabled={isUpdating}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {isUpdating ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+
+            {/* Profile Picture Section */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="relative">
+                    <Avatar className="h-20 w-20 border-4 border-gray-200 dark:border-gray-700">
+                      <AvatarImage 
+                        src={currentUserProfile?.avatar_url || "/placeholder.svg"} 
+                        alt="Profile"
+                      />
+                      <AvatarFallback className="text-xl font-bold">
+                        {(currentUserProfile?.display_name || 'U').charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Button
+                      size="sm"
+                      className="absolute -bottom-2 -right-2 rounded-full h-8 w-8 p-0"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={avatarUploading}
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium mb-1">Profile Picture</h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      Click the camera icon to upload a new profile picture
+                    </p>
+                    {avatarUploading && (
+                      <p className="text-sm text-blue-600">Uploading...</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Profile Information */}
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div>
+                  <Label htmlFor="display-name">Display Name</Label>
+                  <Input
+                    id="display-name"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Enter your display name"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Choose a unique username"
+                    className="mt-1"
+                  />
+                  {isCheckingUsername && (
+                    <p className="text-sm text-blue-600 mt-1">Checking availability...</p>
+                  )}
+                  {username && isAvailable === false && (
+                    <p className="text-sm text-red-600 mt-1">This username is already taken</p>
+                  )}
+                  {username && isAvailable === true && (
+                    <p className="text-sm text-green-600 mt-1">Username is available!</p>
+                  )}
+                  {suggestions.length > 0 && isAvailable === false && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-1">Suggestions:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {suggestions.slice(0, 3).map((suggestion) => (
+                          <Button
+                            key={suggestion}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setUsername(suggestion)}
+                            className="h-7 text-xs"
+                          >
+                            {suggestion}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="bio">Bio</Label>
+                  <Input
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell others about yourself"
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {bio.length}/150 characters
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
       case "habits":
         return (
           <div className="space-y-4">
@@ -419,7 +654,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     if (isMobile && open) {
       setActiveSection("menu");
     } else if (!isMobile && activeSection === "menu") {
-      setActiveSection("habits");
+      setActiveSection("profile");
     }
   }, [isMobile, open]);
 
