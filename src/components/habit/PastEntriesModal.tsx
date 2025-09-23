@@ -82,72 +82,88 @@ const PastEntriesModal: React.FC<PastEntriesModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] bg-gradient-to-br from-background via-background to-accent/5 border-accent/20">
+        <DialogHeader className="text-center pb-4">
+          <div className="mx-auto w-14 h-14 bg-gradient-to-br from-accent to-accent-foreground rounded-full flex items-center justify-center mb-3 shadow-lg">
+            <BookOpen className="h-7 w-7 text-white" />
+          </div>
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
             Past Journal Entries
           </DialogTitle>
+          <p className="text-muted-foreground">Your journey through words and memories</p>
         </DialogHeader>
 
-        <ScrollArea className="h-[60vh] pr-4">
-          {isLoading ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-4">
-                    <div className="h-4 bg-muted rounded mb-2 w-1/4"></div>
-                    <div className="h-3 bg-muted rounded mb-1 w-full"></div>
-                    <div className="h-3 bg-muted rounded w-3/4"></div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : entries.length === 0 ? (
-            <div className="text-center py-12">
-              <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No journal entries yet</h3>
-              <p className="text-muted-foreground">
-                Start journaling by clicking on any day number to create your first entry.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {entries.map((entry) => (
-                <Card 
-                  key={entry.id} 
-                  className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => handleEditEntry(entry)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium text-sm">
-                            {format(new Date(entry.journal_date), 'EEEE, MMMM d, yyyy')}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {truncateContent(entry.content)}
-                        </p>
-                        {entry.updated_at !== entry.created_at && (
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Last edited: {format(new Date(entry.updated_at), 'MMM d, h:mm a')}
-                          </p>
-                        )}
+        <div className="relative">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-primary to-accent rounded-full opacity-20"></div>
+          <ScrollArea className="h-[60vh] pr-4 pt-4">
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <Card key={i} className="animate-pulse border-accent/10">
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="h-4 w-4 bg-muted rounded-full"></div>
+                        <div className="h-4 bg-muted rounded w-1/3"></div>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 ml-2" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+                      <div className="h-3 bg-muted rounded mb-2 w-full"></div>
+                      <div className="h-3 bg-muted rounded w-3/4"></div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : entries.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-gradient-to-br from-muted to-muted/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Calendar className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-foreground">No journal entries yet</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  Start journaling by clicking on any day number to create your first entry and begin your mindful journey.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {entries.map((entry) => (
+                  <Card 
+                    key={entry.id} 
+                    className="hover:shadow-lg hover:border-accent/30 transition-all duration-300 cursor-pointer group border-accent/10 bg-gradient-to-br from-background to-accent/5"
+                    onClick={() => handleEditEntry(entry)}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-2 h-2 bg-accent rounded-full"></div>
+                            <span className="font-semibold text-sm text-foreground">
+                              {format(new Date(entry.journal_date), 'EEEE, MMMM d, yyyy')}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                            {truncateContent(entry.content)}
+                          </p>
+                          {entry.updated_at !== entry.created_at && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                              Last edited: {format(new Date(entry.updated_at), 'MMM d, h:mm a')}
+                            </p>
+                          )}
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors duration-300 flex-shrink-0 ml-3" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
 
-        <div className="flex justify-end pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
+        <div className="flex justify-end pt-6 border-t border-gradient-to-r from-transparent via-accent/20 to-transparent">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="border-accent/30 hover:border-accent hover:bg-accent/5 transition-all duration-300 font-medium"
+          >
             Close
           </Button>
         </div>
