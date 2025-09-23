@@ -10,15 +10,19 @@ import ShareMilestoneCard from "@/components/social/ShareMilestoneCard";
 import MembershipMilestone from "@/components/profile/MembershipMilestone";
 import ConnectedApps from "@/components/profile/ConnectedApps";
 import ProfileActions from "@/components/profile/ProfileActions";
+import { MobileProfileEditor } from "@/components/profile/MobileProfileEditor";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialProfiles } from "@/hooks/useSocialProfiles";
 import { useHabitStats } from "@/hooks/useHabitStats";
 import { useHabitScoring } from "@/hooks/useHabitScoring";
 import { useFriends } from "@/hooks/useFriends";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 
 const Profile = () => {
+  const isMobile = useIsMobile();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showMobileEditor, setShowMobileEditor] = useState(false);
   const { signOut, session } = useAuth();
   const { currentUserProfile } = useSocialProfiles();
   const { streakStats, todayStats } = useHabitStats();
@@ -60,6 +64,16 @@ const Profile = () => {
     weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100)
   };
 
+  // Mobile Profile Editor
+  if (isMobile && showMobileEditor) {
+    return (
+      <MobileProfileEditor 
+        onCancel={() => setShowMobileEditor(false)}
+        onSave={() => setShowMobileEditor(false)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
@@ -91,7 +105,7 @@ const Profile = () => {
           </div>
           
           <ProfileActions 
-            onOpenSettings={() => setSettingsOpen(true)}
+            onOpenSettings={() => isMobile ? setShowMobileEditor(true) : setSettingsOpen(true)}
             onSignOut={handleSignOut}
           />
         </div>
