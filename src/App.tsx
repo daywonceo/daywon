@@ -15,7 +15,7 @@ import GoPremium from "./pages/GoPremium";
 import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
-import AllHabits from "./pages/AllHabits";
+
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
@@ -170,7 +170,7 @@ const AppContent: React.FC = () => {
         <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/all-habits" element={<AllHabits />} />
+        
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
