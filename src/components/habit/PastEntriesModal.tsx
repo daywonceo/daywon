@@ -82,19 +82,19 @@ const PastEntriesModal: React.FC<PastEntriesModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] bg-gradient-to-br from-background via-background to-accent/5 border-accent/20">
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] bg-background border-accent/20">
         <DialogHeader className="text-center pb-4">
-          <div className="mx-auto w-14 h-14 bg-gradient-to-br from-accent to-accent-foreground rounded-full flex items-center justify-center mb-3 shadow-lg">
+          <div className="mx-auto w-14 h-14 bg-accent rounded-full flex items-center justify-center mb-3 shadow-lg">
             <BookOpen className="h-7 w-7 text-white" />
           </div>
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl font-bold text-accent">
             Past Journal Entries
           </DialogTitle>
           <p className="text-muted-foreground">Your journey through words and memories</p>
         </DialogHeader>
 
         <div className="relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-primary to-accent rounded-full opacity-20"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-accent rounded-full opacity-20"></div>
           <ScrollArea className="h-[60vh] pr-4 pt-4">
             {isLoading ? (
               <div className="space-y-4">
@@ -113,7 +113,7 @@ const PastEntriesModal: React.FC<PastEntriesModalProps> = ({
               </div>
             ) : entries.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-20 h-20 bg-gradient-to-br from-muted to-muted/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
                   <Calendar className="h-10 w-10 text-muted-foreground" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-foreground">No journal entries yet</h3>
@@ -126,7 +126,7 @@ const PastEntriesModal: React.FC<PastEntriesModalProps> = ({
                 {entries.map((entry) => (
                   <Card 
                     key={entry.id} 
-                    className="hover:shadow-lg hover:border-accent/30 transition-all duration-300 cursor-pointer group border-accent/10 bg-gradient-to-br from-background to-accent/5"
+                    className="hover:shadow-lg hover:border-accent/30 transition-all duration-300 cursor-pointer group border-accent/10 bg-background"
                     onClick={() => handleEditEntry(entry)}
                   >
                     <CardContent className="p-5">
@@ -158,8 +158,8 @@ const PastEntriesModal: React.FC<PastEntriesModalProps> = ({
           </ScrollArea>
         </div>
 
-        <div className="flex justify-end pt-6 border-t border-gradient-to-r from-transparent via-accent/20 to-transparent">
-          <Button 
+        <div className="flex justify-end pt-6 border-t border-accent/20">
+          <Button
             variant="outline" 
             onClick={onClose}
             className="border-accent/30 hover:border-accent hover:bg-accent/5 transition-all duration-300 font-medium"

@@ -139,12 +139,12 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-lg bg-gradient-to-br from-background via-background to-primary/5 border-primary/20">
+        <DialogContent className="sm:max-w-lg bg-background border-primary/20">
           <DialogHeader className="text-center pb-2">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary-foreground rounded-full flex items-center justify-center mb-4 shadow-lg">
+            <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 shadow-lg">
               <Calendar className="h-8 w-8 text-white" />
             </div>
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">
+            <DialogTitle className="text-2xl font-bold text-primary">
               Daily Journal - Day {day}
             </DialogTitle>
             <p className="text-muted-foreground font-medium">{displayDate}</p>
@@ -152,7 +152,7 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
 
           <div className="space-y-6">
             <div className="relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary rounded-full opacity-20"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-primary rounded-full opacity-20"></div>
               <div className="pt-6">
                 <label className="text-base font-semibold text-foreground mb-3 block flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -160,7 +160,7 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
                 </label>
                 {isLoading ? (
                   <div className="relative">
-                    <div className="h-40 bg-gradient-to-br from-muted via-muted/70 to-muted/50 animate-pulse rounded-xl border-2 border-dashed border-muted-foreground/20"></div>
+                    <div className="h-40 bg-muted animate-pulse rounded-xl border-2 border-dashed border-muted-foreground/20"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -174,7 +174,7 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
                       placeholder="Write about your day, thoughts, feelings, or gratitude... ✨"
                       value={journalText}
                       onChange={(e) => setJournalText(e.target.value)}
-                      className="min-h-40 resize-none border-2 border-primary/20 focus:border-primary/40 rounded-xl bg-gradient-to-br from-background to-muted/30 text-base leading-relaxed shadow-inner transition-all duration-300 focus:shadow-lg"
+                      className="min-h-40 resize-none border-2 border-primary/20 focus:border-primary/40 rounded-xl bg-background text-base leading-relaxed shadow-inner transition-all duration-300 focus:shadow-lg"
                       maxLength={1000}
                     />
                     <div className="absolute bottom-3 right-3 flex items-center gap-2">
@@ -204,7 +204,7 @@ const DailyJournalModal: React.FC<DailyJournalModalProps> = ({
               <Button 
                 onClick={saveJournalEntry} 
                 disabled={isSaving || isLoading || !journalText.trim()}
-                className="bg-gradient-to-r from-primary to-primary-foreground hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium px-6"
+                className="bg-primary hover:bg-primary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium px-6"
               >
                 {isSaving ? (
                   <>
