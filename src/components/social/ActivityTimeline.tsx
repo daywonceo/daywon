@@ -149,7 +149,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div className="flex items-center space-x-4">
@@ -180,7 +180,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                 variant={filter === filterType ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setFilter(filterType)}
-                className={`text-xs px-3 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
+                className={`text-xs px-3 py-2.5 h-9 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
                   filter === filterType 
                     ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
                     : 'hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -203,7 +203,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                 variant={timeFilter === timeFilterType ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setTimeFilter(timeFilterType)}
-                className={`text-xs px-3 py-2 h-8 rounded-lg font-medium transition-all duration-200 ${
+                className={`text-xs px-3 py-2.5 h-9 rounded-lg font-medium transition-all duration-200 min-w-[70px] ${
                   timeFilter === timeFilterType 
                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
                     : 'hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -246,7 +246,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
               </div>
 
               {/* Posts for this date */}
-              <div className="space-y-3 ml-5 mr-2">
+              <div className="space-y-4 ml-3 sm:ml-5 mr-1 sm:mr-2">
                 {dayPosts.map((post) => {
                   const displayName = post.profiles.display_name || post.profiles.email;
                   const avatarUrl = post.profiles.avatar_url;
@@ -258,7 +258,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                     : format(postDate, 'MMM d');
                   
                   return (
-                    <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden">
+                    <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden mx-1 sm:mx-0">
                       <CardContent className="p-6">
                         <div className="flex items-start space-x-4">
                           <div className="relative">
