@@ -287,11 +287,11 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
                             </div>
                             
-                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4 text-center">
+                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4">
                               <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
                               
                               {post.caption && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 italic text-center">{post.caption}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 italic">{post.caption}</p>
                               )}
                             </div>
                             
