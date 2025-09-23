@@ -167,13 +167,10 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">Ready to build some great habits?</p>
           </div>
 
-          {/* Progress Overview */}
-          <div className="grid grid-cols-1 gap-4 mb-8">
-            <WeeklySummaryCard />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-              <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-            </div>
+          {/* Streamlined Progress Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+            <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
             <DailyEncouragementCard />
           </div>
 
