@@ -100,3 +100,8 @@ class AnalyticsService {
 }
 
 export const analytics = AnalyticsService.getInstance();
+
+// Convenience function for direct event tracking
+export const trackEvent = (event: string, properties?: Record<string, any>) => {
+  analytics.track(event, properties);
+};
