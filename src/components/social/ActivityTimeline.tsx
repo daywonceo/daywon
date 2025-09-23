@@ -283,7 +283,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               </span>
                             </div>
                             
-                            <div className="mb-4 flex justify-center">
+                            <div className="mb-4 -ml-4 -mr-6 flex justify-center">
                               {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
                             </div>
                             
