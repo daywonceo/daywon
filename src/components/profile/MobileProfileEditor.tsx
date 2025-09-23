@@ -35,7 +35,7 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
     error: usernameError,
     errorCode,
     suggestions
-  } = useUsernameValidation(displayName, currentUserProfile?.id);
+  } = useUsernameValidation(displayName, currentUserProfile?.username);
 
   // Initialize form with current profile data
   useEffect(() => {
@@ -108,7 +108,7 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
 
     // Check username availability only if username has actually changed
     const hasUsernameChanged = username !== currentUserProfile?.username;
-    if (hasUsernameChanged && isAvailable === false && username) {
+    if (hasUsernameChanged && (isAvailable === false || usernameError)) {
       toast({
         title: "Username not available",
         description: usernameError || "This username is not available. Please choose another one.",
@@ -119,10 +119,22 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
 
     setIsUpdating(true);
     try {
+      console.log('Save attempt - Debug info:', {
+        displayName: displayName.trim(),
+        currentDisplayName: currentUserProfile?.display_name,
+        username,
+        currentUsername: currentUserProfile?.username,
+        isAvailable,
+        hasUsernameChanged,
+        usernameError,
+        errorCode
+      });
+      
       const updates: any = {};
       
       if (displayName.trim() !== currentUserProfile?.display_name) {
         updates.display_name = displayName.trim();
+        console.log('Display name will be updated:', displayName.trim());
       }
       
       if (bio.trim() !== currentUserProfile?.bio) {
@@ -130,7 +142,9 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
       }
 
       // Handle username update with enhanced validation
-      if (username && username !== currentUserProfile?.username && isAvailable && currentUserProfile?.id) {
+      const needsUsernameUpdate = username && username !== currentUserProfile?.username;
+      if (needsUsernameUpdate && currentUserProfile?.id) {
+        console.log('Attempting username update...', { username, isAvailable, hasUsernameChanged });
         const { data, error: rpcError } = await supabase.rpc('update_username_enhanced', {
           user_id: currentUserProfile.id,
           new_username: username
@@ -159,7 +173,11 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
       
       // Update other profile fields if changed
       if (Object.keys(updates).length > 0) {
+        console.log('Updating profile with:', updates);
         await updateProfile(updates);
+        console.log('Profile updated successfully');
+      } else {
+        console.log('No profile updates needed');
       }
       
       toast({

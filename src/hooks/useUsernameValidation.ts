@@ -12,7 +12,7 @@ interface UseUsernameValidationReturn {
   suggestions: string[];
 }
 
-export const useUsernameValidation = (displayName: string = '', userId?: string): UseUsernameValidationReturn => {
+export const useUsernameValidation = (displayName: string = '', currentUsername?: string): UseUsernameValidationReturn => {
   const [username, setUsername] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
@@ -125,12 +125,21 @@ export const useUsernameValidation = (displayName: string = '', userId?: string)
       return;
     }
 
+    // If username hasn't changed from the current user's username, consider it valid
+    if (currentUsername && username === currentUsername) {
+      setIsAvailable(true);
+      setError(null);
+      setErrorCode(null);
+      setSuggestions([]);
+      return;
+    }
+
     const timeoutId = setTimeout(() => {
       checkAvailability(username);
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [username]);
+  }, [username, currentUsername]); // Add currentUsername dependency
 
   const handleSetUsername = (value: string) => {
     // Clean input but preserve dots - let server-side validation handle the rest
