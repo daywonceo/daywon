@@ -71,17 +71,22 @@ export const useUsernameValidation = (displayName: string = '', userId?: string)
         return;
       }
 
-      const result = data as { valid: boolean; error?: string; message?: string };
+      const result = data as { valid: boolean; error?: string; message?: string; suggestions?: string[] };
       setIsAvailable(result.valid);
       
       if (!result.valid) {
         setError(result.message || 'Username is invalid');
         setErrorCode(result.error || 'UNKNOWN_ERROR');
         
-        // Generate new suggestions when current username is invalid
-        if (result.error === 'USERNAME_TAKEN' || result.error === 'USERNAME_INVALID') {
+        // Use pre-checked suggestions from the server when available
+        if (result.suggestions && result.suggestions.length > 0) {
+          setSuggestions(result.suggestions);
+        } else if (result.error === 'USERNAME_TAKEN' || result.error === 'USERNAME_INVALID') {
+          // Fallback to client-side suggestions if server didn't provide any
           const newSuggestions = generateSuggestions(displayName || value);
           setSuggestions(newSuggestions.filter(s => s !== value));
+        } else {
+          setSuggestions([]);
         }
       } else {
         setSuggestions([]);
