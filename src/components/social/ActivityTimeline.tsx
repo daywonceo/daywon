@@ -115,8 +115,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
     const IconComponent = config.icon;
 
     return (
-      <div className="flex items-center gap-2 border-2 border-blue-500 p-2 bg-blue-100">
-        <div className="text-xs text-blue-600 mb-1">DEBUG: Badge wrapper</div>
+      <div className="flex items-center gap-2">
         <Badge className={`${config.color} border-0 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 hover-scale ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-2 animate-pulse' : ''}`}>
           <IconComponent size={12} className={config.iconColor} />
           {habitType.charAt(0).toUpperCase() + habitType.slice(1)}
@@ -260,60 +259,62 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                   
                   return (
                     <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden mx-1 sm:mx-0">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="relative">
-                            <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-gray-800 shadow-md">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex items-start space-x-3 sm:space-x-4">
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-white dark:ring-gray-800 shadow-md">
                               <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={displayName} />
-                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-bold">
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs sm:text-sm font-bold">
                                 {displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
                           </div>
                           
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-3 mb-3">
-                              <span className="font-semibold text-base text-gray-900 dark:text-white truncate">
+                            <div className="flex items-center space-x-2 sm:space-x-3 mb-3">
+                              <span className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">
                                 {displayName}
                               </span>
-                              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                              <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                                <Clock size={12} className="mr-1" />
+                              <div className="w-1 h-1 bg-gray-400 rounded-full flex-shrink-0"></div>
+                              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center flex-shrink-0">
+                                <Clock size={10} className="mr-1 sm:mr-1" />
                                 {timeAgo}
                               </span>
                             </div>
-                            
-                            <div style={{ marginBottom: '1rem', textAlign: 'left', border: '2px solid red', padding: '8px', backgroundColor: 'yellow' }}>
-                              <div style={{ fontSize: '10px', color: 'red', marginBottom: '4px' }}>DEBUG: Badge container with inline styles</div>
-                              {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
-                            </div>
-                            
-                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4">
-                              <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
-                              
-                              {post.caption && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 italic">{post.caption}</p>
-                              )}
-                            </div>
-                            
-                            {/* Extended reactions */}
-                            <div className="flex justify-start mb-4">
-                              <ExtendedReactions
-                                postId={post.id}
-                                currentReaction={post.user_reaction}
-                                reactionCounts={post.reaction_counts}
-                                onReact={handleReaction}
-                              />
-                            </div>
-                            
-                            {/* Comments section */}
-                            <CommentSection 
-                              postId={post.id}
-                              className="border-t border-gray-200 dark:border-gray-700 pt-4"
-                            />
                           </div>
                         </div>
+                        
+                        {/* Badge section - full width on mobile */}
+                        <div className="mt-3 mb-4 -mx-1 sm:mx-0">
+                          <div className="flex justify-center sm:justify-start px-1 sm:px-0">
+                            {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 sm:p-4 mb-4">
+                          <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
+                          
+                          {post.caption && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 italic">{post.caption}</p>
+                          )}
+                        </div>
+                        
+                        {/* Extended reactions */}
+                        <div className="flex justify-start mb-4">
+                          <ExtendedReactions
+                            postId={post.id}
+                            currentReaction={post.user_reaction}
+                            reactionCounts={post.reaction_counts}
+                            onReact={handleReaction}
+                          />
+                        </div>
+                        
+                        {/* Comments section */}
+                        <CommentSection 
+                          postId={post.id}
+                          className="border-t border-gray-200 dark:border-gray-700 pt-4"
+                        />
                       </CardContent>
                     </Card>
                   );
