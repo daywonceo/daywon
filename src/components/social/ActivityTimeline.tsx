@@ -283,26 +283,27 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                               </span>
                             </div>
                             
-                            <div className="mb-4">
+                            <div className="mb-4 flex justify-center">
                               {getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)}
                             </div>
                             
-                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4">
+                            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4 text-center">
                               <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
                               
                               {post.caption && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 italic border-l-2 border-gray-300 dark:border-gray-600 pl-3">{post.caption}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 italic border-l-2 border-gray-300 dark:border-gray-600 pl-3 text-left">{post.caption}</p>
                               )}
                             </div>
                             
                             {/* Extended reactions */}
-                            <ExtendedReactions
-                              postId={post.id}
-                              currentReaction={post.user_reaction}
-                              reactionCounts={post.reaction_counts}
-                              onReact={handleReaction}
-                              className="mb-4"
-                            />
+                            <div className="flex justify-center mb-4">
+                              <ExtendedReactions
+                                postId={post.id}
+                                currentReaction={post.user_reaction}
+                                reactionCounts={post.reaction_counts}
+                                onReact={handleReaction}
+                              />
+                            </div>
                             
                             {/* Comments section */}
                             <CommentSection 
