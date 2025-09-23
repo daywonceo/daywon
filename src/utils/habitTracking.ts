@@ -1,34 +1,25 @@
-// Re-export V1 functionality for backward compatibility - habit_name based (legacy)
-export { recordHabitActivity, getHabitActivities, type HabitActivity } from "./habitActivity";
-export { calculateHabitStats, type HabitStats } from "./habitStats";
+// Export core functionality
 export { 
-  calculateStreakForDate, 
-  calculateLongestStreak, 
-  calculateOverallLongestStreak
-} from "./habitStreaks";
-export { initializeDefaultHabits, getHabitCategories } from "./habitCategories";
-
-// Export V2 functionality as primary - habit_id based system
-export { 
-  recordHabitActivityV2, 
-  getHabitActivitiesV2, 
+  recordHabitActivityV2 as recordHabitActivity, 
+  getHabitActivitiesV2 as getHabitActivities, 
   getHabitActivitiesByIdV2,
   getHabitActivitiesByNameV2,
-  loadHabitActivitiesFromDatabaseV2,
+  loadHabitActivitiesFromDatabaseV2 as loadHabitActivitiesFromDatabase,
   migrateHabitActivitiesToV2,
-  type HabitActivityV2 
-} from "./habitActivityV2";
+  type HabitActivityV2 as HabitActivity,
+  isHabitRecentlyActiveSyncV2 as isHabitRecentlyActiveSync
+} from "./habitActivity";
+export { calculateHabitStats, type HabitStats } from "./habitStats";
 export { 
-  initHabitSyncV2, 
-  synchronizeHabitsV2,
-  getSyncStatusV2,
-  type SyncStatsV2 
-} from "./habitSynchronizationV2";
-
-// Export V2 streak functions as primary
-export {
-  calculateStreakForDateV2,
-  calculateLongestStreakV2,
-  calculateOverallLongestStreakV2,
+  calculateStreakForDateV2 as calculateStreakForDate, 
+  calculateLongestStreakV2 as calculateLongestStreak, 
+  calculateOverallLongestStreakV2 as calculateOverallLongestStreak,
   formatStreakNumber
-} from "./habitStreaksV2";
+} from "./habitStreaks";
+export { initializeDefaultHabits, getHabitCategories } from "./habitCategories";
+export { 
+  initHabitSyncV2 as initHabitSync, 
+  synchronizeHabitsV2 as synchronizeHabits,
+  getSyncStatusV2 as getSyncStatus,
+  type SyncStatsV2 as SyncStats 
+} from "./habitSynchronization";

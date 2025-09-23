@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { migrateHabitActivitiesToV2, initHabitSyncV2 } from '@/utils/habitTracking';
+import { migrateHabitActivitiesToV2, initHabitSync } from '@/utils/habitTracking';
 import { toast } from './use-toast';
 
 const V2_MIGRATION_SHOWN_KEY = 'habit_v2_migration_shown';
@@ -18,7 +18,7 @@ export const useHabitSystemTransition = () => {
         setIsTransitioning(true);
         
         // Initialize the V2 sync system
-        const cleanupSync = initHabitSyncV2();
+        const cleanupSync = initHabitSync();
         
         // Migrate existing data to V2 format
         await migrateHabitActivitiesToV2();

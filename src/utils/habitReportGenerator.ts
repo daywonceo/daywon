@@ -1,5 +1,5 @@
 
-import { getHabitActivitiesV2 } from "./habitActivityV2";
+import { getHabitActivitiesV2 } from "./habitActivity";
 
 export const generateHabitReport = async (userHabits: string[]) => {
   const activities = getHabitActivitiesV2();

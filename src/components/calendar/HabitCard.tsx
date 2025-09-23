@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Plus, Check, MoreVertical } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { Habit } from '@/hooks/useHabits';
-import { recordHabitActivityV2 } from '@/utils/habitActivityV2';
+import { recordHabitActivity } from '@/utils/habitTracking';
 import { hapticSuccess } from '@/utils/haptics';
 import { capitalizeHabitName } from '@/lib/utils';
 import HabitRemovalModal from '@/components/habit/HabitRemovalModal';
@@ -37,7 +37,7 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
         }
         
         const newStatus = isCompletedToday ? 'empty' : 'completed';
-        recordHabitActivityV2(habit.name, newStatus, new Date());
+        recordHabitActivity(habit.name, newStatus, new Date());
         hapticSuccess();
         
         // Dispatch event for RecentActivities to listen to

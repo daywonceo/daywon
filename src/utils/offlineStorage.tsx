@@ -2,7 +2,7 @@
 import { Clock } from "lucide-react";
 import React from "react";
 import { HabitActivity } from "./habitTracking";
-import { HabitActivityV2 } from "./habitActivityV2";
+import { HabitActivityV2 } from "./habitActivity";
 
 const STORAGE_KEY = 'dayWon_offlineData';
 

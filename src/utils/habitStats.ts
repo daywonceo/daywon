@@ -1,5 +1,5 @@
 
-import { getHabitActivitiesV2, HabitActivityV2 } from "./habitActivityV2";
+import { getHabitActivitiesV2, HabitActivityV2 } from "./habitActivity";
 import { getUserTimeWindowSync } from "./userTimeWindow";
 
 export interface HabitStats {

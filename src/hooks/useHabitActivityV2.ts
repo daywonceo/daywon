@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { recordHabitActivityV2, getHabitActivitiesV2, getHabitActivitiesByIdV2 } from '@/utils/habitTracking';
+import { recordHabitActivity, getHabitActivities, getHabitActivitiesByIdV2 } from '@/utils/habitTracking';
 
 // Hook to provide V2 habit activity functionality
 export const useHabitActivityV2 = () => {
@@ -8,11 +8,11 @@ export const useHabitActivityV2 = () => {
     status: "completed" | "failed" | "empty",
     date?: Date
   ) => {
-    return await recordHabitActivityV2(habitName, status, date);
+    return await recordHabitActivity(habitName, status, date);
   }, []);
 
   const getActivities = useCallback(() => {
-    return getHabitActivitiesV2();
+    return getHabitActivities();
   }, []);
 
   const getActivitiesById = useCallback((habitId: string) => {
