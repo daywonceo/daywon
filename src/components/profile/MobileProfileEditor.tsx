@@ -192,9 +192,20 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
 
   const getUsernameStatusText = () => {
     if (isChecking) return "Checking availability...";
-    if (usernameError) return usernameError;
-    if (isAvailable === true && username) return "Username is available";
-    if (isAvailable === false) return "Username is taken";
+    if (usernameError) {
+      if (errorCode === 'USERNAME_TAKEN') return "That username is taken. Try a variation.";
+      if (errorCode === 'USERNAME_INVALID') return "Only letters, numbers, dots, and underscores. No separators at the start/end.";
+      if (errorCode === 'USERNAME_RESERVED') return "That name is reserved.";
+      if (errorCode === 'USERNAME_RATE_LIMIT') {
+        // Extract date from error message if available
+        const match = usernameError.match(/(\d{4}-\d{2}-\d{2})/);
+        const date = match ? new Date(match[1]).toLocaleDateString() : "later";
+        return `You changed your username recently. Try again on ${date}.`;
+      }
+      if (errorCode === 'USERNAME_PROFANE') return "That name is reserved."; // Treat profanity as reserved
+      return usernameError; // Fallback to original error
+    }
+    if (isAvailable === true && username) return "Looks good — available.";
     return "";
   };
 
@@ -272,75 +283,69 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
         </div>
 
         {/* Username */}
-        <div className="space-y-2">
-          <Label htmlFor="username" className="text-sm font-medium">
-            Username
-          </Label>
-          <div className="relative">
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
-              className={cn(
-                "text-base min-h-[44px] pr-10",
-                isAvailable === false || usernameError ? "border-red-500" : "",
-                isAvailable === true ? "border-green-500" : ""
-              )}
-              aria-describedby="username-help username-status"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              {getUsernameStatusIcon()}
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span id="username-help">Lowercase letters, numbers, dots, underscores</span>
-              <span className={username.length > 30 ? "text-red-500" : ""}>
-                {username.length}/30
-              </span>
-            </div>
-            {(isChecking || usernameError || isAvailable !== null) && (
-              <p 
-                id="username-status"
+          <div className="space-y-2">
+            <Label htmlFor="username" className="text-sm font-medium">
+              Username
+            </Label>
+            <div className="relative">
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
                 className={cn(
-                  "text-sm",
-                  isChecking ? "text-blue-500" : "",
-                  usernameError ? "text-red-500" : "",
-                  isAvailable === true ? "text-green-500" : ""
+                  "text-base min-h-[44px] pr-10",
+                  isAvailable === false || usernameError ? "border-red-500" : "",
+                  isAvailable === true ? "border-green-500" : ""
                 )}
-                aria-live="polite"
-              >
-                {getUsernameStatusText()}
-              </p>
-            )}
-            {errorCode === 'USERNAME_RATE_LIMIT' && (
-              <p className="text-xs text-muted-foreground">
-                You can change your username again in 30 days.
-              </p>
-            )}
-          </div>
-          
-          {/* Username Suggestions */}
-          {suggestions.length > 0 && (usernameError || isAvailable === false) && (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Suggestions:</p>
-              <div className="flex flex-wrap gap-2">
-                {suggestions.slice(0, 3).map((suggestion) => (
-                  <Button
-                    key={suggestion}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setUsername(suggestion)}
-                    className="h-8 text-xs min-h-[44px] px-4"
-                  >
-                    {suggestion}
-                  </Button>
-                ))}
+                aria-describedby="username-help username-status"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                {getUsernameStatusIcon()}
               </div>
             </div>
-          )}
-        </div>
+            <div className="space-y-1">
+              <div className="text-xs text-muted-foreground">
+                <span id="username-help">
+                  Usernames are unique. 3–30 characters: letters, numbers, dot, underscore.
+                </span>
+              </div>
+              {(isChecking || usernameError || isAvailable !== null) && (
+                <p 
+                  id="username-status"
+                  className={cn(
+                    "text-sm",
+                    isChecking ? "text-blue-500" : "",
+                    usernameError ? "text-red-500" : "",
+                    isAvailable === true ? "text-green-500" : ""
+                  )}
+                  aria-live="polite"
+                >
+                  {getUsernameStatusText()}
+                </p>
+              )}
+            </div>
+            
+            {/* Username Suggestions */}
+            {suggestions.length > 0 && (usernameError || isAvailable === false) && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Try these:</p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.slice(0, 3).map((suggestion) => (
+                    <Button
+                      key={suggestion}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setUsername(suggestion)}
+                      className="h-8 text-xs min-h-[44px] px-4"
+                    >
+                      {suggestion}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
         {/* Bio */}
         <div className="space-y-2">
