@@ -159,7 +159,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       <PullToRefresh onRefresh={handleRefresh}>
-        <main id="main-content" className="flex-grow px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">
+        <main id="main-content" className="flex-grow px-6 sm:px-8 lg:px-12 pb-24 pt-6 max-w-4xl mx-auto w-full">
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               {getGreeting()}
