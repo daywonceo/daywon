@@ -24,21 +24,21 @@ const ActivePlanCard = ({
 }: ActivePlanCardProps) => {
   if (activePlan) {
     return (
-      <Card className="bg-white dark:bg-gray-800">
+      <Card className="glass-card">
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle className="text-green-800 dark:text-green-400 flex items-center gap-2">
+            <CardTitle className="text-primary flex items-center gap-2">
               <Dumbbell className="w-5 h-5" />
               {activePlan.name}
             </CardTitle>
-            <Badge variant="default" className="bg-green-600">
+            <Badge variant="default">
               Active Plan
             </Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-muted-foreground">
               Split: {activePlan.plan_type.replace(/_/g, ' ').toUpperCase()}
             </span>
           </div>
@@ -46,7 +46,7 @@ const ActivePlanCard = ({
           <div className="flex gap-2">
             <Button 
               onClick={onStartWorkout}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1"
               disabled={!!activeWorkoutSession}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -67,18 +67,17 @@ const ActivePlanCard = ({
 
   if (hasInactivePlans) {
     return (
-      <Card className="bg-white dark:bg-gray-800">
+      <Card className="glass-card">
         <CardContent className="p-8 text-center">
-          <Dumbbell className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          <Dumbbell className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No Active Workout Plan
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-muted-foreground mb-4">
             You have workout plans but none are currently active. Select one to get started.
           </p>
           <Button 
             onClick={onManagePlans}
-            className="bg-green-600 hover:bg-green-700"
           >
             <Target className="w-4 h-4 mr-2" />
             Manage Plans

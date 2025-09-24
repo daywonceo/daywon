@@ -22,11 +22,11 @@ interface WorkoutCardProps {
 
 const WorkoutCard = ({ workout }: WorkoutCardProps) => {
   return (
-    <Card className="bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="glass-card group interactive-glow">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <CardTitle className="text-green-800 dark:text-green-400 flex items-center">
+            <CardTitle className="text-primary flex items-center">
               <Dumbbell className="w-5 h-5 mr-2" />
               {workout.title}
             </CardTitle>
@@ -37,7 +37,7 @@ const WorkoutCard = ({ workout }: WorkoutCardProps) => {
               </span>
               <Badge variant="secondary">{workout.category}</Badge>
               <div className="flex items-center">
-                <Star className="w-4 h-4 mr-1 text-yellow-500" />
+                <Star className="w-4 h-4 mr-1 text-completion-medium" />
                 <span>{workout.rating}</span>
               </div>
             </CardDescription>
@@ -57,25 +57,25 @@ const WorkoutCard = ({ workout }: WorkoutCardProps) => {
         )}
         
         <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <h4 className="text-sm font-medium text-foreground mb-2">
             Exercises ({workout.exercises.length})
           </h4>
           <ul className="space-y-2">
             {workout.exercises.slice(0, 3).map((exercise, idx) => (
               <li key={idx} className="flex items-center text-sm">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-3 flex-shrink-0"></span>
-                <span className="text-gray-600 dark:text-gray-400">{exercise}</span>
+                <span className="w-2 h-2 bg-primary rounded-full mr-3 flex-shrink-0"></span>
+                <span className="text-muted-foreground">{exercise}</span>
               </li>
             ))}
             {workout.exercises.length > 3 && (
-              <li className="text-xs text-gray-500 dark:text-gray-400 ml-5">
+              <li className="text-xs text-muted-foreground ml-5">
                 +{workout.exercises.length - 3} more exercises
               </li>
             )}
           </ul>
         </div>
         
-        <Button className="w-full bg-green-600 hover:bg-green-700">
+        <Button className="w-full">
           Start Workout
         </Button>
       </CardContent>

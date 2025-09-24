@@ -60,10 +60,10 @@ const NewWorkoutsTab = () => {
   // Show error state if there are authentication or data issues
   if (!user) {
     return (
-      <Card className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+      <Card className="glass-card border-destructive/20">
         <CardContent className="p-6 text-center">
-          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-red-600" />
-          <p className="text-red-800 dark:text-red-400">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-destructive" />
+          <p className="text-destructive-foreground">
             Authentication required to access workout features
           </p>
         </CardContent>
@@ -75,24 +75,24 @@ const NewWorkoutsTab = () => {
   if (plansError || sessionsError) {
     console.error('Workout data errors:', { plansError, sessionsError });
     return (
-      <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+      <Card className="glass-card border-completion-medium/20">
         <CardContent className="p-6 text-center">
-          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-completion-medium" />
           <div className="space-y-2">
-            <p className="text-yellow-800 dark:text-yellow-400 font-medium">
+            <p className="text-foreground font-medium">
               Unable to load workout data
             </p>
             {plansError && (
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              <p className="text-sm text-muted-foreground">
                 Plans error: {plansError}
               </p>
             )}
             {sessionsError && (
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              <p className="text-sm text-muted-foreground">
                 Sessions error: {sessionsError}
               </p>
             )}
-            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+            <p className="text-sm text-muted-foreground">
               Please try refreshing the page or check your internet connection.
             </p>
           </div>
@@ -104,10 +104,10 @@ const NewWorkoutsTab = () => {
   // Show loading state
   if (plansLoading) {
     return (
-      <Card className="bg-white dark:bg-gray-800">
+      <Card className="glass-card">
         <CardContent className="p-6 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-2"></div>
-          <p className="text-gray-600 dark:text-gray-400">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-muted-foreground">
             Loading workout data...
           </p>
         </CardContent>
@@ -151,13 +151,13 @@ const NewWorkoutsTab = () => {
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => setCurrentView('overview')}
-            className="text-green-600 hover:text-green-700"
+            className="text-primary hover:text-primary/80 transition-colors"
           >
             ← Back to Overview
           </button>
           <button
             onClick={() => setCurrentView('schedule-workout')}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded transition-colors"
           >
             + Schedule Workout
           </button>
