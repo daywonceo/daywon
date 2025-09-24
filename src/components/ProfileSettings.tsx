@@ -90,16 +90,13 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     friendActivity: true,
   });
 
-  // Initialize local state when dialog opens or when profile data becomes available
+  // Initialize local state when profile data becomes available
   React.useEffect(() => {
     if (currentUserProfile) {
       setDisplayName(currentUserProfile.display_name || "");
       setBio(currentUserProfile.bio || "");
-      if (currentUserProfile.username) {
-        setUsername(currentUserProfile.username);
-      }
     }
-  }, [currentUserProfile, setUsername]); // Initialize whenever profile data is available
+  }, [currentUserProfile]); // Username is handled by the useUsernameValidation hook
 
   const handleSaveProfile = async () => {
     // Validate display name

@@ -13,13 +13,20 @@ interface UseUsernameValidationReturn {
 }
 
 export const useUsernameValidation = (displayName: string = '', currentUsername?: string): UseUsernameValidationReturn => {
-  const [username, setUsername] = useState(currentUsername || '');
+  const [username, setUsername] = useState('');
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // Initialize username when currentUsername becomes available
+  useEffect(() => {
+    if (currentUsername && !hasUserInteracted) {
+      setUsername(currentUsername);
+    }
+  }, [currentUsername, hasUserInteracted]);
 
   // Generate username suggestions based on display name
   const generateSuggestions = (name: string): string[] => {
