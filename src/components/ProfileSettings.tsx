@@ -62,6 +62,8 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   // Profile editing states
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
+  const [hasDisplayNameInteracted, setHasDisplayNameInteracted] = useState(false);
+  const [hasBioInteracted, setHasBioInteracted] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   
@@ -90,14 +92,19 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     friendActivity: true,
   });
 
-  // Initialize local state when profile data becomes available
+  // Initialize display name and bio when profile data becomes available
   React.useEffect(() => {
-    if (currentUserProfile) {
+    if (currentUserProfile && !hasDisplayNameInteracted) {
       console.log('ProfileSettings: Setting display name from profile:', currentUserProfile.display_name);
       setDisplayName(currentUserProfile.display_name || "");
+    }
+  }, [currentUserProfile, hasDisplayNameInteracted]);
+
+  React.useEffect(() => {
+    if (currentUserProfile && !hasBioInteracted) {
       setBio(currentUserProfile.bio || "");
     }
-  }, [currentUserProfile]); // Username is handled by the useUsernameValidation hook
+  }, [currentUserProfile, hasBioInteracted]);
 
   const handleSaveProfile = async () => {
     // Validate display name
@@ -290,7 +297,10 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                   <Input
                     id="display-name"
                     value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    onChange={(e) => {
+                      if (!hasDisplayNameInteracted) setHasDisplayNameInteracted(true);
+                      setDisplayName(e.target.value);
+                    }}
                     placeholder="Enter your display name"
                     className="mt-1"
                   />
@@ -356,7 +366,10 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                   <Input
                     id="bio"
                     value={bio}
-                    onChange={(e) => setBio(e.target.value)}
+                    onChange={(e) => {
+                      if (!hasBioInteracted) setHasBioInteracted(true);
+                      setBio(e.target.value);
+                    }}
                     placeholder="Tell others about yourself"
                     className="mt-1"
                   />
