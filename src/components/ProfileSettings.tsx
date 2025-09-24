@@ -60,8 +60,8 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Profile editing states
-  const [displayName, setDisplayName] = useState(currentUserProfile?.display_name || "");
-  const [bio, setBio] = useState(currentUserProfile?.bio || "");
+  const [displayName, setDisplayName] = useState("");
+  const [bio, setBio] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   
@@ -90,16 +90,16 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     friendActivity: true,
   });
 
-  // Initialize local state when dialog opens and profile is available
+  // Initialize local state when dialog opens or when profile data becomes available
   React.useEffect(() => {
-    if (currentUserProfile && open) {
+    if (currentUserProfile) {
       setDisplayName(currentUserProfile.display_name || "");
       setBio(currentUserProfile.bio || "");
       if (currentUserProfile.username) {
         setUsername(currentUserProfile.username);
       }
     }
-  }, [currentUserProfile, open, setUsername]); // Include currentUserProfile to handle delayed loading
+  }, [currentUserProfile, setUsername]); // Initialize whenever profile data is available
 
   const handleSaveProfile = async () => {
     // Validate display name
