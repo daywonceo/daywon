@@ -559,6 +559,45 @@ export type Database = {
         }
         Relationships: []
       }
+      integration_sync_logs: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          integration_type: string
+          records_processed: number | null
+          started_at: string
+          status: string
+          sync_details: Json | null
+          sync_type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          integration_type: string
+          records_processed?: number | null
+          started_at?: string
+          status?: string
+          sync_details?: Json | null
+          sync_type: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          integration_type?: string
+          records_processed?: number | null
+          started_at?: string
+          status?: string
+          sync_details?: Json | null
+          sync_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       meal_plans: {
         Row: {
           created_at: string
@@ -1099,6 +1138,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_integrations: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          id: string
+          integration_settings: Json | null
+          integration_type: string
+          is_connected: boolean
+          last_sync_at: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          id?: string
+          integration_settings?: Json | null
+          integration_type: string
+          is_connected?: boolean
+          last_sync_at?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          id?: string
+          integration_settings?: Json | null
+          integration_type?: string
+          is_connected?: boolean
+          last_sync_at?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_progress: {
         Row: {
