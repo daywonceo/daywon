@@ -93,6 +93,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   // Initialize local state when profile data becomes available
   React.useEffect(() => {
     if (currentUserProfile) {
+      console.log('ProfileSettings: Setting display name from profile:', currentUserProfile.display_name);
       setDisplayName(currentUserProfile.display_name || "");
       setBio(currentUserProfile.bio || "");
     }
