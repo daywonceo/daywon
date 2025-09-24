@@ -102,7 +102,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   return (
     <div
       className={cn(
-        "w-12 h-12 border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
+        "w-16 h-16 border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
         activeHabit === category && activityIndex === 0
           ? "ring-2 ring-blue-500 ring-offset-2"
           : ""
@@ -112,21 +112,17 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
       {status === "completed" && (
         <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
           {showStreak ? (
-            <span className="text-white font-bold text-xs sm:text-sm leading-none">
+            <span className="text-white font-bold text-sm leading-none">
               {formattedStreak}
             </span>
           ) : (
-            <>
-              <Check size={20} className="sm:hidden text-white" />
-              <Check size={24} className="hidden sm:block text-white" />
-            </>
+            <Check size={28} className="text-white" />
           )}
         </div>
       )}
       {status === "failed" && (
         <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
-          <X size={20} className="sm:hidden text-red-500" />
-          <X size={24} className="hidden sm:block text-red-500" />
+          <X size={28} className="text-red-500" />
         </div>
       )}
     </div>
