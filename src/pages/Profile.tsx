@@ -23,7 +23,10 @@ const Profile = () => {
   const isMobile = useIsMobile();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMobileEditor, setShowMobileEditor] = useState(false);
-  const { signOut, session } = useAuth();
+  const { signOut, session, user } = useAuth();
+  
+  // Debug auth state
+  console.log('Auth state:', { session: !!session, user: !!user, userId: user?.id });
   const { currentUserProfile } = useSocialProfiles();
   const { streakStats, todayStats } = useHabitStats();
   const { calculateHabitScore } = useHabitScoring();
