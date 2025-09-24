@@ -57,17 +57,17 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
 
   return (
     <Card className="mb-8 shadow-sm border-border">
-      <CardContent className="p-6 sm:p-8">
-        <div className="grid grid-cols-[4rem_repeat(3,4rem)] gap-4 sm:gap-6 items-center justify-center max-w-fit mx-auto">
+      <CardContent className="p-8 sm:p-10">
+        <div className="grid grid-cols-[5rem_repeat(3,5rem)] gap-6 sm:gap-8 items-center justify-center max-w-fit mx-auto">
           {/* Header row */}
-          <div className="text-center py-2">
-            <span className="text-sm font-semibold text-muted-foreground block">
+          <div className="flex items-center justify-center py-2">
+            <span className="text-base font-bold text-muted-foreground text-center">
               Day
             </span>
           </div>
           {userHabits.map((habit) => (
-            <div key={habit} className="text-center py-2">
-              <span className="text-sm font-semibold text-muted-foreground block whitespace-nowrap overflow-hidden text-ellipsis">
+            <div key={habit} className="flex items-center justify-center py-2">
+              <span className="text-base font-bold text-muted-foreground text-center whitespace-nowrap overflow-hidden text-ellipsis">
                 {habit}
               </span>
             </div>
@@ -79,13 +79,13 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
             Array.from({ length: 3 }).map((_, index) => (
               <React.Fragment key={`skeleton-${index}`}>
                 {/* Day skeleton */}
-                <div className="flex items-center justify-center w-16 h-16">
-                  <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex items-center justify-center w-20 h-20">
+                  <Skeleton className="h-12 w-12 rounded-full" />
                 </div>
                 {/* Habit status boxes skeleton */}
                 {userHabits.map((_, habitIndex) => (
-                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center w-16 h-16">
-                    <Skeleton className="h-16 w-16 rounded-lg" />
+                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center w-20 h-20">
+                    <Skeleton className="h-20 w-20 rounded-lg" />
                   </div>
                 ))}
               </React.Fragment>
