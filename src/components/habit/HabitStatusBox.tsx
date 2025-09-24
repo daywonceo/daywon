@@ -102,31 +102,31 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   return (
     <div
       className={cn(
-        "w-10 h-10 sm:w-14 sm:h-14 border-2 border-green-800 rounded-md flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
+        "w-14 h-14 sm:w-20 sm:h-20 border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
         activeHabit === category && activityIndex === 0
-          ? "ring-1 ring-blue-500 ring-offset-1"
+          ? "ring-2 ring-blue-500 ring-offset-2"
           : ""
       )}
       onClick={() => onStatusToggle(activityIndex, category)}
     >
       {status === "completed" && (
-        <div className="w-4/5 h-4/5 bg-green-800 rounded-sm flex items-center justify-center animate-checkmark relative">
+        <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
           {showStreak ? (
-            <span className="text-white font-bold text-xs sm:text-sm leading-none text-center">
+            <span className="text-white font-bold text-sm sm:text-lg leading-none text-center">
               {formattedStreak}
             </span>
           ) : (
-            <Check size={16} className="text-white sm:hidden" />
+            <Check size={24} className="text-white sm:hidden" />
           )}
           {!showStreak && (
-            <Check size={20} className="text-white hidden sm:block" />
+            <Check size={32} className="text-white hidden sm:block" />
           )}
         </div>
       )}
       {status === "failed" && (
-        <div className="w-4/5 h-4/5 rounded-sm border border-red-500 flex items-center justify-center">
-          <X size={16} className="text-red-500 sm:hidden" />
-          <X size={20} className="text-red-500 hidden sm:block" />
+        <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
+          <X size={24} className="text-red-500 sm:hidden" />
+          <X size={32} className="text-red-500 hidden sm:block" />
         </div>
       )}
     </div>
