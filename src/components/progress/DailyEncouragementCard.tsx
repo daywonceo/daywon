@@ -268,27 +268,26 @@ const DailyEncouragementCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500/20 via-emerald-400/10 to-transparent backdrop-blur-sm border border-teal-200 dark:border-teal-800 shadow-lg">
-        <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm"></div>
-        <CardContent className="relative p-6">
+      <Card className="glass-card">
+        <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 shadow-sm">
-              <Heart className="h-5 w-5 text-white" />
+            <div className="p-2 rounded-lg gradient-primary shadow-sm">
+              <Heart className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+              <h3 className="text-sm font-semibold text-foreground">
                 Daily Inspiration
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Loading wisdom...
               </p>
             </div>
           </div>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-          </div>
+            <div className="animate-pulse space-y-3">
+              <div className="h-4 bg-muted rounded w-full"></div>
+              <div className="h-4 bg-muted rounded w-3/4"></div>
+              <div className="h-3 bg-muted rounded w-1/2"></div>
+            </div>
         </CardContent>
       </Card>
     );
@@ -296,21 +295,20 @@ const DailyEncouragementCard: React.FC = () => {
 
   return (
     <Card 
-      className="relative overflow-hidden bg-gradient-to-br from-teal-500/20 via-emerald-400/10 to-transparent backdrop-blur-sm border border-teal-200 dark:border-teal-800 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group"
+      className="glass-card group cursor-pointer interactive-glow"
       onClick={handleCardClick}
     >
-      <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm"></div>
-      <CardContent className="relative p-6">
+      <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 transition-transform group-hover:scale-110 duration-300 shadow-sm">
-              <Heart className="h-5 w-5 text-white" />
+            <div className="p-2 rounded-lg gradient-primary transition-transform group-hover:scale-110 duration-300 shadow-sm">
+              <Heart className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+              <h3 className="text-sm font-semibold text-foreground">
                 Daily Inspiration
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Words to motivate
               </p>
             </div>
@@ -345,11 +343,11 @@ const DailyEncouragementCard: React.FC = () => {
         
         {quote && (
           <div className="space-y-4">
-            <blockquote className="text-sm leading-relaxed text-gray-700 dark:text-gray-200 italic border-l-3 border-teal-400 pl-4">
+            <blockquote className="text-sm leading-relaxed text-foreground italic border-l-3 border-primary pl-4">
               {quote.text}
             </blockquote>
             
-            <cite className="text-xs text-gray-500 dark:text-gray-400 not-italic font-medium">
+            <cite className="text-xs text-muted-foreground not-italic font-medium">
               — {quote.author}
             </cite>
           </div>

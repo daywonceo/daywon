@@ -18,47 +18,39 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
   
   const { weeklyStats } = useHabitStats(activeHabitNames);
 
-  // Determine gradient and colors based on completion percentage
+  // Determine gradient and colors based on completion percentage using design system
   const getCompletionStyle = (percentage: number) => {
     if (percentage >= 80) {
       return {
-        gradient: 'from-emerald-500/20 via-emerald-400/10 to-transparent',
-        border: 'border-emerald-200 dark:border-emerald-800',
-        iconBg: 'bg-emerald-100 dark:bg-emerald-900/30',
-        iconColor: 'text-emerald-600 dark:text-emerald-400',
-        textColor: 'text-emerald-700 dark:text-emerald-300',
-        numberColor: 'text-emerald-600 dark:text-emerald-400',
-        progressColor: 'bg-gradient-to-r from-emerald-400 to-emerald-500'
+        iconBg: 'bg-primary/10 dark:bg-primary/20',
+        iconColor: 'text-primary dark:text-primary',
+        textColor: 'text-primary dark:text-primary',
+        numberColor: 'text-primary dark:text-primary',
+        progressColor: 'bg-primary'
       };
     } else if (percentage >= 60) {
       return {
-        gradient: 'from-blue-500/20 via-blue-400/10 to-transparent',
-        border: 'border-blue-200 dark:border-blue-800',
-        iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-        iconColor: 'text-blue-600 dark:text-blue-400',
-        textColor: 'text-blue-700 dark:text-blue-300',
-        numberColor: 'text-blue-600 dark:text-blue-400',
-        progressColor: 'bg-gradient-to-r from-blue-400 to-blue-500'
+        iconBg: 'bg-primary/10 dark:bg-primary/20',
+        iconColor: 'text-primary dark:text-primary',
+        textColor: 'text-primary/80 dark:text-primary/80',
+        numberColor: 'text-primary/90 dark:text-primary/90',
+        progressColor: 'bg-primary/80'
       };
     } else if (percentage >= 40) {
       return {
-        gradient: 'from-amber-500/20 via-amber-400/10 to-transparent',
-        border: 'border-amber-200 dark:border-amber-800',
-        iconBg: 'bg-amber-100 dark:bg-amber-900/30',
-        iconColor: 'text-amber-600 dark:text-amber-500',
-        textColor: 'text-amber-700 dark:text-amber-300',
-        numberColor: 'text-amber-600 dark:text-amber-400',
-        progressColor: 'bg-gradient-to-r from-amber-400 to-amber-500'
+        iconBg: 'bg-completion-medium/10 dark:bg-completion-medium/20',
+        iconColor: 'text-completion-medium dark:text-completion-medium',
+        textColor: 'text-completion-medium dark:text-completion-medium',
+        numberColor: 'text-completion-medium dark:text-completion-medium',
+        progressColor: 'bg-completion-medium'
       };
     } else {
       return {
-        gradient: 'from-red-500/20 via-red-400/10 to-transparent',
-        border: 'border-red-200 dark:border-red-800',
-        iconBg: 'bg-red-100 dark:bg-red-900/30',
-        iconColor: 'text-red-600 dark:text-red-400',
-        textColor: 'text-red-700 dark:text-red-300',
-        numberColor: 'text-red-600 dark:text-red-400',
-        progressColor: 'bg-gradient-to-r from-red-400 to-red-500'
+        iconBg: 'bg-completion-low/10 dark:bg-completion-low/20',
+        iconColor: 'text-completion-low dark:text-completion-low',
+        textColor: 'text-completion-low dark:text-completion-low',
+        numberColor: 'text-completion-low dark:text-completion-low',
+        progressColor: 'bg-completion-low'
       };
     }
   };
@@ -66,19 +58,18 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
   const style = getCompletionStyle(weeklyStats.percentage);
 
   return (
-    <Card className={`relative overflow-hidden bg-gradient-to-br ${style.gradient} backdrop-blur-sm border ${style.border} shadow-lg hover:shadow-xl transition-all duration-300 group`}>
-      <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm"></div>
-      <CardContent className="relative p-6">
+    <Card className="glass-card group">
+      <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${style.iconBg} transition-transform group-hover:scale-110 duration-300`}>
               <Target className={`h-5 w-5 ${style.iconColor}`} />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+              <h3 className="text-sm font-semibold text-foreground">
                 Weekly Progress
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Last 7 days
               </p>
             </div>
@@ -96,13 +87,13 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
             <span className={`text-lg font-medium ${style.textColor}`}>%</span>
           </div>
           
-          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-            You've completed <span className="font-semibold">{weeklyStats.completedCount}</span> of{' '}
-            <span className="font-semibold">{weeklyStats.totalPossible}</span> habits
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            You've completed <span className="font-semibold text-foreground">{weeklyStats.completedCount}</span> of{' '}
+            <span className="font-semibold text-foreground">{weeklyStats.totalPossible}</span> habits
           </p>
           
           <div className="relative">
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
               <div 
                 className={`h-full ${style.progressColor} rounded-full transition-all duration-700 ease-out shadow-sm`}
                 style={{ width: `${weeklyStats.percentage}%` }}
