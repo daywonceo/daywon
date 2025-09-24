@@ -1,198 +1,238 @@
 import { supabase } from "@/integrations/supabase/client";
-import { saveOfflineData, getOfflineData } from "./offlineStorage";
+import { getOfflineData, saveOfflineData } from "@/utils/offlineStorage";
 import { toast } from "@/hooks/use-toast";
-import { HabitActivity } from "./habitActivity";
-import { clearStreakCaches } from "./habitStreaks";
 
-// Define constants for synchronization
-const SYNC_INTERVAL = 60 * 1000; // 1 minute
-const LAST_SYNC_KEY_V2 = 'last_habit_sync_v2';
-const DAY_BOUNDARY_HOUR = 4; // 4 AM local time as day boundary
+// Streak cache management
+export let streakCaches: Record<string, any> = {};
 
-export interface SyncStats {
-  lastSyncTime: Date | null;
-  pendingChanges: number;
-  syncInProgress: boolean;
-  lastSyncStatus: 'success' | 'error' | 'none';
+export const clearStreakCaches = () => {
+  streakCaches = {};
+};
+
+// Define the HabitActivity interface for the V2 system
+export interface HabitActivity {
+  id: string;
+  date: string; // YYYY-MM-DD format
+  habitId: string;
+  habitName: string;
+  status: "completed" | "failed" | "empty";
 }
 
-// Track synchronization state
+// Synchronization state management
+export interface SyncStats {
+  lastSyncTime: number | null;
+  pendingChanges: number;
+  syncInProgress: boolean;
+  lastSyncStatus: 'success' | 'error' | 'never';
+}
+
 let syncState: SyncStats = {
   lastSyncTime: null,
   pendingChanges: 0,
   syncInProgress: false,
-  lastSyncStatus: 'none'
+  lastSyncStatus: 'never'
 };
 
-// Get the current status of synchronization
-export const getSyncStatus = (): SyncStats => {
-  return { ...syncState };
-};
+export const getSyncStatus = (): SyncStats => ({ ...syncState });
 
-// Initialize the sync system
-export const initHabitSync = () => {
-  // Set up listeners for online status changes
-  window.addEventListener('online', handleOnlineStatusChangeV2);
-  
-  // Start the sync interval
-  const interval = setInterval(synchronizeHabits, SYNC_INTERVAL);
-  
-  // Get last sync time from storage
-  const lastSyncStr = localStorage.getItem(LAST_SYNC_KEY_V2);
-  if (lastSyncStr) {
-    try {
-      syncState.lastSyncTime = new Date(JSON.parse(lastSyncStr));
-    } catch (e) {
-      console.error("Failed to parse last sync time V2", e);
+// Initialize habit synchronization system
+export const initHabitSync = (): (() => void) => {
+  // Listen for online status changes and sync when connection is restored
+  const handleOnlineStatusChange = () => {
+    if (navigator.onLine && syncState.pendingChanges > 0) {
+      synchronizeHabits(true).catch(console.error);
     }
-  }
-  
-  // Run an initial sync
-  synchronizeHabits();
-  
-  // Return cleanup function
+  };
+
+  window.addEventListener('online', handleOnlineStatusChange);
+
+  // Set up periodic sync every 30 seconds when online
+  const syncInterval = setInterval(() => {
+    if (navigator.onLine && syncState.pendingChanges > 0) {
+      synchronizeHabits().catch(console.error);
+    }
+  }, 30000);
+
+  // Cleanup function
   return () => {
-    clearInterval(interval);
-    window.removeEventListener('online', handleOnlineStatusChangeV2);
+    window.removeEventListener('online', handleOnlineStatusChange);
+    clearInterval(syncInterval);
   };
 };
 
-// Handle device coming back online
+// Enhanced online status handler
 const handleOnlineStatusChangeV2 = () => {
-  if (navigator.onLine) {
-    console.log("Device is back online, triggering habit sync V2");
-    synchronizeHabits();
+  if (navigator.onLine && !syncState.syncInProgress && syncState.pendingChanges > 0) {
+    console.log('📡 Back online! Syncing pending habit changes...');
+    synchronizeHabits(true).catch(error => {
+      console.error("Failed to sync on reconnect:", error);
+    });
   }
 };
 
-// Main synchronization function
-export const synchronizeHabits = async (forceSync = false): Promise<boolean> => {
-  // Skip if offline or sync already in progress
-  if (!navigator.onLine || (syncState.syncInProgress && !forceSync)) {
+// Main synchronization function with improved error handling
+export const synchronizeHabits = async (forceSync: boolean = false): Promise<boolean> => {
+  // Don't sync if already in progress
+  if (syncState.syncInProgress && !forceSync) {
+    console.log('⏸️ Sync already in progress, skipping...');
     return false;
   }
-  
+
+  // Don't sync if offline
+  if (!navigator.onLine) {
+    console.log('📡 Offline - cannot sync habits');
+    return false;
+  }
+
+  // Check authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    console.log('🔐 User not authenticated, skipping sync');
+    return false;
+  }
+
   try {
     syncState.syncInProgress = true;
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      syncState.syncInProgress = false;
-      return false;
-    }
-    
-    // Get local habit activities (V2 format)
+    console.log('🔄 Starting habit synchronization (V2)...');
+
+    // Get local data
     const offlineData = getOfflineData();
     const localActivities = offlineData.habitActivitiesV2 || [];
     
-    // Flag to check if any changes were made
-    let changesDetected = false;
-    
-    // 1. Push local changes to server
-    const pendingUploads = localActivities.filter(a => a.id.includes('local-'));
-    
-    if (pendingUploads.length > 0) {
-      console.log(`Syncing ${pendingUploads.length} local activities to server (V2)`);
-      
-      for (const activity of pendingUploads) {
-        const { error } = await supabase
-          .from('habit_activities')
-          .upsert({
-            user_id: user.id,
-            habit_id: activity.habitId,
-            habit_name: activity.habitName,
-            activity_date: activity.date,
-            status: activity.status
-          }, {
-            onConflict: 'user_id,habit_id,activity_date'
-          });
-          
-        if (error) {
-          console.error("Failed to upload activity V2:", error);
-        } else {
-          // Mark as uploaded by removing the local- prefix from ID
-          activity.id = activity.id.replace('local-', '');
-          changesDetected = true;
+    // Filter activities that need to be synced (those with local IDs)
+    const activitiesToSync = localActivities.filter(activity => 
+      activity.id.startsWith('local-')
+    );
+
+    console.log(`📤 Found ${activitiesToSync.length} local activities to sync`);
+
+    // Push local changes to server
+    if (activitiesToSync.length > 0) {
+      for (const activity of activitiesToSync) {
+        try {
+          // Check if this activity already exists on the server
+          const { data: existingActivity } = await supabase
+            .from('habit_activities')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('habit_id', activity.habitId)
+            .eq('activity_date', activity.date)
+            .maybeSingle();
+
+          if (existingActivity) {
+            // Update existing activity
+            const { error: updateError } = await supabase
+              .from('habit_activities')
+              .update({
+                status: activity.status,
+                habit_name: activity.habitName,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existingActivity.id);
+
+            if (updateError) {
+              console.error(`❌ Failed to update activity for ${activity.habitName} on ${activity.date}:`, updateError);
+              continue;
+            }
+
+            console.log(`✅ Updated activity for ${activity.habitName} on ${activity.date}`);
+          } else {
+            // Create new activity
+            const { error: insertError } = await supabase
+              .from('habit_activities')
+              .insert({
+                user_id: user.id,
+                habit_id: activity.habitId,
+                habit_name: activity.habitName,
+                activity_date: activity.date,
+                status: activity.status
+              });
+
+            if (insertError) {
+              console.error(`❌ Failed to insert activity for ${activity.habitName} on ${activity.date}:`, insertError);
+              continue;
+            }
+
+            console.log(`✅ Created activity for ${activity.habitName} on ${activity.date}`);
+          }
+
+          // Update local activity with server ID (remove local- prefix)
+          const localIndex = localActivities.findIndex(a => a.id === activity.id);
+          if (localIndex >= 0) {
+            localActivities[localIndex].id = `${activity.habitId}-${activity.date}`;
+          }
+
+        } catch (error) {
+          console.error(`❌ Failed to sync activity for ${activity.habitName}:`, error);
         }
       }
+
+      // Save updated local data
+      saveOfflineData({ habitActivitiesV2: localActivities });
+      console.log('💾 Updated local storage with synced activities');
     }
-    
-    // 2. Pull server changes
-    // Only get activities since last sync or last 30 days if no previous sync
-    const since = syncState.lastSyncTime || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    
-    const { data: serverActivities, error } = await supabase
+
+    // Pull server changes
+    const { data: serverActivities, error: fetchError } = await supabase
       .from('habit_activities')
-      .select('*, habits!inner(name)')
+      .select('id, habit_id, habit_name, activity_date, status')
       .eq('user_id', user.id)
-      .gt('updated_at', since.toISOString());
-      
-    if (error) {
-      console.error("Failed to fetch server activities V2:", error);
+      .gte('activity_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // Last 30 days
+
+    if (fetchError) {
+      console.error('❌ Failed to fetch server activities:', fetchError);
       syncState.lastSyncStatus = 'error';
       return false;
     }
-    
+
+    // Merge server data with local data
     if (serverActivities && serverActivities.length > 0) {
-      console.log(`Retrieved ${serverActivities.length} activities from server (V2)`);
+      console.log(`📥 Received ${serverActivities.length} activities from server`);
       
-      // Convert server format to local format
-      const convertedActivities: HabitActivity[] = serverActivities.map(a => ({
-        id: a.id,
-        date: a.activity_date,
-        habitId: a.habit_id,
-        habitName: a.habit_name || (a.habits as any)?.name || 'Unknown',
-        status: a.status as "completed" | "failed" | "empty"
-      }));
-      
-      // Merge with local activities, preferring server versions
+      // Convert server format to local format and merge
       const mergedActivities = [...localActivities];
       
-      convertedActivities.forEach(serverActivity => {
-        const localIndex = mergedActivities.findIndex(
-          local => local.habitId === serverActivity.habitId && 
-                   local.date === serverActivity.date
+      for (const serverActivity of serverActivities) {
+        const existingIndex = mergedActivities.findIndex(local => 
+          local.habitId === serverActivity.habit_id && 
+          local.date === serverActivity.activity_date
         );
         
-        if (localIndex >= 0) {
-          // Update existing entry if different
-          if (mergedActivities[localIndex].status !== serverActivity.status) {
-            mergedActivities[localIndex] = serverActivity;
-            changesDetected = true;
-          }
+        const localActivity: HabitActivity = {
+          id: `${serverActivity.habit_id}-${serverActivity.activity_date}`,
+          date: serverActivity.activity_date,
+          habitId: serverActivity.habit_id,
+          habitName: serverActivity.habit_name,
+          status: serverActivity.status as "completed" | "failed" | "empty"
+        };
+        
+        if (existingIndex >= 0) {
+          // Update existing local activity with server data (server is source of truth)
+          mergedActivities[existingIndex] = localActivity;
         } else {
-          // Add new entry
-          mergedActivities.push(serverActivity);
-          changesDetected = true;
+          // Add new activity from server
+          mergedActivities.push(localActivity);
         }
-      });
-      
-      // If changes were made, update local storage
-      if (changesDetected) {
-        saveOfflineData({ habitActivitiesV2: mergedActivities });
-        console.log("Updated local storage with synchronized activities (V2)");
-        
-        // Clear streak caches when data is synchronized
-        clearStreakCaches();
-        
-        // Notify the application that data has changed
-        window.dispatchEvent(new CustomEvent('habitDataSyncedV2', {
-          detail: { count: serverActivities.length }
-        }));
       }
+      
+      // Save merged data
+      saveOfflineData({ habitActivitiesV2: mergedActivities });
+      console.log('💾 Merged server data with local storage');
     }
-    
+
     // Update sync state
-    syncState.lastSyncTime = new Date();
+    syncState.lastSyncTime = Date.now();
+    syncState.pendingChanges = 0;
     syncState.lastSyncStatus = 'success';
-    syncState.pendingChanges = pendingUploads.length - pendingUploads.filter(a => !a.id.includes('local-')).length;
     
-    // Save last sync time
-    localStorage.setItem(LAST_SYNC_KEY_V2, JSON.stringify(syncState.lastSyncTime));
+    console.log('✅ Habit synchronization completed successfully (V2)');
+    
+    // Dispatch event for UI updates
+    window.dispatchEvent(new CustomEvent('habitDataSyncedV2'));
     
     return true;
   } catch (error) {
-    console.error("Habit synchronization failed (V2):", error);
+    console.error("❌ Habit synchronization failed (V2):", error);
     syncState.lastSyncStatus = 'error';
     return false;
   } finally {
@@ -280,63 +320,66 @@ export const recordHabitActivityWithSyncV2 = async (
   }
 };
 
-// Force a full synchronization from server (useful after login or for manual sync)
+// Force sync from server - useful after login or when data seems inconsistent
 export const forceSyncFromServerV2 = async (): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
+    console.log('🔄 Force syncing from server (V2)...');
     
-    // Get all habit activities from server with habit names
-    const { data: serverActivities, error } = await supabase
-      .from('habit_activities')
-      .select('*, habits!inner(name)')
-      .eq('user_id', user.id);
-      
-    if (error) {
-      console.error("Failed to fetch all server activities (V2):", error);
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.log('🔐 User not authenticated, cannot force sync');
       return false;
     }
-    
-    if (serverActivities) {
-      // Convert server format to local format
-      const convertedActivities: HabitActivity[] = serverActivities.map(a => ({
-        id: a.id,
-        date: a.activity_date,
-        habitId: a.habit_id,
-        habitName: a.habit_name || (a.habits as any)?.name || 'Unknown',
-        status: a.status as "completed" | "failed" | "empty"
-      }));
-      
-      // Save to local storage, completely replacing the existing data
-      saveOfflineData({ habitActivitiesV2: convertedActivities });
-      
-      // Update sync state
-      syncState.lastSyncTime = new Date();
-      syncState.lastSyncStatus = 'success';
-      syncState.pendingChanges = 0;
-      
-      // Save last sync time
-      localStorage.setItem(LAST_SYNC_KEY_V2, JSON.stringify(syncState.lastSyncTime));
-      
-      // Notify the application that data has changed
-      window.dispatchEvent(new CustomEvent('habitDataSyncedV2', {
-        detail: { count: serverActivities.length, fullSync: true }
-      }));
-      
-      return true;
+
+    // Fetch all habit activities from server (last 90 days)
+    const { data: serverActivities, error: fetchError } = await supabase
+      .from('habit_activities')
+      .select('id, habit_id, habit_name, activity_date, status')
+      .eq('user_id', user.id)
+      .gte('activity_date', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+
+    if (fetchError) {
+      console.error('❌ Failed to fetch activities from server:', fetchError);
+      return false;
     }
+
+    // Convert to local format
+    const localActivities: HabitActivity[] = (serverActivities || []).map(serverActivity => ({
+      id: `${serverActivity.habit_id}-${serverActivity.activity_date}`,
+      date: serverActivity.activity_date,
+      habitId: serverActivity.habit_id,
+      habitName: serverActivity.habit_name,
+      status: serverActivity.status as "completed" | "failed" | "empty"
+    }));
+
+    // Replace local data with server data
+    saveOfflineData({ habitActivitiesV2: localActivities });
     
-    return false;
+    // Clear caches
+    clearStreakCaches();
+    
+    // Update sync state
+    syncState.lastSyncTime = Date.now();
+    syncState.pendingChanges = 0;
+    syncState.lastSyncStatus = 'success';
+    
+    console.log(`✅ Force sync complete: ${localActivities.length} activities loaded from server (V2)`);
+    
+    // Dispatch event for UI updates
+    window.dispatchEvent(new CustomEvent('habitDataSyncedV2'));
+    
+    return true;
+    
   } catch (error) {
     console.error("Force sync failed (V2):", error);
     return false;
   }
 };
 
-// Mark uncompleted habits as failed at end of day - V2 version
-export const processEndOfDayHabits = async (daysToProcess: number = 7): Promise<void> => {
+// MUCH MORE CONSERVATIVE end-of-day processing - only processes truly missing habits
+export const processEndOfDayHabits = async (daysToProcess: number = 3): Promise<void> => {
   try {
-    console.log(`🌙 Processing end-of-day habits for the last ${daysToProcess} days (V2)...`);
+    console.log(`🌙 Processing end-of-day habits for the last ${daysToProcess} days (V2 - Conservative Mode)...`);
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -347,21 +390,28 @@ export const processEndOfDayHabits = async (daysToProcess: number = 7): Promise<
     // Get the current date and time
     const now = new Date();
     
-    // Process all days from yesterday going back the specified number of days
+    // Only process days that are at least 6 hours old to give users time
     const datesToProcess: string[] = [];
     for (let daysBack = 1; daysBack <= daysToProcess; daysBack++) {
       const date = new Date(now);
       date.setDate(now.getDate() - daysBack);
       
-      // Skip future dates and today (we only process completed days)
-      if (date >= now) continue;
+      // Skip if the date is less than 6 hours old
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      const hoursSinceEndOfDay = (now.getTime() - endOfDay.getTime()) / (1000 * 60 * 60);
+      
+      if (hoursSinceEndOfDay < 6) {
+        console.log(`⏭️ Skipping ${date.toISOString().split('T')[0]} (only ${hoursSinceEndOfDay.toFixed(1)} hours old, waiting for 6h grace period)`);
+        continue;
+      }
       
       const dateStr = date.toISOString().split('T')[0];
       datesToProcess.push(dateStr);
     }
     
     if (datesToProcess.length === 0) {
-      console.log('📅 No past dates to process');
+      console.log('📅 No dates old enough to process (6 hour grace period)');
       return;
     }
     
@@ -419,9 +469,10 @@ export const processEndOfDayHabits = async (daysToProcess: number = 7): Promise<
         console.log(`🔍 Checking habit "${habit.name}" (${habit.id}) for ${dateStr}:`, 
           existingActivity ? `Found: ${existingActivity.status}` : 'Not found');
         
-        // If no activity or status is empty, mark as "failed"
-        if (!existingActivity || existingActivity.status === "empty") {
-          // Create a failed activity entry
+        // CONSERVATIVE APPROACH: Only mark as failed if there's absolutely no record
+        // and don't touch anything that already has a status (completed, failed, or even empty)
+        if (!existingActivity) {
+          // Only create failed entry if no record exists at all
           const newActivity: HabitActivity = {
             id: `local-${habit.id}-${dateStr}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             date: dateStr,
@@ -430,26 +481,18 @@ export const processEndOfDayHabits = async (daysToProcess: number = 7): Promise<
             status: "failed"
           };
           
-          // Remove any existing entry for this habit and date first
-          const existingIndex = activities.findIndex(
-            a => a.habitId === habit.id && a.date === dateStr
-          );
-          
-          if (existingIndex >= 0) {
-            activities[existingIndex] = newActivity;
-          } else {
-            activities.push(newActivity);
-          }
-          
+          activities.push(newActivity);
           changesDetected = true;
           dateProcessedCount++;
           totalProcessedCount++;
           
-          console.log(`❌ Marked habit "${habit.name}" (${habit.id}) as failed for ${dateStr}`);
+          console.log(`❌ Marked habit "${habit.name}" (${habit.id}) as failed for ${dateStr} (no activity record found after grace period)`);
         } else if (existingActivity.status === "completed") {
           console.log(`✅ Habit "${habit.name}" was already completed for ${dateStr}`);
         } else if (existingActivity.status === "failed") {
           console.log(`❌ Habit "${habit.name}" was already failed for ${dateStr}`);
+        } else if (existingActivity.status === "empty") {
+          console.log(`⭕ Habit "${habit.name}" was marked empty for ${dateStr} - respecting user's choice`);
         }
       }
       
@@ -490,10 +533,10 @@ export const processEndOfDayHabits = async (daysToProcess: number = 7): Promise<
       // Also dispatch a general data update event for UI refresh
       window.dispatchEvent(new CustomEvent('habitDataUpdatedV2'));
       
-      console.log(`✅ End-of-day processing complete: ${totalProcessedCount} habits marked as failed across ${datesToProcess.length} dates`);
+      console.log(`✅ Conservative end-of-day processing complete: ${totalProcessedCount} habits marked as failed across ${datesToProcess.length} dates`);
       console.log('📊 Summary by date:', processedByDate);
     } else {
-      console.log(`✨ No changes needed for end-of-day processing (${datesToProcess.join(', ')})`);
+      console.log(`✨ No changes needed for end-of-day processing (${datesToProcess.join(', ')}) - all habits already logged`);
     }
   } catch (error) {
     console.error("❌ Failed to process end-of-day habits (V2):", error);
