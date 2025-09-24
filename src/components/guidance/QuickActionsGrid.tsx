@@ -22,19 +22,21 @@ const QuickActionsGrid = ({
         <Button 
           variant="outline" 
           onClick={onManagePlans}
-          className="h-16 flex flex-col items-center gap-1"
+          className="h-16 flex flex-col items-center gap-1 group hover:scale-105 transition-all duration-300 relative overflow-hidden"
         >
-          <Target className="w-5 h-5" />
-          <span className="text-xs">{workoutPlansCount > 0 ? 'Manage Plans' : 'Create Plan'}</span>
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Target className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300 relative z-10" />
+          <span className="text-xs relative z-10">{workoutPlansCount > 0 ? 'Manage Plans' : 'Create Plan'}</span>
         </Button>
         
         <Button 
           variant="outline" 
           onClick={onManualWorkout}
-          className="h-16 flex flex-col items-center gap-1"
+          className="h-16 flex flex-col items-center gap-1 group hover:scale-105 transition-all duration-300 delay-75 relative overflow-hidden"
         >
-          <Dumbbell className="w-5 h-5" />
-          <span className="text-xs">Manual Workout</span>
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Dumbbell className="w-5 h-5 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+          <span className="text-xs relative z-10">Manual Workout</span>
         </Button>
       </div>
 
@@ -42,10 +44,11 @@ const QuickActionsGrid = ({
         <Button 
           variant="outline" 
           onClick={onWeekView}
-          className="h-16 flex flex-col items-center gap-1"
+          className="h-16 flex flex-col items-center gap-1 group hover:scale-105 transition-all duration-300 delay-150 relative overflow-hidden"
         >
-          <Calendar className="w-5 h-5" />
-          <span className="text-xs">Week Schedule</span>
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+          <span className="text-xs relative z-10">Week Schedule</span>
         </Button>
       </div>
     </>
