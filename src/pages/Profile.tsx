@@ -80,18 +80,18 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">
-        <div className="text-center mb-6">
+      <main className="flex-grow px-6 sm:px-8 md:px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">
+        <div className="text-center mb-8 px-2">
           <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
             Your Profile
           </h1>
           <p className="text-sm text-muted-foreground mt-2">Track your progress and achievements</p>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-8 px-2">
           <ProfileHeader profile={profile} />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <PersonalBests 
               habitScore={profile.habitScore}
               mostConsistentHabit={profile.mostConsistentHabit}
@@ -101,7 +101,7 @@ const Profile = () => {
           
           <ShareMilestoneCard />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <BestFriends bestFriends={profile.bestFriends} />
             <MembershipMilestone daysActive={profile.daysActive} />
           </div>
