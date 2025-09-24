@@ -17,7 +17,7 @@ const ClickableDate: React.FC<ClickableDateProps> = ({
     <>
       <button
         onClick={() => setIsJournalOpen(true)}
-        className="text-center text-3xl sm:text-4xl font-bold text-green-800 hover:text-green-600 transition-colors cursor-pointer p-2 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20"
+        className="text-center text-lg sm:text-xl font-bold text-foreground hover:text-primary transition-all duration-200 cursor-pointer p-2 rounded-lg hover:bg-primary/10 active:scale-95"
         title="Click to add journal entry"
       >
         {day}
