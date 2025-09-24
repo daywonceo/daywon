@@ -124,12 +124,9 @@ const DailyEncouragementCard: React.FC = () => {
       if (!forceRefresh && cachedData) {
         const parsed = JSON.parse(cachedData);
         if (parsed.date === currentDay && parsed.quote) {
-          console.log('Using cached quote for:', currentDay);
           return parsed.quote;
         }
       }
-
-      console.log('Selecting new quote for:', forceRefresh ? 'refresh request' : currentDay);
       
       // Get a random quote if forcing refresh, otherwise get the day's quote
       const selectedQuote = getQuoteForDay(currentDay, fallbackQuotes, forceRefresh, forceRefresh ? quote || undefined : undefined);
@@ -181,7 +178,6 @@ const DailyEncouragementCard: React.FC = () => {
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
         if (parsed.date !== newCurrentDay) {
-          console.log('New day detected, fetching new quote');
           const newQuote = await fetchDailyQuote();
           setQuote(newQuote);
           
@@ -244,10 +240,8 @@ const DailyEncouragementCard: React.FC = () => {
     setIsRefreshing(true);
     
     try {
-      console.log('Refreshing quote, current quote:', quote?.text);
       // Force a new quote selection by passing true
       const newQuote = await fetchDailyQuote(true);
-      console.log('New quote selected:', newQuote.text);
       setQuote(newQuote);
       
       // Check if this quote is already saved
@@ -262,7 +256,6 @@ const DailyEncouragementCard: React.FC = () => {
         description: "You've got a new quote to inspire you!",
       });
     } catch (error) {
-      console.error('Error refreshing quote:', error);
       toast({
         title: "Failed to refresh",
         description: "Using a backup quote instead",
@@ -275,17 +268,26 @@ const DailyEncouragementCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="bg-white dark:bg-gray-800/50 border-t-4 border-t-teal-500 shadow-md">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Heart className="h-5 w-5 text-teal-500" />
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Daily Encouragement
-            </h3>
+      <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500/20 via-emerald-400/10 to-transparent backdrop-blur-sm border border-teal-200 dark:border-teal-800 shadow-lg">
+        <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm"></div>
+        <CardContent className="relative p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 shadow-sm">
+              <Heart className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Daily Inspiration
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Loading wisdom...
+              </p>
+            </div>
           </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+          <div className="animate-pulse space-y-3">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
           </div>
         </CardContent>
       </Card>
@@ -294,51 +296,69 @@ const DailyEncouragementCard: React.FC = () => {
 
   return (
     <Card 
-      className="bg-white dark:bg-gray-800/50 border-t-4 border-t-teal-500 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+      className="relative overflow-hidden bg-gradient-to-br from-teal-500/20 via-emerald-400/10 to-transparent backdrop-blur-sm border border-teal-200 dark:border-teal-800 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group"
       onClick={handleCardClick}
     >
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-3">
+      <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm"></div>
+      <CardContent className="relative p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 transition-transform group-hover:scale-110 duration-300 shadow-sm">
+              <Heart className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Daily Inspiration
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Words to motivate
+              </p>
+            </div>
+          </div>
+          
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveQuote}
-              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors group/save"
               aria-label={isSaved ? "Remove from saved quotes" : "Save quote"}
             >
               <Heart 
-                className={`h-5 w-5 transition-colors ${
+                className={`h-4 w-4 transition-all duration-300 ${
                   isSaved 
-                    ? 'fill-red-500 text-red-500' 
-                    : 'text-teal-500 hover:text-red-500'
+                    ? 'fill-red-500 text-red-500 scale-110' 
+                    : 'text-gray-400 group-hover/save:text-red-500 group-hover/save:scale-110'
                 }`}
               />
             </button>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Daily Encouragement
-            </h3>
+            <button
+              onClick={handleRefreshQuote}
+              className="p-2 rounded-lg hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
+              aria-label="Refresh quote"
+              disabled={isRefreshing}
+            >
+              <RefreshCw 
+                className={`h-4 w-4 text-gray-400 hover:text-teal-500 transition-all duration-300 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-180'}`}
+              />
+            </button>
           </div>
-          
-          <button
-            onClick={handleRefreshQuote}
-            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Refresh quote"
-            disabled={isRefreshing}
-          >
-            <RefreshCw 
-              className={`h-4 w-4 text-gray-400 hover:text-teal-500 ${isRefreshing ? 'animate-spin' : ''}`}
-            />
-          </button>
         </div>
         
         {quote && (
-          <div className="space-y-3">
-            <blockquote className="text-sm sm:text-base italic text-gray-700 dark:text-gray-200 leading-relaxed">
-              "{quote.text}"
-            </blockquote>
+          <div className="space-y-4">
+            <div className="relative">
+              <div className="absolute -left-2 -top-1 text-3xl text-teal-500/30 font-serif">"</div>
+              <blockquote className="text-sm leading-relaxed text-gray-700 dark:text-gray-200 italic pl-4 pr-2">
+                {quote.text}
+              </blockquote>
+              <div className="absolute -right-2 -bottom-1 text-3xl text-teal-500/30 font-serif">"</div>
+            </div>
             
-            <cite className="text-xs text-gray-500 dark:text-gray-400 not-italic">
-              – {quote.author}
-            </cite>
+            <div className="flex items-center justify-between">
+              <cite className="text-xs text-gray-500 dark:text-gray-400 not-italic font-medium">
+                — {quote.author}
+              </cite>
+              <div className="h-1 w-12 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full opacity-60"></div>
+            </div>
           </div>
         )}
       </CardContent>
