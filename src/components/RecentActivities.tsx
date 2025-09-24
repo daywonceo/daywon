@@ -56,7 +56,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
   }, [onHabitUpdate, refreshActivities]);
 
   return (
-    <Card className="mb-8 shadow-sm border-border/50 bg-card/50 backdrop-blur-sm">
+    <Card className="mb-8 shadow-sm border-border">
       <CardContent className="p-3 sm:p-6">
         <div className="grid grid-cols-[2.5rem_repeat(3,2.5rem)] sm:grid-cols-[3.5rem_repeat(3,3.5rem)] gap-2 sm:gap-4 items-center justify-center max-w-fit mx-auto">
           {/* Header row */}
