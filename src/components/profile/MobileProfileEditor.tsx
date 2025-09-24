@@ -129,35 +129,12 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
         updates.bio = bio.trim() || null;
       }
 
-      // Handle username update with enhanced validation
-      const needsUsernameUpdate = username && username !== currentUserProfile?.username;
-      if (needsUsernameUpdate && currentUserProfile?.id) {
-        const { data, error: rpcError } = await supabase.rpc('update_username_enhanced', {
-          user_id: currentUserProfile.id,
-          new_username: username
-        });
-
-        if (rpcError) {
-          toast({
-            title: "Username update failed",
-            description: "Failed to update username. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const result = data as { success?: boolean; error?: string; message?: string };
-        if (!result.success) {
-          toast({
-            title: "Username update failed", 
-            description: result.message || "Failed to update username.",
-            variant: "destructive",
-          });
-          return;
-        }
+      // Add username to updates if it changed and is available
+      if (username && username !== currentUserProfile?.username && isAvailable) {
+        updates.username = username;
       }
       
-      // Update other profile fields if changed
+      // Update profile using the hook (which handles username validation internally)
       if (Object.keys(updates).length > 0) {
         await updateProfile(updates);
       }

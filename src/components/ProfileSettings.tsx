@@ -144,53 +144,28 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
         updates.bio = bio.trim() || undefined;
       }
 
-      // Handle username update with enhanced validation
-      if (username && username !== currentUserProfile?.username && isAvailable && currentUserProfile?.id) {
-        const { data, error: rpcError } = await supabase.rpc('update_username_enhanced', {
-          user_id: currentUserProfile.id,
-          new_username: username
-        });
-
-        if (rpcError) {
-          toast({
-            title: "Username Update Failed",
-            description: "Failed to update username. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const result = data as { success?: boolean; error?: string; message?: string };
-        if (!result.success) {
-          toast({
-            title: "Username Update Failed", 
-            description: result.message || "Failed to update username.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        toast({
-          title: "Username updated",
-          description: `Your username has been changed to @${username}`,
-        });
+      // Add username to updates if it has changed and is available
+      if (username && username !== currentUserProfile?.username && isAvailable) {
+        updates.username = username;
       }
       
-      // Update other profile fields if changed
+      // Update profile using the hook (which handles username validation internally)
       if (Object.keys(updates).length > 0) {
         await updateProfile(updates);
+        
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been successfully updated",
+        });
+      } else {
+        toast({
+          title: "No changes",
+          description: "No changes were made to your profile",
+        });
       }
-      
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated",
-      });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
-      });
+      // Error is already handled by the updateProfile hook
+      console.error('Profile update error:', error);
     } finally {
       setIsUpdating(false);
     }

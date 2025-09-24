@@ -72,32 +72,58 @@ export const useSocialProfiles = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
 
-      const { data, error } = await supabase
+      // Handle username update separately if it exists
+      if (updates.username && updates.username !== currentUserProfile?.username) {
+        const { data: usernameResult, error: usernameError } = await supabase.rpc('update_username_enhanced', {
+          user_id: user.id,
+          new_username: updates.username
+        });
+
+        if (usernameError || !usernameResult?.success) {
+          throw new Error(usernameResult?.message || 'Username update failed');
+        }
+
+        // Remove username from updates since it was handled by the RPC
+        const { username, ...otherUpdates } = updates;
+        updates = otherUpdates;
+      }
+
+      // Update other profile fields if any remain
+      let data = currentUserProfile;
+      if (Object.keys(updates).length > 0) {
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .update({
+            ...updates,
+            last_active: new Date().toISOString(),
+          })
+          .eq('id', user.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        data = profileData;
+      }
+
+      // Fetch fresh profile data to ensure we have the latest
+      const { data: freshProfile, error: fetchError } = await supabase
         .from('profiles')
-        .update({
-          ...updates,
-          last_active: new Date().toISOString(),
-        })
+        .select('*')
         .eq('id', user.id)
-        .select()
         .single();
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
       
-      setCurrentUserProfile(data);
+      setCurrentUserProfile(freshProfile);
       // Update in profiles list if it exists
-      setProfiles(prev => prev.map(p => p.id === data.id ? data : p));
-      
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-      });
+      setProfiles(prev => prev.map(p => p.id === freshProfile.id ? freshProfile : p));
 
-      return data;
+      return freshProfile;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;
