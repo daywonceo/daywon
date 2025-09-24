@@ -102,19 +102,15 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   }, [currentUserProfile, open, setUsername]);
 
   const handleSaveProfile = async () => {
-    console.log('ProfileSettings - Save attempt:', {
-      displayName: displayName.trim(),
-      currentDisplayName: currentUserProfile?.display_name,
-      username,
-      currentUsername: currentUserProfile?.username,
-      isAvailable,
-      isCheckingUsername,
-      usernameError,
-      errorCode,
-      hasDisplayNameChanged: displayName.trim() !== currentUserProfile?.display_name,
-      hasUsernameChanged: username !== currentUserProfile?.username,
-      hasBioChanged: bio.trim() !== currentUserProfile?.bio
-    });
+    // Validate display name
+    if (!displayName.trim()) {
+      toast({
+        title: "Display name required",
+        description: "Please enter a display name",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Only validate username if it has changed
     if (username !== currentUserProfile?.username && isAvailable === false && username) {
@@ -156,7 +152,6 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
         });
 
         if (rpcError) {
-          console.error('Username update error:', rpcError);
           toast({
             title: "Username Update Failed",
             description: "Failed to update username. Please try again.",
@@ -191,7 +186,6 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
         description: "Your profile has been successfully updated",
       });
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
@@ -229,7 +223,6 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
         description: "Your profile picture has been successfully updated",
       });
     } catch (error) {
-      console.error('Error uploading avatar:', error);
       toast({
         title: "Upload failed",
         description: "Failed to upload profile picture",

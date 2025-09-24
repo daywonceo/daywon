@@ -32,12 +32,6 @@ const NewWorkoutsTab = () => {
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
   const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
 
-  console.log('NewWorkoutsTab - Auth user:', user?.id);
-  console.log('NewWorkoutsTab - Plans loading:', plansLoading);
-  console.log('NewWorkoutsTab - Plans error:', plansError);
-  console.log('NewWorkoutsTab - Sessions error:', sessionsError);
-  console.log('NewWorkoutsTab - Workout plans:', workoutPlans?.length);
-  console.log('NewWorkoutsTab - Sessions:', sessions?.length);
 
   // Filter sessions to only include today or earlier dates
   const filteredSessions = sessions.filter(session => {

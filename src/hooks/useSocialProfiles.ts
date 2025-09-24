@@ -43,7 +43,7 @@ export const useSocialProfiles = () => {
       if (error) throw error;
       setCurrentUserProfile(data);
     } catch (error) {
-      console.error('Error fetching current user profile:', error);
+      // Silently handle error - profile might not exist yet
     }
   };
 
@@ -56,7 +56,6 @@ export const useSocialProfiles = () => {
       if (error) throw error;
       setProfiles(data || []);
     } catch (error) {
-      console.error('Error fetching profiles:', error);
       toast({
         title: "Error",
         description: "Failed to load user profiles",
@@ -96,7 +95,6 @@ export const useSocialProfiles = () => {
 
       return data;
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile",
@@ -127,7 +125,7 @@ export const useSocialProfiles = () => {
         setProfiles(prev => prev.map(p => p.id === user.id ? updated : p));
       }
     } catch (error) {
-      console.error('Error updating status:', error);
+      // Silently handle status update errors
     }
   };
 
@@ -141,7 +139,6 @@ export const useSocialProfiles = () => {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error searching profiles:', error);
       return [];
     }
   };
@@ -156,7 +153,6 @@ export const useSocialProfiles = () => {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error discovering profiles:', error);
       return [];
     }
   };
@@ -173,7 +169,6 @@ export const useSocialProfiles = () => {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching profile:', error);
       return null;
     }
   };

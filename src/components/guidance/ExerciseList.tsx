@@ -17,12 +17,7 @@ const ExerciseList = ({
   onLogExercise,
   onToggleExerciseComplete 
 }: ExerciseListProps) => {
-  console.log('ExerciseList - workoutPlan:', workoutPlan);
-  console.log('ExerciseList - exerciseLogs:', exerciseLogs);
-  console.log('ExerciseList - completedExercises:', completedExercises);
-  
   if (!workoutPlan) {
-    console.log('ExerciseList - No workout plan found');
     return (
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200">
@@ -36,7 +31,6 @@ const ExerciseList = ({
   }
 
   if (!workoutPlan.exercises || workoutPlan.exercises.length === 0) {
-    console.log('ExerciseList - No exercises in workout plan');
     return (
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200">
