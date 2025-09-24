@@ -13,7 +13,8 @@ interface UseUsernameValidationReturn {
 }
 
 export const useUsernameValidation = (displayName: string = '', currentUsername?: string): UseUsernameValidationReturn => {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(currentUsername || '');
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,16 +41,16 @@ export const useUsernameValidation = (displayName: string = '', currentUsername?
     ].filter(suggestion => suggestion.length >= 3 && suggestion.length <= 30);
   };
 
-  // Auto-suggest username when display name changes
+  // Auto-suggest username when display name changes, but only if user hasn't interacted with username field
   useEffect(() => {
-    if (displayName && !username) {
+    if (displayName && !username && !hasUserInteracted && !currentUsername) {
       const suggestions = generateSuggestions(displayName);
       setSuggestions(suggestions);
       if (suggestions.length > 0) {
         setUsername(suggestions[0]);
       }
     }
-  }, [displayName, username]);
+  }, [displayName, username, hasUserInteracted, currentUsername]);
 
   // Check username availability using enhanced validation
   const checkAvailability = async (value: string) => {
@@ -142,6 +143,10 @@ export const useUsernameValidation = (displayName: string = '', currentUsername?
   }, [username, currentUsername]); // Add currentUsername dependency
 
   const handleSetUsername = (value: string) => {
+    // Mark that user has interacted with the username field
+    if (!hasUserInteracted) {
+      setHasUserInteracted(true);
+    }
     // Clean input but preserve dots - let server-side validation handle the rest
     const cleanValue = value.toLowerCase().replace(/[^a-z0-9._]/g, '');
     setUsername(cleanValue);
