@@ -1,5 +1,6 @@
 
 import React from "react";
+import { AppErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -52,8 +53,6 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
     if (user) {
       // Use the synchronization system
       import('./utils/habitSynchronization').then(({ initHabitSync, processEndOfDayHabits }) => {
-        console.log('Initializing habit synchronization system (V2)');
-        
         // Initialize synchronization
         const cleanup = initHabitSync();
         
@@ -65,7 +64,6 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
           const now = new Date();
           // Run at the start of each new day (midnight to 1 AM)
           if (now.getHours() === 0 && now.getMinutes() < 5) {
-            console.log('New day detected, processing end-of-day habits...');
             processEndOfDayHabits(7);
           }
         }, 300000); // Check every 5 minutes instead of every minute for better performance
@@ -76,7 +74,6 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
           const today = new Date().toISOString().split('T')[0];
           
           if (!lastCheck || lastCheck !== today) {
-            console.log('App focused on new day, processing end-of-day habits...');
             processEndOfDayHabits(7);
             localStorage.setItem('lastEndOfDayCheck', today);
           }
@@ -125,8 +122,6 @@ const AppContent: React.FC = () => {
   }, [user, loading]);
 
   const handleOnboardingComplete = () => {
-    console.log('Onboarding completed');
-    
     // Save onboarding data to localStorage
     localStorage.setItem('onboardingCompleted', 'true');
     
@@ -180,9 +175,10 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <SettingsProvider>
+    <AppErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <SettingsProvider>
           <TooltipProvider>
             <BrowserRouter>
               <Toaster />
@@ -191,9 +187,10 @@ const App: React.FC = () => {
               <AppContent />
             </BrowserRouter>
           </TooltipProvider>
-        </SettingsProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+          </SettingsProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </AppErrorBoundary>
   );
 };
 

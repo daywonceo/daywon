@@ -70,7 +70,6 @@ const Index = () => {
       if (throttleTimer) return; // Already pending
       
       throttleTimer = setTimeout(() => {
-        console.log('App became visible/focused, refreshing data...');
         setRefreshTrigger(prev => prev + 1);
         throttleTimer = null;
       }, 2000); // Throttle to max once every 2 seconds
@@ -124,7 +123,6 @@ const Index = () => {
         duration: 3000,
       });
     } catch (error) {
-      console.error("Error refreshing data:", error);
       toast({
         title: "Refresh failed",
         description: "Could not update your data. Please try again.",
