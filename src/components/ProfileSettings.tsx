@@ -92,19 +92,33 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     friendActivity: true,
   });
 
-  // Initialize display name and bio when profile data becomes available
+  // Initialize display name when currentUserProfile becomes available
   React.useEffect(() => {
-    if (currentUserProfile && !hasDisplayNameInteracted) {
-      console.log('ProfileSettings: Setting display name from profile:', currentUserProfile.display_name);
-      setDisplayName(currentUserProfile.display_name || "");
+    console.log('ProfileSettings: Checking display name initialization:', {
+      currentDisplayName: currentUserProfile?.display_name,
+      hasInteracted: hasDisplayNameInteracted,
+      currentState: displayName
+    });
+    
+    if (currentUserProfile?.display_name && !hasDisplayNameInteracted) {
+      console.log('ProfileSettings: Setting display name to:', currentUserProfile.display_name);
+      setDisplayName(currentUserProfile.display_name);
     }
-  }, [currentUserProfile, hasDisplayNameInteracted]);
+  }, [currentUserProfile?.display_name, hasDisplayNameInteracted]);
 
+  // Initialize bio when currentUserProfile becomes available
   React.useEffect(() => {
-    if (currentUserProfile && !hasBioInteracted) {
-      setBio(currentUserProfile.bio || "");
+    console.log('ProfileSettings: Checking bio initialization:', {
+      currentBio: currentUserProfile?.bio,
+      hasInteracted: hasBioInteracted,
+      currentState: bio
+    });
+    
+    if (currentUserProfile?.bio && !hasBioInteracted) {
+      console.log('ProfileSettings: Setting bio to:', currentUserProfile.bio);
+      setBio(currentUserProfile.bio);
     }
-  }, [currentUserProfile, hasBioInteracted]);
+  }, [currentUserProfile?.bio, hasBioInteracted]);
 
   const handleSaveProfile = async () => {
     // Validate display name
