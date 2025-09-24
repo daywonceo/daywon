@@ -102,7 +102,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   return (
     <div
       className={cn(
-        "aspect-square w-full border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
+        "w-12 h-12 border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
         activeHabit === category && activityIndex === 0
           ? "ring-2 ring-blue-500 ring-offset-2"
           : ""

@@ -58,7 +58,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
   return (
     <Card className="mb-8 shadow-sm border-border">
       <CardContent className="p-4 sm:p-6">
-        <div className="grid grid-cols-[auto_repeat(3,1fr)] gap-3 sm:gap-6 items-center">
+        <div className="grid grid-cols-[3rem_repeat(3,3rem)] gap-3 sm:gap-4 items-center justify-center max-w-fit mx-auto">
           {/* Header row */}
           <div className="text-center">
             <span className="text-xs font-medium text-muted-foreground block">
@@ -66,7 +66,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
             </span>
           </div>
           {userHabits.map((habit) => (
-            <div key={habit} className="text-center px-2">
+            <div key={habit} className="text-center">
               <span className="text-xs font-medium text-muted-foreground block whitespace-nowrap overflow-hidden text-ellipsis">
                 {habit}
               </span>
@@ -79,13 +79,13 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
             Array.from({ length: 3 }).map((_, index) => (
               <React.Fragment key={`skeleton-${index}`}>
                 {/* Day skeleton */}
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center w-12 h-12">
                   <Skeleton className="h-8 w-8 rounded-full" />
                 </div>
                 {/* Habit status boxes skeleton */}
                 {userHabits.map((_, habitIndex) => (
-                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center">
-                    <Skeleton className="h-8 w-8 rounded-md" />
+                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center w-12 h-12">
+                    <Skeleton className="h-12 w-12 rounded-md" />
                   </div>
                 ))}
               </React.Fragment>
