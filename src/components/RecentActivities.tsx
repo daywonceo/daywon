@@ -58,7 +58,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
   return (
     <Card className="mb-8 shadow-sm border-border">
       <CardContent className="p-6 sm:p-8">
-        <div className="grid grid-cols-[4rem_repeat(3,4rem)] gap-4 sm:gap-6 items-center justify-center max-w-fit mx-auto">
+        <div className="grid grid-cols-[4rem_repeat(3,4rem)] gap-4 sm:gap-6 items-center max-w-fit">
           {/* Header row */}
           <div className="text-center py-2">
             <span className="text-sm font-semibold text-muted-foreground block">
