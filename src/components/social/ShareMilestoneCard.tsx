@@ -76,13 +76,13 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
 
   if (shareableHabits.length === 0) {
     return (
-      <Card className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 ${className}`}>
-        <CardContent className="p-6 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
-            <Target className="text-gray-400" size={20} />
+      <Card className={`glass-card ${className}`}>
+        <CardContent className="p-4 text-center">
+          <div className="inline-flex items-center justify-center w-10 h-10 bg-muted rounded-full mb-3">
+            <Target className="text-muted-foreground" size={18} />
           </div>
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">No Active Streaks</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="font-medium text-foreground mb-1 text-sm">No Active Streaks</h3>
+          <p className="text-xs text-muted-foreground">
             Complete some habits to start building streaks you can share!
           </p>
         </CardContent>
@@ -91,40 +91,39 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
   }
 
   return (
-    <Card className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 ${className}`}>
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center space-x-2 text-lg">
-          <Share2 className="text-blue-600 dark:text-blue-400" size={20} />
+    <Card className={`glass-card ${className}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center space-x-2 text-base">
+          <div className="p-1.5 rounded-lg bg-primary/10">
+            <Share2 className="text-primary" size={16} />
+          </div>
           <span>Share Your Progress</span>
         </CardTitle>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Celebrate your achievements with the community
-        </p>
       </CardHeader>
       
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Milestones Section */}
         {milestones.length > 0 && (
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Milestones Ready to Share</h3>
+            <div className="flex items-center space-x-2 mb-2">
+              <h3 className="font-medium text-sm text-foreground">Milestones Ready to Share</h3>
             </div>
             <div className="space-y-2">
               {milestones.map((habit) => (
                 <div
                   key={habit.habitName}
-                  className="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800"
+                  className="flex items-center justify-between p-2.5 bg-primary/5 rounded-lg border border-primary/20"
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <div>
-                      <p className="font-medium text-sm text-gray-900 dark:text-white">
+                      <p className="font-medium text-sm text-foreground">
                         {habit.habitName}
                       </p>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={`${getStreakBadgeColor(habit.streak)} border-0 text-xs font-bold`}>
+                      <div className="flex items-center space-x-1.5">
+                        <Badge className="bg-primary text-primary-foreground border-0 text-xs font-medium">
                           {habit.streak} days
                         </Badge>
-                        <span className="text-xs text-yellow-700 dark:text-yellow-300 font-medium">
+                        <span className="text-xs text-primary font-medium">
                           Milestone!
                         </span>
                       </div>
@@ -132,15 +131,15 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
                   </div>
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-sm"
+                    className="h-8"
                     onClick={() => handleShare(habit.habitName)}
                     disabled={sharing === habit.habitName}
                   >
                     {sharing === habit.habitName ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3 h-3 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <>
-                        <Share2 size={14} className="mr-1" />
+                        <Share2 size={12} className="mr-1" />
                         Share
                       </>
                     )}
@@ -154,21 +153,21 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
         {/* Regular Streaks Section */}
         {regularStreaks.length > 0 && (
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Current Streaks</h3>
+            <div className="flex items-center space-x-2 mb-2">
+              <h3 className="font-medium text-sm text-foreground">Current Streaks</h3>
             </div>
             <div className="grid grid-cols-1 gap-2">
               {regularStreaks.map((habit) => (
                 <div
                   key={habit.habitName}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
+                  className="flex items-center justify-between p-2.5 bg-muted/30 rounded-lg border border-border"
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <div>
-                      <p className="font-medium text-sm text-gray-900 dark:text-white">
+                      <p className="font-medium text-sm text-foreground">
                         {habit.habitName}
                       </p>
-                      <Badge className={`${getStreakBadgeColor(habit.streak)} border-0 text-xs`}>
+                      <Badge className="bg-primary/20 text-primary border-0 text-xs">
                         {habit.streak} days
                       </Badge>
                     </div>
@@ -176,15 +175,15 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-green-200 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-900/20"
+                    className="h-8"
                     onClick={() => handleShare(habit.habitName)}
                     disabled={sharing === habit.habitName}
                   >
                     {sharing === habit.habitName ? (
-                      <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <>
-                        <Share2 size={14} className="mr-1" />
+                        <Share2 size={12} className="mr-1" />
                         Share
                       </>
                     )}
@@ -194,19 +193,6 @@ const ShareMilestoneCard = ({ className }: ShareMilestoneCardProps) => {
             </div>
           </div>
         )}
-
-        {/* Sharing tip */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-          <div className="flex items-start space-x-2">
-            <Calendar className="text-blue-600 dark:text-blue-400 mt-0.5" size={14} />
-            <div>
-              <p className="text-xs font-medium text-blue-900 dark:text-blue-100">Pro Tip</p>
-              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                Sharing your progress motivates others and helps build accountability in your community!
-              </p>
-            </div>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
