@@ -16,37 +16,44 @@ const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-4">
       <Button 
         variant="outline" 
-        className="border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-900/20"
+        className="glass-card border-primary/20 hover:border-primary/40 hover:bg-primary/10 group h-14 relative overflow-hidden"
         onClick={onOpenSettings}
       >
-        <Settings className="w-4 h-4 mr-2" />
-        Settings
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <Settings className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300 relative z-10" />
+        <span className="relative z-10">Settings</span>
       </Button>
+      
       <Button 
         variant="outline" 
-        className="border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+        className="glass-card border-primary/20 hover:border-primary/40 hover:bg-primary/10 group h-14 relative overflow-hidden"
       >
-        <Share2 className="w-4 h-4 mr-2" />
-        Share
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <Share2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+        <span className="relative z-10">Share</span>
       </Button>
+      
       <Button 
         variant="outline" 
-        className="border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+        className="glass-card border-primary/20 hover:border-primary/40 hover:bg-primary/10 group h-14 relative overflow-hidden"
         onClick={handleStartOnboarding}
       >
-        <RefreshCcw className="w-4 h-4 mr-2" />
-        Restart Onboarding
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <RefreshCcw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-500 relative z-10" />
+        <span className="relative z-10">Restart Onboarding</span>
       </Button>
+      
       <Button 
         variant="outline" 
-        className="border-red-200 dark:border-red-800 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+        className="glass-card border-destructive/20 hover:border-destructive/40 hover:bg-destructive/10 text-destructive group h-14 relative overflow-hidden"
         onClick={onSignOut}
       >
-        <LogOut className="w-4 h-4 mr-2" />
-        Sign Out
+        <div className="absolute inset-0 bg-destructive/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <LogOut className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+        <span className="relative z-10">Sign Out</span>
       </Button>
     </div>
   );

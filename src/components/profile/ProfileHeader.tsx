@@ -20,47 +20,67 @@ interface ProfileHeaderProps {
 
 const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
   return (
-    <Card className="mb-6 border-green-200 dark:border-green-800 shadow-lg">
-      <CardContent className="pt-6">
+    <Card className="glass-card group relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors duration-700"></div>
+      <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors duration-700 delay-300"></div>
+      
+      <CardContent className="pt-8 pb-6 relative z-10">
         <div className="flex flex-col items-center text-center">
-          <div className="relative mb-4">
-            <div className="w-24 h-24">
+          {/* Enhanced Avatar Section */}
+          <div className="relative mb-6 group/avatar">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-500"></div>
+            <div className="w-28 h-28 relative">
               <AspectRatio ratio={1/1}>
-                <Avatar className="w-full h-full border-4 border-green-200 dark:border-green-800">
+                <Avatar className="w-full h-full border-4 border-primary/30 group-hover/avatar:border-primary/50 transition-colors duration-300 relative z-10">
                   <AvatarImage src={profile.avatar} alt={profile.name} className="object-cover" />
-                  <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">{profile.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </AspectRatio>
             </div>
+            {/* Animated ring around avatar */}
+            <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-pulse"></div>
           </div>
           
-          <div className="mb-4">
-            <h2 className="text-xl font-bold">{profile.name}</h2>
-            <p className="text-muted-foreground">@{profile.username}</p>
+          {/* Enhanced Name Section */}
+          <div className="mb-6 space-y-1">
+            <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{profile.name}</h2>
+            <p className="text-muted-foreground bg-muted/50 px-3 py-1 rounded-full text-sm">@{profile.username}</p>
           </div>
           
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4 w-full max-w-sm">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <Users className="w-5 h-5 text-green-600" />
+          {/* Enhanced Stats Grid */}
+          <div className="grid grid-cols-3 gap-6 w-full max-w-sm">
+            <div className="text-center group/stat hover:scale-105 transition-transform duration-300">
+              <div className="relative mb-2">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300"></div>
+                <div className="p-3 rounded-full bg-primary/10 group-hover/stat:bg-primary/20 transition-colors duration-300 inline-flex relative z-10">
+                  <Users className="w-5 h-5 text-primary group-hover/stat:scale-110 transition-transform duration-300" />
+                </div>
               </div>
-              <p className="text-lg font-bold text-green-600">{profile.friendCount}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Friends</p>
+              <p className="text-xl font-bold text-primary mb-1">{profile.friendCount}</p>
+              <p className="text-xs text-muted-foreground font-medium">Friends</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <Calendar className="w-5 h-5 text-blue-600" />
+            
+            <div className="text-center group/stat hover:scale-105 transition-transform duration-300 delay-75">
+              <div className="relative mb-2">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300"></div>
+                <div className="p-3 rounded-full bg-primary/10 group-hover/stat:bg-primary/20 transition-colors duration-300 inline-flex relative z-10">
+                  <Calendar className="w-5 h-5 text-primary group-hover/stat:scale-110 transition-transform duration-300" />
+                </div>
               </div>
-              <p className="text-lg font-bold text-blue-600">{profile.daysActive}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Days Active</p>
+              <p className="text-xl font-bold text-primary mb-1">{profile.daysActive}</p>
+              <p className="text-xs text-muted-foreground font-medium">Days Active</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-1">
-                <Trophy className="w-5 h-5 text-purple-600" />
+            
+            <div className="text-center group/stat hover:scale-105 transition-transform duration-300 delay-150">
+              <div className="relative mb-2">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300"></div>
+                <div className="p-3 rounded-full bg-primary/10 group-hover/stat:bg-primary/20 transition-colors duration-300 inline-flex relative z-10">
+                  <Trophy className="w-5 h-5 text-primary group-hover/stat:scale-110 transition-transform duration-300" />
+                </div>
               </div>
-              <p className="text-lg font-bold text-purple-600">{profile.totalHabitsCompleted}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Completed</p>
+              <p className="text-xl font-bold text-primary mb-1">{profile.totalHabitsCompleted}</p>
+              <p className="text-xs text-muted-foreground font-medium">Completed</p>
             </div>
           </div>
         </div>
