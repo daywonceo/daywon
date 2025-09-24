@@ -22,8 +22,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         iconColor: 'text-white',
         textColor: 'text-purple-700 dark:text-purple-300',
         numberColor: 'text-purple-600 dark:text-purple-400',
-        icon: Trophy,
-        emoji: '👑'
+        icon: Trophy
       };
     } else if (streak >= 14) {
       return {
@@ -33,8 +32,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         iconColor: 'text-white',
         textColor: 'text-orange-700 dark:text-orange-300',
         numberColor: 'text-orange-600 dark:text-orange-400',
-        icon: Flame,
-        emoji: '🔥'
+        icon: Flame
       };
     } else if (streak >= 7) {
       return {
@@ -44,8 +42,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         iconColor: 'text-white',
         textColor: 'text-amber-700 dark:text-amber-300',
         numberColor: 'text-amber-600 dark:text-amber-400',
-        icon: Award,
-        emoji: '⭐'
+        icon: Award
       };
     } else {
       return {
@@ -55,8 +52,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
         iconColor: 'text-white',
         textColor: 'text-blue-700 dark:text-blue-300',
         numberColor: 'text-blue-600 dark:text-blue-400',
-        icon: Flame,
-        emoji: '💪'
+        icon: Flame
       };
     }
   };
@@ -82,9 +78,6 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
               </p>
             </div>
           </div>
-          <div className="text-2xl opacity-80">
-            {style.emoji}
-          </div>
         </div>
         
         <div className="space-y-4">
@@ -109,13 +102,6 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({ userHabits }) => {
               <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                 Start completing habits to build your first streak!
               </p>
-            )}
-            
-            {streakStats.longestStreak >= 7 && (
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                <div className="h-1 w-8 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
-                <span>Keep it up!</span>
-              </div>
             )}
           </div>
         </div>

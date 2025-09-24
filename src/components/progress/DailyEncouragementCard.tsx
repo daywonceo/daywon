@@ -319,14 +319,14 @@ const DailyEncouragementCard: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveQuote}
-              className="p-2 rounded-lg hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors group/save"
+              className="p-2 rounded-lg hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
               aria-label={isSaved ? "Remove from saved quotes" : "Save quote"}
             >
               <Heart 
                 className={`h-4 w-4 transition-all duration-300 ${
                   isSaved 
-                    ? 'fill-red-500 text-red-500 scale-110' 
-                    : 'text-gray-400 group-hover/save:text-red-500 group-hover/save:scale-110'
+                    ? 'fill-red-500 text-red-500' 
+                    : 'text-gray-400 hover:text-red-500'
                 }`}
               />
             </button>
@@ -337,7 +337,7 @@ const DailyEncouragementCard: React.FC = () => {
               disabled={isRefreshing}
             >
               <RefreshCw 
-                className={`h-4 w-4 text-gray-400 hover:text-teal-500 transition-all duration-300 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-180'}`}
+                className={`h-4 w-4 text-gray-400 hover:text-teal-500 transition-colors ${isRefreshing ? 'animate-spin' : ''}`}
               />
             </button>
           </div>
@@ -345,20 +345,13 @@ const DailyEncouragementCard: React.FC = () => {
         
         {quote && (
           <div className="space-y-4">
-            <div className="relative">
-              <div className="absolute -left-2 -top-1 text-3xl text-teal-500/30 font-serif">"</div>
-              <blockquote className="text-sm leading-relaxed text-gray-700 dark:text-gray-200 italic pl-4 pr-2">
-                {quote.text}
-              </blockquote>
-              <div className="absolute -right-2 -bottom-1 text-3xl text-teal-500/30 font-serif">"</div>
-            </div>
+            <blockquote className="text-sm leading-relaxed text-gray-700 dark:text-gray-200 italic border-l-3 border-teal-400 pl-4">
+              {quote.text}
+            </blockquote>
             
-            <div className="flex items-center justify-between">
-              <cite className="text-xs text-gray-500 dark:text-gray-400 not-italic font-medium">
-                — {quote.author}
-              </cite>
-              <div className="h-1 w-12 bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full opacity-60"></div>
-            </div>
+            <cite className="text-xs text-gray-500 dark:text-gray-400 not-italic font-medium">
+              — {quote.author}
+            </cite>
           </div>
         )}
       </CardContent>

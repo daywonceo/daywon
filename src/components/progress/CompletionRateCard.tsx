@@ -108,9 +108,6 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
                 style={{ width: `${weeklyStats.percentage}%` }}
               />
             </div>
-            <div className="absolute -top-1 right-0 text-xs font-medium text-gray-500 dark:text-gray-400">
-              {weeklyStats.percentage >= 80 ? '🔥' : weeklyStats.percentage >= 60 ? '💪' : weeklyStats.percentage >= 40 ? '👍' : '📈'}
-            </div>
           </div>
         </div>
       </CardContent>
