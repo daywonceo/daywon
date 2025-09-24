@@ -40,10 +40,13 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
         recordHabitActivity(habit.name, newStatus, new Date());
         hapticSuccess();
         
-        // Dispatch event for RecentActivities to listen to
+        // Dispatch events for components to listen to
         window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
             detail: { category: habit.name, status: newStatus, date: new Date().toISOString().split('T')[0] } 
         }));
+        
+        // Also dispatch habitUpdated for progress components
+        window.dispatchEvent(new CustomEvent('habitUpdated'));
         
         onUpdate();
     };

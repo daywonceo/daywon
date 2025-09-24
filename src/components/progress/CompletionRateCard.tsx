@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, Target } from 'lucide-react';
@@ -12,11 +12,27 @@ interface CompletionRateCardProps {
 
 const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) => {
   const { habits } = useHabits();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Use all active habits instead of just the default ones (exclude ended and archived)
   const activeHabitNames = userHabits || habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
   
   const { weeklyStats } = useHabitStats(activeHabitNames);
+
+  // Listen for habit updates to refresh progress
+  useEffect(() => {
+    const handleHabitUpdate = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+    
+    window.addEventListener('habitUpdated', handleHabitUpdate);
+    window.addEventListener('habitStatusChanged', handleHabitUpdate);
+
+    return () => {
+      window.removeEventListener('habitUpdated', handleHabitUpdate);
+      window.removeEventListener('habitStatusChanged', handleHabitUpdate);
+    };
+  }, []);
 
   // Determine gradient and colors based on completion percentage using design system
   const getCompletionStyle = (percentage: number) => {
