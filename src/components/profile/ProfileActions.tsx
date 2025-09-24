@@ -32,11 +32,12 @@ const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
       <Button 
         variant="outline" 
         className="glass-card border-primary/20 hover:border-primary/40 hover:bg-primary/10 group h-14 relative overflow-hidden flex items-center justify-center text-center"
+        onClick={() => window.location.href = '/integrations'}
       >
         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div className="flex items-center justify-center relative z-10">
           <Share2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
-          <span className="text-sm">Share</span>
+          <span className="text-sm">Integrations</span>
         </div>
       </Button>
       

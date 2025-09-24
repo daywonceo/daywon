@@ -16,6 +16,7 @@ import GoPremium from "./pages/GoPremium";
 import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import Integrations from "./pages/Integrations";
 
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -161,6 +162,7 @@ const AppContent: React.FC = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/guidance" element={<Guidance />} />
+        <Route path="/integrations" element={<Integrations />} />
         <Route path="/premium" element={<GoPremium />} />
         <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
