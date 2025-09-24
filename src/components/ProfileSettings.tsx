@@ -90,7 +90,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     friendActivity: true,
   });
 
-  // Initialize local state when dialog opens (only once)
+  // Initialize local state when dialog opens and profile is available
   React.useEffect(() => {
     if (currentUserProfile && open) {
       setDisplayName(currentUserProfile.display_name || "");
@@ -99,7 +99,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
         setUsername(currentUserProfile.username);
       }
     }
-  }, [open]); // Only depend on 'open' to prevent resetting during editing
+  }, [currentUserProfile, open, setUsername]); // Include currentUserProfile to handle delayed loading
 
   const handleSaveProfile = async () => {
     // Validate display name
