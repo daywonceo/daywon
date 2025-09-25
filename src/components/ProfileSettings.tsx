@@ -767,6 +767,11 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
             <span>Settings</span>
           </DialogTitle>
         </DialogHeader>
+        
+        {/* Debug info */}
+        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded mb-4">
+          Debug: displayName="{displayName}", bio="{bio}", username="{username}"
+        </div>
         {renderDesktopView()}
       </DialogContent>
     </Dialog>
