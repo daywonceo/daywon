@@ -37,16 +37,20 @@ export const MobileProfileEditor = ({ onCancel, onSave }: MobileProfileEditorPro
     suggestions
   } = useUsernameValidation(displayName, currentUserProfile?.username);
 
-  // Initialize form with current profile data (only once on mount)
+  // Initialize form with current profile data
   useEffect(() => {
     if (currentUserProfile) {
-      setDisplayName(currentUserProfile.display_name || '');
-      setBio(currentUserProfile.bio || '');
-      if (currentUserProfile.username) {
+      if (currentUserProfile.display_name && displayName === '') {
+        setDisplayName(currentUserProfile.display_name);
+      }
+      if (currentUserProfile.bio && bio === '') {
+        setBio(currentUserProfile.bio);
+      }
+      if (currentUserProfile.username && username === '') {
         setUsername(currentUserProfile.username);
       }
     }
-  }, []); // Empty dependency array to run only once on mount
+  }, [currentUserProfile, displayName, bio, username]);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
