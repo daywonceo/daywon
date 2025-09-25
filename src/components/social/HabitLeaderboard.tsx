@@ -195,7 +195,7 @@ const HabitLeaderboard = () => {
           <span>Full Rankings - {getPeriodLabel(period)}</span>
         </h3>
         
-        {leaderboard.map((entry, index) => (
+        {leaderboard.slice(0, 10).map((entry, index) => (
           <Card 
             key={entry.userId} 
             className={`group transition-all duration-300 hover:shadow-lg ${
