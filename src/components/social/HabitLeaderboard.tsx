@@ -37,20 +37,27 @@ const HabitLeaderboard = () => {
   const userRank = leaderboard.find(entry => entry.name === "Sarah Chen"); // Mock current user
 
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Crown className="text-yellow-500" size={18} />;
-    if (rank === 2) return <Trophy className="text-gray-400" size={18} />;
-    if (rank === 3) return <Medal className="text-amber-600" size={18} />;
+    if (rank === 1) return <Crown className="text-yellow-500 dark:text-yellow-400" size={20} />;
+    if (rank === 2) return <Trophy className="text-slate-500 dark:text-slate-400" size={18} />;
+    if (rank === 3) return <Medal className="text-amber-600 dark:text-amber-400" size={18} />;
     return (
-      <div className="w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-        <span className="font-bold text-sm text-gray-600 dark:text-gray-300">{rank}</span>
+      <div className="w-7 h-7 bg-gradient-to-br from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 rounded-full flex items-center justify-center border border-border">
+        <span className="font-bold text-sm text-muted-foreground">{rank}</span>
       </div>
     );
   };
 
+  const getRankBadge = (rank: number) => {
+    if (rank === 1) return "bg-gradient-to-r from-yellow-500 to-orange-500 text-white";
+    if (rank === 2) return "bg-gradient-to-r from-slate-400 to-slate-500 text-white";
+    if (rank === 3) return "bg-gradient-to-r from-amber-500 to-orange-400 text-white";
+    return "bg-gradient-to-r from-muted to-muted-foreground/20 text-muted-foreground";
+  };
+
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 dark:text-green-400";
-    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
+    if (score >= 80) return "text-emerald-600 dark:text-emerald-400";
+    if (score >= 60) return "text-amber-600 dark:text-amber-400";
+    return "text-red-500 dark:text-red-400";
   };
 
   const getPeriodLabel = (period: TimePeriod) => {
@@ -62,145 +69,191 @@ const HabitLeaderboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4">
       {/* Header */}
-      <div className="text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-full mb-3">
-          <Trophy className="text-yellow-600 dark:text-yellow-400" size={20} />
+      <div className="text-center space-y-4">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-3xl rounded-full transform scale-150"></div>
+          <div className="relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl shadow-lg">
+            <Trophy className="text-white" size={24} />
+          </div>
         </div>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Habit Champions</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Rankings based on consistency, streaks, variety, and recency
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Champions Arena
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Where dedication meets recognition
+          </p>
+        </div>
         
         <ToggleGroup 
           type="single" 
           value={period} 
           onValueChange={(value) => value && setPeriod(value as TimePeriod)} 
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-1 rounded-lg border border-gray-200 dark:border-gray-700"
+          className="bg-card border rounded-xl p-1 shadow-sm"
         >
-          <ToggleGroupItem value="weekly" className="text-sm font-semibold px-4 py-2.5">Week</ToggleGroupItem>
-          <ToggleGroupItem value="monthly" className="text-sm font-semibold px-4 py-2.5">Month</ToggleGroupItem>
-          <ToggleGroupItem value="yearly" className="text-sm font-semibold px-4 py-2.5">Year</ToggleGroupItem>
+          <ToggleGroupItem value="weekly" className="text-sm font-medium px-6 py-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Week</ToggleGroupItem>
+          <ToggleGroupItem value="monthly" className="text-sm font-medium px-6 py-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Month</ToggleGroupItem>
+          <ToggleGroupItem value="yearly" className="text-sm font-medium px-6 py-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">Year</ToggleGroupItem>
         </ToggleGroup>
       </div>
 
       {/* User's Current Rank */}
       {userRank && (
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Your Rank - {getPeriodLabel(period)}</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                {getRankIcon(userRank.rankPosition)}
+        <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 border-primary/20 shadow-lg">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50"></div>
+          <CardContent className="relative p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getRankBadge(userRank.rankPosition)} shadow-lg`}>
+                    {getRankIcon(userRank.rankPosition)}
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-primary-foreground">#{userRank.rankPosition}</span>
+                  </div>
+                </div>
                 <div>
-                  <p className="font-bold text-gray-900 dark:text-white">#{userRank.rankPosition}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">out of {leaderboard.length}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Your Position</p>
+                  <p className="text-lg font-bold">Rank #{userRank.rankPosition} of {leaderboard.length}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className={`text-2xl font-bold ${getScoreColor(userRank.totalScore)}`}>
+                <p className={`text-3xl font-bold ${getScoreColor(userRank.totalScore)}`}>
                   {userRank.totalScore.toFixed(1)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Habit Score</p>
+                <p className="text-sm text-muted-foreground">Habit Score</p>
               </div>
             </div>
             
             {/* Score Breakdown */}
-            <div className="grid grid-cols-4 gap-2 mt-4">
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Target className="w-3 h-3 text-blue-500 mr-1" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-card/50 rounded-lg p-3 border border-border/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Target className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium">Consistency</span>
+                  </div>
+                  <span className="text-lg font-bold text-primary">{userRank.consistencyRate.toFixed(0)}%</span>
                 </div>
-                <p className="text-xs font-medium text-gray-900 dark:text-white">{userRank.consistencyRate.toFixed(1)}</p>
-                <p className="text-xs text-gray-500">Consistency</p>
+                <Progress value={userRank.consistencyRate} className="mt-2 h-2" />
               </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Zap className="w-3 h-3 text-orange-500 mr-1" />
+              <div className="bg-card/50 rounded-lg p-3 border border-border/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-medium">Streak</span>
+                  </div>
+                  <span className="text-lg font-bold text-accent">{userRank.streakScore.toFixed(0)}</span>
                 </div>
-                <p className="text-xs font-medium text-gray-900 dark:text-white">{userRank.streakScore.toFixed(1)}</p>
-                <p className="text-xs text-gray-500">Streak</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
-                </div>
-                <p className="text-xs font-medium text-gray-900 dark:text-white">{userRank.varietyScore.toFixed(1)}</p>
-                <p className="text-xs text-gray-500">Variety</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Clock className="w-3 h-3 text-purple-500 mr-1" />
-                </div>
-                <p className="text-xs font-medium text-gray-900 dark:text-white">{userRank.recencyScore.toFixed(1)}</p>
-                <p className="text-xs text-gray-500">Recency</p>
+                <Progress value={userRank.streakScore * 4} className="mt-2 h-2" />
               </div>
             </div>
           </CardContent>
         </Card>
       )}
       
-      {/* Leaderboard */}
+      {/* Top 3 Podium */}
+      <div className="grid grid-cols-3 gap-2 mb-6">
+        {leaderboard.slice(0, 3).map((entry, index) => {
+          const heights = ["h-24", "h-32", "h-20"];
+          const positions = [1, 0, 2]; // 2nd, 1st, 3rd
+          const actualIndex = positions[index];
+          const actualEntry = leaderboard[actualIndex];
+          
+          return (
+            <div key={actualEntry.userId} className="flex flex-col items-center">
+              <Avatar className={`mb-2 ${actualIndex === 0 ? 'h-16 w-16' : 'h-12 w-12'} ring-2 ${actualIndex === 0 ? 'ring-yellow-400' : actualIndex === 1 ? 'ring-slate-400' : 'ring-amber-400'}`}>
+                <AvatarImage src={actualEntry.avatar} alt={actualEntry.name} />
+                <AvatarFallback className={`font-bold ${actualIndex === 0 ? 'bg-gradient-to-br from-yellow-400 to-orange-400 text-white' : actualIndex === 1 ? 'bg-gradient-to-br from-slate-400 to-slate-500 text-white' : 'bg-gradient-to-br from-amber-400 to-orange-400 text-white'}`}>
+                  {actualEntry.name.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className={`${heights[actualIndex]} w-full bg-gradient-to-t ${
+                actualIndex === 0 ? 'from-yellow-400 to-yellow-500' : 
+                actualIndex === 1 ? 'from-slate-400 to-slate-500' : 
+                'from-amber-400 to-amber-500'
+              } rounded-t-lg flex flex-col items-center justify-center text-white relative`}>
+                <div className="absolute -top-2 w-6 h-6 bg-gradient-to-br from-background to-muted rounded-full flex items-center justify-center border-2 border-current">
+                  <span className="text-xs font-bold text-current">{actualIndex + 1}</span>
+                </div>
+                <div className="text-center mt-2">
+                  <p className="text-xs font-medium truncate px-1">{actualEntry.name}</p>
+                  <p className="text-lg font-bold">{actualEntry.totalScore.toFixed(0)}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Full Leaderboard */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
-          All Rankings - {getPeriodLabel(period)}
+        <h3 className="text-lg font-semibold flex items-center space-x-2 mb-4">
+          <TrendingUp className="w-5 h-5 text-primary" />
+          <span>Full Rankings - {getPeriodLabel(period)}</span>
         </h3>
         
         {leaderboard.map((entry, index) => (
           <Card 
             key={entry.userId} 
-            className={`transition-all duration-200 hover:shadow-md ${
+            className={`group transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
               index < 3 
-                ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10 border-yellow-200 dark:border-yellow-800/50' 
+                ? 'bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 shadow-md' 
                 : entry.name === userRank?.name
-                ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 border-blue-200 dark:border-blue-800/50'
-                : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700'
+                ? 'bg-gradient-to-r from-accent/5 to-primary/5 border-accent/20 shadow-md'
+                : 'bg-card hover:bg-accent/5'
             }`}
           >
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3 flex-1 min-w-0">
-                  {/* Rank Icon */}
-                  <div className="flex-shrink-0">
-                    {getRankIcon(entry.rankPosition)}
-                  </div>
-                  
-                  {/* Avatar */}
-                  <Avatar className="h-10 w-10 ring-2 ring-gray-100 dark:ring-gray-800/50 flex-shrink-0">
-                    <AvatarImage src={entry.avatar} alt={entry.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-800 dark:to-purple-800 text-blue-800 dark:text-blue-200 text-sm font-semibold">
-                      {entry.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  {/* User Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-gray-900 dark:text-white truncate">
+              <div className="flex items-center space-x-4">
+                {/* Rank Badge */}
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${getRankBadge(entry.rankPosition)} shadow-lg group-hover:scale-110 transition-transform`}>
+                  #{entry.rankPosition}
+                </div>
+                
+                {/* Avatar */}
+                <Avatar className="h-12 w-12 ring-2 ring-border group-hover:ring-primary/50 transition-all">
+                  <AvatarImage src={entry.avatar} alt={entry.name} />
+                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-foreground font-semibold">
+                    {entry.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                
+                {/* User Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2">
+                    <p className="font-bold text-foreground truncate">
                       {entry.name}
                     </p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <Badge variant="secondary" className="text-xs px-2 py-0">
-                        C: {entry.consistencyRate.toFixed(0)}
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs px-2 py-0">
-                        S: {entry.streakScore.toFixed(0)}
-                      </Badge>
+                    {index < 3 && (
+                      <div className="flex-shrink-0">
+                        {getRankIcon(entry.rankPosition)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-3 mt-1">
+                    <div className="flex items-center space-x-1">
+                      <Target className="w-3 h-3 text-primary" />
+                      <span className="text-xs text-muted-foreground">{entry.consistencyRate.toFixed(0)}%</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Zap className="w-3 h-3 text-accent" />
+                      <span className="text-xs text-muted-foreground">{entry.streakScore.toFixed(0)}</span>
                     </div>
                   </div>
                 </div>
                 
                 {/* Score */}
-                <div className="text-right flex-shrink-0 ml-3">
-                  <p className={`text-xl font-bold ${getScoreColor(entry.totalScore)}`}>
+                <div className="text-right">
+                  <p className={`text-2xl font-bold ${getScoreColor(entry.totalScore)}`}>
                     {entry.totalScore.toFixed(1)}
                   </p>
-                  <div className="w-16">
+                  <div className="w-20 mt-1">
                     <Progress 
                       value={entry.totalScore} 
-                      className="h-1.5 bg-gray-200 dark:bg-gray-600" 
+                      className="h-2" 
                     />
                   </div>
                 </div>
@@ -211,45 +264,69 @@ const HabitLeaderboard = () => {
       </div>
 
       {/* Scoring Formula */}
-      <Card className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-            <Award className="w-4 h-4 mr-2 text-blue-500" />
-            How Your Habit Score is Calculated
+      <Card className="bg-gradient-to-br from-muted/30 to-accent/10 border-muted">
+        <CardContent className="p-6">
+          <h4 className="text-lg font-semibold mb-4 flex items-center">
+            <Award className="w-5 h-5 mr-2 text-primary" />
+            Scoring System
           </h4>
-          <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center">
-                <Target className="w-3 h-3 text-blue-500 mr-2" />
-                <strong>Consistency Rate (40%)</strong>
-              </span>
-              <span>Days completed ÷ Total days</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-card rounded-lg border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Target className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Consistency</p>
+                    <p className="text-sm text-muted-foreground">40% weight</p>
+                  </div>
+                </div>
+                <Badge variant="secondary">Key Factor</Badge>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-card rounded-lg border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-accent" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Streak Power</p>
+                    <p className="text-sm text-muted-foreground">30% weight</p>
+                  </div>
+                </div>
+                <Badge variant="secondary">High Impact</Badge>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center">
-                <Zap className="w-3 h-3 text-orange-500 mr-2" />
-                <strong>Streak Score (30%)</strong>
-              </span>
-              <span>Current streak × difficulty multiplier</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center">
-                <TrendingUp className="w-3 h-3 text-green-500 mr-2" />
-                <strong>Variety Score (20%)</strong>
-              </span>
-              <span>Number of different habits tracked</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center">
-                <Clock className="w-3 h-3 text-purple-500 mr-2" />
-                <strong>Recency Bonus (10%)</strong>
-              </span>
-              <span>Activity in the last 7 days</span>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-card rounded-lg border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Variety</p>
+                    <p className="text-sm text-muted-foreground">20% weight</p>
+                  </div>
+                </div>
+                <Badge variant="outline">Balanced</Badge>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-card rounded-lg border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-violet-500/10 rounded-full flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-violet-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Recency</p>
+                    <p className="text-sm text-muted-foreground">10% weight</p>
+                  </div>
+                </div>
+                <Badge variant="outline">Bonus</Badge>
+              </div>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              <strong>Total Score = </strong>(Consistency × 0.4) + (Streak × 0.3) + (Variety × 0.2) + (Recency × 0.1)
+          <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+            <p className="text-sm text-center font-medium">
+              <span className="text-primary">Score Formula:</span> (Consistency × 0.4) + (Streak × 0.3) + (Variety × 0.2) + (Recency × 0.1)
             </p>
           </div>
         </CardContent>
