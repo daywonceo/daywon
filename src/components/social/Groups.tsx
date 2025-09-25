@@ -12,6 +12,7 @@ import ChallengeDiscovery from './ChallengeDiscovery';
 import BulkChallengeActions from './BulkChallengeActions';
 import ChallengeRecommendations from './ChallengeRecommendations';
 import ChallengeAchievements from './ChallengeAchievements';
+import OptimizedChallengeList from './OptimizedChallengeList';
 import { useChallenges } from '@/hooks/useChallenges';
 
 const Groups = () => {
@@ -161,64 +162,16 @@ const Groups = () => {
             <ChallengeAchievements />
           </div>
 
-          {/* Bulk Actions */}
-          {challenges.length > 0 && (
-            <BulkChallengeActions
-              challenges={challenges}
-              selectedChallenges={selectedChallenges}
-              onSelectionChange={setSelectedChallenges}
-              onBulkAction={handleBulkAction}
-            />
-          )}
-          
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-3"></div>
-              <p className="text-sm text-gray-500">Loading challenges...</p>
-            </div>
-          ) : challenges.length === 0 ? (
-            <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-              <CardContent className="p-8 text-center">
-                <Trophy className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">No Active Challenges</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  Be the first to create a challenge for your community!
-                </p>
-                <Button 
-                  className="bg-purple-600 hover:bg-purple-700"
-                  onClick={() => setShowCreateModal(true)}
-                >
-                  <Plus size={16} className="mr-1" />
-                  Create Challenge
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {challenges.map((challenge) => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={challenge}
-                  onJoin={joinChallenge}
-                  onLeave={leaveChallenge}
-                  onViewDetails={handleViewDetails}
-                  onShare={handleShare}
-                  onFavorite={handleFavorite}
-                  onQuickProgress={handleQuickProgress}
-                  loading={loading}
-                  isSelected={selectedChallenges.includes(challenge.id)}
-                  onSelect={(id) => {
-                    if (selectedChallenges.includes(id)) {
-                      setSelectedChallenges(prev => prev.filter(cId => cId !== id));
-                    } else {
-                      setSelectedChallenges(prev => [...prev, id]);
-                    }
-                  }}
-                  showQuickActions={true}
-                />
-              ))}
-            </div>
-          )}
+          {/* Optimized Challenge List */}
+          <OptimizedChallengeList
+            category={activeTab === 'challenges' ? 'all' : activeTab}
+            onJoin={joinChallenge}
+            onLeave={leaveChallenge}
+            onViewDetails={handleViewDetails}
+            onShare={handleShare}
+            onFavorite={handleFavorite}
+            onQuickProgress={handleQuickProgress}
+          />
         </div>
       )}
 
