@@ -94,31 +94,17 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
 
   // Initialize display name when currentUserProfile becomes available
   React.useEffect(() => {
-    console.log('ProfileSettings: Checking display name initialization:', {
-      currentDisplayName: currentUserProfile?.display_name,
-      hasInteracted: hasDisplayNameInteracted,
-      currentState: displayName
-    });
-    
-    if (currentUserProfile?.display_name && !hasDisplayNameInteracted) {
-      console.log('ProfileSettings: Setting display name to:', currentUserProfile.display_name);
+    if (currentUserProfile?.display_name && !hasDisplayNameInteracted && displayName !== currentUserProfile.display_name) {
       setDisplayName(currentUserProfile.display_name);
     }
-  }, [currentUserProfile?.display_name, hasDisplayNameInteracted]);
+  }, [currentUserProfile?.display_name, hasDisplayNameInteracted, displayName]);
 
   // Initialize bio when currentUserProfile becomes available
   React.useEffect(() => {
-    console.log('ProfileSettings: Checking bio initialization:', {
-      currentBio: currentUserProfile?.bio,
-      hasInteracted: hasBioInteracted,
-      currentState: bio
-    });
-    
-    if (currentUserProfile?.bio && !hasBioInteracted) {
-      console.log('ProfileSettings: Setting bio to:', currentUserProfile.bio);
+    if (currentUserProfile?.bio && !hasBioInteracted && bio !== currentUserProfile.bio) {
       setBio(currentUserProfile.bio);
     }
-  }, [currentUserProfile?.bio, hasBioInteracted]);
+  }, [currentUserProfile?.bio, hasBioInteracted, bio]);
 
   const handleSaveProfile = async () => {
     // Validate display name
@@ -767,11 +753,6 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
             <span>Settings</span>
           </DialogTitle>
         </DialogHeader>
-        
-        {/* Debug info */}
-        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded mb-4">
-          Debug: displayName="{displayName}", bio="{bio}", username="{username}"
-        </div>
         {renderDesktopView()}
       </DialogContent>
     </Dialog>
