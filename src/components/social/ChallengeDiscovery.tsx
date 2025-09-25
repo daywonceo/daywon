@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, Filter, Calendar, Users, Trophy, 
-  TrendingUp, Clock, Target
+  TrendingUp, Clock, Target, Star, Flame, 
+  BookOpen, Brain
 } from 'lucide-react';
 import ChallengeCard from './ChallengeCard';
 
@@ -39,12 +40,12 @@ interface ChallengeDiscoveryProps {
 }
 
 const CHALLENGE_CATEGORIES = [
-  { id: 'all', label: 'All', icon: '🎯' },
-  { id: 'habit_streak', label: 'Habits', icon: '🔥' },
-  { id: 'workout_count', label: 'Fitness', icon: '💪' },
-  { id: 'steps', label: 'Steps', icon: '👟' },
-  { id: 'reading', label: 'Reading', icon: '📚' },
-  { id: 'meditation', label: 'Mindfulness', icon: '🧘‍♀️' },
+  { id: 'all', label: 'All', icon: <Star size={16} /> },
+  { id: 'habit_streak', label: 'Habits', icon: <Flame size={16} /> },
+  { id: 'workout_count', label: 'Fitness', icon: <Trophy size={16} /> },
+  { id: 'steps', label: 'Steps', icon: <Target size={16} /> },
+  { id: 'reading', label: 'Reading', icon: <BookOpen size={16} /> },
+  { id: 'meditation', label: 'Mindfulness', icon: <Brain size={16} /> },
 ];
 
 const SORT_OPTIONS = [

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Trophy, BookOpen, Target, Brain } from 'lucide-react';
 import { Clock, Users, Zap } from 'lucide-react';
 
 interface QuickTemplate {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
   duration: string;
   participants: string;
   type: string;
@@ -24,7 +25,7 @@ const QUICK_TEMPLATES: QuickTemplate[] = [
     id: 'weekly-workout',
     title: '7-Day Workout Challenge',
     description: 'Complete a workout every day for a week',
-    icon: '💪',
+    icon: <Trophy size={16} className="text-blue-500" />,
     duration: '1 week',
     participants: 'Open',
     type: 'workout_count',
@@ -39,7 +40,7 @@ const QUICK_TEMPLATES: QuickTemplate[] = [
     id: 'reading-month',
     title: '30-Day Reading Challenge',
     description: 'Read for 30 minutes every day this month',
-    icon: '📚',
+    icon: <BookOpen size={16} className="text-purple-500" />,
     duration: '1 month',
     participants: 'Open',
     type: 'reading',
@@ -54,7 +55,7 @@ const QUICK_TEMPLATES: QuickTemplate[] = [
     id: 'step-weekend',
     title: 'Weekend 10K Steps',
     description: 'Hit 10,000 steps both Saturday and Sunday',
-    icon: '👟',
+    icon: <Target size={16} className="text-green-500" />,
     duration: '2 days',
     participants: 'Open',
     type: 'steps',
@@ -69,7 +70,7 @@ const QUICK_TEMPLATES: QuickTemplate[] = [
     id: 'meditation-week',
     title: 'Mindful Week',
     description: 'Meditate for 10 minutes daily for 7 days',
-    icon: '🧘‍♀️',
+    icon: <Brain size={16} className="text-indigo-500" />,
     duration: '1 week',
     participants: 'Open',
     type: 'meditation',
@@ -106,7 +107,9 @@ const QuickChallengeTemplates = ({ onSelectTemplate, className }: QuickChallenge
           >
             <CardContent className="p-4">
               <div className="flex items-start space-x-3">
-                <div className="text-2xl">{template.icon}</div>
+                <div className="flex items-center justify-center w-6 h-6">
+                  {template.icon}
+                </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-1">
                     {template.title}

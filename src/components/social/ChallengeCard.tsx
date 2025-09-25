@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Users, Target, Trophy, Clock, Share2, Heart, MessageCircle, Plus, CheckCircle2, Star } from 'lucide-react';
+import { Calendar, Users, Target, Trophy, Clock, Share2, Heart, MessageCircle, Plus, CheckCircle2, Star, Flame } from 'lucide-react';
 import { formatDistanceToNow, format, isAfter, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
 import SocialProofIndicators from './SocialProofIndicators';
@@ -79,10 +79,10 @@ const ChallengeCard = ({
 
   const getChallengeTypeIcon = (type: string) => {
     switch (type) {
-      case 'habit_streak': return '🔥';
-      case 'workout_count': return '💪';
-      case 'steps': return '👟';
-      default: return '🎯';
+      case 'habit_streak': return <Flame size={20} className="text-orange-500" />;
+      case 'workout_count': return <Trophy size={20} className="text-blue-500" />;
+      case 'steps': return <Target size={20} className="text-green-500" />;
+      default: return <Star size={20} className="text-purple-500" />;
     }
   };
 
@@ -202,7 +202,9 @@ const ChallengeCard = ({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-2xl">{getChallengeTypeIcon(challenge.challenge_type)}</span>
+            <div className="flex items-center justify-center">
+              {getChallengeTypeIcon(challenge.challenge_type)}
+            </div>
             <div>
               <CardTitle className="text-lg line-clamp-1">{challenge.title}</CardTitle>
               <p className="text-sm text-gray-500 dark:text-gray-400">

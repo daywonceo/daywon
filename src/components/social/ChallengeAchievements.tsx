@@ -194,7 +194,7 @@ const ChallengeAchievements: React.FC = () => {
 
   const celebrateAchievement = (achievement: Achievement) => {
     toast({
-      title: "🎉 Achievement Unlocked!",
+      title: "Achievement Unlocked!",
       description: `${achievement.title} - ${achievement.description}`,
     });
   };
@@ -313,7 +313,7 @@ const ChallengeAchievements: React.FC = () => {
         {newAchievements.length > 0 && (
           <div className="mt-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
             <p className="text-xs text-yellow-800 dark:text-yellow-400 text-center">
-              🎉 {newAchievements.length} new achievement{newAchievements.length > 1 ? 's' : ''} unlocked!
+              {newAchievements.length} new achievement{newAchievements.length > 1 ? 's' : ''} unlocked!
             </p>
           </div>
         )}

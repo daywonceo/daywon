@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Calendar, Users, Target, Trophy, Clock, Share2, 
   MessageCircle, Heart, ArrowLeft, Crown, Medal,
-  TrendingUp, Activity
+  TrendingUp, Activity, Flame, BookOpen, Brain, Star
 } from 'lucide-react';
 import { format, formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 
@@ -73,12 +73,12 @@ const ChallengeDetail = ({
 
   const getChallengeTypeIcon = (type: string) => {
     switch (type) {
-      case 'habit_streak': return '🔥';
-      case 'workout_count': return '💪';
-      case 'steps': return '👟';
-      case 'reading': return '📚';
-      case 'meditation': return '🧘‍♀️';
-      default: return '🎯';
+      case 'habit_streak': return <Flame size={20} className="text-orange-500" />;
+      case 'workout_count': return <Trophy size={20} className="text-blue-500" />;
+      case 'steps': return <Target size={20} className="text-green-500" />;
+      case 'reading': return <BookOpen size={20} className="text-purple-500" />;
+      case 'meditation': return <Brain size={20} className="text-indigo-500" />;
+      default: return <Star size={20} className="text-yellow-500" />;
     }
   };
 
