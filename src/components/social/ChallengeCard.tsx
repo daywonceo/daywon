@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Calendar, Users, Target, Trophy, Clock, Share2, Heart, MessageCircle, Plus, CheckCircle2, Star } from 'lucide-react';
 import { formatDistanceToNow, format, isAfter, isBefore } from 'date-fns';
 import { cn } from '@/lib/utils';
+import SocialProofIndicators from './SocialProofIndicators';
 
 interface Challenge {
   id: string;
@@ -221,6 +222,19 @@ const ChallengeCard = ({
         <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
           {challenge.description}
         </p>
+
+        {/* Social Proof Indicators */}
+        <SocialProofIndicators
+          challenge={{
+            id: challenge.id,
+            participant_count: challenge.participant_count || 0,
+            friends_participating: [], // Would be populated from actual data
+            is_trending: (challenge.participant_count || 0) > 20,
+            popularity_score: (challenge.participant_count || 0) * 2,
+            time_left_days: Math.ceil((new Date(challenge.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+          }}
+          className="mb-2"
+        />
         
         {/* Challenge Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">

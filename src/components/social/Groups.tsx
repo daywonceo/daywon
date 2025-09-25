@@ -10,6 +10,8 @@ import ChallengeManager from './ChallengeManager';
 import ChallengeDetail from './ChallengeDetail';
 import ChallengeDiscovery from './ChallengeDiscovery';
 import BulkChallengeActions from './BulkChallengeActions';
+import ChallengeRecommendations from './ChallengeRecommendations';
+import ChallengeAchievements from './ChallengeAchievements';
 import { useChallenges } from '@/hooks/useChallenges';
 
 const Groups = () => {
@@ -150,6 +152,15 @@ const Groups = () => {
       {/* Content */}
       {activeTab === 'challenges' && (
         <div className="space-y-4">
+          {/* Recommendations and Achievements */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChallengeRecommendations
+              onJoinChallenge={joinChallenge}
+              onViewDetails={handleViewDetails}
+            />
+            <ChallengeAchievements />
+          </div>
+
           {/* Bulk Actions */}
           {challenges.length > 0 && (
             <BulkChallengeActions
