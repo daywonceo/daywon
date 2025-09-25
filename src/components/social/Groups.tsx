@@ -6,16 +6,22 @@ import { Users, Trophy, Plus, Settings } from 'lucide-react';
 import ChallengeCard from './ChallengeCard';
 import CreateChallengeModal from './CreateChallengeModal';
 import ChallengeManager from './ChallengeManager';
+import ChallengeDetail from './ChallengeDetail';
 import { useChallenges } from '@/hooks/useChallenges';
 
 const Groups = () => {
   const [activeTab, setActiveTab] = useState<'challenges' | 'manage' | 'teams'>('challenges');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedChallenge, setSelectedChallenge] = useState<any>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { challenges, loading, joinChallenge, leaveChallenge, refreshChallenges } = useChallenges();
 
   const handleViewDetails = (challengeId: string) => {
-    // TODO: Implement challenge details modal/page
-    console.log('View challenge details:', challengeId);
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (challenge) {
+      setSelectedChallenge(challenge);
+      setShowDetailModal(true);
+    }
   };
 
   const handleCreateSuccess = () => {
@@ -130,6 +136,18 @@ const Groups = () => {
         onOpenChange={setShowCreateModal}
         onSuccess={handleCreateSuccess}
       />
+
+      {/* Challenge Detail Modal */}
+      {selectedChallenge && (
+        <ChallengeDetail
+          challenge={selectedChallenge}
+          open={showDetailModal}
+          onOpenChange={setShowDetailModal}
+          onJoin={joinChallenge}
+          onLeave={leaveChallenge}
+          loading={loading}
+        />
+      )}
     </div>
   );
 };

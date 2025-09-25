@@ -1,319 +1,366 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Trophy, Flame, Send, Users, Clock, Share } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import MemberCard from "./MemberCard";
-import { useToast } from "@/hooks/use-toast";
-
-interface ChallengeParticipant {
-  id: number;
-  name: string;
-  avatar: string;
-  progress: number;
-  dayStreak: number;
-  totalDays: number;
-}
-
-interface ChatMessage {
-  id: number;
-  userId: number;
-  userName: string;
-  avatar: string;
-  message: string;
-  timestamp: string;
-  emoji?: string;
-}
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Calendar, Users, Target, Trophy, Clock, Share2, 
+  MessageCircle, Heart, ArrowLeft, Crown, Medal,
+  TrendingUp, Activity
+} from 'lucide-react';
+import { format, formatDistanceToNow, isAfter, isBefore } from 'date-fns';
 
 interface Challenge {
-  id: number;
+  id: string;
   title: string;
-  habit: string;
-  duration: string;
-  participants: ChallengeParticipant[];
-  progress: number;
-  rank: number;
-  totalParticipants: number;
-  timeRemaining: string;
-  joined: boolean;
-  communityId: number;
-  chatMessages: ChatMessage[];
-}
-
-interface User {
-  id: number;
-  name: string;
-  avatar: string;
-  initials: string;
-  topHabits: string[];
-  streak: number;
+  description: string;
+  challenge_type: string;
+  target_value: number | null;
+  target_unit: string | null;
+  start_date: string;
+  end_date: string;
+  max_participants: number | null;
+  is_team_based: boolean;
+  max_team_size: number;
+  status: string;
+  creator_id: string;
+  participant_count?: number;
+  user_participation?: {
+    current_progress: number;
+    status: string;
+    team_id?: string;
+  };
 }
 
 interface ChallengeDetailProps {
   challenge: Challenge;
-  onBack: () => void;
-  newMessage: string;
-  setNewMessage: (message: string) => void;
-  onSendMessage: () => void;
-  onLeaveChallenge: () => void;
-  onInvite?: (challenge: Challenge) => void;
-  onViewAllMembers: (title: string, members: User[]) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onJoin: (challengeId: string) => void;
+  onLeave: (challengeId: string) => void;
+  onShare?: (challengeId: string) => void;
+  loading?: boolean;
 }
 
-const ChallengeDetail: React.FC<ChallengeDetailProps> = ({
-  challenge,
-  onBack,
-  newMessage,
-  setNewMessage,
-  onSendMessage,
-  onLeaveChallenge,
-  onInvite,
-  onViewAllMembers
-}) => {
-  const { toast } = useToast();
-  const currentUserId = 1; // Mock current user ID
-  const sortedParticipants = [...challenge.participants].sort((a, b) => b.progress - a.progress);
-  const userRank = challenge.joined ? challenge.rank : null;
+const ChallengeDetail = ({ 
+  challenge, 
+  open, 
+  onOpenChange, 
+  onJoin, 
+  onLeave, 
+  onShare,
+  loading 
+}: ChallengeDetailProps) => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  const now = new Date();
+  const startDate = new Date(challenge.start_date);
+  const endDate = new Date(challenge.end_date);
+  
+  const isUpcoming = isAfter(startDate, now);
+  const isActive = !isUpcoming && isBefore(now, endDate);
+  const isExpired = isAfter(now, endDate);
+  
+  const daysUntilStart = isUpcoming ? formatDistanceToNow(startDate, { addSuffix: true }) : null;
+  const daysUntilEnd = isActive ? formatDistanceToNow(endDate, { addSuffix: true }) : null;
+  
+  const progressPercentage = challenge.user_participation 
+    ? Math.min((challenge.user_participation.current_progress / (challenge.target_value || 100)) * 100, 100)
+    : 0;
 
-  // Convert participants to member format for MemberCard
-  const participantsAsMembers = sortedParticipants.map(participant => ({
-    id: participant.id,
-    name: participant.name,
-    avatar: participant.avatar,
-    initials: participant.name.split(' ').map(n => n[0]).join(''),
-    topHabits: [challenge.habit],
-    streak: participant.dayStreak
-  }));
-
-  const handleMemberMessage = (memberId: number) => {
-    toast({
-      title: "Message Sent!",
-      description: "Your message has been delivered.",
-    });
+  const getChallengeTypeIcon = (type: string) => {
+    switch (type) {
+      case 'habit_streak': return '🔥';
+      case 'workout_count': return '💪';
+      case 'steps': return '👟';
+      case 'reading': return '📚';
+      case 'meditation': return '🧘‍♀️';
+      default: return '🎯';
+    }
   };
 
-  const handleMemberInvite = (memberId: number) => {
-    toast({
-      title: "Invitation Sent!",
-      description: "Your invitation has been sent to this participant.",
-    });
+  const getStatusColor = () => {
+    if (isUpcoming) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+    if (isActive) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+    if (isExpired) return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+  };
+
+  const getStatusText = () => {
+    if (isUpcoming) return 'Upcoming';
+    if (isActive) return 'Active';
+    if (isExpired) return 'Completed';
+    return 'Draft';
   };
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm" onClick={onBack} className="h-8 w-8 p-0">
-            <ArrowLeft size={16} />
-          </Button>
-          <div>
-            <h3 className="font-bold text-lg text-gray-900 dark:text-white">{challenge.title}</h3>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span>{challenge.habit}</span>
-              <span>•</span>
-              <span>{challenge.duration}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          {onInvite && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => onInvite(challenge)}
-              className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-            >
-              <Share size={14} />
-              <span className="hidden sm:inline">Invite</span>
-            </Button>
-          )}
-          {challenge.joined && (
-            <Button variant="outline" size="sm" onClick={onLeaveChallenge}>
-              Leave
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Challenge Stats */}
-      <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {challenge.participants.length}
-              </div>
-              <p className="text-xs text-gray-500">Participants</p>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {challenge.timeRemaining.split(' ')[0]}
-              </div>
-              <p className="text-xs text-gray-500">Days Left</p>
-            </div>
-            {challenge.joined && (
-              <div>
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  #{challenge.rank}
-                </div>
-                <p className="text-xs text-gray-500">Your Rank</p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-  {/* Leaderboard */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <Trophy className="text-yellow-500" size={18} />
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h2>
-          </div>
-          <Button
-            variant="ghost" 
-            size="sm"
-            onClick={() => onViewAllMembers(`${challenge.title} Participants`, participantsAsMembers)}
-            className="text-xs text-blue-500 hover:text-blue-600 h-6 px-2"
-          >
-            View All
-          </Button>
-        </div>
-        <div className="space-y-3">
-          {sortedParticipants.slice(0, 3).map((participant, index) => {
-            const memberData = participantsAsMembers.find(m => m.id === participant.id);
-            if (!memberData) return null;
-            
-            return (
-              <div key={participant.id} className="relative">
-                {/* Rank Badge */}
-                <div className="absolute -left-2 top-4 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 border-2 border-white dark:border-gray-900 shadow-sm">
-                  <span className="text-xs font-bold text-white">
-                    #{index + 1}
-                  </span>
-                </div>
-                
-                {/* Enhanced Member Card with Progress */}
-                <div className="ml-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-start space-x-3">
-                    {/* Profile Picture */}
-                    <Avatar className="h-14 w-14 border-2 border-gray-200 dark:border-gray-600">
-                      <AvatarImage src={participant.avatar} alt={participant.name} />
-                      <AvatarFallback className="text-lg font-medium bg-gradient-to-br from-green-400 to-blue-500 text-white">
-                        {participant.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    {/* Member Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white text-base">
-                            {participant.name}
-                          </h3>
-                          <div className="flex items-center space-x-1 mt-1">
-                            <span className="text-orange-500">🔥</span>
-                            <span className="text-orange-500 font-medium text-sm">
-                              {participant.dayStreak} day streak
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {participant.dayStreak}/{participant.totalDays} days
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Progress Bar */}
-                      <div className="mb-3">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs text-gray-500">Progress</span>
-                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{participant.progress}%</span>
-                        </div>
-                        <Progress value={participant.progress} className="h-2" />
-                      </div>
-
-                      {/* Habit Tag */}
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        <Badge
-                          className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 text-xs px-2.5 py-1 font-medium hover:bg-green-200 dark:hover:bg-green-900/50"
-                        >
-                          {challenge.habit}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden mx-2 sm:mx-0 p-0">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <DialogHeader className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onOpenChange(false)}
+                  className="p-2 h-8 w-8"
+                >
+                  <ArrowLeft size={16} />
+                </Button>
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl">{getChallengeTypeIcon(challenge.challenge_type)}</span>
+                  <div>
+                    <DialogTitle className="text-lg sm:text-xl">{challenge.title}</DialogTitle>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Badge className={`${getStatusColor()} border-0 text-xs`}>
+                        {getStatusText()}
+                      </Badge>
+                      {challenge.is_team_based && (
+                        <Badge variant="outline" className="text-xs">
+                          <Users size={12} className="mr-1" />
+                          Team Challenge
                         </Badge>
-                      </div>
-
-                      {/* Action Buttons */}
-                      {participant.id !== currentUserId && (
-                        <div className="flex space-x-2">
-                          <Button
-                            onClick={() => handleMemberMessage(participant.id)}
-                            className="flex-1 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white h-10 rounded-full font-medium"
-                          >
-                            <Send size={16} className="mr-2" />
-                            Message
-                          </Button>
-                        </div>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Challenge Chat */}
-      <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Challenge Chat</h4>
-          <div className="space-y-3 mb-4">
-            {challenge.chatMessages.map((message) => (
-              <div key={message.id} className="flex items-start space-x-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={message.avatar} alt={message.userName} />
-                  <AvatarFallback className="text-xs">
-                    {message.userName.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {message.userName}
-                    </p>
-                    <span className="text-xs text-gray-500">{message.timestamp}</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {message.message} {message.emoji}
-                  </p>
-                </div>
+              
+              <div className="flex items-center space-x-2">
+                {onShare && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onShare(challenge.id)}
+                    className="h-8 px-3"
+                  >
+                    <Share2 size={14} className="mr-1" />
+                    <span className="hidden sm:inline">Share</span>
+                  </Button>
+                )}
+                
+                {challenge.user_participation ? (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onLeave(challenge.id)}
+                    disabled={loading}
+                    className="h-8 px-3"
+                  >
+                    {loading ? 'Leaving...' : 'Leave'}
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    onClick={() => onJoin(challenge.id)}
+                    disabled={loading || isExpired || (challenge.max_participants && (challenge.participant_count || 0) >= challenge.max_participants)}
+                    className="h-8 px-3"
+                  >
+                    {loading ? 'Joining...' : 'Join Challenge'}
+                  </Button>
+                )}
               </div>
-            ))}
-          </div>
-
-          {/* Message Input */}
-          {challenge.joined && (
-            <div className="flex items-center space-x-2 pt-3 border-t border-gray-100 dark:border-gray-700">
-              <Input
-                placeholder="Encourage your teammates..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && onSendMessage()}
-                className="flex-1"
-              />
-              <Button size="sm" onClick={onSendMessage} disabled={!newMessage.trim()}>
-                <Send size={14} />
-              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          </DialogHeader>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                  <CardContent className="p-3 text-center">
+                    <div className="flex items-center justify-center mb-1">
+                      <Users size={16} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                      {challenge.participant_count || 0}
+                    </div>
+                    <div className="text-xs text-blue-600/70 dark:text-blue-400/70">
+                      Participants
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                  <CardContent className="p-3 text-center">
+                    <div className="flex items-center justify-center mb-1">
+                      <Target size={16} className="text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                      {challenge.target_value}
+                    </div>
+                    <div className="text-xs text-green-600/70 dark:text-green-400/70">
+                      {challenge.target_unit}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
+                  <CardContent className="p-3 text-center">
+                    <div className="flex items-center justify-center mb-1">
+                      <Calendar size={16} className="text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                      {format(endDate, 'MMM d')}
+                    </div>
+                    <div className="text-xs text-orange-600/70 dark:text-orange-400/70">
+                      Ends
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
+                  <CardContent className="p-3 text-center">
+                    <div className="flex items-center justify-center mb-1">
+                      <Trophy size={16} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                      Active
+                    </div>
+                    <div className="text-xs text-purple-600/70 dark:text-purple-400/70">
+                      Status
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* User Progress (if participating) */}
+              {challenge.user_participation && (
+                <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-700">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Your Progress</h3>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {challenge.user_participation.current_progress} / {challenge.target_value} {challenge.target_unit}
+                      </span>
+                    </div>
+                    <Progress value={progressPercentage} className="h-3 mb-2" />
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>{Math.round(progressPercentage)}% complete</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Time indicators */}
+              {(daysUntilStart || daysUntilEnd) && (
+                <div className="mb-6">
+                  {daysUntilStart && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 text-center">
+                      <Clock size={16} className="inline mr-2 text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        Starts {daysUntilStart}
+                      </span>
+                    </div>
+                  )}
+                  {daysUntilEnd && (
+                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg p-3 text-center">
+                      <Clock size={16} className="inline mr-2 text-orange-600 dark:text-orange-400" />
+                      <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                        Ends {daysUntilEnd}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tabs */}
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
+                  <TabsTrigger value="participants" className="text-xs">Participants</TabsTrigger>
+                  <TabsTrigger value="discussion" className="text-xs">Discussion</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">About this Challenge</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-gray-600 dark:text-gray-300">{challenge.description}</p>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Calendar size={14} className="text-gray-500" />
+                            <span className="font-medium">Duration:</span>
+                            <span>{format(startDate, 'MMM d')} - {format(endDate, 'MMM d')}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Target size={14} className="text-gray-500" />
+                            <span className="font-medium">Goal:</span>
+                            <span>{challenge.target_value} {challenge.target_unit}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Users size={14} className="text-gray-500" />
+                            <span className="font-medium">Participants:</span>
+                            <span>
+                              {challenge.participant_count || 0}
+                              {challenge.max_participants && ` / ${challenge.max_participants}`}
+                            </span>
+                          </div>
+                          {challenge.is_team_based && (
+                            <div className="flex items-center space-x-2">
+                              <Trophy size={14} className="text-gray-500" />
+                              <span className="font-medium">Team Size:</span>
+                              <span>Max {challenge.max_team_size} members</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="participants" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center space-x-2">
+                        <Users className="text-blue-500" size={18} />
+                        <span>Participants</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <Users className="mx-auto h-12 w-12 mb-3 opacity-50" />
+                        <p>Participant details coming soon...</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="discussion" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center space-x-2">
+                        <MessageCircle className="text-green-500" size={18} />
+                        <span>Discussion</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <MessageCircle className="mx-auto h-12 w-12 mb-3 opacity-50" />
+                        <p>Challenge discussions coming soon...</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

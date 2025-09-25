@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Target, Users, Trophy, Clock, Plus } from 'lucide-react';
 import { useChallengeManagement } from '@/hooks/useChallengeManagement';
 import { format, addDays } from 'date-fns';
+import QuickChallengeTemplates from './QuickChallengeTemplates';
 
 interface CreateChallengeModalProps {
   open: boolean;
@@ -70,8 +71,8 @@ const CHALLENGE_TYPES = [
 ];
 
 const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallengeModalProps) => {
-  const [step, setStep] = useState(1);
   const [selectedType, setSelectedType] = useState<string>('');
+  const [showTemplates, setShowTemplates] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -94,13 +95,29 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
     const type = CHALLENGE_TYPES.find(t => t.id === typeId);
     if (type) {
       setSelectedType(typeId);
+      setShowTemplates(false);
       setFormData(prev => ({
         ...prev,
         challenge_type: typeId,
         target_unit: type.defaultUnit,
+        title: `${type.label} Challenge`,
+        description: type.description,
       }));
-      setStep(2);
     }
+  };
+
+  const handleTemplateSelect = (template: any) => {
+    setSelectedType(template.type);
+    setShowTemplates(false);
+    setFormData(prev => ({
+      ...prev,
+      challenge_type: template.defaultValues.challenge_type,
+      target_value: template.defaultValues.target_value,
+      target_unit: template.defaultValues.target_unit,
+      title: template.title,
+      description: template.description,
+      end_date: format(addDays(new Date(), template.defaultValues.duration_days), 'yyyy-MM-dd'),
+    }));
   };
 
   const handleInputChange = (field: string, value: any) => {
@@ -122,8 +139,8 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
     
     if (result.success) {
       // Reset form
-      setStep(1);
       setSelectedType('');
+      setShowTemplates(true);
       setFormData({
         title: '',
         description: '',
@@ -144,8 +161,10 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
   };
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
+    if (selectedType) {
+      setSelectedType('');
+    } else {
+      setShowTemplates(true);
     }
   };
 
@@ -159,9 +178,55 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
           </DialogTitle>
         </DialogHeader>
 
-        {/* Step 1: Challenge Type Selection */}
-        {step === 1 && (
+        {/* Quick Templates */}
+        {showTemplates && (
           <div className="space-y-6">
+            <QuickChallengeTemplates onSelectTemplate={handleTemplateSelect} />
+            
+            <div className="text-center">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-200 dark:border-gray-700" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white dark:bg-gray-900 px-3 text-gray-500 dark:text-gray-400">
+                    or create from scratch
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {CHALLENGE_TYPES.map((type) => (
+                <Card
+                  key={type.id}
+                  className="cursor-pointer hover:shadow-md transition-all duration-200 hover:scale-[1.02] bg-white/90 dark:bg-gray-800/90"
+                  onClick={() => handleTypeSelect(type.id)}
+                >
+                  <CardContent className="p-3 text-center">
+                    <div className="text-2xl mb-1">{type.icon}</div>
+                    <h3 className="font-medium text-gray-900 dark:text-white mb-1 text-sm">
+                      {type.label}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                      {type.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Challenge Type Selection */}
+        {!selectedType && !showTemplates && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Button type="button" variant="ghost" onClick={handleBack}>
+                ← Back to Templates
+              </Button>
+            </div>
+
             <div className="text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Choose the type of challenge you want to create
@@ -190,8 +255,8 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
           </div>
         )}
 
-        {/* Step 2: Challenge Details */}
-        {step === 2 && selectedChallengeType && (
+        {/* Challenge Details */}
+        {selectedType && selectedChallengeType && (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex items-center justify-between">
               <Button type="button" variant="ghost" onClick={handleBack}>
