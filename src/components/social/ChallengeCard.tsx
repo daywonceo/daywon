@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Users, Target, Trophy, Clock } from 'lucide-react';
+import { Calendar, Users, Target, Trophy, Clock, Share2, Heart, MessageCircle, Plus, CheckCircle2, Star } from 'lucide-react';
 import { formatDistanceToNow, format, isAfter, isBefore } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface Challenge {
   id: string;
@@ -32,10 +33,34 @@ interface ChallengeCardProps {
   onJoin: (challengeId: string) => void;
   onLeave: (challengeId: string) => void;
   onViewDetails: (challengeId: string) => void;
+  onShare?: (challengeId: string) => void;
+  onFavorite?: (challengeId: string) => void;
+  onQuickProgress?: (challengeId: string) => void;
   loading?: boolean;
+  isSelected?: boolean;
+  onSelect?: (challengeId: string) => void;
+  showQuickActions?: boolean;
 }
 
-const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: ChallengeCardProps) => {
+const ChallengeCard = ({ 
+  challenge, 
+  onJoin, 
+  onLeave, 
+  onViewDetails, 
+  onShare,
+  onFavorite,
+  onQuickProgress,
+  loading,
+  isSelected,
+  onSelect,
+  showQuickActions = true 
+}: ChallengeCardProps) => {
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [showActions, setShowActions] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const currentX = useRef(0);
+  const isDragging = useRef(false);
   const now = new Date();
   const startDate = new Date(challenge.start_date);
   const endDate = new Date(challenge.end_date);
@@ -83,8 +108,96 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
     return 'Draft';
   };
 
+  // Touch/swipe handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+    isDragging.current = true;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    
+    currentX.current = e.touches[0].clientX;
+    const diff = currentX.current - startX.current;
+    
+    // Only allow left swipe for actions
+    if (diff < 0) {
+      setSwipeOffset(Math.max(diff, -120));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    isDragging.current = false;
+    
+    // If swiped more than 60px, show actions
+    if (swipeOffset < -60) {
+      setShowActions(true);
+      setSwipeOffset(-120);
+    } else {
+      setSwipeOffset(0);
+      setShowActions(false);
+    }
+  };
+
+  // Quick actions for mobile swipe
+  const quickActions = [
+    {
+      icon: Heart,
+      label: 'Favorite',
+      action: () => onFavorite?.(challenge.id),
+      color: 'bg-pink-500 hover:bg-pink-600',
+    },
+    {
+      icon: Share2,
+      label: 'Share',
+      action: () => onShare?.(challenge.id),
+      color: 'bg-blue-500 hover:bg-blue-600',
+    },
+    ...(challenge.user_participation && isActive ? [{
+      icon: Plus,
+      label: 'Progress',
+      action: () => onQuickProgress?.(challenge.id),
+      color: 'bg-green-500 hover:bg-green-600',
+    }] : []),
+  ];
+
   return (
-    <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200">
+    <div className="relative overflow-hidden rounded-lg">
+      {/* Quick Actions (revealed on swipe) */}
+      {showQuickActions && (
+        <div className="absolute right-0 top-0 h-full flex items-center bg-gray-100 dark:bg-gray-700 z-10">
+          {quickActions.map((action, index) => (
+            <Button
+              key={index}
+              size="sm"
+              className={`${action.color} text-white h-full rounded-none px-3 transition-all duration-200`}
+              onClick={(e) => {
+                e.stopPropagation();
+                action.action();
+                setShowActions(false);
+                setSwipeOffset(0);
+              }}
+            >
+              <action.icon size={16} />
+              <span className="sr-only">{action.label}</span>
+            </Button>
+          ))}
+        </div>
+      )}
+
+      <Card 
+        ref={cardRef}
+        className={cn(
+          "bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 relative",
+          isSelected && "ring-2 ring-purple-500 border-purple-300",
+          onSelect && "cursor-pointer"
+        )}
+        style={{ transform: `translateX(${swipeOffset}px)` }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClick={() => onSelect?.(challenge.id)}
+      >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
@@ -204,22 +317,58 @@ const ChallengeCard = ({ challenge, onJoin, onLeave, onViewDetails, loading }: C
         </div>
         
         {/* Quick interactions for active challenges */}
-        {isActive && challenge.user_participation && (
+        {isActive && challenge.user_participation && showQuickActions && (
           <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex justify-center">
+            <div className="flex justify-center space-x-1">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onViewDetails(challenge.id)}
-                className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewDetails(challenge.id);
+                }}
+                className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 px-2"
               >
-                💬 Join Discussion • ❤️ React • 📊 View Progress
+                <MessageCircle size={12} className="mr-1" />
+                Chat
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFavorite?.(challenge.id);
+                }}
+                className="text-xs text-gray-600 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 px-2"
+              >
+                <Heart size={12} className="mr-1" />
+                Like
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQuickProgress?.(challenge.id);
+                }}
+                className="text-xs text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 px-2"
+              >
+                <Plus size={12} className="mr-1" />
+                Log
               </Button>
             </div>
           </div>
         )}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <div className="absolute top-2 right-2">
+            <CheckCircle2 className="text-purple-600 bg-white rounded-full" size={20} />
+          </div>
+        )}
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 
