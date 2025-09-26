@@ -1032,9 +1032,9 @@ const ExtendedReactions = ({
           </Button>
         </PopoverTrigger>
         
-        <PopoverContent className="w-96 p-4 max-h-96 overflow-hidden" align="start" side="top" avoidCollisions={true} collisionPadding={10}>
-          <div className="space-y-4">
-            <h4 className="font-medium text-sm text-gray-900 dark:text-white">
+        <PopoverContent className="w-80 p-3 max-h-80 overflow-hidden" align="start" side="top" avoidCollisions={true} collisionPadding={10}>
+          <div className="space-y-3">
+            <h4 className="font-medium text-xs text-gray-900 dark:text-white">
               Choose your reaction
             </h4>
             
@@ -1044,20 +1044,20 @@ const ExtendedReactions = ({
                 <button
                   key={category.name}
                   onClick={() => setActiveCategory(index)}
-                  className={`px-3 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                  className={`px-2 py-1 text-xs font-medium rounded-t-lg transition-colors ${
                     activeCategory === index
                       ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-b-2 border-blue-500'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
                   <span className="mr-1">{category.icon}</span>
-                  <span className="hidden sm:inline">{category.name}</span>
+                  <span className="hidden sm:inline text-xs">{category.name}</span>
                 </button>
               ))}
             </div>
 
             {/* Reactions Grid */}
-            <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
+            <div className="grid grid-cols-8 gap-1 max-h-40 overflow-y-auto">
               {REACTION_CATEGORIES[activeCategory].reactions.map((reaction) => {
                 const count = reactionCounts[reaction.type] || 0;
                 const isSelected = currentReaction === reaction.type;
@@ -1067,7 +1067,7 @@ const ExtendedReactions = ({
                     key={reaction.type}
                     variant="ghost"
                     onClick={() => handleReaction(reaction.type)}
-                    className={`h-auto p-2 flex items-center justify-center relative transition-all duration-200 aspect-square ${
+                    className={`h-8 w-8 p-1 flex items-center justify-center relative transition-all duration-200 ${
                       isSelected 
                         ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 scale-105' 
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -1077,9 +1077,9 @@ const ExtendedReactions = ({
                     {count > 0 && (
                       <Badge 
                         variant="secondary" 
-                        className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full p-0 flex items-center justify-center text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                       >
-                        {count}
+                        {count > 9 ? '9+' : count}
                       </Badge>
                     )}
                   </Button>
@@ -1088,7 +1088,7 @@ const ExtendedReactions = ({
             </div>
 
             {totalReactions > 0 && (
-              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-1 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                   {totalReactions} total reaction{totalReactions === 1 ? '' : 's'}
                 </p>
