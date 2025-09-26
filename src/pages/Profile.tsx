@@ -8,8 +8,8 @@ import PersonalBests from "@/components/profile/PersonalBests";
 import BestFriends from "@/components/profile/BestFriends";
 import ShareMilestoneCard from "@/components/social/ShareMilestoneCard";
 import MembershipMilestone from "@/components/profile/MembershipMilestone";
-import ConnectedApps from "@/components/profile/ConnectedApps";
 import ProfileActions from "@/components/profile/ProfileActions";
+import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
 import { MobileProfileEditor } from "@/components/profile/MobileProfileEditor";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialProfiles } from "@/hooks/useSocialProfiles";
@@ -99,7 +99,11 @@ const Profile = () => {
               habitScore={profile.habitScore}
               mostConsistentHabit={profile.mostConsistentHabit}
             />
-            <ConnectedApps isSpotifyConnected={!!session?.provider_token} />
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Connected Apps</h2>
+            <IntegrationsPage />
           </div>
           
           <ShareMilestoneCard />

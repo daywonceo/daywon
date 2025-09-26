@@ -47,7 +47,6 @@ import {
   User,
   Save,
 } from "lucide-react";
-import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
 
 interface ProfileSettingsProps {
   open: boolean;
@@ -223,7 +222,6 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   const menuItems = [
     { id: "profile", label: "Edit Profile", icon: User },
     { id: "habits", label: "Adjust Habits", icon: Target },
-    { id: "integrations", label: "Connected Apps", icon: Share2 },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "privacy", label: "Privacy & Security", icon: Shield },
     { id: "account", label: "Account Settings", icon: Settings },
@@ -445,14 +443,6 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                 </div>
               ))}
             </div>
-          </div>
-        );
-
-      case "integrations":
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Connected Apps</h3>
-            <IntegrationsPage />
           </div>
         );
 
