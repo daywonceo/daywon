@@ -1032,7 +1032,7 @@ const ExtendedReactions = ({
           </Button>
         </PopoverTrigger>
         
-        <PopoverContent className="w-80 p-3 max-h-80 overflow-hidden" align="center" side="top" avoidCollisions={true} collisionPadding={10}>
+        <PopoverContent className="w-80 p-3 max-h-80 overflow-hidden" align="end" side="top" avoidCollisions={true} collisionPadding={10}>
           <div className="space-y-3">
             <h4 className="font-medium text-xs text-gray-900 dark:text-white">
               Choose your reaction
@@ -1067,13 +1067,13 @@ const ExtendedReactions = ({
                     key={reaction.type}
                     variant="ghost"
                     onClick={() => handleReaction(reaction.type)}
-                    className={`h-8 w-8 p-1 flex items-center justify-center relative transition-all duration-200 ${
+                    className={`h-8 w-8 p-0 flex items-center justify-center relative transition-all duration-200 ${
                       isSelected 
                         ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 scale-105' 
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <span className="text-lg">{reaction.emoji}</span>
+                    <span className="text-lg leading-none">{reaction.emoji}</span>
                     {count > 0 && (
                       <Badge 
                         variant="secondary" 
