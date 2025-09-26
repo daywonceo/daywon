@@ -15,7 +15,7 @@ const Social = () => {
   // Initialize habit social integration (auto-creates posts on completions)
   useHabitSocialIntegration();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
+    <div className="min-h-screen bg-subtle/30 flex flex-col">
       <Header />
       
       <main className="flex-grow px-responsive pb-20 pt-4 max-w-4xl mx-auto w-full">
@@ -37,7 +37,7 @@ const Social = () => {
         </div>
 
         <Tabs defaultValue="timeline" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6 glass border h-11">
+          <TabsList className="grid w-full grid-cols-5 mb-6 glass border h-11 bg-warm/20">
             <TabsTrigger value="timeline" className="text-xs sm:text-sm font-medium px-1">
               TIMELINE
             </TabsTrigger>

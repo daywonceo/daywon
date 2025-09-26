@@ -39,18 +39,18 @@ const MainFeed = ({}: MainFeedProps) => {
     if (!habitType) return null;
     
     const badgeConfig = {
-      workout: { emoji: "💪", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" },
-      reading: { emoji: "📚", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
-      meditation: { emoji: "🧘‍♀️", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
-      nutrition: { emoji: "🥗", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
-      fitness: { emoji: "🏃‍♂️", color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300" },
+      workout: { emoji: "💪", color: "bg-accent/20 text-accent-foreground border-accent/30" },
+      reading: { emoji: "📚", color: "bg-primary/20 text-primary-foreground border-primary/30" },
+      meditation: { emoji: "🧘‍♀️", color: "bg-muted/20 text-muted-foreground border-muted/30" },
+      nutrition: { emoji: "🥗", color: "bg-success/20 text-success-foreground border-success/30" },
+      fitness: { emoji: "🏃‍♂️", color: "bg-secondary/20 text-secondary-foreground border-secondary/30" },
     };
 
     const config = badgeConfig[habitType as keyof typeof badgeConfig] || 
-                  { emoji: "✅", color: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300" };
+                  { emoji: "✅", color: "bg-neutral/20 text-neutral-foreground border-neutral/30" };
 
     return (
-      <Badge className={`${config.color} border-0 text-xs font-medium`}>
+      <Badge className={`${config.color} border text-xs font-medium`}>
         {config.emoji} {habitType}
         {streakCount && streakCount > 1 && (
           <span className="ml-1 font-bold">🔥{streakCount}</span>
@@ -65,12 +65,12 @@ const MainFeed = ({}: MainFeedProps) => {
     <div className="space-y-4">
       {/* Header */}
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Recent Activity</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Celebrate wins with your community!</p>
+        <h2 className="text-xl font-bold text-primary mb-1">Recent Activity</h2>
+        <p className="text-sm text-muted-foreground">Celebrate wins with your community!</p>
       </div>
 
       {/* Create Post Section */}
-      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <div className="bg-warm/30 backdrop-blur-sm border border-accent/20 rounded-lg p-4">
         <CreatePostModal />
       </div>
 
@@ -78,14 +78,14 @@ const MainFeed = ({}: MainFeedProps) => {
       <div className="space-y-4">
         {loading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-sm text-gray-500 mt-2">Loading posts...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="text-sm text-muted-foreground mt-2">Loading posts...</p>
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-gray-400 mb-2">📱</div>
-            <p className="text-sm text-gray-500">No posts to show</p>
-            <p className="text-xs text-gray-400 mt-1">Complete some habits to see activity here!</p>
+            <div className="text-muted-foreground mb-2">📱</div>
+            <p className="text-sm text-muted-foreground">No posts to show</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Complete some habits to see activity here!</p>
           </div>
         ) : (
           filteredPosts.map((post) => {
@@ -94,27 +94,27 @@ const MainFeed = ({}: MainFeedProps) => {
             const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
             
             return (
-              <Card key={post.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+              <Card key={post.id} className="bg-background/95 backdrop-blur-sm border-border/50 shadow-md hover:shadow-lg transition-all duration-200">
                 <CardContent className="p-4 space-y-4">
                   {/* Post Header */}
                   <div className="flex items-start space-x-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={displayName} />
-                      <AvatarFallback className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-sm font-semibold">
+                      <AvatarFallback className="bg-primary/20 text-primary text-sm font-semibold">
                         {displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-bold text-sm text-gray-900 dark:text-white">{displayName}</h3>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{timeAgo}</span>
+                        <h3 className="font-bold text-sm text-foreground">{displayName}</h3>
+                        <span className="text-xs text-muted-foreground">•</span>
+                        <span className="text-xs text-muted-foreground">{timeAgo}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {post.habit_name ? (
                           getHabitBadge(post.habit_type, post.streak_count, post.is_milestone)
                         ) : (
-                          <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-0 text-xs font-medium">
+                          <Badge className="bg-accent/20 text-accent-foreground border-accent/30 text-xs font-medium">
                             💭 Shared
                           </Badge>
                         )}
@@ -124,14 +124,14 @@ const MainFeed = ({}: MainFeedProps) => {
 
                   {/* Post Content */}
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{post.content}</p>
+                    <p className="text-sm font-medium text-foreground">{post.content}</p>
                     {post.caption && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{post.caption}</p>
+                      <p className="text-sm text-muted-foreground">{post.caption}</p>
                     )}
                   </div>
 
                   {/* Reactions */}
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center justify-between pt-3 border-t border-border">
                     <div className="flex items-center space-x-2">
                       {(['like', 'fire', 'clap', 'star'] as const).map((reactionType) => {
                         const isSelected = post.user_reaction === reactionType;
@@ -142,7 +142,7 @@ const MainFeed = ({}: MainFeedProps) => {
                             key={reactionType}
                             variant="ghost"
                             size="sm"
-                            className={`h-8 px-2 ${isSelected ? 'text-red-600' : 'text-gray-500'}`}
+                            className={`h-8 px-2 ${isSelected ? 'text-accent' : 'text-muted-foreground'}`}
                             onClick={() => handleReaction(post.id, reactionType)}
                           >
                             {reactionType === 'like' && <ThumbsUp size={14} />}

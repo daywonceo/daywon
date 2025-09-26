@@ -76,38 +76,38 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
     const badgeConfig = {
       fitness: { 
         icon: Activity, 
-        color: "bg-gradient-to-r from-red-500 to-pink-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-accent text-accent-foreground", 
+        iconColor: "text-accent-foreground" 
       },
       reading: { 
         icon: Book, 
-        color: "bg-gradient-to-r from-blue-500 to-cyan-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-primary text-primary-foreground", 
+        iconColor: "text-primary-foreground" 
       },
       meditation: { 
         icon: Brain, 
-        color: "bg-gradient-to-r from-purple-500 to-indigo-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-muted text-muted-foreground", 
+        iconColor: "text-muted-foreground" 
       },
       spiritual: { 
         icon: Target, 
-        color: "bg-gradient-to-r from-yellow-500 to-orange-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-secondary text-secondary-foreground", 
+        iconColor: "text-secondary-foreground" 
       },
       health: { 
         icon: HeartIcon, 
-        color: "bg-gradient-to-r from-cyan-500 to-blue-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-success text-success-foreground", 
+        iconColor: "text-success-foreground" 
       },
       nutrition: { 
         icon: Utensils, 
-        color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-success text-success-foreground", 
+        iconColor: "text-success-foreground" 
       },
       personal: { 
         icon: User, 
-        color: "bg-gradient-to-r from-slate-500 to-gray-500 text-white", 
-        iconColor: "text-white" 
+        color: "bg-neutral text-neutral-foreground", 
+        iconColor: "text-neutral-foreground" 
       },
     };
 
@@ -116,7 +116,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
 
     return (
       <div className="flex items-center gap-2">
-        <Badge className={`${config.color} border-0 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 hover-scale ${isMilestone ? 'ring-2 ring-yellow-400 ring-offset-2 animate-pulse' : ''}`}>
+        <Badge className={`${config.color} border-0 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 transition-all duration-200 ${isMilestone ? 'ring-2 ring-accent ring-offset-2 animate-pulse' : ''}`}>
           <IconComponent size={12} className={config.iconColor} />
           {habitType.charAt(0).toUpperCase() + habitType.slice(1)}
           {streakCount && streakCount > 1 && (
@@ -126,7 +126,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
           )}
         </Badge>
         {isMilestone && (
-          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 border-0 text-xs font-bold px-2 py-1 animate-fade-in">
+          <Badge className="bg-accent text-accent-foreground border-0 text-xs font-bold px-2 py-1 animate-fade-in">
             <Award size={10} className="mr-1" />
             MILESTONE
           </Badge>
@@ -142,8 +142,8 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-        <p className="text-sm text-gray-500 mt-2">Loading timeline...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="text-sm text-muted-foreground mt-2">Loading timeline...</p>
       </div>
     );
   }
@@ -154,16 +154,16 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div className="flex items-center space-x-4">
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg hover-scale">
-              <TrendingUp className="text-white" size={20} />
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-primary rounded-xl shadow-lg transition-all duration-200">
+              <TrendingUp className="text-primary-foreground" size={20} />
             </div>
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"></div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background animate-pulse"></div>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+            <h2 className="text-xl font-bold text-foreground mb-1">
               {showOnlyFriends ? 'Friends Activity' : 'Activity Timeline'}
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {showOnlyFriends ? 'Track your friends\' achievements and progress' : 'Real-time updates from your community'}
             </p>
           </div>
@@ -173,7 +173,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       {/* Filters */}
       <div className="space-y-3 mb-6 animate-fade-in">
         <div className="flex flex-wrap gap-2 w-full justify-center">
-          <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex gap-1 bg-warm/30 rounded-xl p-1.5 shadow-sm border border-accent/20">
             {(['all', 'milestones', 'streaks'] as const).map((filterType) => (
               <Button
                 key={filterType}
@@ -182,8 +182,8 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                 onClick={() => setFilter(filterType)}
                 className={`text-xs px-3 py-2.5 h-9 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
                   filter === filterType 
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md' 
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-primary text-primary-foreground shadow-md' 
+                    : 'hover:bg-accent/50'
                 }`}
               >
                 {filterType === 'all' && <Filter size={12} className="mr-1" />}
@@ -196,7 +196,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
         </div>
 
         <div className="flex flex-wrap gap-2 w-full justify-center">
-          <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex gap-1 bg-warm/30 rounded-xl p-1.5 shadow-sm border border-accent/20">
             {(['today', 'week', 'month', 'all'] as const).map((timeFilterType) => (
               <Button
                 key={timeFilterType}
@@ -205,8 +205,8 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                 onClick={() => setTimeFilter(timeFilterType)}
                 className={`text-xs px-3 py-2.5 h-9 rounded-lg font-medium transition-all duration-200 min-w-[70px] ${
                   timeFilter === timeFilterType 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-secondary text-secondary-foreground shadow-md' 
+                    : 'hover:bg-accent/50'
                 }`}
               >
                 <Clock size={12} className="mr-1" />
@@ -221,11 +221,11 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       <div className="space-y-6">
         {Object.keys(groupedPosts).length === 0 ? (
           <div className="text-center py-12 animate-fade-in">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="text-gray-400" size={24} />
+            <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="text-muted-foreground" size={24} />
             </div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No activities found</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+            <p className="text-lg font-semibold text-foreground mb-2">No activities found</p>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
               {showOnlyFriends ? 'Your friends haven\'t shared any activities yet. Encourage them to start their journey!' : 'Complete some habits to see them here and inspire others!'}
             </p>
           </div>
@@ -235,12 +235,12 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
               {/* Date Header */}
               <div className="flex items-center space-x-4 mb-4 animate-fade-in">
                 <div className="relative">
-                  <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-sm"></div>
-                  <div className="absolute inset-0 w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse opacity-50"></div>
+                  <div className="w-3 h-3 bg-primary rounded-full shadow-sm"></div>
+                  <div className="absolute inset-0 w-3 h-3 bg-primary rounded-full animate-pulse opacity-50"></div>
                 </div>
-                <h3 className="font-bold text-base text-gray-900 dark:text-white">{dateKey}</h3>
-                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"></div>
-                <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-0 text-xs font-medium">
+                <h3 className="font-bold text-base text-foreground">{dateKey}</h3>
+                <div className="flex-1 h-px bg-border"></div>
+                <Badge className="bg-muted/50 text-muted-foreground border-0 text-xs font-medium">
                   {dayPosts.length} {dayPosts.length === 1 ? 'activity' : 'activities'}
                 </Badge>
               </div>
@@ -258,26 +258,26 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                     : format(postDate, 'MMM d');
                   
                   return (
-                    <Card key={post.id} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in rounded-xl overflow-hidden mx-1 sm:mx-0">
+                    <Card key={post.id} className="bg-background/95 backdrop-blur-md border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in rounded-xl overflow-hidden mx-1 sm:mx-0">
                       <CardContent className="p-4 sm:p-6">
                         <div className="flex items-start space-x-3 sm:space-x-4">
                           <div className="relative flex-shrink-0">
-                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-white dark:ring-gray-800 shadow-md">
+                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-background shadow-md">
                               <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={displayName} />
-                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs sm:text-sm font-bold">
+                              <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm font-bold">
                                 {displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-success rounded-full border-2 border-background"></div>
                           </div>
                           
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 sm:space-x-3 mb-3">
-                              <span className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">
+                              <span className="font-semibold text-sm sm:text-base text-foreground truncate">
                                 {displayName}
                               </span>
-                              <div className="w-1 h-1 bg-gray-400 rounded-full flex-shrink-0"></div>
-                              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center flex-shrink-0">
+                              <div className="w-1 h-1 bg-muted-foreground rounded-full flex-shrink-0"></div>
+                              <span className="text-xs sm:text-sm text-muted-foreground flex items-center flex-shrink-0">
                                 <Clock size={10} className="mr-1 sm:mr-1" />
                                 {timeAgo}
                               </span>
@@ -292,11 +292,11 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                           </div>
                         </div>
                         
-                        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 sm:p-4 mb-4">
-                          <p className="text-sm text-gray-900 dark:text-white leading-relaxed mb-2">{post.content}</p>
+                        <div className="bg-muted/30 rounded-lg p-3 sm:p-4 mb-4">
+                          <p className="text-sm text-foreground leading-relaxed mb-2">{post.content}</p>
                           
                           {post.caption && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 italic">{post.caption}</p>
+                            <p className="text-sm text-muted-foreground italic">{post.caption}</p>
                           )}
                         </div>
                         
@@ -313,7 +313,7 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
                         {/* Comments section */}
                         <CommentSection 
                           postId={post.id}
-                          className="border-t border-gray-200 dark:border-gray-700 pt-4"
+                          className="border-t border-border pt-4"
                         />
                       </CardContent>
                     </Card>
