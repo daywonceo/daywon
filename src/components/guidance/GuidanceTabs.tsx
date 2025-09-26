@@ -35,7 +35,7 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-16 p-1 gap-1">
+      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-16 p-1 gap-1 bg-black/20 backdrop-blur-sm">
         <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-white/80 data-[state=active]:text-white hover:text-white/90">
           <Dumbbell className="w-3 h-3 mb-0.5" />
           <span className="leading-none font-medium">WORKOUTS</span>
