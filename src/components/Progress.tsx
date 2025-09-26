@@ -53,7 +53,7 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
 
   return (
     <DialogContent className="max-w-lg glass border-primary-light/30 pt-16 pb-6 px-6 pr-12 max-h-[85vh] overflow-y-auto">
-      <DialogHeader className="text-center space-y-2 mb-6">
+      <DialogHeader className="text-center space-y-1 mb-4">
         <DialogTitle className="text-gradient-primary text-xl font-bold">
           {period.period.replace('FROM ', '').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())} Comparison
         </DialogTitle>
@@ -63,54 +63,54 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
       </DialogHeader>
       
       {/* Main Progress Indicator */}
-      <div className="gradient-warm p-6 rounded-xl border border-primary-light/20 shadow-glow mb-6 mx-auto max-w-sm">
-        <div className="text-center space-y-3">
+      <div className="gradient-warm p-4 rounded-xl border border-primary-light/20 shadow-glow mb-4 mx-auto max-w-sm">
+        <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-3">
             {period.trend === "up" ? (
-              <div className="p-3 rounded-full bg-success/20 border border-success/30">
-                <TrendingUp className="text-success w-6 h-6" />
+              <div className="p-2 rounded-full bg-success/20 border border-success/30">
+                <TrendingUp className="text-success w-5 h-5" />
               </div>
             ) : (
-              <div className="p-3 rounded-full bg-destructive/20 border border-destructive/30">
-                <TrendingDown className="text-destructive w-6 h-6" />
+              <div className="p-2 rounded-full bg-destructive/20 border border-destructive/30">
+                <TrendingDown className="text-destructive w-5 h-5" />
               </div>
             )}
-            <span className={`text-3xl font-bold ${period.trend === "up" ? "text-success" : "text-destructive"}`}>
+            <span className={`text-2xl font-bold ${period.trend === "up" ? "text-success" : "text-destructive"}`}>
               {period.percentage}
             </span>
           </div>
-          <p className={`font-medium ${period.trend === 'up' ? 'text-success' : 'text-destructive'}`}>
+          <p className={`font-medium text-sm ${period.trend === 'up' ? 'text-success' : 'text-destructive'}`}>
             {improvementText}
           </p>
         </div>
       </div>
 
       {/* Period Comparison Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-6 max-w-md mx-auto">
+      <div className="grid grid-cols-2 gap-3 mb-4 max-w-md mx-auto">
         {/* Current Period */}
-        <div className="glass-card p-4 border-primary/20 rounded-xl">
-          <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              <h4 className="font-semibold text-primary text-sm">{labels.current}</h4>
+        <div className="glass-card p-3 border-primary/20 rounded-xl">
+          <div className="text-center space-y-2">
+            <div className="flex items-center justify-center gap-1">
+              <Calendar className="w-3 h-3 text-primary" />
+              <h4 className="font-semibold text-primary text-xs">{labels.current}</h4>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="relative">
-                <div className="w-16 h-16 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md border-2 border-primary-light/30">
+                <div className="w-12 h-12 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md border-2 border-primary-light/30">
                   <div className="text-center">
-                    <div className="text-white font-bold text-lg">{period.completedCount}</div>
+                    <div className="text-white font-bold text-sm">{period.completedCount}</div>
                     <div className="text-white/80 text-xs">done</div>
                   </div>
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1.5 shadow-sm border border-primary-light/20">
-                  <Target className="w-3 h-3 text-muted-foreground" />
+                <div className="absolute -bottom-0.5 -right-0.5 bg-background rounded-full p-1 shadow-sm border border-primary-light/20">
+                  <Target className="w-2 h-2 text-muted-foreground" />
                 </div>
               </div>
               
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground">out of {period.totalPossible} possible</div>
-                <div className="bg-primary-light/30 rounded-full h-2 overflow-hidden border border-primary-light/40">
+                <div className="bg-primary-light/30 rounded-full h-1.5 overflow-hidden border border-primary-light/40">
                   <div 
                     className="gradient-primary h-full transition-all duration-500 rounded-full"
                     style={{ width: `${Math.min(currentPercentage, 100)}%` }}
@@ -125,29 +125,29 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
         </div>
 
         {/* Previous Period */}
-        <div className="glass-card p-4 border-muted/30 rounded-xl">
-          <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <h4 className="font-semibold text-muted-foreground text-sm">{labels.previous}</h4>
+        <div className="glass-card p-3 border-muted/30 rounded-xl">
+          <div className="text-center space-y-2">
+            <div className="flex items-center justify-center gap-1">
+              <Calendar className="w-3 h-3 text-muted-foreground" />
+              <h4 className="font-semibold text-muted-foreground text-xs">{labels.previous}</h4>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="relative">
-                <div className="w-16 h-16 mx-auto rounded-full bg-muted/20 flex items-center justify-center border-2 border-muted/30">
+                <div className="w-12 h-12 mx-auto rounded-full bg-muted/20 flex items-center justify-center border-2 border-muted/30">
                   <div className="text-center">
-                    <div className="text-muted-foreground font-bold text-lg">{period.previousCompletedCount}</div>
+                    <div className="text-muted-foreground font-bold text-sm">{period.previousCompletedCount}</div>
                     <div className="text-muted-foreground/60 text-xs">done</div>
                   </div>
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1.5 shadow-sm border border-muted/20">
-                  <Target className="w-3 h-3 text-muted-foreground" />
+                <div className="absolute -bottom-0.5 -right-0.5 bg-background rounded-full p-1 shadow-sm border border-muted/20">
+                  <Target className="w-2 h-2 text-muted-foreground" />
                 </div>
               </div>
               
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground">out of {period.previousTotalPossible} possible</div>
-                <div className="bg-muted/20 rounded-full h-2 overflow-hidden border border-muted/30">
+                <div className="bg-muted/20 rounded-full h-1.5 overflow-hidden border border-muted/30">
                   <div 
                     className="bg-muted/60 h-full transition-all duration-500 rounded-full"
                     style={{ width: `${Math.min(previousPercentage, 100)}%` }}
@@ -163,28 +163,28 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
       </div>
 
       {/* Insights Section */}
-      <div className="space-y-4 max-w-md mx-auto">
-        <div className="gradient-subtle p-4 rounded-xl border border-primary-light/20">
-          <h4 className="font-semibold text-primary mb-3 flex items-center justify-center gap-2">
-            <Info className="w-4 h-4" />
+      <div className="space-y-3 max-w-md mx-auto">
+        <div className="gradient-subtle p-3 rounded-xl border border-primary-light/20">
+          <h4 className="font-semibold text-primary mb-2 flex items-center justify-center gap-2 text-sm">
+            <Info className="w-3 h-3" />
             {period.trend === 'up' ? 'What Likely Helped' : 'Areas to Improve'}
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {getReasonsForChange().slice(0, 3).map((reason, index) => (
-              <div key={index} className="flex items-start gap-3 p-2 rounded-lg bg-white/50">
-                <div className={`w-2 h-2 rounded-full mt-2 ${period.trend === 'up' ? 'bg-success' : 'bg-warning'}`} />
-                <span className="text-sm text-foreground/80">{reason}</span>
+              <div key={index} className="flex items-start gap-2 p-2 rounded-lg bg-white/50">
+                <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${period.trend === 'up' ? 'bg-success' : 'bg-warning'}`} />
+                <span className="text-xs text-foreground/80">{reason}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Motivational Message */}
-        <div className={`p-4 rounded-xl border text-center ${period.trend === 'up' 
+        <div className={`p-3 rounded-xl border text-center ${period.trend === 'up' 
           ? 'bg-success/10 border-success/20' 
           : 'bg-warning/10 border-warning/20'
         }`}>
-          <p className={`text-sm font-medium ${period.trend === 'up' ? 'text-success' : 'text-warning'}`}>
+          <p className={`text-xs font-medium ${period.trend === 'up' ? 'text-success' : 'text-warning'}`}>
             {period.trend === 'up' 
               ? "🎉 Excellent progress! Your consistency is creating lasting change." 
               : "💪 Small steps lead to big wins. Every day is a new opportunity to improve."}
