@@ -20,12 +20,12 @@ const Guidance = () => {
       <Header />
       
       <main className="max-w-4xl mx-auto px-responsive pb-32">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex-1 text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               Daily Guidance
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
               Workouts, nutrition, and spiritual guidance for your journey
             </p>
           </div>
