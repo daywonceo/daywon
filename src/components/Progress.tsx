@@ -52,7 +52,7 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
   };
 
   return (
-    <DialogContent className="max-w-lg glass border-primary-light/30 pt-12 pb-6 px-6">
+    <DialogContent className="max-w-lg glass border-primary-light/30 pt-16 pb-6 px-6 pr-12 max-h-[85vh] overflow-y-auto">
       <DialogHeader className="text-center space-y-2 mb-6">
         <DialogTitle className="text-gradient-primary text-xl font-bold">
           {period.period.replace('FROM ', '')} Comparison
