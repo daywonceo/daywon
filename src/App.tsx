@@ -17,6 +17,10 @@ import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import Integrations from "./pages/Integrations";
+import Analytics from "./pages/Analytics";
+import DataExport from "./pages/DataExport";
+import Notifications from "./pages/Notifications";
+import Help from "./pages/Help";
 
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -195,6 +199,10 @@ const AppContent: React.FC = () => {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/guidance" element={<Guidance />} />
         <Route path="/integrations" element={<Integrations />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/data-export" element={<DataExport />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/help" element={<Help />} />
         <Route path="/premium" element={<GoPremium />} />
         <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
