@@ -100,6 +100,18 @@ const handler = async (req: Request): Promise<Response> => {
           syncResult = await syncHeadspace(integration, sync_type, user.id, supabaseClient);
           break;
         
+        case 'discord':
+          syncResult = await syncDiscord(integration, sync_type, user.id, supabaseClient);
+          break;
+        
+        case 'philips_hue':
+          syncResult = await syncPhilipsHue(integration, sync_type, user.id, supabaseClient);
+          break;
+        
+        case 'google_home':
+          syncResult = await syncGoogleHome(integration, sync_type, user.id, supabaseClient);
+          break;
+        
         case 'spotify':
           syncResult = await syncSpotify(integration, sync_type, user.id, supabaseClient);
           break;
@@ -449,6 +461,93 @@ async function syncHeadspace(integration: any, syncType: string, userId: string,
     const goalMinutes = settings.dailyMeditationGoal;
     syncDetails.habits_auto_completed = dailyMinutes >= goalMinutes ? Math.floor(Math.random() * 4) : Math.floor(Math.random() * 2);
     syncDetails.habit_types = ['Daily Meditation', 'Mindfulness Practice', 'Sleep Wellness', 'Stress Relief'];
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Discord sync implementation
+async function syncDiscord(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.shareHabitMilestones && (syncType === 'export' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use Discord Bot API to send messages to channels
+    // 2. Share recent habit milestones and achievements
+    // 3. Post streak celebrations and progress updates
+    
+    recordsProcessed = Math.floor(Math.random() * 5) + 1; // 1-5 messages sent
+    syncDetails.messages_sent = recordsProcessed;
+    syncDetails.milestones_shared = Math.floor(Math.random() * 3);
+    syncDetails.streak_celebrations = Math.floor(Math.random() * 2);
+    syncDetails.channel_id = settings.channelId || 'default';
+    syncDetails.demo_note = "Discord sync simulated - requires bot token and channel permissions";
+  }
+
+  if (settings.communityFeatures) {
+    syncDetails.community_interactions = Math.floor(Math.random() * 10) + 1;
+    syncDetails.encouragement_messages = Math.floor(Math.random() * 3);
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Philips Hue sync implementation
+async function syncPhilipsHue(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.habitCompletionLights && (syncType === 'export' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use Philips Hue Bridge API to control lights
+    // 2. Trigger celebration lighting for habit completions
+    // 3. Set workout ambience and sleep schedule automation
+    
+    recordsProcessed = Math.floor(Math.random() * 8) + 1; // 1-8 lighting events
+    syncDetails.lighting_events_triggered = recordsProcessed;
+    syncDetails.celebration_lights = Math.floor(Math.random() * 3);
+    syncDetails.workout_scenes = Math.floor(Math.random() * 2);
+    syncDetails.sleep_automation = settings.sleepSchedule ? 1 : 0;
+    syncDetails.bridge_ip = settings.bridgeIP;
+    syncDetails.room_group = settings.roomGroup;
+    syncDetails.demo_note = "Philips Hue sync simulated - requires Bridge API access";
+  }
+
+  if (settings.motivationalColors) {
+    syncDetails.color_theme_changes = Math.floor(Math.random() * 5);
+    syncDetails.current_theme = settings.colorTheme;
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Google Home sync implementation
+async function syncGoogleHome(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.voiceAnnouncements && (syncType === 'export' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use Google Assistant SDK to make announcements
+    // 2. Trigger routines based on habit completions
+    // 3. Control smart home devices for habit automation
+    
+    recordsProcessed = Math.floor(Math.random() * 6) + 1; // 1-6 smart home actions
+    syncDetails.voice_announcements = Math.floor(Math.random() * 3);
+    syncDetails.routines_triggered = Math.floor(Math.random() * 4);
+    syncDetails.thermostat_adjustments = settings.thermostatControl ? Math.floor(Math.random() * 2) : 0;
+    syncDetails.device_group = settings.deviceGroup;
+    syncDetails.announcement_volume = settings.announcementVolume;
+    syncDetails.demo_note = "Google Home sync simulated - requires Assistant API integration";
+  }
+
+  if (settings.habitReminders) {
+    syncDetails.reminder_announcements = Math.floor(Math.random() * 5);
+    syncDetails.habit_reminders_sent = Math.floor(Math.random() * 3);
   }
 
   return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };

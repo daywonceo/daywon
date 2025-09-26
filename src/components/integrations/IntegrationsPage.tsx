@@ -14,6 +14,9 @@ import { FitbitIntegration } from './FitbitIntegration';
 import { TodoistIntegration } from './TodoistIntegration';
 import { RescueTimeIntegration } from './RescueTimeIntegration';
 import { HeadspaceIntegration } from './HeadspaceIntegration';
+import { DiscordIntegration } from './DiscordIntegration';
+import { PhilipsHueIntegration } from './PhilipsHueIntegration';
+import { GoogleHomeIntegration } from './GoogleHomeIntegration';
 import { SyncLogsSection } from './SyncLogsSection';
 import { 
   Music, 
@@ -27,7 +30,10 @@ import {
   Utensils,
   CheckSquare,
   Clock,
-  Brain
+  Brain,
+  MessageSquare,
+  Lightbulb,
+  Home
 } from 'lucide-react';
 
 const integrationConfigs = [
@@ -80,6 +86,30 @@ const integrationConfigs = [
     features: ['Meditation tracking', 'Sleep monitoring', 'Mindfulness exercises', 'Wellness goals']
   },
   {
+    type: 'discord',
+    name: 'Discord',
+    description: 'Share your habit achievements and milestones with your Discord community',
+    icon: MessageSquare,
+    category: 'social',
+    features: ['Achievement sharing', 'Community challenges', 'Milestone celebrations', 'Progress updates']
+  },
+  {
+    type: 'philips_hue',
+    name: 'Philips Hue',
+    description: 'Create immersive lighting experiences that respond to your habit achievements',
+    icon: Lightbulb,
+    category: 'smart_home',
+    features: ['Celebration lighting', 'Workout ambience', 'Sleep schedule automation', 'Motivational themes']
+  },
+  {
+    type: 'google_home',
+    name: 'Google Home',
+    description: 'Automate your smart home environment based on habit schedules and achievements',
+    icon: Home,
+    category: 'smart_home',
+    features: ['Voice announcements', 'Routine automation', 'Climate control', 'Achievement celebrations']
+  },
+  {
     type: 'spotify',
     name: 'Spotify',
     description: 'Connect to Spotify for workout playlist recommendations and music-based habit tracking',
@@ -130,6 +160,12 @@ export const IntegrationsPage: React.FC = () => {
         return <RescueTimeIntegration />;
       case 'headspace':
         return <HeadspaceIntegration />;
+      case 'discord':
+        return <DiscordIntegration />;
+      case 'philips_hue':
+        return <PhilipsHueIntegration />;
+      case 'google_home':
+        return <GoogleHomeIntegration />;
       case 'spotify':
         return <SpotifyIntegration />;
       case 'google_fit':
@@ -149,6 +185,8 @@ export const IntegrationsPage: React.FC = () => {
     fitness: Activity,
     productivity: CheckSquare,
     wellness: Brain,
+    social: MessageSquare,
+    smart_home: Home,
     entertainment: Music,
     automation: Zap,
   };
