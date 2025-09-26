@@ -64,17 +64,25 @@
     --radius-lg: 1rem;
     
     /* Enhanced shadows with earthy color hints */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(151 40% 28% / 0.05);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(151 40% 28% / 0.05);
-    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 10px 10px -5px hsl(151 40% 28% / 0.05);
-    --shadow-glow: 0 0 0 1px hsl(151 40% 28% / 0.1), 0 4px 16px hsl(151 40% 28% / 0.12);
+    --shadow-sm: 0 1px 2px 0 hsl(151 40% 28% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(151 40% 28% / 0.08), 0 2px 4px -1px hsl(24 27% 57% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(151 40% 28% / 0.1), 0 4px 6px -2px hsl(146 17% 42% / 0.06);
+    --shadow-xl: 0 20px 25px -5px hsl(151 40% 28% / 0.12), 0 10px 10px -5px hsl(24 27% 57% / 0.05);
+    --shadow-glow: 0 0 0 1px hsl(151 40% 28% / 0.1), 0 4px 16px hsl(151 40% 28% / 0.15);
     
-    /* Gradients with new palette */
+    /* Subtle gradients with new palette */
     --gradient-primary: linear-gradient(135deg, hsl(151 40% 28%), hsl(146 17% 42%));
     --gradient-accent: linear-gradient(135deg, hsl(24 27% 57%), hsl(74 13% 52%));
     --gradient-success: linear-gradient(135deg, hsl(151 40% 28%), hsl(151 45% 35%));
-    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9), hsl(0 0% 100% / 0.7));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.95), hsl(146 8% 96%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(146 8% 98%));
+    --gradient-warm: linear-gradient(135deg, hsl(24 27% 97%), hsl(74 13% 96%));
+    --gradient-page: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(146 8% 98%) 50%, hsl(74 13% 96%) 100%);
+    
+    /* Background variations */
+    --bg-subtle: hsl(146 8% 98%);
+    --bg-warm: hsl(24 27% 97%);
+    --bg-cool: hsl(146 12% 96%);
     
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -154,7 +162,9 @@
   
   body {
     @apply bg-background text-foreground antialiased;
+    background: var(--gradient-subtle);
     font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
   }
   
   /* Improved typography hierarchy */
@@ -238,8 +248,32 @@
     background: var(--gradient-primary);
   }
   
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
   .gradient-success {
     background: var(--gradient-success);
+  }
+  
+  .gradient-warm {
+    background: var(--gradient-warm);
+  }
+  
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+  
+  .bg-subtle {
+    background-color: var(--bg-subtle);
+  }
+  
+  .bg-warm {
+    background-color: var(--bg-warm);
+  }
+  
+  .bg-cool {
+    background-color: var(--bg-cool);
   }
   
   /* Enhanced shadows */
