@@ -18,6 +18,9 @@ const buttonVariants = cva(
         success: "bg-success text-success-foreground hover:bg-success/90 shadow-md hover:shadow-lg",
         premium: "gradient-primary text-primary-foreground hover:shadow-glow shadow-md",
         glass: "glass-card text-foreground hover:bg-white/90 dark:hover:bg-gray-800/90",
+        accent: "bg-accent text-accent-foreground hover:bg-accent-hover shadow-md hover:shadow-lg",
+        muted: "bg-muted text-muted-foreground hover:bg-muted-hover",
+        neutral: "bg-neutral text-neutral-foreground hover:bg-neutral/90 shadow-md hover:shadow-lg",
       },
       size: {
         default: "h-10 px-4 py-2",
