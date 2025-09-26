@@ -27,8 +27,36 @@ import { useAuth } from "./contexts/AuthContext";
 import { useAppTimeTracking } from "./hooks/useAppTimeTracking";
 import { useAppSessions } from "./hooks/useAppSessions";
 import { useAuthErrorHandler } from "./hooks/useAuthErrorHandler";
+import { GlobalErrorHandler, errorLogger } from "./components/ErrorLogger";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: (failureCount, error: any) => {
+        // Don't retry on 4xx errors (client errors)
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        // Log errors for monitoring
+        if (failureCount === 0) {
+          errorLogger.logError(new Error(`Query failed: ${error?.message || 'Unknown error'}`));
+        }
+        return failureCount < 2;
+      },
+    },
+    mutations: {
+      retry: (failureCount, error: any) => {
+        // Don't retry mutations on client errors
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        return failureCount < 1; // Only retry once for mutations
+      },
+    },
+  },
+});
 
 // Add CSS variables for animation control based on reduced motion preference
 const setupReducedMotion = () => {
@@ -182,6 +210,7 @@ const App: React.FC = () => {
         <AuthProvider>
           <SettingsProvider>
           <TooltipProvider>
+            <GlobalErrorHandler />
             <BrowserRouter>
               <Toaster />
               <Sonner />
