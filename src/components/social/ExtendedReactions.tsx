@@ -11,59 +11,82 @@ interface ExtendedReactionsProps {
   className?: string;
 }
 
-const REACTION_TYPES = [
-  { type: 'like', emoji: '👍' },
-  { type: 'love', emoji: '❤️' },
-  { type: 'heart_eyes', emoji: '😍' },
-  { type: 'fire', emoji: '🔥' },
-  { type: 'clap', emoji: '👏' },
-  { type: 'star', emoji: '⭐' },
-  { type: 'strong', emoji: '💪' },
-  { type: 'mind_blown', emoji: '🤯' },
-  { type: 'celebrate', emoji: '🎉' },
-  { type: 'rocket', emoji: '🚀' },
-  { type: 'trophy', emoji: '🏆' },
-  { type: 'crown', emoji: '👑' },
-  { type: 'gem', emoji: '💎' },
-  { type: 'sparkles', emoji: '✨' },
-  { type: 'lightning', emoji: '⚡' },
-  { type: 'boom', emoji: '💥' },
-  { type: 'hundred', emoji: '💯' },
-  { type: 'pray', emoji: '🙏' },
-  { type: 'raised_hands', emoji: '🙌' },
-  { type: 'ok_hand', emoji: '👌' },
-  { type: 'thumbs_down', emoji: '👎' },
-  { type: 'laugh', emoji: '😂' },
-  { type: 'joy', emoji: '😭' },
-  { type: 'smiling_face', emoji: '😊' },
-  { type: 'wink', emoji: '😉' },
-  { type: 'cool', emoji: '😎' },
-  { type: 'thinking', emoji: '🤔' },
-  { type: 'surprised', emoji: '😮' },
-  { type: 'shock', emoji: '😱' },
-  { type: 'party', emoji: '🥳' },
-  { type: 'flower', emoji: '🌸' },
-  { type: 'sun', emoji: '☀️' },
-  { type: 'rainbow', emoji: '🌈' },
-  { type: 'peace', emoji: '✌️' },
-  { type: 'victory', emoji: '🤝' },
-  { type: 'fist_bump', emoji: '👊' },
-  { type: 'wave', emoji: '👋' },
-  { type: 'salute', emoji: '🫡' },
-  { type: 'pinched_fingers', emoji: '🤌' },
-  { type: 'crossed_fingers', emoji: '🤞' },
-  { type: 'finger_heart', emoji: '🫰' },
-  { type: 'heart_hands', emoji: '🫶' },
-  { type: 'melting_face', emoji: '🫠' },
-  { type: 'face_with_peeking_eye', emoji: '🫣' },
-  { type: 'saluting_face', emoji: '🫡' },
-  { type: 'dotted_line_face', emoji: '🫥' },
-  { type: 'face_with_diagonal_mouth', emoji: '🫤' },
-  { type: 'biting_lip', emoji: '🫦' },
-  { type: 'beans', emoji: '🫘' },
-  { type: 'ginger', emoji: '🫚' },
-  { type: 'pea_pod', emoji: '🫛' },
+const REACTION_CATEGORIES = [
+  {
+    name: 'Smileys & People',
+    icon: '😊',
+    reactions: [
+      { type: 'smiling_face', emoji: '😊' },
+      { type: 'laugh', emoji: '😂' },
+      { type: 'joy', emoji: '😭' },
+      { type: 'heart_eyes', emoji: '😍' },
+      { type: 'wink', emoji: '😉' },
+      { type: 'cool', emoji: '😎' },
+      { type: 'party', emoji: '🥳' },
+      { type: 'thinking', emoji: '🤔' },
+      { type: 'surprised', emoji: '😮' },
+      { type: 'shock', emoji: '😱' },
+      { type: 'melting_face', emoji: '🫠' },
+      { type: 'face_with_peeking_eye', emoji: '🫣' },
+      { type: 'saluting_face', emoji: '🫡' },
+      { type: 'face_with_diagonal_mouth', emoji: '🫤' },
+      { type: 'biting_lip', emoji: '🫦' },
+      { type: 'like', emoji: '👍' },
+      { type: 'thumbs_down', emoji: '👎' },
+      { type: 'clap', emoji: '👏' },
+      { type: 'pray', emoji: '🙏' },
+      { type: 'raised_hands', emoji: '🙌' },
+      { type: 'ok_hand', emoji: '👌' },
+      { type: 'strong', emoji: '💪' },
+      { type: 'peace', emoji: '✌️' },
+      { type: 'victory', emoji: '🤝' },
+      { type: 'fist_bump', emoji: '👊' },
+      { type: 'wave', emoji: '👋' },
+      { type: 'salute', emoji: '🫡' },
+      { type: 'pinched_fingers', emoji: '🤌' },
+      { type: 'crossed_fingers', emoji: '🤞' },
+      { type: 'finger_heart', emoji: '🫰' },
+      { type: 'heart_hands', emoji: '🫶' },
+    ]
+  },
+  {
+    name: 'Hearts & Symbols',
+    icon: '❤️',
+    reactions: [
+      { type: 'love', emoji: '❤️' },
+      { type: 'sparkles', emoji: '✨' },
+      { type: 'star', emoji: '⭐' },
+      { type: 'lightning', emoji: '⚡' },
+      { type: 'fire', emoji: '🔥' },
+      { type: 'boom', emoji: '💥' },
+      { type: 'hundred', emoji: '💯' },
+      { type: 'gem', emoji: '💎' },
+      { type: 'crown', emoji: '👑' },
+      { type: 'trophy', emoji: '🏆' },
+    ]
+  },
+  {
+    name: 'Activities & Objects',
+    icon: '🎉',
+    reactions: [
+      { type: 'celebrate', emoji: '🎉' },
+      { type: 'rocket', emoji: '🚀' },
+      { type: 'mind_blown', emoji: '🤯' },
+    ]
+  },
+  {
+    name: 'Nature',
+    icon: '🌸',
+    reactions: [
+      { type: 'flower', emoji: '🌸' },
+      { type: 'sun', emoji: '☀️' },
+      { type: 'rainbow', emoji: '🌈' },
+    ]
+  }
 ];
+
+// Flatten all reactions for quick access
+const ALL_REACTIONS = REACTION_CATEGORIES.flatMap(category => category.reactions);
 
 const ExtendedReactions = ({ 
   postId, 
@@ -73,16 +96,17 @@ const ExtendedReactions = ({
   className 
 }: ExtendedReactionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(0);
 
   // Get the most popular reactions to show by default
-  const topReactions = REACTION_TYPES
+  const topReactions = ALL_REACTIONS
     .filter(reaction => (reactionCounts[reaction.type] || 0) > 0)
     .sort((a, b) => (reactionCounts[b.type] || 0) - (reactionCounts[a.type] || 0))
     .slice(0, 3);
 
   // If user has reacted, make sure their reaction is included
   if (currentReaction && !topReactions.find(r => r.type === currentReaction)) {
-    const userReaction = REACTION_TYPES.find(r => r.type === currentReaction);
+    const userReaction = ALL_REACTIONS.find(r => r.type === currentReaction);
     if (userReaction) {
       topReactions.unshift(userReaction);
       if (topReactions.length > 3) {
@@ -140,14 +164,33 @@ const ExtendedReactions = ({
           </Button>
         </PopoverTrigger>
         
-        <PopoverContent className="w-80 p-3" align="start">
-          <div className="space-y-3">
+        <PopoverContent className="w-96 p-4" align="start">
+          <div className="space-y-4">
             <h4 className="font-medium text-sm text-gray-900 dark:text-white">
               Choose your reaction
             </h4>
             
-            <div className="grid grid-cols-6 gap-2">
-              {REACTION_TYPES.map((reaction) => {
+            {/* Category Tabs */}
+            <div className="flex space-x-1 border-b border-gray-200 dark:border-gray-700">
+              {REACTION_CATEGORIES.map((category, index) => (
+                <button
+                  key={category.name}
+                  onClick={() => setActiveCategory(index)}
+                  className={`px-3 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    activeCategory === index
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-b-2 border-blue-500'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <span className="mr-1">{category.icon}</span>
+                  <span className="hidden sm:inline">{category.name}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Reactions Grid */}
+            <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
+              {REACTION_CATEGORIES[activeCategory].reactions.map((reaction) => {
                 const count = reactionCounts[reaction.type] || 0;
                 const isSelected = currentReaction === reaction.type;
                 
