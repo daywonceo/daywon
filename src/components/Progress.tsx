@@ -52,8 +52,8 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
   };
 
   return (
-    <DialogContent className="max-w-lg glass border-primary-light/30">
-      <DialogHeader className="text-center space-y-2">
+    <DialogContent className="max-w-lg glass border-primary-light/30 pr-12 pt-8">
+      <DialogHeader className="text-center space-y-2 pr-4">
         <DialogTitle className="text-gradient-primary text-xl font-bold">
           {period.period.replace('FROM ', '')} Comparison
         </DialogTitle>
