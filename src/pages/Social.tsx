@@ -23,7 +23,6 @@ const Social = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-              <span className="text-2xl">🌟</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               Connect & Grow
