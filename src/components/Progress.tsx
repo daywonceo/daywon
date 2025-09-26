@@ -35,7 +35,7 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
     if (period.trend === 'up') {
       return [
         "More consistent daily check-ins",
-        "Better habit tracking routine",
+        "Better habit tracking routine", 
         "Increased motivation and focus",
         "Improved time management",
         "Stronger habit formation"
@@ -44,7 +44,7 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
       return [
         "Missed daily check-ins",
         "Inconsistent routine",
-        "External life stressors",
+        "External life stressors", 
         "Need for better reminders",
         "Habit difficulty adjustment needed"
       ];
@@ -52,92 +52,142 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
   };
 
   return (
-    <DialogContent className="max-w-md">
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-          <Calendar className="w-5 h-5" />
-          {period.period} Comparison
+    <DialogContent className="max-w-lg glass border-primary-light/30">
+      <DialogHeader className="text-center space-y-2">
+        <DialogTitle className="text-gradient-primary text-xl font-bold">
+          {period.period.replace('FROM ', '')} Comparison
         </DialogTitle>
-        <DialogDescription>
-          Detailed breakdown of your habit progress comparison
+        <DialogDescription className="text-muted-foreground">
+          Detailed breakdown of your habit progress
         </DialogDescription>
       </DialogHeader>
       
-      <div className="space-y-6">
-        {/* Progress Summary */}
-        <div className="text-center p-4 rounded-lg bg-gradient-to-r from-primary-light/20 to-accent/20">
-          <div className="flex items-center justify-center gap-2 mb-2">
+      {/* Main Progress Indicator */}
+      <div className="gradient-warm p-6 rounded-xl border border-primary-light/20 shadow-glow mb-6">
+        <div className="text-center space-y-3">
+          <div className="flex items-center justify-center gap-3">
             {period.trend === "up" ? (
-              <TrendingUp className="text-green-600 w-6 h-6" />
+              <div className="p-2 rounded-full bg-success/20">
+                <TrendingUp className="text-success w-6 h-6" />
+              </div>
             ) : (
-              <TrendingDown className="text-red-500 w-6 h-6" />
+              <div className="p-2 rounded-full bg-destructive/20">
+                <TrendingDown className="text-destructive w-6 h-6" />
+              </div>
             )}
-            <span className={`text-2xl font-bold ${period.trend === "up" ? "text-green-600" : "text-red-500"}`}>
+            <span className={`text-3xl font-bold ${period.trend === "up" ? "text-success" : "text-destructive"}`}>
               {period.percentage}
             </span>
           </div>
-          <p className="text-sm text-muted-foreground">{improvementText}</p>
+          <p className={`font-medium ${period.trend === 'up' ? 'text-success' : 'text-destructive'}`}>
+            {improvementText}
+          </p>
         </div>
+      </div>
 
-        {/* Period Comparison */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-3 rounded-lg bg-white/80 backdrop-blur-sm border">
-            <h4 className="font-medium text-sm text-primary mb-2">{labels.current}</h4>
-            <div className="space-y-1">
-              <div className="flex items-center justify-center gap-1">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-lg font-bold text-green-600">{period.completedCount}</span>
+      {/* Period Comparison Cards */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* Current Period */}
+        <div className="glass-card p-4 border-primary/20">
+          <div className="text-center space-y-3">
+            <div className="flex items-center justify-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              <h4 className="font-semibold text-primary text-sm">{labels.current}</h4>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="relative">
+                <div className="w-16 h-16 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md">
+                  <div className="text-center">
+                    <div className="text-white font-bold text-lg">{period.completedCount}</div>
+                    <div className="text-white/80 text-xs">done</div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 shadow-sm">
+                  <Target className="w-3 h-3 text-muted-foreground" />
+                </div>
               </div>
-              <div className="flex items-center justify-center gap-1">
-                <Target className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{period.totalPossible} total</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {Math.round(currentPercentage)}% completion
+              
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground">out of {period.totalPossible} possible</div>
+                <div className="bg-primary-light/30 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="gradient-primary h-full transition-all duration-500"
+                    style={{ width: `${Math.min(currentPercentage, 100)}%` }}
+                  />
+                </div>
+                <div className="text-xs font-medium text-primary">
+                  {Math.round(currentPercentage)}% completion
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="text-center p-3 rounded-lg bg-muted/50 border">
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">{labels.previous}</h4>
-            <div className="space-y-1">
-              <div className="flex items-center justify-center gap-1">
-                <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                <span className="text-lg font-bold">{period.previousCompletedCount}</span>
+        {/* Previous Period */}
+        <div className="glass-card p-4 border-muted/30">
+          <div className="text-center space-y-3">
+            <div className="flex items-center justify-center gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <h4 className="font-semibold text-muted-foreground text-sm">{labels.previous}</h4>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="relative">
+                <div className="w-16 h-16 mx-auto rounded-full bg-muted/20 flex items-center justify-center border-2 border-muted/30">
+                  <div className="text-center">
+                    <div className="text-muted-foreground font-bold text-lg">{period.previousCompletedCount}</div>
+                    <div className="text-muted-foreground/60 text-xs">done</div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 shadow-sm">
+                  <Target className="w-3 h-3 text-muted-foreground" />
+                </div>
               </div>
-              <div className="flex items-center justify-center gap-1">
-                <Target className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{period.previousTotalPossible} total</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {Math.round(previousPercentage)}% completion
+              
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground">out of {period.previousTotalPossible} possible</div>
+                <div className="bg-muted/20 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-muted/60 h-full transition-all duration-500"
+                    style={{ width: `${Math.min(previousPercentage, 100)}%` }}
+                  />
+                </div>
+                <div className="text-xs font-medium text-muted-foreground">
+                  {Math.round(previousPercentage)}% completion
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Insights */}
-        <div className="space-y-3">
-          <h4 className="font-medium text-sm flex items-center gap-2">
+      {/* Insights Section */}
+      <div className="space-y-4">
+        <div className="gradient-subtle p-4 rounded-lg border border-primary-light/20">
+          <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
             <Info className="w-4 h-4" />
-            {period.trend === 'up' ? 'What Likely Helped:' : 'Areas to Improve:'}
+            {period.trend === 'up' ? 'What Likely Helped' : 'Areas to Improve'}
           </h4>
-          <ul className="space-y-1">
+          <div className="space-y-2">
             {getReasonsForChange().slice(0, 3).map((reason, index) => (
-              <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                <div className={`w-1.5 h-1.5 rounded-full mt-2 ${period.trend === 'up' ? 'bg-green-500' : 'bg-orange-500'}`} />
-                {reason}
-              </li>
+              <div key={index} className="flex items-start gap-3">
+                <div className={`w-2 h-2 rounded-full mt-2 ${period.trend === 'up' ? 'bg-success' : 'bg-warning'}`} />
+                <span className="text-sm text-foreground/80">{reason}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
-        {/* Action Suggestion */}
-        <div className="p-3 rounded-lg bg-accent/20 border border-accent/30">
-          <p className="text-sm text-accent-foreground">
+        {/* Motivational Message */}
+        <div className={`p-4 rounded-lg border ${period.trend === 'up' 
+          ? 'bg-success/10 border-success/20' 
+          : 'bg-warning/10 border-warning/20'
+        }`}>
+          <p className={`text-sm font-medium ${period.trend === 'up' ? 'text-success' : 'text-warning'}`}>
             {period.trend === 'up' 
-              ? "Keep up the great work! Your consistency is paying off." 
-              : "Small improvements each day can lead to big changes. Focus on one habit at a time."}
+              ? "🎉 Excellent progress! Your consistency is creating lasting change." 
+              : "💪 Small steps lead to big wins. Every day is a new opportunity to improve."}
           </p>
         </div>
       </div>
