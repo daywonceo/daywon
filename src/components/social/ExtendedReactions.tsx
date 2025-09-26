@@ -1032,7 +1032,7 @@ const ExtendedReactions = ({
           </Button>
         </PopoverTrigger>
         
-        <PopoverContent className="w-80 p-3 max-h-80 overflow-hidden" align="start" side="top" avoidCollisions={true} collisionPadding={10}>
+        <PopoverContent className="w-80 p-3 max-h-80 overflow-hidden" align="center" side="top" avoidCollisions={true} collisionPadding={10}>
           <div className="space-y-3">
             <h4 className="font-medium text-xs text-gray-900 dark:text-white">
               Choose your reaction
@@ -1057,7 +1057,7 @@ const ExtendedReactions = ({
             </div>
 
             {/* Reactions Grid */}
-            <div className="grid grid-cols-8 gap-1 max-h-40 overflow-y-auto">
+            <div className="grid grid-cols-8 gap-1 max-h-40 overflow-y-auto px-1">
               {REACTION_CATEGORIES[activeCategory].reactions.map((reaction) => {
                 const count = reactionCounts[reaction.type] || 0;
                 const isSelected = currentReaction === reaction.type;
