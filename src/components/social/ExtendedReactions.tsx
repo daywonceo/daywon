@@ -1067,13 +1067,13 @@ const ExtendedReactions = ({
                     key={reaction.type}
                     variant="ghost"
                     onClick={() => handleReaction(reaction.type)}
-                    className={`h-8 w-8 p-0 flex items-center justify-center relative transition-all duration-200 ${
+                    className={`h-8 w-8 p-0 flex items-center justify-center relative transition-all duration-200 flex-shrink-0 ${
                       isSelected 
                         ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 scale-105' 
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <span className="text-lg leading-none">{reaction.emoji}</span>
+                    <span className="text-lg leading-none flex items-center justify-center h-full w-full">{reaction.emoji}</span>
                     {count > 0 && (
                       <Badge 
                         variant="secondary" 
