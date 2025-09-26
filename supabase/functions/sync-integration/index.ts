@@ -76,6 +76,18 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       // Perform sync based on integration type
       switch (integration_type) {
+        case 'apple_health':
+          syncResult = await syncAppleHealth(integration, sync_type, user.id, supabaseClient);
+          break;
+        
+        case 'myfitnesspal':
+          syncResult = await syncMyFitnessPal(integration, sync_type, user.id, supabaseClient);
+          break;
+        
+        case 'fitbit':
+          syncResult = await syncFitbit(integration, sync_type, user.id, supabaseClient);
+          break;
+        
         case 'spotify':
           syncResult = await syncSpotify(integration, sync_type, user.id, supabaseClient);
           break;
@@ -242,6 +254,96 @@ async function syncZapier(integration: any, syncType: string, userId: string, su
       syncDetails.webhook_test = 'failed';
       syncDetails.error = error.message;
     }
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Apple Health sync implementation
+async function syncAppleHealth(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.syncSteps && (syncType === 'import' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use HealthKit data received from iOS app
+    // 2. Process step counts, workouts, heart rate, sleep data
+    // 3. Auto-complete related habits
+    
+    recordsProcessed = Math.floor(Math.random() * 7) + 1;
+    syncDetails.health_data_synced = recordsProcessed;
+    syncDetails.steps_processed = Math.floor(Math.random() * 50000) + 5000;
+    syncDetails.workouts_processed = Math.floor(Math.random() * 5);
+    syncDetails.demo_note = "Apple Health sync simulated - requires iOS HealthKit integration";
+  }
+
+  if (settings.autoCompleteHabits) {
+    syncDetails.habits_auto_completed = Math.floor(Math.random() * 4);
+    syncDetails.habit_types = ['Exercise', 'Steps Goal', 'Sleep Goal'];
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// MyFitnessPal sync implementation
+async function syncMyFitnessPal(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.syncNutrition && (syncType === 'import' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use MyFitnessPal API to get food diary entries
+    // 2. Process calorie intake, macro nutrients, water intake
+    // 3. Auto-complete nutrition-related habits
+    
+    recordsProcessed = Math.floor(Math.random() * 14) + 1; // 1-14 days of nutrition data
+    syncDetails.nutrition_entries_synced = recordsProcessed;
+    syncDetails.calories_tracked = Math.floor(Math.random() * 2000) + 1500;
+    syncDetails.water_logged = Math.floor(Math.random() * 8) + 4; // glasses of water
+    syncDetails.demo_note = "MyFitnessPal sync simulated - requires API integration";
+  }
+
+  if (settings.autoCompleteNutritionHabits) {
+    syncDetails.habits_auto_completed = Math.floor(Math.random() * 3);
+    syncDetails.habit_types = ['Log Food', 'Drink Water', 'Meet Calorie Goal'];
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Fitbit sync implementation
+async function syncFitbit(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.syncSteps && (syncType === 'import' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use Fitbit Web API to get activity data
+    // 2. Process steps, heart rate, sleep, exercise data
+    // 3. Handle token refresh if needed
+    // 4. Auto-complete fitness habits
+    
+    recordsProcessed = Math.floor(Math.random() * 30) + 1; // Up to 30 days of data
+    syncDetails.activity_data_synced = recordsProcessed;
+    syncDetails.avg_daily_steps = Math.floor(Math.random() * 5000) + 7000;
+    syncDetails.workouts_detected = Math.floor(Math.random() * 10);
+    syncDetails.sleep_records = Math.floor(Math.random() * 7) + 1;
+    syncDetails.demo_note = "Fitbit sync simulated - requires OAuth 2.0 integration";
+  }
+
+  if (settings.autoCompleteStepGoals || settings.autoCompleteExerciseGoals || settings.autoCompleteSleepGoals) {
+    syncDetails.habits_auto_completed = Math.floor(Math.random() * 5);
+    syncDetails.habit_types = ['Daily Steps', 'Exercise', 'Sleep Goal', 'Active Minutes'];
+  }
+
+  // Check if token needs refresh (Fitbit tokens expire)
+  const tokenExpiry = new Date(integration.token_expires_at);
+  const now = new Date();
+  if (tokenExpiry.getTime() - now.getTime() < 24 * 60 * 60 * 1000) { // Less than 24 hours
+    syncDetails.token_refresh_needed = true;
   }
 
   return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };

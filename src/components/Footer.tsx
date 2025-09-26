@@ -1,5 +1,5 @@
 
-import { Grid2x2, Calendar as CalendarIcon, Book, MessageSquare, User } from "lucide-react";
+import { Grid2x2, Calendar as CalendarIcon, Book, MessageSquare, User, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -19,14 +19,16 @@ const Footer = () => {
     else if (path === "/calendar") setActiveTab("calendar");
     else if (path === "/social") setActiveTab("social");
     else if (path === "/profile") setActiveTab("profile");
-    else if (path === "/guidance") setActiveTab("settings");
+    else if (path === "/guidance") setActiveTab("guidance");
+    else if (path === "/integrations") setActiveTab("integrations");
   }, [location]);
   
   const tabs = [
     { id: "home", icon: Grid2x2, label: "Home", path: "/" },
     { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/calendar" },
     { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
-    { id: "settings", icon: Book, label: "Guidance", path: "/guidance" },
+    { id: "guidance", icon: Book, label: "Guidance", path: "/guidance" },
+    { id: "integrations", icon: Settings, label: "Apps", path: "/integrations" },
     { id: "profile", icon: User, label: "Profile", path: "/profile" },
   ];
   

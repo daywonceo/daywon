@@ -8,6 +8,9 @@ import { SpotifyIntegration } from './SpotifyIntegration';
 import { GoogleFitIntegration } from './GoogleFitIntegration';
 import { CalendarIntegration } from './CalendarIntegration';
 import { ZapierIntegration } from './ZapierIntegration';
+import { AppleHealthIntegration } from './AppleHealthIntegration';
+import { MyFitnessPalIntegration } from './MyFitnessPalIntegration';
+import { FitbitIntegration } from './FitbitIntegration';
 import { SyncLogsSection } from './SyncLogsSection';
 import { 
   Music, 
@@ -16,10 +19,36 @@ import {
   Zap,
   Settings,
   Smartphone,
-  Cloud
+  Cloud,
+  Watch,
+  Utensils
 } from 'lucide-react';
 
 const integrationConfigs = [
+  {
+    type: 'apple_health',
+    name: 'Apple Health',
+    description: 'Sync comprehensive health data from your iPhone including steps, workouts, heart rate, and sleep',
+    icon: Smartphone,
+    category: 'health',
+    features: ['Step tracking', 'Workout detection', 'Heart rate monitoring', 'Sleep analysis', 'Auto habit completion']
+  },
+  {
+    type: 'myfitnesspal',
+    name: 'MyFitnessPal',
+    description: 'Track nutrition habits with automatic food logging and calorie goal sync',
+    icon: Utensils,
+    category: 'nutrition',
+    features: ['Food logging', 'Calorie tracking', 'Nutrition goals', 'Water intake', 'Auto habit completion']
+  },
+  {
+    type: 'fitbit',
+    name: 'Fitbit',
+    description: 'Connect your Fitbit device for comprehensive fitness and health tracking',
+    icon: Watch,
+    category: 'fitness',
+    features: ['Steps & distance', 'Heart rate', 'Sleep tracking', 'Exercise detection', 'Goal automation']
+  },
   {
     type: 'spotify',
     name: 'Spotify',
@@ -59,6 +88,12 @@ export const IntegrationsPage: React.FC = () => {
 
   const getIntegrationComponent = (type: string) => {
     switch (type) {
+      case 'apple_health':
+        return <AppleHealthIntegration />;
+      case 'myfitnesspal':
+        return <MyFitnessPalIntegration />;
+      case 'fitbit':
+        return <FitbitIntegration />;
       case 'spotify':
         return <SpotifyIntegration />;
       case 'google_fit':
@@ -73,8 +108,10 @@ export const IntegrationsPage: React.FC = () => {
   };
 
   const categoryIcons = {
-    entertainment: Music,
+    health: Smartphone,
+    nutrition: Utensils,
     fitness: Activity,
+    entertainment: Music,
     productivity: Calendar,
     automation: Zap,
   };
