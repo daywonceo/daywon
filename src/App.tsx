@@ -21,6 +21,7 @@ import Analytics from "./pages/Analytics";
 import DataExport from "./pages/DataExport";
 import Notifications from "./pages/Notifications";
 import Help from "./pages/Help";
+import Advanced from "./pages/Advanced";
 
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -202,7 +203,8 @@ const AppContent: React.FC = () => {
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/data-export" element={<DataExport />} />
         <Route path="/notifications" element={<Notifications />} />
-        <Route path="/help" element={<Help />} />
+            <Route path="/advanced" element={<Advanced />} />
+            <Route path="/help" element={<Help />} />
         <Route path="/premium" element={<GoPremium />} />
         <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
