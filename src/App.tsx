@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { AppErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -21,7 +21,6 @@ import Integrations from "./pages/Integrations";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
-import { useState, useEffect } from "react";
 import SimpleOnboardingFlow from "./components/onboarding/SimpleOnboardingFlow";
 import { useAuth } from "./contexts/AuthContext";
 import { useAppTimeTracking } from "./hooks/useAppTimeTracking";

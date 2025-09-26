@@ -27,12 +27,18 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   habit
 }) => {
   const [streak, setStreak] = useState(0);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   // Calculate streak and listen for updates using habit_id
   useEffect(() => {
     const calculateCurrentStreak = () => {
+      if (isCalculating) return; // Prevent multiple calculations
+      
+      setIsCalculating(true);
+      
       if (status !== "completed") {
         setStreak(0);
+        setIsCalculating(false);
         return;
       }
 
@@ -62,28 +68,30 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
       } catch (error) {
         console.error("Error calculating streak:", error);
         setStreak(0);
+      } finally {
+        setIsCalculating(false);
       }
     };
 
-    // Calculate initial streak
-    calculateCurrentStreak();
+    // Calculate initial streak with debounce
+    const timeoutId = setTimeout(calculateCurrentStreak, 50);
 
     // Listen for habit updates to recalculate streak
     const handleHabitUpdate = (event: CustomEvent) => {
       const { habitName, date } = event.detail;
       // Re-calculate if this update affects our habit or date
-      if (habitName === category || date === activityDate.toISOString().split('T')[0]) {
-        // Small delay to ensure data is saved
-        setTimeout(calculateCurrentStreak, 100);
+      if ((habitName === category || date === activityDate.toISOString().split('T')[0]) && !isCalculating) {
+        // Debounced recalculation to prevent rapid state changes
+        setTimeout(calculateCurrentStreak, 200);
       }
     };
 
     // Listen for status changes to recalculate streak immediately
     const handleStatusChange = (event: CustomEvent) => {
       const { category: updatedCategory } = event.detail;
-      if (updatedCategory === category) {
-        // Immediate recalculation for UI responsiveness
-        calculateCurrentStreak();
+      if (updatedCategory === category && !isCalculating) {
+        // Debounced recalculation for UI stability
+        setTimeout(calculateCurrentStreak, 100);
       }
     };
 
@@ -91,10 +99,11 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
     window.addEventListener('habitStatusChanged', handleStatusChange as EventListener);
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('habitUpdated', handleHabitUpdate as EventListener);
       window.removeEventListener('habitStatusChanged', handleStatusChange as EventListener);
     };
-  }, [category, status, activityDate]);
+  }, [category, status, activityDate, isCalculating, habit?.ended_at]);
 
   const showStreak = streak >= 3;
   const formattedStreak = formatStreakNumber(streak);
@@ -102,12 +111,18 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   return (
     <div
       className={cn(
-        "w-14 h-14 sm:w-20 sm:h-20 border-2 border-green-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-200/50 transition-colors relative",
+        "w-14 h-14 sm:w-20 sm:h-20 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors relative",
+        status === "completed" 
+          ? "border-green-800 hover:bg-green-200/50" 
+          : status === "failed"
+          ? "border-red-500 hover:bg-red-100/50"
+          : "border-gray-300 hover:bg-gray-100",
         activeHabit === category && activityIndex === 0
           ? "ring-2 ring-blue-500 ring-offset-2"
           : ""
       )}
       onClick={() => onStatusToggle(activityIndex, category)}
+      aria-label={`${category} habit ${status === "completed" ? "completed" : status === "failed" ? "failed" : "not completed"}`}
     >
       {status === "completed" && (
         <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
