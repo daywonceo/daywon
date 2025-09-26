@@ -20,7 +20,7 @@ const Footer = () => {
     else if (path === "/social") setActiveTab("social");
     else if (path === "/profile") setActiveTab("profile");
     else if (path === "/guidance") setActiveTab("guidance");
-    else if (path === "/integrations") setActiveTab("integrations");
+    
   }, [location]);
   
   const tabs = [
@@ -28,7 +28,6 @@ const Footer = () => {
     { id: "calendar", icon: CalendarIcon, label: "Calendar", path: "/calendar" },
     { id: "social", icon: MessageSquare, label: "Social", path: "/social" },
     { id: "guidance", icon: Book, label: "Guidance", path: "/guidance" },
-    { id: "integrations", icon: Settings, label: "Apps", path: "/integrations" },
     { id: "profile", icon: User, label: "Profile", path: "/profile" },
   ];
   

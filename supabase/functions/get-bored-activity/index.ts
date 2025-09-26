@@ -186,7 +186,7 @@ serve(async (req) => {
       
     } catch (fetchError) {
       clearTimeout(timeoutId);
-      console.warn('BoredAPI is unavailable, using fallback activity:', fetchError.message);
+      console.warn('BoredAPI is unavailable, using fallback activity:', fetchError instanceof Error ? fetchError.message : 'Unknown error');
       
       // Use fallback activity when API is down
       const fallbackActivity = getRandomFallbackActivity(type);

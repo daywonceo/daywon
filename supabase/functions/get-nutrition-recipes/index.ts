@@ -88,7 +88,7 @@ serve(async (req) => {
     }) || []
 
     console.log('Transformed nutrition recipes:', transformedRecipes.length)
-    console.log('Nutrition recipes with nutrition data:', transformedRecipes.filter(r => r.nutrition && Object.values(r.nutrition).some(v => v > 0)).length)
+    console.log('Nutrition recipes with nutrition data:', transformedRecipes.filter((r: any) => r.nutrition && Object.values(r.nutrition).some((v: any) => v > 0)).length)
     
     return new Response(
       JSON.stringify(transformedRecipes),
@@ -103,7 +103,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: 'Failed to fetch nutrition recipes', 
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error' 
       }),
       { 
         status: 500, 

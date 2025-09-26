@@ -157,7 +157,7 @@ const handler = async (req: Request): Promise<Response> => {
         .from('integration_sync_logs')
         .update({
           status: 'error',
-          error_message: syncError.message,
+          error_message: syncError instanceof Error ? syncError.message : 'Unknown sync error',
           completed_at: new Date().toISOString(),
         })
         .eq('id', syncLog.id);
@@ -276,7 +276,7 @@ async function syncZapier(integration: any, syncType: string, userId: string, su
       syncDetails.webhook_status = response.status;
     } catch (error) {
       syncDetails.webhook_test = 'failed';
-      syncDetails.error = error.message;
+      syncDetails.error = error instanceof Error ? error.message : 'Unknown error';
     }
   }
 
