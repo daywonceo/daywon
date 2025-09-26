@@ -52,8 +52,8 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
   };
 
   return (
-    <DialogContent className="max-w-lg glass border-primary-light/30 pr-12 pt-8">
-      <DialogHeader className="text-center space-y-2 pr-4">
+    <DialogContent className="max-w-lg glass border-primary-light/30 pt-12 pb-6 px-6">
+      <DialogHeader className="text-center space-y-2 mb-6">
         <DialogTitle className="text-gradient-primary text-xl font-bold">
           {period.period.replace('FROM ', '')} Comparison
         </DialogTitle>
@@ -63,15 +63,15 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
       </DialogHeader>
       
       {/* Main Progress Indicator */}
-      <div className="gradient-warm p-6 rounded-xl border border-primary-light/20 shadow-glow mb-6">
+      <div className="gradient-warm p-6 rounded-xl border border-primary-light/20 shadow-glow mb-6 mx-auto max-w-sm">
         <div className="text-center space-y-3">
           <div className="flex items-center justify-center gap-3">
             {period.trend === "up" ? (
-              <div className="p-2 rounded-full bg-success/20">
+              <div className="p-3 rounded-full bg-success/20 border border-success/30">
                 <TrendingUp className="text-success w-6 h-6" />
               </div>
             ) : (
-              <div className="p-2 rounded-full bg-destructive/20">
+              <div className="p-3 rounded-full bg-destructive/20 border border-destructive/30">
                 <TrendingDown className="text-destructive w-6 h-6" />
               </div>
             )}
@@ -86,9 +86,9 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
       </div>
 
       {/* Period Comparison Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6 max-w-md mx-auto">
         {/* Current Period */}
-        <div className="glass-card p-4 border-primary/20">
+        <div className="glass-card p-4 border-primary/20 rounded-xl">
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
@@ -97,22 +97,22 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
             
             <div className="space-y-2">
               <div className="relative">
-                <div className="w-16 h-16 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md">
+                <div className="w-16 h-16 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md border-2 border-primary-light/30">
                   <div className="text-center">
                     <div className="text-white font-bold text-lg">{period.completedCount}</div>
                     <div className="text-white/80 text-xs">done</div>
                   </div>
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 shadow-sm">
+                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1.5 shadow-sm border border-primary-light/20">
                   <Target className="w-3 h-3 text-muted-foreground" />
                 </div>
               </div>
               
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground">out of {period.totalPossible} possible</div>
-                <div className="bg-primary-light/30 rounded-full h-2 overflow-hidden">
+                <div className="bg-primary-light/30 rounded-full h-2 overflow-hidden border border-primary-light/40">
                   <div 
-                    className="gradient-primary h-full transition-all duration-500"
+                    className="gradient-primary h-full transition-all duration-500 rounded-full"
                     style={{ width: `${Math.min(currentPercentage, 100)}%` }}
                   />
                 </div>
@@ -125,7 +125,7 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
         </div>
 
         {/* Previous Period */}
-        <div className="glass-card p-4 border-muted/30">
+        <div className="glass-card p-4 border-muted/30 rounded-xl">
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -140,16 +140,16 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
                     <div className="text-muted-foreground/60 text-xs">done</div>
                   </div>
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 shadow-sm">
+                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1.5 shadow-sm border border-muted/20">
                   <Target className="w-3 h-3 text-muted-foreground" />
                 </div>
               </div>
               
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground">out of {period.previousTotalPossible} possible</div>
-                <div className="bg-muted/20 rounded-full h-2 overflow-hidden">
+                <div className="bg-muted/20 rounded-full h-2 overflow-hidden border border-muted/30">
                   <div 
-                    className="bg-muted/60 h-full transition-all duration-500"
+                    className="bg-muted/60 h-full transition-all duration-500 rounded-full"
                     style={{ width: `${Math.min(previousPercentage, 100)}%` }}
                   />
                 </div>
@@ -163,15 +163,15 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
       </div>
 
       {/* Insights Section */}
-      <div className="space-y-4">
-        <div className="gradient-subtle p-4 rounded-lg border border-primary-light/20">
-          <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+      <div className="space-y-4 max-w-md mx-auto">
+        <div className="gradient-subtle p-4 rounded-xl border border-primary-light/20">
+          <h4 className="font-semibold text-primary mb-3 flex items-center justify-center gap-2">
             <Info className="w-4 h-4" />
             {period.trend === 'up' ? 'What Likely Helped' : 'Areas to Improve'}
           </h4>
           <div className="space-y-2">
             {getReasonsForChange().slice(0, 3).map((reason, index) => (
-              <div key={index} className="flex items-start gap-3">
+              <div key={index} className="flex items-start gap-3 p-2 rounded-lg bg-white/50">
                 <div className={`w-2 h-2 rounded-full mt-2 ${period.trend === 'up' ? 'bg-success' : 'bg-warning'}`} />
                 <span className="text-sm text-foreground/80">{reason}</span>
               </div>
@@ -180,7 +180,7 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
         </div>
 
         {/* Motivational Message */}
-        <div className={`p-4 rounded-lg border ${period.trend === 'up' 
+        <div className={`p-4 rounded-xl border text-center ${period.trend === 'up' 
           ? 'bg-success/10 border-success/20' 
           : 'bg-warning/10 border-warning/20'
         }`}>
