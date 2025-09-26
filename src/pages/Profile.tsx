@@ -11,6 +11,9 @@ import MembershipMilestone from "@/components/profile/MembershipMilestone";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
 import { MobileProfileEditor } from "@/components/profile/MobileProfileEditor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialProfiles } from "@/hooks/useSocialProfiles";
 import { useHabitStats } from "@/hooks/useHabitStats";
@@ -23,6 +26,7 @@ const Profile = () => {
   const isMobile = useIsMobile();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMobileEditor, setShowMobileEditor] = useState(false);
+  const [showIntegrations, setShowIntegrations] = useState(false);
   const { signOut, session, user } = useAuth();
   
   // Debug auth state
@@ -103,7 +107,22 @@ const Profile = () => {
           
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Connected Apps</h2>
-            <IntegrationsPage />
+            <Dialog open={showIntegrations} onOpenChange={setShowIntegrations}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-auto flex items-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  Manage Connected Apps
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+                <DialogHeader>
+                  <DialogTitle>Connected Apps & Integrations</DialogTitle>
+                </DialogHeader>
+                <div className="overflow-y-auto max-h-[60vh]">
+                  <IntegrationsPage />
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           
           <ShareMilestoneCard />
