@@ -35,24 +35,24 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-10 shadow-sm h-16 p-1 gap-1 bg-black/20 backdrop-blur-sm">
-        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-400/80 data-[state=active]:text-green-300 hover:text-green-400/90">
+      <TabsList className="grid w-full grid-cols-5 mb-10 h-16 p-1 gap-1 bg-white/80 backdrop-blur-md shadow-lg border border-white/20">
+        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-700/80 data-[state=active]:text-green-800 hover:text-green-700">
           <Dumbbell className="w-3 h-3 mb-0.5" />
           <span className="leading-none font-medium">WORKOUTS</span>
         </TabsTrigger>
-        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-400/80 data-[state=active]:text-green-300 hover:text-green-400/90">
+        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-700/80 data-[state=active]:text-green-800 hover:text-green-700">
           <Utensils className="w-3 h-3 mb-0.5" />
           <span className="leading-none font-medium">NUTRITION</span>
         </TabsTrigger>
-        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-400/80 data-[state=active]:text-green-300 hover:text-green-400/90">
+        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-700/80 data-[state=active]:text-green-800 hover:text-green-700">
           <Book className="w-3 h-3 mb-0.5" />
           <span className="leading-none font-medium">SPIRITUAL</span>
         </TabsTrigger>
-        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-400/80 data-[state=active]:text-green-300 hover:text-green-400/90">
+        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-700/80 data-[state=active]:text-green-800 hover:text-green-700">
           <Heart className="w-3 h-3 mb-0.5" />
           <span className="leading-none font-medium">MINDFUL</span>
         </TabsTrigger>
-        <TabsTrigger value="bored" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-400/80 data-[state=active]:text-green-300 hover:text-green-400/90">
+        <TabsTrigger value="bored" className="flex flex-col items-center justify-center py-1 px-0.5 text-[10px] h-full text-green-700/80 data-[state=active]:text-green-800 hover:text-green-700">
           <Zap className="w-3 h-3 mb-0.5" />
           <span className="leading-none font-medium">BORED</span>
         </TabsTrigger>
