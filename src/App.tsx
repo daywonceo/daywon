@@ -28,6 +28,8 @@ import { useAppTimeTracking } from "./hooks/useAppTimeTracking";
 import { useAppSessions } from "./hooks/useAppSessions";
 import { useAuthErrorHandler } from "./hooks/useAuthErrorHandler";
 import { GlobalErrorHandler, errorLogger } from "./components/ErrorLogger";
+import { AccessibilityProvider } from "./components/ui/accessibility";
+import { performanceMonitor } from "./utils/performanceMonitor";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,6 +67,9 @@ const setupReducedMotion = () => {
     document.documentElement.classList.add('reduce-motion');
     localStorage.setItem('reducedMotion', 'true');
   }
+  
+  // Initialize performance monitoring
+  performanceMonitor.initialize();
 };
 
 // Component that handles time tracking and habit sync integration
@@ -209,15 +214,19 @@ const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <SettingsProvider>
-          <TooltipProvider>
-            <GlobalErrorHandler />
-            <BrowserRouter>
-              <Toaster />
-              <Sonner />
-              <OfflineIndicator />
-              <AppContent />
-            </BrowserRouter>
-          </TooltipProvider>
+            <AccessibilityProvider>
+              <TooltipProvider>
+                <GlobalErrorHandler />
+                <BrowserRouter>
+                  <div id="main-content" role="main">
+                    <Toaster />
+                    <Sonner />
+                    <OfflineIndicator />
+                    <AppContent />
+                  </div>
+                </BrowserRouter>
+              </TooltipProvider>
+            </AccessibilityProvider>
           </SettingsProvider>
         </AuthProvider>
       </QueryClientProvider>

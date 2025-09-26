@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ScrollToTop, ProgressBar } from "./ui/enhanced-elements";
-import { AccessibleIcon, SkipLink } from "./ui/accessibility";
+import { SkipLink } from "./ui/accessibility";
+import { performanceMonitor } from "@/utils/performanceMonitor";
 
 export const AppEnhancements: React.FC = () => {
+  useEffect(() => {
+    performanceMonitor.initialize();
+    return () => performanceMonitor.cleanup();
+  }, []);
+
   return (
     <>
-      <SkipLink href="#main-content">Skip to main content</SkipLink>
+      <SkipLink target="#main-content">Skip to main content</SkipLink>
       <ScrollToTop />
     </>
   );
