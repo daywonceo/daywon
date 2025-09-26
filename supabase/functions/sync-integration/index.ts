@@ -88,6 +88,18 @@ const handler = async (req: Request): Promise<Response> => {
           syncResult = await syncFitbit(integration, sync_type, user.id, supabaseClient);
           break;
         
+        case 'todoist':
+          syncResult = await syncTodoist(integration, sync_type, user.id, supabaseClient);
+          break;
+        
+        case 'rescuetime':
+          syncResult = await syncRescueTime(integration, sync_type, user.id, supabaseClient);
+          break;
+        
+        case 'headspace':
+          syncResult = await syncHeadspace(integration, sync_type, user.id, supabaseClient);
+          break;
+        
         case 'spotify':
           syncResult = await syncSpotify(integration, sync_type, user.id, supabaseClient);
           break;
@@ -344,6 +356,99 @@ async function syncFitbit(integration: any, syncType: string, userId: string, su
   const now = new Date();
   if (tokenExpiry.getTime() - now.getTime() < 24 * 60 * 60 * 1000) { // Less than 24 hours
     syncDetails.token_refresh_needed = true;
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Todoist sync implementation
+async function syncTodoist(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.syncTasks && (syncType === 'import' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use Todoist API to get completed tasks
+    // 2. Match task completion with productivity habits
+    // 3. Auto-complete habits based on task completion
+    
+    recordsProcessed = Math.floor(Math.random() * 15) + 1; // 1-15 tasks processed
+    syncDetails.tasks_synced = recordsProcessed;
+    syncDetails.projects_found = Math.floor(Math.random() * 5) + 1;
+    syncDetails.completed_tasks = Math.floor(Math.random() * 8) + 1;
+    syncDetails.demo_note = "Todoist sync simulated - requires API token integration";
+  }
+
+  if (settings.autoCompleteTaskHabits) {
+    syncDetails.habits_auto_completed = Math.floor(Math.random() * 4);
+    syncDetails.habit_types = ['Complete Tasks', 'Daily Planning', 'Project Organization'];
+  }
+
+  if (settings.createHabitTasks && (syncType === 'export' || syncType === 'bidirectional')) {
+    syncDetails.habit_tasks_created = Math.floor(Math.random() * 3);
+    syncDetails.task_creation_note = "Created Todoist tasks for active habits";
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// RescueTime sync implementation
+async function syncRescueTime(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.trackScreenTime && (syncType === 'import' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use RescueTime API to get productivity data
+    // 2. Calculate daily productive time vs distracting time
+    // 3. Auto-complete digital wellness habits based on screen time goals
+    
+    recordsProcessed = Math.floor(Math.random() * 7) + 1; // 1-7 days of data
+    syncDetails.screen_time_days_synced = recordsProcessed;
+    syncDetails.avg_daily_productive_time = Math.floor(Math.random() * 300) + 180; // 3-8 hours
+    syncDetails.avg_daily_distracting_time = Math.floor(Math.random() * 120) + 60; // 1-3 hours
+    syncDetails.productivity_score = Math.floor(Math.random() * 40) + 60; // 60-100%
+    syncDetails.demo_note = "RescueTime sync simulated - requires API key integration";
+  }
+
+  if (settings.autoCompleteDigitalWellnessHabits) {
+    const productiveHours = syncDetails.avg_daily_productive_time / 60;
+    const goalHours = settings.dailyTimeGoals / 60;
+    syncDetails.habits_auto_completed = productiveHours >= goalHours ? Math.floor(Math.random() * 3) : 0;
+    syncDetails.habit_types = ['Productive Screen Time', 'Focus Sessions', 'Digital Wellness'];
+  }
+
+  return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };
+}
+
+// Headspace sync implementation
+async function syncHeadspace(integration: any, syncType: string, userId: string, supabase: any) {
+  const settings = integration.integration_settings;
+  let recordsProcessed = 0;
+  const syncDetails: any = {};
+
+  if (settings.trackMeditation && (syncType === 'import' || syncType === 'bidirectional')) {
+    // In a real implementation:
+    // 1. Use Headspace API to get meditation session data
+    // 2. Track mindfulness exercises and sleep stories
+    // 3. Auto-complete meditation and wellness habits
+    
+    recordsProcessed = Math.floor(Math.random() * 14) + 1; // 1-14 days of sessions
+    syncDetails.meditation_sessions_synced = recordsProcessed;
+    syncDetails.total_meditation_minutes = Math.floor(Math.random() * 200) + 50;
+    syncDetails.sleep_sessions = Math.floor(Math.random() * 7) + 1;
+    syncDetails.mindfulness_exercises = Math.floor(Math.random() * 10) + 1;
+    syncDetails.streak_days = Math.floor(Math.random() * 14) + 1;
+    syncDetails.demo_note = "Headspace sync simulated - requires account integration";
+  }
+
+  if (settings.autoCompleteMeditationHabits || settings.autoCompleteSleepHabits) {
+    const dailyMinutes = syncDetails.total_meditation_minutes / recordsProcessed;
+    const goalMinutes = settings.dailyMeditationGoal;
+    syncDetails.habits_auto_completed = dailyMinutes >= goalMinutes ? Math.floor(Math.random() * 4) : Math.floor(Math.random() * 2);
+    syncDetails.habit_types = ['Daily Meditation', 'Mindfulness Practice', 'Sleep Wellness', 'Stress Relief'];
   }
 
   return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };

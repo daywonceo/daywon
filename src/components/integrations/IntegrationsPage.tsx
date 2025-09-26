@@ -11,6 +11,9 @@ import { ZapierIntegration } from './ZapierIntegration';
 import { AppleHealthIntegration } from './AppleHealthIntegration';
 import { MyFitnessPalIntegration } from './MyFitnessPalIntegration';
 import { FitbitIntegration } from './FitbitIntegration';
+import { TodoistIntegration } from './TodoistIntegration';
+import { RescueTimeIntegration } from './RescueTimeIntegration';
+import { HeadspaceIntegration } from './HeadspaceIntegration';
 import { SyncLogsSection } from './SyncLogsSection';
 import { 
   Music, 
@@ -21,7 +24,10 @@ import {
   Smartphone,
   Cloud,
   Watch,
-  Utensils
+  Utensils,
+  CheckSquare,
+  Clock,
+  Brain
 } from 'lucide-react';
 
 const integrationConfigs = [
@@ -48,6 +54,30 @@ const integrationConfigs = [
     icon: Watch,
     category: 'fitness',
     features: ['Steps & distance', 'Heart rate', 'Sleep tracking', 'Exercise detection', 'Goal automation']
+  },
+  {
+    type: 'todoist',
+    name: 'Todoist',
+    description: 'Sync your tasks and projects to automatically complete productivity habits',
+    icon: CheckSquare,
+    category: 'productivity',
+    features: ['Task completion tracking', 'Project sync', 'Habit task creation', 'Goal automation']
+  },
+  {
+    type: 'rescuetime',
+    name: 'RescueTime',
+    description: 'Monitor digital wellness with automatic screen time and productivity tracking',
+    icon: Clock,
+    category: 'productivity',
+    features: ['Screen time tracking', 'App usage monitoring', 'Productivity scoring', 'Focus goals']
+  },
+  {
+    type: 'headspace',
+    name: 'Headspace',
+    description: 'Track meditation, mindfulness, and sleep wellness activities automatically',
+    icon: Brain,
+    category: 'wellness',
+    features: ['Meditation tracking', 'Sleep monitoring', 'Mindfulness exercises', 'Wellness goals']
   },
   {
     type: 'spotify',
@@ -94,6 +124,12 @@ export const IntegrationsPage: React.FC = () => {
         return <MyFitnessPalIntegration />;
       case 'fitbit':
         return <FitbitIntegration />;
+      case 'todoist':
+        return <TodoistIntegration />;
+      case 'rescuetime':
+        return <RescueTimeIntegration />;
+      case 'headspace':
+        return <HeadspaceIntegration />;
       case 'spotify':
         return <SpotifyIntegration />;
       case 'google_fit':
@@ -111,8 +147,9 @@ export const IntegrationsPage: React.FC = () => {
     health: Smartphone,
     nutrition: Utensils,
     fitness: Activity,
+    productivity: CheckSquare,
+    wellness: Brain,
     entertainment: Music,
-    productivity: Calendar,
     automation: Zap,
   };
 
