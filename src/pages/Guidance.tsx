@@ -16,26 +16,39 @@ const Guidance = () => {
   const showSearchBar = activeTab === "workouts";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen gradient-subtle">
       <Header />
       
-      <main className="max-w-4xl mx-auto px-responsive pb-32">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex-1 text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-              Daily Guidance
-            </h1>
-            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-              Workouts, nutrition, and spiritual guidance for your journey
-            </p>
+      {/* Enhanced hero section with color and spacing */}
+      <div className="gradient-warm border-b border-primary-light/20">
+        <div className="container-responsive pt-8 pb-6">
+          <div className="text-center">
+            <div className="mb-4">
+              <h1 className="text-gradient-primary text-3xl sm:text-4xl font-bold mb-3">
+                Daily Guidance
+              </h1>
+              <p className="text-muted-foreground max-w-md mx-auto text-base">
+                Workouts, nutrition, and spiritual guidance for your journey
+              </p>
+            </div>
+            
+            {/* Decorative accent */}
+            <div className="flex justify-center mb-2">
+              <div className="w-16 h-1 gradient-primary rounded-full"></div>
+            </div>
           </div>
         </div>
+      </div>
+      
+      <main className="container-responsive py-8 pb-32">
 
         {showSearchBar && (
-          <SearchBar 
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
+          <div className="mb-8">
+            <SearchBar 
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+          </div>
         )}
 
         <GuidanceTabs
