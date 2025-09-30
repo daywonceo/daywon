@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Users, Crown, Zap } from 'lucide-react';
 import { AIInsights } from '@/components/advanced/AIInsights';
 import { HabitCoach } from '@/components/advanced/HabitCoach';
+import { ConversationalChat } from '@/components/chat/ConversationalChat';
 import { TeamCollaboration } from '@/components/advanced/TeamCollaboration';
 import { PremiumFeatures } from '@/components/advanced/PremiumFeatures';
 import { AdvancedIntegrations } from '@/components/advanced/AdvancedIntegrations';
@@ -43,8 +44,13 @@ export default function Advanced() {
         </TabsList>
 
         <TabsContent value="ai-insights" className="space-y-6">
-          <HabitCoach />
-          <AIInsights userId={user?.id} />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="space-y-6">
+              <HabitCoach />
+              <AIInsights userId={user?.id} />
+            </div>
+            <ConversationalChat />
+          </div>
         </TabsContent>
 
         <TabsContent value="teams" className="space-y-6">

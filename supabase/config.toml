@@ -14,3 +14,9 @@ verify_jwt = true
 
 [functions.streak-prediction]
 verify_jwt = true
+
+[functions.habit-chat]
+verify_jwt = true
+
+[functions.transcribe-audio]
+verify_jwt = true
