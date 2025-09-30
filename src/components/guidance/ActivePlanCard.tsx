@@ -55,9 +55,9 @@ const ActivePlanCard = ({
               className="flex-1 sm:flex-none relative group/btn px-6"
               disabled={!!activeWorkoutSession}
             >
-              <span className="relative z-10 flex items-center justify-center gap-2">
+              <span className="relative z-10 flex items-center justify-center gap-3 px-2">
                 <Plus className="w-4 h-4 flex-shrink-0 group-hover/btn:rotate-90 transition-transform duration-300" />
-                <span>{activeWorkoutSession ? 'Workout In Progress' : 'Start Workout'}</span>
+                <span className="px-1">{activeWorkoutSession ? 'Workout In Progress' : 'Start Workout'}</span>
               </span>
               {!activeWorkoutSession && (
                 <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 -z-10"></div>
