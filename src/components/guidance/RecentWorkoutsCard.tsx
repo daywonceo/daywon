@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Dumbbell, Heart, Zap, Calendar, TrendingUp, Activity } from "lucide-react";
+import { Dumbbell, Heart, Zap, Calendar, TrendingUp, Activity } from "lucide-react";
 
 interface RecentWorkoutsCardProps {
   recentSessions: any[];
@@ -105,13 +105,7 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
                   </div>
 
                   {/* Stats Row */}
-                  <div className="flex items-center gap-4 mb-3 text-sm">
-                    {session.duration_minutes != null && session.duration_minutes > 0 && (
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Timer className="w-4 h-4" />
-                        <span className="font-medium">{session.duration_minutes}min</span>
-                      </div>
-                    )}
+                  <div className="flex items-center gap-4 text-sm">
                     {exerciseCount > 0 && (
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Dumbbell className="w-4 h-4" />
