@@ -88,16 +88,16 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
                 <div className="flex-1 min-w-0">
                   {/* Header Row */}
                   <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-foreground group-hover/item:text-primary transition-colors leading-snug break-words">
-                        {session.workout_type.replace(/_/g, ' ').toUpperCase()}
+                    <div className="flex-1 overflow-hidden">
+                      <h4 className="font-semibold text-foreground group-hover/item:text-primary transition-colors leading-snug break-words capitalize">
+                        {session.workout_type.replace(/_/g, ' ')}
                       </h4>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                         <Calendar className="w-3 h-3 flex-shrink-0" />
                         <span>{formatDate(session.workout_date)}</span>
                       </div>
                     </div>
-                    <Badge variant="default" className="bg-success text-success-foreground flex-shrink-0">
+                    <Badge variant="default" className="bg-success text-success-foreground flex-shrink-0 whitespace-nowrap">
                       Completed
                     </Badge>
                   </div>
