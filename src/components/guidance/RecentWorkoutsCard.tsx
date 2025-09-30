@@ -95,9 +95,6 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
                         <span>{formatDate(session.workout_date)}</span>
                       </div>
                     </div>
-                    <Badge variant="default" className="bg-success text-success-foreground flex-shrink-0 whitespace-nowrap">
-                      Completed
-                    </Badge>
                   </div>
 
                   {/* Stats Row */}
