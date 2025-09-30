@@ -83,9 +83,9 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
               {/* Top border accent */}
               <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${colorClass.split(' ')[1]} opacity-50 group-hover/item:opacity-100 transition-opacity`}></div>
               
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 {/* Workout Icon */}
-                <div className={`p-3 rounded-xl ${colorClass} group-hover/item:scale-110 transition-transform duration-300`}>
+                <div className={`p-3 rounded-xl ${colorClass} group-hover/item:scale-110 transition-transform duration-300 flex-shrink-0`}>
                   <WorkoutIcon className="w-5 h-5" />
                 </div>
 
