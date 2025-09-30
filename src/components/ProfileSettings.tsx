@@ -27,6 +27,9 @@ import { useSocialProfiles } from "@/hooks/useSocialProfiles";
 import { useUsernameValidation } from "@/hooks/useUsernameValidation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { DataExportCenter } from "@/components/DataExportCenter";
+import { NotificationCenter } from "@/components/NotificationCenter";
+import { HelpCenter } from "@/components/HelpCenter";
 import {
   Settings,
   Target,
@@ -46,6 +49,7 @@ import {
   Camera,
   User,
   Save,
+  HelpCircle,
 } from "lucide-react";
 
 interface ProfileSettingsProps {
@@ -223,6 +227,8 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     { id: "profile", label: "Edit Profile", icon: User },
     { id: "habits", label: "Adjust Habits", icon: Target },
     { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "data-export", label: "Data Export", icon: Download },
+    { id: "help", label: "Help Center", icon: HelpCircle },
     { id: "privacy", label: "Privacy & Security", icon: Shield },
     { id: "account", label: "Account Settings", icon: Settings },
     { id: "about", label: "About & Legal", icon: FileText },
@@ -418,31 +424,21 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
       case "notifications":
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Notification Preferences</h3>
-            <div className="space-y-4">
-              {Object.entries(notifications).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between p-3 rounded-lg border">
-                  <div className="flex items-center space-x-3">
-                    <Bell className="w-5 h-5 text-gray-500" />
-                    <div>
-                      <p className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</p>
-                      <p className="text-sm text-gray-500">
-                        {key === 'pushNotifications' && 'Receive push notifications on your device'}
-                        {key === 'emailReminders' && 'Get habit reminders via email'}
-                        {key === 'weeklyReports' && 'Weekly progress summary'}
-                        {key === 'friendActivity' && 'Updates from friends and groups'}
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={value}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, [key]: checked }))
-                    }
-                  />
-                </div>
-              ))}
-            </div>
+            <NotificationCenter />
+          </div>
+        );
+
+      case "data-export":
+        return (
+          <div className="space-y-4">
+            <DataExportCenter />
+          </div>
+        );
+
+      case "help":
+        return (
+          <div className="space-y-4">
+            <HelpCenter />
           </div>
         );
 
