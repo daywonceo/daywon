@@ -35,26 +35,26 @@ const GuidanceTabs = ({
 }: GuidanceTabsProps) => {
   return (
     <Tabs defaultValue="workouts" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-10 h-16 p-2 gap-3 bg-white/80 backdrop-blur-md shadow-lg border border-white/20">
-        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center py-2 px-1 text-[10px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
-          <Dumbbell className="w-4 h-4 mb-1.5" />
-          <span className="leading-tight font-medium">WORKOUTS</span>
+      <TabsList className="grid w-full grid-cols-5 mb-10 h-16 p-2 gap-2 bg-white/80 backdrop-blur-md shadow-lg border border-white/20">
+        <TabsTrigger value="workouts" className="flex flex-col items-center justify-center gap-1.5 py-2 px-1 text-[9px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
+          <Dumbbell className="w-3.5 h-3.5" />
+          <span className="leading-tight font-semibold">WORKOUTS</span>
         </TabsTrigger>
-        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center py-2 px-1 text-[10px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
-          <Utensils className="w-4 h-4 mb-1.5" />
-          <span className="leading-tight font-medium">NUTRITION</span>
+        <TabsTrigger value="nutrition" className="flex flex-col items-center justify-center gap-1.5 py-2 px-1 text-[9px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
+          <Utensils className="w-3.5 h-3.5" />
+          <span className="leading-tight font-semibold">NUTRITION</span>
         </TabsTrigger>
-        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center py-2 px-1 text-[10px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
-          <Book className="w-4 h-4 mb-1.5" />
-          <span className="leading-tight font-medium">SPIRITUAL</span>
+        <TabsTrigger value="devotions" className="flex flex-col items-center justify-center gap-1.5 py-2 px-1 text-[9px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
+          <Book className="w-3.5 h-3.5" />
+          <span className="leading-tight font-semibold">SPIRITUAL</span>
         </TabsTrigger>
-        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center py-2 px-1 text-[10px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
-          <Heart className="w-4 h-4 mb-1.5" />
-          <span className="leading-tight font-medium">MINDFUL</span>
+        <TabsTrigger value="mindful" className="flex flex-col items-center justify-center gap-1.5 py-2 px-1 text-[9px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
+          <Heart className="w-3.5 h-3.5" />
+          <span className="leading-tight font-semibold">MINDFUL</span>
         </TabsTrigger>
-        <TabsTrigger value="bored" className="flex flex-col items-center justify-center py-2 px-1 text-[10px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
-          <Zap className="w-4 h-4 mb-1.5" />
-          <span className="leading-tight font-medium">BORED</span>
+        <TabsTrigger value="bored" className="flex flex-col items-center justify-center gap-1.5 py-2 px-1 text-[9px] h-full text-muted-foreground data-[state=active]:text-foreground hover:text-foreground">
+          <Zap className="w-3.5 h-3.5" />
+          <span className="leading-tight font-semibold">BORED</span>
         </TabsTrigger>
       </TabsList>
       
