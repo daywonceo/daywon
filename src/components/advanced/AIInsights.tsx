@@ -6,6 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { Brain, TrendingUp, Target, Lightbulb, Zap, Calendar } from 'lucide-react';
 import { useHabits } from '@/hooks/useHabits';
 import { useHabitActivities } from '@/hooks/useHabitActivities';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { format, subDays, isAfter } from 'date-fns';
 
 interface AIInsight {
@@ -30,78 +32,58 @@ export const AIInsights: React.FC<AIInsightsProps> = ({ userId }) => {
   
   const { habits } = useHabits();
   const { activities } = useHabitActivities();
+  const { toast } = useToast();
 
   const generateInsights = async () => {
     setLoading(true);
     
-    // Simulate AI analysis delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const mockInsights: AIInsight[] = [
-      {
+    try {
+      console.log('Fetching AI insights...');
+      
+      const { data, error } = await supabase.functions.invoke('analyze-habit-patterns');
+
+      if (error) {
+        console.error('Error fetching insights:', error);
+        throw error;
+      }
+
+      if (data?.insights) {
+        setInsights(data.insights);
+        console.log('Insights loaded successfully:', data.insights.length);
+      } else {
+        // Fallback to basic insight if no data
+        setInsights([{
+          id: '1',
+          type: 'pattern',
+          title: 'Keep Building Your Habits',
+          description: 'Continue tracking your habits to receive personalized AI insights based on your patterns and progress.',
+          confidence: 80,
+          actionable: false,
+          priority: 'medium',
+          category: 'timing'
+        }]);
+      }
+    } catch (error) {
+      console.error('Failed to generate insights:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load AI insights. Please try again.",
+        variant: "destructive"
+      });
+      // Set fallback insight on error
+      setInsights([{
         id: '1',
         type: 'pattern',
-        title: 'Peak Performance Window',
-        description: 'You consistently complete 85% more habits between 7-9 AM. Consider scheduling important habits during this time.',
-        confidence: 92,
-        actionable: true,
-        priority: 'high',
-        category: 'timing'
-      },
-      {
-        id: '2',
-        type: 'suggestion',
-        title: 'Habit Stacking Opportunity',
-        description: 'Your "Morning Meditation" has a 95% completion rate. Consider adding "Gratitude Journal" immediately after.',
-        confidence: 88,
-        actionable: true,
-        priority: 'medium',
-        category: 'optimization'
-      },
-      {
-        id: '3',
-        type: 'prediction',
-        title: 'Streak Risk Alert',
-        description: 'Your "Daily Reading" habit shows declining engagement. 73% chance of streak break in next 5 days.',
-        confidence: 73,
-        actionable: true,
-        priority: 'high',
-        category: 'risk'
-      },
-      {
-        id: '4',
-        type: 'achievement',
-        title: 'Consistency Milestone',
-        description: 'You\'re on track to achieve a 30-day perfect streak across 3 habits - a personal best!',
-        confidence: 96,
+        title: 'Analysis Temporarily Unavailable',
+        description: 'We\'re having trouble analyzing your habits right now. Please try again in a few moments.',
+        confidence: 50,
         actionable: false,
-        priority: 'medium',
-        category: 'achievement'
-      },
-      {
-        id: '5',
-        type: 'pattern',
-        title: 'Weekly Pattern Analysis',
-        description: 'Mondays show 40% lower completion rates. Consider lighter goals or motivational reminders.',
-        confidence: 84,
-        actionable: true,
-        priority: 'medium',
-        category: 'timing'
-      },
-      {
-        id: '6',
-        type: 'suggestion',
-        title: 'Social Boost Opportunity',
-        description: 'Habits shared with friends have 60% higher completion rates. Consider making more habits social.',
-        confidence: 79,
-        actionable: true,
         priority: 'low',
-        category: 'social'
-      }
-    ];
-    
-    setInsights(mockInsights);
-    setLoading(false);
+        category: 'timing'
+      }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

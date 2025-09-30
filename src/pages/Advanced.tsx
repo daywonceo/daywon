@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Users, Crown, Zap } from 'lucide-react';
 import { AIInsights } from '@/components/advanced/AIInsights';
+import { HabitCoach } from '@/components/advanced/HabitCoach';
 import { TeamCollaboration } from '@/components/advanced/TeamCollaboration';
 import { PremiumFeatures } from '@/components/advanced/PremiumFeatures';
 import { AdvancedIntegrations } from '@/components/advanced/AdvancedIntegrations';
@@ -42,6 +43,7 @@ export default function Advanced() {
         </TabsList>
 
         <TabsContent value="ai-insights" className="space-y-6">
+          <HabitCoach />
           <AIInsights userId={user?.id} />
         </TabsContent>
 
