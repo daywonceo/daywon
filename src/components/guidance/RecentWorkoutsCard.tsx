@@ -28,12 +28,13 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
 
   const getWorkoutColor = (workoutType: string) => {
     const type = workoutType.toLowerCase();
-    if (type.includes('cardio')) return 'text-red-600 bg-red-100 dark:bg-red-900/30';
-    if (type.includes('push') || type.includes('chest')) return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30';
-    if (type.includes('pull') || type.includes('back')) return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30';
-    if (type.includes('legs') || type.includes('lower')) return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30';
-    if (type.includes('full')) return 'text-green-600 bg-green-100 dark:bg-green-900/30';
-    return 'text-primary bg-primary/10';
+    if (type.includes('cardio')) return 'text-destructive bg-destructive/10 dark:bg-destructive/20';
+    if (type.includes('push') || type.includes('chest')) return 'text-primary bg-primary/10 dark:bg-primary/20';
+    if (type.includes('pull') || type.includes('back')) return 'text-secondary bg-secondary/10 dark:bg-secondary/20';
+    if (type.includes('legs') || type.includes('lower')) return 'text-accent bg-accent/10 dark:bg-accent/20';
+    if (type.includes('full')) return 'text-primary-glow bg-primary/15 dark:bg-primary/25';
+    if (type.includes('arms') || type.includes('shoulders')) return 'text-muted bg-muted/15 dark:bg-muted/25';
+    return 'text-primary bg-primary/10 dark:bg-primary/20';
   };
 
   const formatDate = (dateString: string) => {
