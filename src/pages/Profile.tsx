@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProfileSettings from "@/components/ProfileSettings";
 import ProfileHeader from "@/components/profile/ProfileHeader";
-import PersonalBests from "@/components/profile/PersonalBests";
 import BestFriends from "@/components/profile/BestFriends";
 import ShareMilestoneCard from "@/components/social/ShareMilestoneCard";
 import MembershipMilestone from "@/components/profile/MembershipMilestone";
@@ -157,13 +156,6 @@ const Profile = () => {
                 </CardContent>
               </Card>
             </div>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <PersonalBests 
-              habitScore={profile.habitScore}
-              mostConsistentHabit={profile.mostConsistentHabit}
-            />
           </div>
           
           <div className="space-y-4">
