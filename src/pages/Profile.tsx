@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProfileSettings from "@/components/ProfileSettings";
@@ -13,7 +14,8 @@ import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
 import { MobileProfileEditor } from "@/components/profile/MobileProfileEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Share2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Share2, BarChart3, Brain, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialProfiles } from "@/hooks/useSocialProfiles";
 import { useHabitStats } from "@/hooks/useHabitStats";
@@ -23,6 +25,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMobileEditor, setShowMobileEditor] = useState(false);
@@ -97,6 +100,64 @@ const Profile = () => {
         
         <div className="space-y-8 px-2">
           <ProfileHeader profile={profile} />
+          
+          {/* Tools & Insights Section */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Tools & Insights</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Analytics Dashboard Card */}
+              <Card 
+                className="glass-card cursor-pointer group hover:shadow-glow transition-all duration-300 overflow-hidden"
+                onClick={() => navigate('/analytics')}
+              >
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <BarChart3 className="w-6 h-6 text-primary" />
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Analytics Dashboard</h3>
+                    <p className="text-sm text-muted-foreground">
+                      View detailed habit insights, progress trends, and performance metrics
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground">
+                      Weekly completion: <span className="font-semibold text-foreground">{profile.weeklyGoalCompletion}%</span>
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* AI-Powered Tools Card */}
+              <Card 
+                className="glass-card cursor-pointer group hover:shadow-glow transition-all duration-300 overflow-hidden"
+                onClick={() => navigate('/advanced')}
+              >
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                      <Brain className="w-6 h-6 text-accent" />
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">AI-Powered Tools</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Access conversational AI coach, content generation, and smart recommendations
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground">
+                      4 AI tools available
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <PersonalBests 
