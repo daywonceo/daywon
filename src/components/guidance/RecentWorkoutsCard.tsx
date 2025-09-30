@@ -2,7 +2,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Play, CheckCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Timer, Dumbbell, Heart, Zap, Calendar, TrendingUp, Activity } from "lucide-react";
 
 interface RecentWorkoutsCardProps {
   recentSessions: any[];
@@ -17,80 +18,121 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
 
   if (recentCompletedWorkouts.length === 0) return null;
 
-  const getWorkoutStatus = (session: any) => {
-    if (session.is_completed) {
-      return { status: 'Completed', color: 'default', icon: CheckCircle };
-    }
-    
-    // Check if workout is truly in progress or just stuck
-    const sessionDate = new Date(session.workout_date);
+  const getWorkoutIcon = (workoutType: string) => {
+    const type = workoutType.toLowerCase();
+    if (type.includes('cardio')) return Heart;
+    if (type.includes('upper') || type.includes('push') || type.includes('pull')) return Dumbbell;
+    if (type.includes('legs') || type.includes('lower')) return Activity;
+    if (type.includes('full')) return Zap;
+    return Dumbbell;
+  };
+
+  const getWorkoutColor = (workoutType: string) => {
+    const type = workoutType.toLowerCase();
+    if (type.includes('cardio')) return 'text-red-600 bg-red-100 dark:bg-red-900/30';
+    if (type.includes('push') || type.includes('chest')) return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30';
+    if (type.includes('pull') || type.includes('back')) return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30';
+    if (type.includes('legs') || type.includes('lower')) return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30';
+    if (type.includes('full')) return 'text-green-600 bg-green-100 dark:bg-green-900/30';
+    return 'text-primary bg-primary/10';
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    
-    if (sessionDate <= today && !session.is_completed) {
-      // If no duration and created more than 5 minutes ago, it might be stuck
-      const timeSinceCreation = Date.now() - new Date(session.created_at).getTime();
-      if (!session.duration_minutes && timeSinceCreation > 5 * 60 * 1000) {
-        return { status: 'Ready to Start', color: 'secondary', icon: Play };
-      }
-      return { status: 'In Progress', color: 'orange', icon: Timer };
-    }
-    
-    return { status: 'Scheduled', color: 'secondary', icon: Play };
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) return 'Today';
+    if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
-    <Card className="bg-white dark:bg-gray-800">
-      <CardHeader>
-        <CardTitle className="text-gray-800 dark:text-gray-200">Recent Workouts</CardTitle>
+    <Card className="glass-card group relative overflow-hidden">
+      {/* Animated background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      
+      <CardHeader className="relative">
+        <CardTitle className="text-primary flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <TrendingUp className="w-5 h-5" />
+          </div>
+          Recent Workouts
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {recentCompletedWorkouts.map((session) => {
-          const { status, color, icon: StatusIcon } = getWorkoutStatus(session);
-          
+      <CardContent className="space-y-4 relative">
+        {recentCompletedWorkouts.map((session, index) => {
+          const WorkoutIcon = getWorkoutIcon(session.workout_type);
+          const colorClass = getWorkoutColor(session.workout_type);
+          const exerciseCount = session.exercise_logs?.length || 0;
+          const completionRate = session.duration_minutes ? Math.min(100, (session.duration_minutes / 60) * 100) : 100;
+
           return (
             <div 
               key={session.id} 
-              className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                status === 'In Progress' 
-                  ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30' 
-                  : status === 'Ready to Start'
-                  ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30'
-                  : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
-              }`}
+              className="group/item relative p-4 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-300 cursor-pointer hover:shadow-md hover:-translate-y-0.5"
               onClick={() => onWorkoutClick(session)}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div>
-                <div className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                  {session.workout_type.replace(/_/g, ' ').toUpperCase()}
-                  {!session.workout_plan_id && (
-                    <Badge variant="outline" className="ml-2 text-xs">Manual</Badge>
-                  )}
-                  <StatusIcon className={`w-4 h-4 ${
-                    status === 'In Progress' ? 'text-orange-600' : 
-                    status === 'Ready to Start' ? 'text-blue-600' : 
-                    'text-green-600'
-                  }`} />
+              {/* Top border accent */}
+              <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${colorClass.split(' ')[1]} opacity-50 group-hover/item:opacity-100 transition-opacity`}></div>
+              
+              <div className="flex items-start gap-4">
+                {/* Workout Icon */}
+                <div className={`p-3 rounded-xl ${colorClass} group-hover/item:scale-110 transition-transform duration-300`}>
+                  <WorkoutIcon className="w-5 h-5" />
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {new Date(session.workout_date).toLocaleDateString()}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {session.duration_minutes && (
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {session.duration_minutes}min
+
+                {/* Main Content */}
+                <div className="flex-1 min-w-0">
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-foreground truncate group-hover/item:text-primary transition-colors">
+                        {session.workout_type.replace(/_/g, ' ').toUpperCase()}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                        <Calendar className="w-3 h-3" />
+                        <span>{formatDate(session.workout_date)}</span>
+                      </div>
+                    </div>
+                    <Badge variant="default" className="bg-success text-success-foreground flex-shrink-0">
+                      Completed
+                    </Badge>
                   </div>
-                )}
-                <Badge 
-                  variant={color === 'default' ? "default" : "secondary"} 
-                  className={
-                    status === 'In Progress' ? "bg-orange-600 text-white" : 
-                    status === 'Ready to Start' ? "bg-blue-600 text-white" : ""
-                  }
-                >
-                  {status}
-                </Badge>
+
+                  {/* Stats Row */}
+                  <div className="flex items-center gap-4 mb-3 text-sm">
+                    {session.duration_minutes && (
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Timer className="w-4 h-4" />
+                        <span className="font-medium">{session.duration_minutes}min</span>
+                      </div>
+                    )}
+                    {exerciseCount > 0 && (
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Dumbbell className="w-4 h-4" />
+                        <span className="font-medium">{exerciseCount} exercises</span>
+                      </div>
+                    )}
+                    {!session.workout_plan_id && (
+                      <Badge variant="outline" className="text-xs">Manual</Badge>
+                    )}
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Workout Intensity</span>
+                      <span className="font-medium">{Math.round(completionRate)}%</span>
+                    </div>
+                    <Progress 
+                      value={completionRate} 
+                      className="h-1.5"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           );
