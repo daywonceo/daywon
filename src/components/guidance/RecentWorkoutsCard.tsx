@@ -99,7 +99,7 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
 
                   {/* Stats Row */}
                   <div className="flex items-center gap-4 mb-3 text-sm">
-                    {session.duration_minutes && (
+                    {session.duration_minutes != null && session.duration_minutes > 0 && (
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Timer className="w-4 h-4" />
                         <span className="font-medium">{session.duration_minutes}min</span>
