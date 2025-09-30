@@ -52,12 +52,12 @@ const ActivePlanCard = ({
             <Button 
               onClick={onStartWorkout}
               size="lg"
-              className="flex-1 relative group/btn min-w-0"
+              className="flex-1 sm:flex-none relative group/btn px-6"
               disabled={!!activeWorkoutSession}
             >
-              <span className="relative z-10 flex items-center justify-center gap-2 whitespace-nowrap px-2">
+              <span className="relative z-10 flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4 flex-shrink-0 group-hover/btn:rotate-90 transition-transform duration-300" />
-                <span className="truncate">{activeWorkoutSession ? 'Workout In Progress' : 'Start Workout'}</span>
+                <span>{activeWorkoutSession ? 'Workout In Progress' : 'Start Workout'}</span>
               </span>
               {!activeWorkoutSession && (
                 <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 -z-10"></div>
