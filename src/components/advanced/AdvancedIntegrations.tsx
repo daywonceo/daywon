@@ -233,14 +233,14 @@ export const AdvancedIntegrations: React.FC<AdvancedIntegrationsProps> = ({
             </Badge>
           </CardTitle>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {categories.map(category => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(category)}
-                className="capitalize"
+                className="capitalize text-xs sm:text-sm px-2 sm:px-3"
               >
                 {category === 'all' ? 'All' : category}
               </Button>
@@ -255,29 +255,29 @@ export const AdvancedIntegrations: React.FC<AdvancedIntegrationsProps> = ({
             return (
               <div
                 key={integration.id}
-                className={`p-4 border rounded-lg ${
+                className={`p-3 sm:p-4 border rounded-lg ${
                   available ? 'bg-background' : 'bg-muted/30'
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <div className="text-2xl">{integration.icon}</div>
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-xl sm:text-2xl shrink-0">{integration.icon}</div>
                   
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <h4 className={`font-medium ${
+                  <div className="flex-1 space-y-2 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 flex-wrap flex-1">
+                        <h4 className={`font-medium text-sm sm:text-base ${
                           available ? 'text-foreground' : 'text-muted-foreground'
                         }`}>
                           {integration.name}
                         </h4>
                         {integration.premium && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs w-fit">
                             Premium
                           </Badge>
                         )}
                         <Badge 
                           variant="secondary" 
-                          className={`${getComplexityColor(integration.setupComplexity)} capitalize text-xs`}
+                          className={`${getComplexityColor(integration.setupComplexity)} capitalize text-xs w-fit`}
                         >
                           {integration.setupComplexity}
                         </Badge>
@@ -291,28 +291,30 @@ export const AdvancedIntegrations: React.FC<AdvancedIntegrationsProps> = ({
                               variant="outline"
                               size="sm"
                               onClick={() => toggleIntegration(integration.id)}
+                              className="text-xs sm:text-sm"
                             >
-                              <Settings className="h-4 w-4 mr-2" />
-                              Configure
+                              <Settings className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                              <span className="hidden sm:inline">Configure</span>
                             </Button>
                           ) : (
                             <Button
                               size="sm"
                               onClick={() => setShowSetup(integration)}
+                              className="text-xs sm:text-sm"
                             >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Connect
+                              <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                              <span className="hidden sm:inline">Connect</span>
                             </Button>
                           )
                         ) : (
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="text-xs sm:text-sm">
                             Upgrade
                           </Button>
                         )}
                       </div>
                     </div>
                     
-                    <p className={`text-sm ${
+                    <p className={`text-xs sm:text-sm ${
                       available ? 'text-muted-foreground' : 'text-muted-foreground/70'
                     }`}>
                       {integration.description}
@@ -320,14 +322,14 @@ export const AdvancedIntegrations: React.FC<AdvancedIntegrationsProps> = ({
                     
                     <div className="flex flex-wrap gap-1">
                       {integration.features.slice(0, 3).map((feature, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} variant="outline" className="text-[10px] sm:text-xs">
                           {feature}
                         </Badge>
                       ))}
                     </div>
                     
                     {integration.status === 'connected' && integration.lastSync && (
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[10px] sm:text-xs text-muted-foreground">
                         <span>Last sync: {integration.lastSync}</span>
                         <span>Frequency: {integration.syncFrequency}</span>
                       </div>

@@ -112,20 +112,20 @@ export const HabitCoach: React.FC = () => {
       <CardContent className="space-y-6">
         {/* Stats Overview */}
         {stats && (
-          <div className="grid grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 p-3 sm:p-4 bg-muted/50 rounded-lg">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{stats.completionRate}%</div>
-              <div className="text-xs text-muted-foreground">Today's Progress</div>
+              <div className="text-xl sm:text-2xl font-bold text-primary">{stats.completionRate}%</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Today's Progress</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.completedToday}/{stats.totalHabits}</div>
-              <div className="text-xs text-muted-foreground">Completed</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.completedToday}/{stats.totalHabits}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Completed</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">
+              <div className="text-xl sm:text-2xl font-bold text-primary">
                 {Math.max(...stats.streaks.map(s => s.streak), 0)}
               </div>
-              <div className="text-xs text-muted-foreground">Best Streak</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Best Streak</div>
             </div>
           </div>
         )}
@@ -146,10 +146,10 @@ export const HabitCoach: React.FC = () => {
               <TrendingUp className="h-4 w-4" />
               Active Streaks
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {stats.streaks.map((streak, idx) => (
-                <div key={idx} className="p-2 bg-muted/50 rounded-lg">
-                  <div className="text-sm font-medium">{streak.habit}</div>
+                <div key={idx} className="p-2 sm:p-3 bg-muted/50 rounded-lg">
+                  <div className="text-sm font-medium truncate">{streak.habit}</div>
                   <div className="text-xs text-muted-foreground">
                     <Target className="h-3 w-3 inline mr-1" />
                     {streak.streak} day{streak.streak !== 1 ? 's' : ''}

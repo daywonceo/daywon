@@ -268,16 +268,16 @@ export const TeamCollaboration: React.FC<TeamCollaborationProps> = ({ userId }) 
       {selectedTeam && (
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{selectedTeam.name}</CardTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <CardTitle className="text-lg sm:text-xl">{selectedTeam.name}</CardTitle>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Chat
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                  <MessageCircle className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Chat</span>
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Events
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                  <Calendar className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Events</span>
                 </Button>
               </div>
             </div>
@@ -307,27 +307,27 @@ export const TeamCollaboration: React.FC<TeamCollaborationProps> = ({ userId }) 
               <h4 className="font-medium mb-3">Members</h4>
               <div className="grid gap-3">
                 {selectedTeam.members.map(member => (
-                  <div key={member.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
+                  <div key={member.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12 shrink-0">
                         <AvatarImage src={member.avatar} />
                         <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{member.name}</span>
-                          <Badge variant={getRoleColor(member.role)} className="capitalize">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium text-sm sm:text-base truncate">{member.name}</span>
+                          <Badge variant={getRoleColor(member.role)} className="capitalize text-xs">
                             {member.role}
                           </Badge>
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-xs sm:text-sm text-muted-foreground">
                           {member.habitCount} habits • {member.streakCount} day streak
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-medium">{member.contribution}%</div>
-                      <div className="text-sm text-muted-foreground">contribution</div>
+                    <div className="text-left sm:text-right">
+                      <div className="font-medium text-sm sm:text-base">{member.contribution}%</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">contribution</div>
                     </div>
                   </div>
                 ))}

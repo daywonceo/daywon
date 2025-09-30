@@ -153,14 +153,14 @@ export const AIInsights: React.FC<AIInsightsProps> = ({ userId }) => {
             </Badge>
           </CardTitle>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {categories.map(category => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(category)}
-                className="capitalize"
+                className="capitalize text-xs sm:text-sm px-2 sm:px-3"
               >
                 {category}
               </Button>
@@ -172,39 +172,39 @@ export const AIInsights: React.FC<AIInsightsProps> = ({ userId }) => {
           {filteredInsights.map(insight => (
             <div
               key={insight.id}
-              className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg shrink-0">
                   {getInsightIcon(insight.type)}
                 </div>
                 
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium">{insight.title}</h4>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={getPriorityColor(insight.priority)}>
+                <div className="flex-1 space-y-2 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <h4 className="font-medium text-sm sm:text-base">{insight.title}</h4>
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                      <Badge variant={getPriorityColor(insight.priority)} className="text-xs">
                         {insight.priority}
                       </Badge>
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="outline" className="capitalize text-xs">
                         {insight.type}
                       </Badge>
                     </div>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {insight.description}
                   </p>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>Confidence:</span>
-                      <Progress value={insight.confidence} className="w-16 h-2" />
+                      <span className="hidden sm:inline">Confidence:</span>
+                      <Progress value={insight.confidence} className="w-12 sm:w-16 h-2" />
                       <span>{insight.confidence}%</span>
                     </div>
                     
                     {insight.actionable && (
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
                         Take Action
                       </Button>
                     )}
@@ -213,7 +213,7 @@ export const AIInsights: React.FC<AIInsightsProps> = ({ userId }) => {
               </div>
             </div>
           ))}
-          
+
           <div className="flex justify-center pt-4">
             <Button variant="outline" onClick={generateInsights}>
               <Zap className="h-4 w-4 mr-2" />

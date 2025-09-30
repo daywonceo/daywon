@@ -117,26 +117,28 @@ export const ContentGenerator: React.FC = () => {
       
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="workout" className="text-xs">
-              <Dumbbell className="h-3 w-3 mr-1" />
-              Workout
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto gap-1">
+            <TabsTrigger value="workout" className="text-[10px] sm:text-xs flex-col sm:flex-row gap-0.5 sm:gap-1 py-2">
+              <Dumbbell className="h-3 w-3" />
+              <span>Workout</span>
             </TabsTrigger>
-            <TabsTrigger value="meal" className="text-xs">
-              <Utensils className="h-3 w-3 mr-1" />
-              Meals
+            <TabsTrigger value="meal" className="text-[10px] sm:text-xs flex-col sm:flex-row gap-0.5 sm:gap-1 py-2">
+              <Utensils className="h-3 w-3" />
+              <span>Meals</span>
             </TabsTrigger>
-            <TabsTrigger value="meditation" className="text-xs">
-              <Heart className="h-3 w-3 mr-1" />
-              Meditate
+            <TabsTrigger value="meditation" className="text-[10px] sm:text-xs flex-col sm:flex-row gap-0.5 sm:gap-1 py-2">
+              <Heart className="h-3 w-3" />
+              <span className="hidden sm:inline">Meditate</span>
+              <span className="sm:hidden">Mind</span>
             </TabsTrigger>
-            <TabsTrigger value="devotional" className="text-xs">
-              <Book className="h-3 w-3 mr-1" />
-              Devotion
+            <TabsTrigger value="devotional" className="text-[10px] sm:text-xs flex-col sm:flex-row gap-0.5 sm:gap-1 py-2">
+              <Book className="h-3 w-3" />
+              <span className="hidden sm:inline">Devotion</span>
+              <span className="sm:hidden">Faith</span>
             </TabsTrigger>
-            <TabsTrigger value="recommendations" className="text-xs">
-              <Sparkles className="h-3 w-3 mr-1" />
-              Books
+            <TabsTrigger value="recommendations" className="text-[10px] sm:text-xs flex-col sm:flex-row gap-0.5 sm:gap-1 py-2">
+              <Sparkles className="h-3 w-3" />
+              <span>Books</span>
             </TabsTrigger>
           </TabsList>
 
