@@ -51,6 +51,7 @@ const ActivePlanCard = ({
           <div className="flex gap-2">
             <Button 
               onClick={onStartWorkout}
+              size="lg"
               className="flex-1 relative overflow-hidden group/btn"
               disabled={!!activeWorkoutSession}
             >
@@ -63,7 +64,8 @@ const ActivePlanCard = ({
               )}
             </Button>
             <Button 
-              variant="outline" 
+              variant="outline"
+              size="lg"
               onClick={onViewProgress}
               className="group/btn"
             >

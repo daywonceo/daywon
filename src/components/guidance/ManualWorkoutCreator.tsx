@@ -346,7 +346,8 @@ const ManualWorkoutCreator = ({ onBack }: ManualWorkoutCreatorProps) => {
       <Button
         onClick={startWorkout}
         disabled={!workoutType || selectedExercises.length === 0 || (workoutType === 'custom' && !customWorkoutName.trim())}
-        className="w-full bg-green-600 hover:bg-green-700 h-12"
+        size="lg"
+        className="w-full bg-green-600 hover:bg-green-700"
       >
         <Play className="w-5 h-5 mr-2" />
         Start Workout

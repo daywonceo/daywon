@@ -47,6 +47,7 @@ const WorkoutTimer = ({
           {!workoutStarted ? (
             <Button
               onClick={onStartTimer}
+              size="lg"
               className="bg-green-600 hover:bg-green-700"
             >
               <Play className="w-4 h-4 mr-2" />

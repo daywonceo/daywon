@@ -86,7 +86,7 @@ const WorkoutCard = ({ workout }: WorkoutCardProps) => {
           </ul>
         </div>
         
-        <Button className="w-full relative overflow-hidden group/btn">
+        <Button size="lg" className="w-full relative overflow-hidden group/btn">
           <span className="relative z-10 flex items-center justify-center">
             <Dumbbell className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform duration-300" />
             Start Workout
