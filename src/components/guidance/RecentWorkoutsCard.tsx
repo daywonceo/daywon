@@ -2,7 +2,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Timer, Dumbbell, Heart, Zap, Calendar, TrendingUp, Activity } from "lucide-react";
 
 interface RecentWorkoutsCardProps {
@@ -66,7 +65,6 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
           const WorkoutIcon = getWorkoutIcon(session.workout_type);
           const colorClass = getWorkoutColor(session.workout_type);
           const exerciseCount = session.exercise_logs?.length || 0;
-          const completionRate = session.duration_minutes ? Math.min(100, (session.duration_minutes / 60) * 100) : 100;
 
           return (
             <div 
@@ -119,18 +117,6 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
                     {!session.workout_plan_id && (
                       <Badge variant="outline" className="text-xs">Manual</Badge>
                     )}
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Workout Intensity</span>
-                      <span className="font-medium">{Math.round(completionRate)}%</span>
-                    </div>
-                    <Progress 
-                      value={completionRate} 
-                      className="h-1.5"
-                    />
                   </div>
                 </div>
               </div>
