@@ -59,7 +59,7 @@ interface ProfileSettingsProps {
 
 const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   const isMobile = useIsMobile();
-  const [activeSection, setActiveSection] = useState("profile");
+  const [activeSection, setActiveSection] = useState<string>("menu");
   const { currentUserProfile, updateProfile } = useSocialProfiles();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -722,16 +722,13 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     </div>
   );
 
-  // Set initial state based on device and open state
+  // Set initial state based on device and when dialog opens
   React.useEffect(() => {
     if (open) {
-      if (isMobile) {
-        setActiveSection("menu");
-      } else if (activeSection === "menu") {
-        setActiveSection("profile");
-      }
+      // Reset to menu on mobile, profile on desktop when opening
+      setActiveSection(isMobile ? "menu" : "profile");
     }
-  }, [isMobile, open]);
+  }, [open, isMobile]);
 
   if (isMobile) {
     return (

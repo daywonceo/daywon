@@ -186,7 +186,7 @@ const Profile = () => {
           </div>
           
           <ProfileActions 
-            onOpenSettings={() => isMobile ? setShowMobileEditor(true) : setSettingsOpen(true)}
+            onOpenSettings={() => setSettingsOpen(true)}
             onSignOut={handleSignOut}
           />
         </div>
