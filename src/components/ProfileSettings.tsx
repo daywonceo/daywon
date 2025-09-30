@@ -653,25 +653,26 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     <div className="h-full flex flex-col">
       {activeSection === "menu" ? (
         <div className="flex-1 p-4">
-          <div className="space-y-1">
+          <h2 className="text-lg font-semibold mb-4">Settings Menu</h2>
+          <div className="space-y-2">
             {menuItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className="w-full flex items-center justify-between p-4 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="w-full flex items-center justify-between p-4 rounded-lg border hover:bg-muted transition-colors"
               >
                 <div className="flex items-center space-x-3">
-                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <item.icon className="w-5 h-5 text-muted-foreground" />
                   <span className="font-medium">{item.label}</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </button>
             ))}
           </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col">
-          <div className="flex items-center p-4 border-b">
+          <div className="flex items-center p-4 border-b bg-background sticky top-0 z-10">
             <Button
               variant="ghost"
               size="sm"
@@ -721,12 +722,14 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     </div>
   );
 
-  // Set initial state for mobile
+  // Set initial state based on device and open state
   React.useEffect(() => {
-    if (isMobile && open) {
-      setActiveSection("menu");
-    } else if (!isMobile && activeSection === "menu") {
-      setActiveSection("profile");
+    if (open) {
+      if (isMobile) {
+        setActiveSection("menu");
+      } else if (activeSection === "menu") {
+        setActiveSection("profile");
+      }
     }
   }, [isMobile, open]);
 
