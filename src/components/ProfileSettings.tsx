@@ -423,22 +423,28 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
 
       case "notifications":
         return (
-          <div className="space-y-4">
-            <NotificationCenter />
+          <div className="space-y-4 -mx-4 -my-2">
+            <div className="max-h-[60vh] overflow-y-auto">
+              <NotificationCenter />
+            </div>
           </div>
         );
 
       case "data-export":
         return (
-          <div className="space-y-4">
-            <DataExportCenter />
+          <div className="space-y-4 -mx-4 -my-2">
+            <div className="max-h-[60vh] overflow-y-auto">
+              <DataExportCenter />
+            </div>
           </div>
         );
 
       case "help":
         return (
-          <div className="space-y-4">
-            <HelpCenter />
+          <div className="space-y-4 -mx-4 -my-2">
+            <div className="max-h-[60vh] overflow-y-auto">
+              <HelpCenter />
+            </div>
           </div>
         );
 
@@ -687,9 +693,9 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   );
 
   const renderDesktopView = () => (
-    <div className="flex h-96">
+    <div className="flex h-[70vh] max-h-[700px]">
       {/* Sidebar */}
-      <div className="w-1/3 border-r pr-4">
+      <div className="w-1/3 border-r pr-4 overflow-y-auto">
         <nav className="space-y-1">
           {menuItems.map((item) => (
             <button
@@ -697,8 +703,8 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
               onClick={() => setActiveSection(item.id)}
               className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                 activeSection === item.id
-                  ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "bg-primary/10 text-primary"
+                  : "hover:bg-muted"
               }`}
             >
               <item.icon className="w-4 h-4" />
@@ -742,7 +748,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-w-6xl max-h-[85vh] overflow-hidden p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Settings className="w-5 h-5" />
