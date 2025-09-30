@@ -15,11 +15,13 @@ import ActivePlanCard from "./ActivePlanCard";
 import UpcomingWorkoutsCard from "./UpcomingWorkoutsCard";
 import RecentWorkoutsCard from "./RecentWorkoutsCard";
 import QuickActionsGrid from "./QuickActionsGrid";
+import WorkoutDetailModal from "./WorkoutDetailModal";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
   const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'week-view' | 'schedule-workout' | 'manual-workout'>('overview');
+  const [selectedWorkoutForDetail, setSelectedWorkoutForDetail] = useState<any>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -116,9 +118,8 @@ const NewWorkoutsTab = () => {
   }
 
   const handleWorkoutClick = (session: any) => {
-    // Always go to active workout view when clicking a workout
-    // This allows users to complete or view any workout session
-    setCurrentView('active-workout');
+    // Open workout detail modal to show comprehensive information
+    setSelectedWorkoutForDetail(session);
   };
 
   if (currentView === 'plan-selector') {
@@ -253,6 +254,12 @@ const NewWorkoutsTab = () => {
         onManagePlans={() => setCurrentView('plan-selector')}
         onManualWorkout={() => setCurrentView('manual-workout')}
         onWeekView={() => setCurrentView('week-view')}
+      />
+
+      <WorkoutDetailModal
+        open={!!selectedWorkoutForDetail}
+        onOpenChange={(open) => !open && setSelectedWorkoutForDetail(null)}
+        session={selectedWorkoutForDetail}
       />
     </div>
   );

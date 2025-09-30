@@ -7,7 +7,21 @@ export const fetchWorkoutSessions = async (userId: string): Promise<WorkoutSessi
   
   const { data, error } = await supabase
     .from('workout_sessions')
-    .select('*')
+    .select(`
+      *,
+      exercise_logs (
+        id,
+        exercise_name,
+        muscle_group,
+        equipment,
+        sets,
+        reps,
+        weight_lbs,
+        difficulty,
+        exercise_instructions,
+        created_at
+      )
+    `)
     .eq('user_id', userId)
     .order('workout_date', { ascending: false });
 
