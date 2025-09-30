@@ -5,6 +5,7 @@ import { Brain, Users, Crown, Zap } from 'lucide-react';
 import { AIInsights } from '@/components/advanced/AIInsights';
 import { HabitCoach } from '@/components/advanced/HabitCoach';
 import { ConversationalChat } from '@/components/chat/ConversationalChat';
+import { ContentGenerator } from '@/components/content/ContentGenerator';
 import { TeamCollaboration } from '@/components/advanced/TeamCollaboration';
 import { PremiumFeatures } from '@/components/advanced/PremiumFeatures';
 import { AdvancedIntegrations } from '@/components/advanced/AdvancedIntegrations';
@@ -47,9 +48,12 @@ export default function Advanced() {
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="space-y-6">
               <HabitCoach />
+              <ContentGenerator />
+            </div>
+            <div className="space-y-6">
+              <ConversationalChat />
               <AIInsights userId={user?.id} />
             </div>
-            <ConversationalChat />
           </div>
         </TabsContent>
 

@@ -20,3 +20,15 @@ verify_jwt = true
 
 [functions.transcribe-audio]
 verify_jwt = true
+
+[functions.generate-ai-workout-plan]
+verify_jwt = true
+
+[functions.generate-personalized-meal-plan]
+verify_jwt = true
+
+[functions.generate-spiritual-content]
+verify_jwt = true
+
+[functions.smart-recommendations]
+verify_jwt = true
