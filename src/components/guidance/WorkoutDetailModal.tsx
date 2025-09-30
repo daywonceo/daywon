@@ -18,6 +18,13 @@ interface WorkoutDetailModalProps {
 const WorkoutDetailModal = ({ open, onOpenChange, session }: WorkoutDetailModalProps) => {
   if (!session) return null;
 
+  const formatWorkoutName = (workoutType: string) => {
+    return workoutType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' & ');
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
@@ -44,7 +51,7 @@ const WorkoutDetailModal = ({ open, onOpenChange, session }: WorkoutDetailModalP
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-2xl">
             <Dumbbell className="w-6 h-6 text-primary" />
-            <span className="capitalize">{session.workout_type.replace(/_/g, ' ')}</span>
+            <span>{formatWorkoutName(session.workout_type)}</span>
           </DialogTitle>
         </DialogHeader>
 

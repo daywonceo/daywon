@@ -47,6 +47,13 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  const formatWorkoutName = (workoutType: string) => {
+    return workoutType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' & ');
+  };
+
   return (
     <Card className="glass-card group relative overflow-hidden">
       {/* Animated background gradient */}
@@ -87,8 +94,8 @@ const RecentWorkoutsCard = ({ recentSessions, onWorkoutClick }: RecentWorkoutsCa
                   {/* Header Row */}
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 overflow-hidden">
-                      <h4 className="font-semibold text-foreground group-hover/item:text-primary transition-colors leading-snug break-words capitalize">
-                        {session.workout_type.replace(/_/g, ' ')}
+                      <h4 className="font-semibold text-foreground group-hover/item:text-primary transition-colors leading-snug break-words">
+                        {formatWorkoutName(session.workout_type)}
                       </h4>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                         <Calendar className="w-3 h-3 flex-shrink-0" />
