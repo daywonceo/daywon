@@ -239,42 +239,43 @@ export const HelpCenter: React.FC = () => {
 
   if (selectedTopic) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto p-3 sm:p-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="px-4 sm:px-6">
             <div className="flex items-center gap-2 mb-2">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setSelectedTopic(null)}
+                className="text-xs sm:text-sm -ml-2"
               >
                 ← Back to Help Center
               </Button>
             </div>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-2xl">
               {getCategoryIcon(selectedTopic.category)}
               {selectedTopic.title}
             </CardTitle>
-            <CardDescription>{selectedTopic.description}</CardDescription>
-            <div className="flex gap-2 mt-3">
-              <Badge className={getDifficultyColor(selectedTopic.difficulty)}>
+            <CardDescription className="text-sm">{selectedTopic.description}</CardDescription>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
+              <Badge className={`${getDifficultyColor(selectedTopic.difficulty)} text-xs`}>
                 {selectedTopic.difficulty}
               </Badge>
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-xs">
                 {selectedTopic.estimatedTime}
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 px-4 sm:px-6">
             <div>
-              <h3 className="font-semibold mb-3">Steps to Complete</h3>
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">Steps to Complete</h3>
               <div className="space-y-3">
                 {selectedTopic.steps.map((step, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div key={index} className="flex items-start gap-2 sm:gap-3">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary text-primary-foreground text-xs sm:text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
                       {index + 1}
                     </div>
-                    <p className="text-sm">{step}</p>
+                    <p className="text-xs sm:text-sm">{step}</p>
                   </div>
                 ))}
               </div>
@@ -282,11 +283,11 @@ export const HelpCenter: React.FC = () => {
 
             {selectedTopic.tips && (
               <div>
-                <h3 className="font-semibold mb-3">Pro Tips</h3>
+                <h3 className="font-semibold mb-3 text-sm sm:text-base">Pro Tips</h3>
                 <div className="space-y-2">
                   {selectedTopic.tips.map((tip, index) => (
-                    <div key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <Star className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+                    <div key={index} className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                      <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
                       <p>{tip}</p>
                     </div>
                   ))}
@@ -294,22 +295,23 @@ export const HelpCenter: React.FC = () => {
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button 
                 onClick={() => markTopicComplete(selectedTopic.id)}
                 disabled={userProgress.completedTopics.includes(selectedTopic.id)}
+                className="w-full sm:w-auto text-sm"
               >
                 {userProgress.completedTopics.includes(selectedTopic.id) ? (
                   <>
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     Completed
                   </>
                 ) : (
                   'Mark as Complete'
                 )}
               </Button>
-              <Button variant="outline">
-                <MessageCircle className="w-4 h-4 mr-2" />
+              <Button variant="outline" className="w-full sm:w-auto text-sm">
+                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Need Help?
               </Button>
             </div>
@@ -320,25 +322,25 @@ export const HelpCenter: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Help Center</h1>
-        <p className="text-muted-foreground">
+    <div className="max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="text-center space-y-1 sm:space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Help Center</h1>
+        <p className="text-sm sm:text-base text-muted-foreground px-4">
           Learn how to make the most of DayWon with step-by-step guides
         </p>
       </div>
 
       {/* Progress Overview */}
       <Card>
-        <CardHeader>
-          <CardTitle>Your Learning Progress</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+          <CardTitle className="text-lg sm:text-xl">Your Learning Progress</CardTitle>
+          <CardDescription className="text-sm">
             Track your progress through DayWon tutorials and guides
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <div className="space-y-3">
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span>Completed Topics</span>
               <span>{userProgress.completedTopics.length}/{helpTopics.length}</span>
             </div>
@@ -351,25 +353,25 @@ export const HelpCenter: React.FC = () => {
       </Card>
 
       {/* Search and Filters */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
           <Input
             placeholder="Search help topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-9 sm:pl-10 text-sm"
           />
         </div>
         
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {categories.map((category) => (
             <Button
               key={category.id}
               variant={selectedCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category.id)}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap text-xs sm:text-sm px-2.5 sm:px-3 shrink-0"
             >
               {category.name}
             </Button>
@@ -378,7 +380,7 @@ export const HelpCenter: React.FC = () => {
       </div>
 
       {/* Help Topics Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {filteredTopics.map((topic) => {
           const isCompleted = userProgress.completedTopics.includes(topic.id);
           const isCurrent = userProgress.currentTopic === topic.id;
@@ -391,34 +393,36 @@ export const HelpCenter: React.FC = () => {
               }`}
               onClick={() => startTopic(topic)}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    {getCategoryIcon(topic.category)}
-                    <CardTitle className="text-lg">{topic.title}</CardTitle>
+              <CardHeader className="pb-3 px-4 sm:px-6 py-4 sm:py-6">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <div className="shrink-0">
+                      {getCategoryIcon(topic.category)}
+                    </div>
+                    <CardTitle className="text-base sm:text-lg truncate">{topic.title}</CardTitle>
                   </div>
                   {isCompleted && (
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 shrink-0" />
                   )}
                 </div>
-                <CardDescription className="text-sm">
+                <CardDescription className="text-xs sm:text-sm line-clamp-2">
                   {topic.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
+              <CardContent className="pt-0 px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                     <Badge 
                       variant="secondary" 
-                      className={getDifficultyColor(topic.difficulty)}
+                      className={`${getDifficultyColor(topic.difficulty)} text-[10px] sm:text-xs`}
                     >
                       {topic.difficulty}
                     </Badge>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-[10px] sm:text-xs">
                       {topic.estimatedTime}
                     </Badge>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground shrink-0" />
                 </div>
               </CardContent>
             </Card>
@@ -428,17 +432,17 @@ export const HelpCenter: React.FC = () => {
 
       {/* FAQ Section */}
       <Card>
-        <CardHeader>
-          <CardTitle>Frequently Asked Questions</CardTitle>
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+          <CardTitle className="text-lg sm:text-xl">Frequently Asked Questions</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6">
           {faqs.map((faq, index) => (
             <details key={index} className="group">
-              <summary className="flex items-center justify-between cursor-pointer p-3 border rounded-lg hover:bg-muted/50">
-                <span className="font-medium">{faq.question}</span>
-                <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90" />
+              <summary className="flex items-center justify-between cursor-pointer p-2.5 sm:p-3 border rounded-lg hover:bg-muted/50">
+                <span className="font-medium text-sm sm:text-base pr-2">{faq.question}</span>
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-open:rotate-90 shrink-0" />
               </summary>
-              <div className="mt-2 p-3 text-sm text-muted-foreground border-l-2 border-muted ml-3">
+              <div className="mt-2 p-2.5 sm:p-3 text-xs sm:text-sm text-muted-foreground border-l-2 border-muted ml-2 sm:ml-3">
                 {faq.answer}
               </div>
             </details>
@@ -448,20 +452,20 @@ export const HelpCenter: React.FC = () => {
 
       {/* Contact Support */}
       <Card>
-        <CardHeader>
-          <CardTitle>Still Need Help?</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+          <CardTitle className="text-lg sm:text-xl">Still Need Help?</CardTitle>
+          <CardDescription className="text-sm">
             Can't find what you're looking for? Our support team is here to help.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            <Button>
-              <MessageCircle className="w-4 h-4 mr-2" />
+        <CardContent className="px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button className="w-full sm:w-auto text-sm">
+              <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Contact Support
             </Button>
-            <Button variant="outline">
-              <Book className="w-4 h-4 mr-2" />
+            <Button variant="outline" className="w-full sm:w-auto text-sm">
+              <Book className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Community Forum
             </Button>
           </div>
