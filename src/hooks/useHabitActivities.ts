@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { recordHabitActivity, getHabitActivities, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
 import { toast } from "@/hooks/use-toast";
 import { hapticSuccess } from "@/utils/haptics";
+import { supabase } from "@/integrations/supabase/client";
 
 export type ActivityStatus = "completed" | "failed" | "empty";
 
@@ -61,10 +62,28 @@ export const useHabitActivities = (habitList?: string[]) => {
       // Get all habit activities from V2 system (uses habit_id)
       const storedActivities = getHabitActivities();
       
-      // Create activities for the past 3 days
+      // Fetch the habits for each specific date's month
+      const { data: { user } } = await supabase.auth.getUser();
+      const habitsForDates = await Promise.all(dates.map(async (date) => {
+        const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (!user?.id) return userHabits;
+        
+        const { data } = await supabase
+          .from('user_top_habits')
+          .select('habits')
+          .eq('user_id', user.id)
+          .eq('month', monthStr)
+          .maybeSingle();
+        
+        return data?.habits || userHabits;
+      }));
+      
+      // Create activities for the past 3 days with date-specific habits
       const newActivities = dates.map((date, index) => {
         const day = date.getDate();
         const dateStr = dateStrings[index];
+        const dateHabits = habitsForDates[index];
         
         let text = "";
         if (index === 0) {
@@ -79,7 +98,7 @@ export const useHabitActivities = (habitList?: string[]) => {
         const statuses: Record<string, ActivityStatus> = {};
         
         // Populate statuses from stored activities using habit_id when available
-        userHabits.forEach(category => {
+        dateHabits.forEach(category => {
           // Find by habit_id if available, otherwise fallback to name
           const activity = storedActivities.find(a => {
             if (a.habitId) {
@@ -97,7 +116,7 @@ export const useHabitActivities = (habitList?: string[]) => {
         return {
           day,
           text,
-          categories: userHabits,
+          categories: dateHabits,
           statuses,
           isEditing: false
         };
