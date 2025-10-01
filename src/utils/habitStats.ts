@@ -1,6 +1,7 @@
 
 import { getHabitActivities, HabitActivity } from "./habitActivity";
 import { getUserTimeWindowSync } from "./userTimeWindow";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface HabitStats {
   habitName: string;
@@ -13,7 +14,7 @@ export interface HabitStats {
 }
 
 // Calculate habit statistics for the specified timeframe with automatic categorization using habit_id
-export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] } => {
+export const calculateHabitStats = async (timeframe: "week" | "month" | "year"): Promise<{ goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] }> => {
   try {
     const activities = getHabitActivities();
     
@@ -22,6 +23,27 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
     
     console.log(`Calculating habit stats for ${timeframe} - Start date: ${startDate.toISOString()}, Total days: ${totalDaysAvailable}`);
     
+    // Fetch habits from database to get created_at dates
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { goodHabits: [], badHabits: [], inProgressHabits: [] };
+    }
+
+    const { data: habits, error } = await supabase
+      .from('habits')
+      .select('id, name, created_at')
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error fetching habits:', error);
+      return { goodHabits: [], badHabits: [], inProgressHabits: [] };
+    }
+
+    const habitCreationDates = new Map<string, Date>();
+    habits?.forEach(habit => {
+      habitCreationDates.set(habit.id, new Date(habit.created_at));
+    });
+    
     // Filter activities by date
     const startDateStr = startDate.toISOString().split('T')[0];
     const filteredActivities = activities.filter(
@@ -29,16 +51,17 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
     );
     
     // Get all unique habits (using habit_id as primary key, habitName as fallback)
-    const habitMap = new Map<string, string>(); // habitId -> habitName mapping
+    const habitMap = new Map<string, { habitName: string; createdAt: Date | null }>();
     filteredActivities.forEach(activity => {
       const key = activity.habitId || activity.habitName;
       if (!habitMap.has(key)) {
-        habitMap.set(key, activity.habitName);
+        const createdAt = activity.habitId ? habitCreationDates.get(activity.habitId) || null : null;
+        habitMap.set(key, { habitName: activity.habitName, createdAt });
       }
     });
     
     // Calculate statistics for each habit
-    const allHabitStats: HabitStats[] = Array.from(habitMap.entries()).map(([habitKey, habitName]) => {
+    const allHabitStats: HabitStats[] = Array.from(habitMap.entries()).map(([habitKey, { habitName, createdAt }]) => {
       // Get all activities for this habit
       const habitActivities = filteredActivities.filter(activity => {
         const activityKey = activity.habitId || activity.habitName;
@@ -62,11 +85,18 @@ export const calculateHabitStats = (timeframe: "week" | "month" | "year"): { goo
       const failed = uniqueActivities.filter(a => a.status === "failed").length;
       const empty = uniqueActivities.filter(a => a.status === "empty").length;
       
-      // CRITICAL FIX: Total should be ALL days in the user's available period
-      // Days without any record are considered "missed" (empty/incomplete)
+      // CRITICAL: Calculate total days only from habit creation date
+      let habitSpecificTotalDays = totalDaysAvailable;
+      if (createdAt) {
+        const habitStartDate = createdAt > startDate ? createdAt : startDate;
+        const now = new Date();
+        const daysSinceCreation = Math.floor((now.getTime() - habitStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        habitSpecificTotalDays = Math.min(daysSinceCreation, totalDaysAvailable);
+      }
+      
       const recordedDays = uniqueActivities.length;
-      const missedDays = Math.max(0, totalDaysAvailable - recordedDays);
-      const total = totalDaysAvailable;
+      const missedDays = Math.max(0, habitSpecificTotalDays - recordedDays);
+      const total = habitSpecificTotalDays;
       
       // Ensure completed count never exceeds total
       const safeCompleted = Math.min(completed, total);

@@ -56,7 +56,7 @@ export const useHabitScoring = () => {
     return difficulty?.multiplier || 1.0;
   };
 
-  const calculateConsistencyRate = (period: 'weekly' | 'monthly' | 'yearly'): number => {
+  const calculateConsistencyRate = async (period: 'weekly' | 'monthly' | 'yearly'): Promise<number> => {
     const activities = getHabitActivities();
     const now = new Date();
     
@@ -84,6 +84,17 @@ export const useHabitScoring = () => {
     const startDateStr = startDate.toISOString().split('T')[0];
     const endDateStr = now.toISOString().split('T')[0];
 
+    // Fetch habit creation dates
+    const { data: habits } = await supabase
+      .from('habits')
+      .select('id, name, created_at')
+      .eq('user_id', user?.id);
+
+    const habitCreationDates = new Map<string, Date>();
+    habits?.forEach(habit => {
+      habitCreationDates.set(habit.id, new Date(habit.created_at));
+    });
+
     // Get all completed activities in the period
     const completedActivities = activities.filter(
       activity => activity.status === 'completed' && 
@@ -96,19 +107,30 @@ export const useHabitScoring = () => {
     let totalPossibleWeighted = 0;
 
     // Group by habit_id when available, fallback to habit_name (same pattern as streak calculation)
-    const habitGroups = new Map<string, { habitName: string; habitId?: string }>();
+    const habitGroups = new Map<string, { habitName: string; habitId?: string; createdAt: Date | null }>();
     activities.forEach(activity => {
       const key = activity.habitId || activity.habitName;
       if (!habitGroups.has(key)) {
+        const createdAt = activity.habitId ? habitCreationDates.get(activity.habitId) || null : null;
         habitGroups.set(key, { 
           habitName: activity.habitName, 
-          habitId: activity.habitId 
+          habitId: activity.habitId,
+          createdAt
         });
       }
     });
 
-    habitGroups.forEach(({ habitName, habitId }) => {
+    habitGroups.forEach(({ habitName, habitId, createdAt }) => {
       const multiplier = getHabitMultiplier(habitName);
+      
+      // Calculate actual days this habit existed in the period
+      let habitDaysInPeriod = daysInPeriod;
+      if (createdAt) {
+        const habitStart = createdAt > startDate ? createdAt : startDate;
+        habitDaysInPeriod = Math.floor((now.getTime() - habitStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        habitDaysInPeriod = Math.min(habitDaysInPeriod, daysInPeriod);
+      }
+      
       // Count completions for this habit group
       const habitCompletions = completedActivities.filter(a => {
         const activityKey = a.habitId || a.habitName;
@@ -117,7 +139,7 @@ export const useHabitScoring = () => {
       }).length;
       
       totalWeightedCompletions += habitCompletions * multiplier;
-      totalPossibleWeighted += daysInPeriod * multiplier;
+      totalPossibleWeighted += habitDaysInPeriod * multiplier;
     });
 
     return totalPossibleWeighted > 0 ? (totalWeightedCompletions / totalPossibleWeighted) * 100 : 0;
@@ -206,8 +228,8 @@ export const useHabitScoring = () => {
     return hasRecentActivity ? 100 : 0;
   };
 
-  const calculateHabitScore = (period: 'weekly' | 'monthly' | 'yearly'): HabitScore => {
-    const consistencyRate = calculateConsistencyRate(period);
+  const calculateHabitScore = async (period: 'weekly' | 'monthly' | 'yearly'): Promise<HabitScore> => {
+    const consistencyRate = await calculateConsistencyRate(period);
     const streakScore = calculateStreakScore();
     const varietyScore = calculateVarietyScore();
     const recencyScore = calculateRecencyScore();
@@ -283,9 +305,9 @@ export const useHabitScoring = () => {
   const calculateAndSaveAllScores = async () => {
     if (!user) return;
 
-    const weeklyScore = calculateHabitScore('weekly');
-    const monthlyScore = calculateHabitScore('monthly');
-    const yearlyScore = calculateHabitScore('yearly');
+    const weeklyScore = await calculateHabitScore('weekly');
+    const monthlyScore = await calculateHabitScore('monthly');
+    const yearlyScore = await calculateHabitScore('yearly');
 
     await Promise.all([
       saveHabitScore(weeklyScore),

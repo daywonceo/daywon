@@ -80,7 +80,7 @@ export const AnalyticsDashboard: React.FC = () => {
         postsResponse,
         sessionsResponse
       ] = await Promise.all([
-        supabase.from('habits').select('*').eq('user_id', user.id),
+        supabase.from('habits').select('id, name, created_at, status, user_id').eq('user_id', user.id),
         supabase.from('habit_activities').select('*')
           .eq('user_id', user.id)
           .gte('activity_date', format(periodStart, 'yyyy-MM-dd'))
@@ -103,7 +103,7 @@ export const AnalyticsDashboard: React.FC = () => {
       const sessions = sessionsResponse.data || [];
 
       // Process data for analytics
-      const analytics = processAnalyticsData(habits, activities, workouts, posts, sessions);
+      const analytics = processAnalyticsData(habits, activities, workouts, posts, sessions, periodStart, periodEnd);
       setAnalyticsData(analytics);
       
     } catch (error) {
@@ -113,11 +113,26 @@ export const AnalyticsDashboard: React.FC = () => {
     }
   };
 
-  const processAnalyticsData = (habits: any[], activities: any[], workouts: any[], posts: any[], sessions: any[]): AnalyticsData => {
-    // Calculate overview metrics
+  const processAnalyticsData = (habits: any[], activities: any[], workouts: any[], posts: any[], sessions: any[], periodStart: Date, periodEnd: Date): AnalyticsData => {
+    // Create a map of habit creation dates
+    const habitCreationDates = new Map<string, Date>();
+    habits.forEach(habit => {
+      habitCreationDates.set(habit.id, new Date(habit.created_at));
+    });
+    
+    // Calculate overview metrics - only include habits from their creation date
     const totalHabits = habits.filter(h => h.status === 'active').length;
-    const completedActivities = activities.filter(a => a.status === 'completed').length;
-    const totalActivities = activities.length;
+    
+    // Filter activities to only include those after habit creation
+    const validActivities = activities.filter(activity => {
+      const habitCreated = habitCreationDates.get(activity.habit_id);
+      if (!habitCreated) return true; // Include if we can't find creation date
+      const activityDate = new Date(activity.activity_date);
+      return activityDate >= habitCreated;
+    });
+    
+    const completedActivities = validActivities.filter(a => a.status === 'completed').length;
+    const totalActivities = validActivities.length;
     const completionRate = totalActivities > 0 ? (completedActivities / totalActivities) * 100 : 0;
     
     // Calculate streaks (simplified)
@@ -126,11 +141,11 @@ export const AnalyticsDashboard: React.FC = () => {
     const totalAppUsage = sessions.reduce((sum, session) => sum + (session.total_time_minutes || 0), 0);
     const appUsageHours = Math.round(totalAppUsage / 60 * 10) / 10;
 
-    // Weekly completion trends
+    // Weekly completion trends - respect habit creation dates
     const weeklyData = [];
     for (let i = 6; i >= 0; i--) {
       const date = subDays(new Date(), i);
-      const dayActivities = activities.filter(a => 
+      const dayActivities = validActivities.filter(a => 
         format(new Date(a.activity_date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
       );
       const completed = dayActivities.filter(a => a.status === 'completed').length;
@@ -144,9 +159,9 @@ export const AnalyticsDashboard: React.FC = () => {
       });
     }
 
-    // Habit category performance
+    // Habit category performance - use validActivities
     const categoryStats: { [key: string]: { completed: number; total: number } } = {};
-    activities.forEach(activity => {
+    validActivities.forEach(activity => {
       const category = activity.habit_name || 'Other';
       if (!categoryStats[category]) {
         categoryStats[category] = { completed: 0, total: 0 };
@@ -167,9 +182,9 @@ export const AnalyticsDashboard: React.FC = () => {
       .sort((a, b) => b.completion - a.completion)
       .slice(0, 5);
 
-    // Find insights
+    // Find insights - use validActivities
     const dayOfWeekStats: { [key: string]: number } = {};
-    activities.forEach(activity => {
+    validActivities.forEach(activity => {
       if (activity.status === 'completed') {
         const dayOfWeek = format(new Date(activity.activity_date), 'EEEE');
         dayOfWeekStats[dayOfWeek] = (dayOfWeekStats[dayOfWeek] || 0) + 1;

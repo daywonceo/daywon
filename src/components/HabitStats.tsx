@@ -26,9 +26,9 @@ const HabitStats = ({ refreshTrigger }: HabitStatsProps) => {
     loadHabitStats();
   }, [timeframe, refreshTrigger]);
   
-  const loadHabitStats = () => {
+  const loadHabitStats = async () => {
     try {
-      const stats = calculateHabitStats(timeframe);
+      const stats = await calculateHabitStats(timeframe);
       setGoodHabits(stats.goodHabits.slice(0, 3)); // Top 3
       setBadHabits(stats.badHabits.slice(0, 3)); // Bottom 3
       setInProgressHabits(stats.inProgressHabits.slice(0, 3)); // Top 3 in progress
