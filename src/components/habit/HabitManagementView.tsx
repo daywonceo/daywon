@@ -150,6 +150,14 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
           // Apply the same logic: archived_at IS NULL AND (ended_at IS NULL OR ended_at::date >= current_date)
           if (habit.archived_at) return false; // Skip archived habits
           
+          const habitCreatedDate = new Date(habit.created_at);
+          habitCreatedDate.setHours(0, 0, 0, 0);
+          const currentDate = new Date(date);
+          currentDate.setHours(0, 0, 0, 0);
+          
+          // Skip if habit was created after this date
+          if (habitCreatedDate > currentDate) return false;
+          
           const habitEndDate = habit.ended_at ? new Date(habit.ended_at) : null;
           
           // Include if not ended, or if ended on or after this date
