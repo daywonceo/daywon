@@ -77,46 +77,56 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
               </div>
             ))
           ) : (
-            activities.map((activity, activityIndex) => (
-              <div key={activityIndex} className="space-y-2">
-                {/* Habit labels for this row */}
-                <div 
-                  className="grid gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto"
-                  style={{ 
-                    gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
-                  }}
-                >
-                  <div />
-                  {activity.categories.map((habit) => (
-                    <div key={habit} className="flex items-center justify-center">
-                      <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground/70 text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
-                        {habit}
-                      </span>
+            activities.map((activity, activityIndex) => {
+              // Check if habits changed from previous row
+              const previousActivity = activityIndex > 0 ? activities[activityIndex - 1] : null;
+              const habitsChanged = !previousActivity || 
+                activity.categories.length !== previousActivity.categories.length ||
+                activity.categories.some((habit, idx) => habit !== previousActivity.categories[idx]);
+              
+              return (
+                <div key={activityIndex} className="space-y-2">
+                  {/* Only show habit labels when habits change or for first row */}
+                  {habitsChanged && (
+                    <div 
+                      className="grid gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto"
+                      style={{ 
+                        gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
+                      }}
+                    >
+                      <div />
+                      {activity.categories.map((habit) => (
+                        <div key={habit} className="flex items-center justify-center">
+                          <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground/70 text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                            {habit}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  
+                  {/* Activity row */}
+                  <div 
+                    className="grid gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto"
+                    style={{ 
+                      gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
+                    }}
+                  >
+                    <HabitActivityRow
+                      activity={activity}
+                      activityIndex={activityIndex}
+                      activities={activities}
+                      setActivities={setActivities}
+                      activeHabit={activeHabit}
+                      setActiveHabit={setActiveHabit}
+                      toggleStatus={toggleStatus}
+                      toggleEditMode={toggleEditMode}
+                      updateActivityText={updateActivityText}
+                    />
+                  </div>
                 </div>
-                
-                {/* Activity row */}
-                <div 
-                  className="grid gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto"
-                  style={{ 
-                    gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
-                  }}
-                >
-                  <HabitActivityRow
-                    activity={activity}
-                    activityIndex={activityIndex}
-                    activities={activities}
-                    setActivities={setActivities}
-                    activeHabit={activeHabit}
-                    setActiveHabit={setActiveHabit}
-                    toggleStatus={toggleStatus}
-                    toggleEditMode={toggleEditMode}
-                    updateActivityText={updateActivityText}
-                  />
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </CardContent>
