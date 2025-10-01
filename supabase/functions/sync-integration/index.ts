@@ -41,10 +41,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { integration_type, sync_type }: SyncRequest = await req.json();
 
-    // Get the integration settings
+    // Get the integration settings (tokens are encrypted in access_token_encrypted and refresh_token_encrypted)
     const { data: integration, error: integrationError } = await supabaseClient
       .from('user_integrations')
-      .select('*')
+      .select('integration_type, is_connected, integration_settings, access_token_encrypted, refresh_token_encrypted, token_expires_at, last_sync_at')
       .eq('user_id', user.id)
       .eq('integration_type', integration_type)
       .eq('is_connected', true)
@@ -190,16 +190,21 @@ async function syncSpotify(integration: any, syncType: string, userId: string, s
   let recordsProcessed = 0;
   const syncDetails: any = {};
 
+  // NOTE: Tokens are now encrypted for security
+  // To use OAuth tokens: integration.access_token_encrypted and integration.refresh_token_encrypted
+  // Implement OAuth token refresh flow with encrypted storage when ready
+
   if (settings.trackListeningHabits && (syncType === 'import' || syncType === 'bidirectional')) {
     // In a real implementation, you would:
-    // 1. Use the access_token to call Spotify API
-    // 2. Get recently played tracks
-    // 3. Create habit events for "Listen to Music" habit
+    // 1. Decrypt access_token_encrypted using service role client
+    // 2. Call Spotify API with decrypted token
+    // 3. Get recently played tracks
+    // 4. Create habit events for "Listen to Music" habit
     
     // For demo purposes, simulate processing
     recordsProcessed = Math.floor(Math.random() * 10) + 1;
     syncDetails.listening_sessions = recordsProcessed;
-    syncDetails.demo_note = "Spotify sync simulated - requires real OAuth integration";
+    syncDetails.demo_note = "Spotify sync simulated - tokens now encrypted for security";
   }
 
   return { records_processed: recordsProcessed, error_message: null, sync_details: syncDetails };

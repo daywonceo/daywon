@@ -1142,6 +1142,7 @@ export type Database = {
       user_integrations: {
         Row: {
           access_token: string | null
+          access_token_encrypted: string | null
           created_at: string
           id: string
           integration_settings: Json | null
@@ -1149,12 +1150,14 @@ export type Database = {
           is_connected: boolean
           last_sync_at: string | null
           refresh_token: string | null
+          refresh_token_encrypted: string | null
           token_expires_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           access_token?: string | null
+          access_token_encrypted?: string | null
           created_at?: string
           id?: string
           integration_settings?: Json | null
@@ -1162,12 +1165,14 @@ export type Database = {
           is_connected?: boolean
           last_sync_at?: string | null
           refresh_token?: string | null
+          refresh_token_encrypted?: string | null
           token_expires_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           access_token?: string | null
+          access_token_encrypted?: string | null
           created_at?: string
           id?: string
           integration_settings?: Json | null
@@ -1175,6 +1180,7 @@ export type Database = {
           is_connected?: boolean
           last_sync_at?: string | null
           refresh_token?: string | null
+          refresh_token_encrypted?: string | null
           token_expires_at?: string | null
           updated_at?: string
           user_id?: string

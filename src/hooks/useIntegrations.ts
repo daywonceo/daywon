@@ -92,14 +92,16 @@ export const useIntegrations = () => {
     if (!user) return false;
 
     try {
+      // Note: Tokens are automatically encrypted by database trigger before storage
+      // access_token and refresh_token are stored as encrypted values for security
       const { error } = await supabase
         .from('user_integrations')
         .upsert({
           user_id: user.id,
           integration_type: integrationType,
           is_connected: true,
-          access_token: accessToken,
-          refresh_token: refreshToken,
+          access_token: accessToken, // Auto-encrypted by trigger
+          refresh_token: refreshToken, // Auto-encrypted by trigger
           token_expires_at: expiresAt,
           integration_settings: settings || {},
         });
