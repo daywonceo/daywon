@@ -9,6 +9,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    // Reduce token refresh frequency
+    storageKey: 'daywon-auth-token'
+  },
+  global: {
+    headers: {
+      'x-client-info': 'daywon-web'
+    }
   }
 })

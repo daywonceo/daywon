@@ -24,22 +24,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
+    let initializing = true;
     
     // Set up auth state listener FIRST with performance optimization
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state changed:', event, session);
-        
-        // Batch state updates to prevent multiple re-renders
-        const newUser = session?.user ?? null;
-        const hasUserChanged = user?.id !== newUser?.id;
-        const hasSessionChanged = session?.access_token !== session?.access_token;
-        
-        if (hasUserChanged || hasSessionChanged) {
-          setSession(session);
-          setUser(newUser);
+        // Only update state if session actually changed
+        if (!initializing) {
+          const newUser = session?.user ?? null;
+          const currentUserId = user?.id;
+          const currentAccessToken = session?.access_token;
+          
+          // Only update if there's a real change
+          if (currentUserId !== newUser?.id || currentAccessToken !== session?.access_token) {
+            setSession(session);
+            setUser(newUser);
+          }
         }
         
         setLoading(false);
@@ -53,7 +55,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.provider_token && session?.provider_refresh_token) {
           localStorage.setItem('spotify_access_token', session.provider_token);
           localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
-          console.log('Spotify tokens stored from OAuth');
         }
       }
     );
@@ -63,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const lastFetch = sessionStorage.getItem(sessionKey);
     const now = Date.now();
     
-    if (!lastFetch || now - parseInt(lastFetch) > 60000) { // 1 minute
+    if (!lastFetch || now - parseInt(lastFetch) > 300000) { // 5 minutes
       sessionStorage.setItem(sessionKey, now.toString());
       
       supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        initializing = false;
         
         // Cache user creation date for habit calculations
         if (session?.user?.created_at) {
@@ -87,17 +89,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error fetching session:', error);
         if (mounted) {
           setLoading(false);
+          initializing = false;
         }
       });
     } else {
+      // Use cached session without API call
       setLoading(false);
+      initializing = false;
     }
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []); // Remove user dependency to prevent infinite loops
+  }, [])
 
   const signUp = async (email: string, password: string, displayName?: string, username?: string) => {
     const redirectUrl = `${window.location.origin}/`;
