@@ -80,7 +80,7 @@ const CalendarPage = () => {
         </div>
       </div>
       
-      <main className="flex-grow px-responsive pb-20 pt-6 max-w-4xl mx-auto w-full">
+      <main className="flex-grow px-responsive pb-safe-mobile pt-6 max-w-4xl mx-auto w-full">
         {/* Calendar Header Card */}
         <div className="glass rounded-lg shadow-sm border p-responsive mb-6 animate-fade-in">
           <CalendarHeader

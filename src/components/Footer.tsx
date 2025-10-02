@@ -40,13 +40,13 @@ const Footer = () => {
   };
   
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-10 glass-card border-t">
-      <nav className="max-w-4xl mx-auto flex items-center justify-between px-2 sm:px-8 py-2" aria-label="Main navigation">
+    <footer className="fixed bottom-0 left-0 right-0 z-10 glass-card border-t safe-area-bottom">
+      <nav className="max-w-4xl mx-auto flex items-center justify-between px-2 sm:px-4 py-2 gap-1" aria-label="Main navigation">
         {tabs.map((tab) => (
           <button 
             key={tab.id}
             className={cn(
-              "flex flex-col items-center py-2 px-3 rounded-md interactive-subtle focus-ring-enhanced",
+              "flex flex-col items-center py-2 px-2 sm:px-3 rounded-md interactive-subtle focus-ring-enhanced touch-target-sm flex-1 min-w-0",
               activeTab === tab.id 
                 ? "text-primary bg-primary/10 shadow-sm" 
                 : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
@@ -55,8 +55,8 @@ const Footer = () => {
             aria-current={activeTab === tab.id ? "page" : undefined}
             onClick={() => handleTabChange(tab.id, tab.path)}
           >
-            <tab.icon size={isMobile ? 20 : 24} />
-            <span className="text-[10px] sm:text-xs mt-0.5 sm:mt-1">{tab.label}</span>
+            <tab.icon size={isMobile ? 22 : 24} className="flex-shrink-0" />
+            <span className="text-[10px] sm:text-xs mt-0.5 sm:mt-1 truncate w-full">{tab.label}</span>
           </button>
         ))}
       </nav>

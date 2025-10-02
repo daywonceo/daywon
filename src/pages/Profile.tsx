@@ -89,7 +89,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-6 sm:px-8 md:px-responsive pb-24 pt-6 max-w-4xl mx-auto w-full">
+      <main className="flex-grow px-responsive pb-safe-mobile pt-6 max-w-4xl mx-auto w-full">
         <div className="text-center mb-8 px-2">
           <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
             Your Profile

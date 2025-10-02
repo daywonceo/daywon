@@ -287,6 +287,34 @@
     max-width: min(100% - 2rem, 1200px);
   }
   
+  /* Responsive spacing utilities */
+  .px-responsive {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .p-responsive {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  /* Mobile-safe spacing for pages with fixed footer (footer height ~65px) */
+  .pb-safe-mobile {
+    @apply pb-20 sm:pb-24;
+  }
+  
+  /* Touch-friendly minimum sizes for interactive elements (WCAG 2.5.5) */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .touch-target-sm {
+    @apply min-h-[36px] min-w-[36px];
+  }
+  
+  /* Safe area for devices with notches */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
   /* Scroll utilities */
   .scroll-smooth {
     scroll-behavior: smooth;

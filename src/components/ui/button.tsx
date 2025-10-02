@@ -23,12 +23,12 @@ const buttonVariants = cva(
         neutral: "bg-neutral text-neutral-foreground hover:bg-neutral/90 shadow-md hover:shadow-lg",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 px-3 text-xs",
-        lg: "h-12 px-6 text-base font-semibold",
-        icon: "h-10 w-10",
-        "icon-sm": "h-8 w-8",
-        "icon-lg": "h-12 w-12",
+        default: "h-10 min-h-[44px] px-4 py-2",
+        sm: "h-9 min-h-[36px] px-3 text-xs",
+        lg: "h-12 min-h-[48px] px-6 text-base font-semibold",
+        icon: "h-10 w-10 min-h-[44px] min-w-[44px]",
+        "icon-sm": "h-9 w-9 min-h-[36px] min-w-[36px]",
+        "icon-lg": "h-12 w-12 min-h-[48px] min-w-[48px]",
       },
       glow: {
         true: "interactive-glow",

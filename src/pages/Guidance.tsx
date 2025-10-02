@@ -41,7 +41,7 @@ const Guidance = () => {
         </div>
       </div>
       
-      <main className="container-responsive py-8 pb-32">
+      <main className="px-responsive py-8 pb-safe-mobile max-w-4xl mx-auto w-full">
 
         {showSearchBar && (
           <div className="mb-8">

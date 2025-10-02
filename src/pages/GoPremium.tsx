@@ -86,7 +86,7 @@ const GoPremium = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
       
-      <main className="max-w-6xl mx-auto px-4 py-8 pb-24">
+      <main className="max-w-6xl mx-auto px-responsive py-8 pb-safe-mobile">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Go Premium

@@ -37,7 +37,7 @@ const Header = () => {
               <input 
                 type="text" 
                 placeholder="Search..." 
-                className="pl-8 py-1 pr-2 bg-muted/50 dark:bg-muted rounded-full text-sm w-full focus-ring-enhanced transition-all duration-200 hover:bg-muted/70"
+                className="pl-8 py-2 pr-2 min-h-[36px] bg-muted/50 dark:bg-muted rounded-full text-sm w-full focus-ring-enhanced transition-all duration-200 hover:bg-muted/70"
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
                 aria-label="Search habits and activities"

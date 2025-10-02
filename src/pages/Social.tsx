@@ -19,7 +19,7 @@ const Social = () => {
     <div className="min-h-screen bg-subtle/30 flex flex-col">
       <Header />
       
-      <main className="flex-grow px-responsive pb-20 pt-4 max-w-4xl mx-auto w-full">
+      <main className="flex-grow px-responsive pb-safe-mobile pt-4 max-w-4xl mx-auto w-full">
         {/* Header with Notifications */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 text-center">
