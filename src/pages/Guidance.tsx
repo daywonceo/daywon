@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/guidance/SearchBar";
 import GuidanceTabs from "@/components/guidance/GuidanceTabs";
+import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 
 const Guidance = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,18 +52,20 @@ const Guidance = () => {
           </div>
         )}
 
-        <GuidanceTabs
-          searchQuery={searchQuery}
-          selectedDifficulty={selectedDifficulty}
-          selectedTranslation={selectedTranslation}
-          selectedCategory={selectedCategory}
-          translationDialogOpen={translationDialogOpen}
-          onDifficultyChange={setSelectedDifficulty}
-          onTranslationChange={setSelectedTranslation}
-          onCategoryChange={setSelectedCategory}
-          onTranslationClick={() => setTranslationDialogOpen(true)}
-          onTranslationDialogOpenChange={setTranslationDialogOpen}
-        />
+        <FeatureErrorBoundary featureName="Guidance">
+          <GuidanceTabs
+            searchQuery={searchQuery}
+            selectedDifficulty={selectedDifficulty}
+            selectedTranslation={selectedTranslation}
+            selectedCategory={selectedCategory}
+            translationDialogOpen={translationDialogOpen}
+            onDifficultyChange={setSelectedDifficulty}
+            onTranslationChange={setSelectedTranslation}
+            onCategoryChange={setSelectedCategory}
+            onTranslationClick={() => setTranslationDialogOpen(true)}
+            onTranslationDialogOpenChange={setTranslationDialogOpen}
+          />
+        </FeatureErrorBoundary>
       </main>
       
       <Footer />

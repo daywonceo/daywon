@@ -6,6 +6,7 @@ import { ActivityStatus } from "@/hooks/useHabitActivities";
 import { calculateStreakForDate, formatStreakNumber } from "@/utils/habitStreaks";
 import { getHabitActivities } from "@/utils/habitActivity";
 import { hasRecentRecovery } from "@/utils/streakRecovery";
+import { toast } from "@/hooks/use-toast";
 
 interface HabitStatusBoxProps {
   category: string;
@@ -121,7 +122,19 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
           ? "ring-2 ring-blue-500 ring-offset-2"
           : ""
       )}
-      onClick={() => onStatusToggle(activityIndex, category)}
+      onClick={async () => {
+        try {
+          onStatusToggle(activityIndex, category);
+        } catch (error) {
+          console.error('Error toggling habit status:', error);
+          toast({
+            title: "Unable to update habit",
+            description: "Your progress is saved locally and will sync when connection is restored.",
+            variant: "destructive",
+            duration: 4000,
+          });
+        }
+      }}
       aria-label={`${category} habit ${status === "completed" ? "completed" : status === "failed" ? "failed" : "not completed"}`}
     >
       {status === "completed" && (

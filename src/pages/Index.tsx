@@ -4,6 +4,7 @@ import RecentActivities from "@/components/RecentActivities";
 import HabitStats from "@/components/HabitStats";
 import Progress from "@/components/Progress";
 import Footer from "@/components/Footer";
+import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "@/hooks/use-toast";
@@ -206,9 +207,11 @@ const Index = () => {
             </div>
           </div>
 
-          <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />
-          <HabitStats refreshTrigger={refreshTrigger} />
-          <Progress userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+          <FeatureErrorBoundary featureName="Habit Tracker">
+            <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />
+            <HabitStats refreshTrigger={refreshTrigger} />
+            <Progress userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+          </FeatureErrorBoundary>
         </main>
       </PullToRefresh>
       <AppEnhancements />

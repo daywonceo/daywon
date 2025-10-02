@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { getHabitActivities, isHabitRecentlyActiveSync, loadHabitActivitiesFromDatabase } from "@/utils/habitActivity";
+import { toast } from "@/hooks/use-toast";
+import { ERROR_MESSAGES, getUserFriendlyError } from "@/utils/errorMessages";
 // Removed deduplication functionality
 
 export type Habit = Tables<'habits'>;
@@ -228,6 +230,14 @@ export function useHabits() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },
+    onError: (error) => {
+      console.error('Error adding habit:', error);
+      toast({
+        title: "Unable to create habit",
+        description: getUserFriendlyError('create habit', error),
+        variant: "destructive",
+      });
+    },
   });
 
   const updateMutation = useMutation({
@@ -235,12 +245,28 @@ export function useHabits() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },
+    onError: (error) => {
+      console.error('Error updating habit:', error);
+      toast({
+        title: "Unable to update habit",
+        description: getUserFriendlyError('update habit', error),
+        variant: "destructive",
+      });
+    },
   });
   
   const deleteMutation = useMutation({
     mutationFn: (habitId: string) => deleteHabit(habitId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
+    },
+    onError: (error) => {
+      console.error('Error deleting habit:', error);
+      toast({
+        title: "Unable to delete habit",
+        description: getUserFriendlyError('delete habit', error),
+        variant: "destructive",
+      });
     },
   });
 
