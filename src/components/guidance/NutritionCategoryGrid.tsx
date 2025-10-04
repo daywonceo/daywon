@@ -28,8 +28,9 @@ const NutritionCategoryGrid = ({ categories, onCategorySelect }: NutritionCatego
             className="cursor-pointer hover:shadow-md transition-shadow border-green-200 dark:border-green-800"
             onClick={() => onCategorySelect(category)}
           >
-            <CardContent className="p-2 text-center">
-              <h4 className="font-medium text-xs mb-1">{category.name}</h4>
+            <CardContent className="p-4 text-center">
+              <div className="text-4xl mb-3">{category.emoji}</div>
+              <h4 className="font-medium text-sm mb-1">{category.name}</h4>
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
                 {category.description}
               </p>
