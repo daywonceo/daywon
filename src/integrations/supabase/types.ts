@@ -1594,6 +1594,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      normalize_habit_name: {
+        Args: { habit_name: string }
+        Returns: string
+      }
       resume_habit: {
         Args: { p_habit: string }
         Returns: undefined
