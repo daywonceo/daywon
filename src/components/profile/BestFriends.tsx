@@ -1,10 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { toast } from "sonner";
+import { FriendManagementDialog } from "@/components/social/FriendManagementDialog";
 
 interface Friend {
   name: string;
@@ -17,18 +19,32 @@ interface BestFriendsProps {
 }
 
 const BestFriends = ({ bestFriends }: BestFriendsProps) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   const handleFriendTap = (friendName: string) => {
     toast.info(`Opening ${friendName}'s profile`);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-primary/10">
-          <Users className="w-5 h-5 text-primary" />
+    <>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">Best Friends</h3>
+          </div>
+          {bestFriends.length > 0 && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setDialogOpen(true)}
+            >
+              View All
+            </Button>
+          )}
         </div>
-        <h3 className="text-lg font-semibold text-foreground">Best Friends</h3>
-      </div>
       
       <Card className="glass-card group relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -64,6 +80,13 @@ const BestFriends = ({ bestFriends }: BestFriendsProps) => {
         </CardContent>
       </Card>
     </div>
+
+    <FriendManagementDialog
+      open={dialogOpen}
+      onOpenChange={setDialogOpen}
+      defaultTab="friends"
+    />
+    </>
   );
 };
 

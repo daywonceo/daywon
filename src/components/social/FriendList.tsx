@@ -9,12 +9,12 @@ import { useFriends } from "@/hooks/useFriends";
 import { useSocialProfiles } from "@/hooks/useSocialProfiles";
 
 interface FriendListProps {
-  // This component now uses hooks, so no props needed
+  defaultTab?: 'friends' | 'pending' | 'discover';
 }
 
-const FriendList = ({}: FriendListProps) => {
+const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState<'friends' | 'pending' | 'discover'>('friends');
+  const [activeTab, setActiveTab] = useState<'friends' | 'pending' | 'discover'>(defaultTab);
   
   const { 
     friends, 

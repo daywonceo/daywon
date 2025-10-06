@@ -381,6 +381,57 @@ export type Database = {
           },
         ]
       }
+      friend_suggestions: {
+        Row: {
+          created_at: string | null
+          dismissed_at: string | null
+          id: string
+          mutual_friends_count: number | null
+          score: number | null
+          shared_habits_count: number | null
+          suggested_user_id: string
+          suggestion_reason: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          dismissed_at?: string | null
+          id?: string
+          mutual_friends_count?: number | null
+          score?: number | null
+          shared_habits_count?: number | null
+          suggested_user_id: string
+          suggestion_reason?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          dismissed_at?: string | null
+          id?: string
+          mutual_friends_count?: number | null
+          score?: number | null
+          shared_habits_count?: number | null
+          suggested_user_id?: string
+          suggestion_reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_suggestions_suggested_user_id_fkey"
+            columns: ["suggested_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friend_suggestions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       habit_activities: {
         Row: {
           activity_date: string
@@ -1498,6 +1549,19 @@ export type Database = {
           id: string
           last_active: string
           status: string
+        }[]
+      }
+      get_friend_suggestions: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          mutual_friends_count: number
+          score: number
+          shared_habits_count: number
+          suggestion_reason: string
+          user_id: string
+          username: string
         }[]
       }
       get_public_profiles: {

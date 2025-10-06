@@ -11,6 +11,8 @@ import MembershipMilestone from "@/components/profile/MembershipMilestone";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
 import { MobileProfileEditor } from "@/components/profile/MobileProfileEditor";
+import { FriendManagementWidget } from "@/components/profile/FriendManagementWidget";
+import { FriendSuggestionsCarousel } from "@/components/profile/FriendSuggestionsCarousel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -99,6 +101,12 @@ const Profile = () => {
         
         <div className="space-y-8 px-2">
           <ProfileHeader profile={profile} />
+          
+          {/* Friends & Connections Section */}
+          <FriendManagementWidget />
+          
+          {/* Friend Suggestions */}
+          <FriendSuggestionsCarousel />
           
           {/* Tools & Insights Section */}
           <div className="space-y-4">
