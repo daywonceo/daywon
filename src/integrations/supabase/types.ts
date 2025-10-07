@@ -381,6 +381,42 @@ export type Database = {
           },
         ]
       }
+      friend_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          inviter_id: string
+          status: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          inviter_id: string
+          status?: string
+          token: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          inviter_id?: string
+          status?: string
+          token?: string
+        }
+        Relationships: []
+      }
       friend_suggestions: {
         Row: {
           created_at: string | null
@@ -834,6 +870,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      privacy_settings: {
+        Row: {
+          allow_friend_requests: string
+          created_at: string
+          id: string
+          profile_visibility: string
+          show_activity: boolean
+          show_habits: boolean
+          show_online_status: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allow_friend_requests?: string
+          created_at?: string
+          id?: string
+          profile_visibility?: string
+          show_activity?: boolean
+          show_habits?: boolean
+          show_online_status?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allow_friend_requests?: string
+          created_at?: string
+          id?: string
+          profile_visibility?: string
+          show_activity?: boolean
+          show_habits?: boolean
+          show_online_status?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1500,6 +1572,10 @@ export type Database = {
       calculate_habit_streak: {
         Args: { p_as_of_date?: string; p_user_habit_id: string }
         Returns: number
+      }
+      can_send_friend_request: {
+        Args: { target_user_id: string }
+        Returns: boolean
       }
       check_username_availability: {
         Args: { username_input: string }
