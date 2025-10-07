@@ -1,15 +1,21 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Settings } from 'lucide-react';
+import { Users, UserPlus, Settings, Mail, Shield, ContactRound } from 'lucide-react';
 import { useFriends } from '@/hooks/useFriends';
 import { useState } from 'react';
 import { FriendManagementDialog } from '@/components/social/FriendManagementDialog';
+import { InviteFriendsDialog } from '@/components/social/InviteFriendsDialog';
+import { PrivacySettingsDialog } from '@/components/social/PrivacySettingsDialog';
+import { ContactSyncDialog } from '@/components/social/ContactSyncDialog';
 
 export const FriendManagementWidget = () => {
   const { friends, pendingRequests, loading } = useFriends();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'friends' | 'pending' | 'suggestions' | 'discover'>('friends');
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [privacyDialogOpen, setPrivacyDialogOpen] = useState(false);
+  const [contactSyncOpen, setContactSyncOpen] = useState(false);
 
   const openDialog = (tab: typeof activeTab) => {
     setActiveTab(tab);
@@ -57,25 +63,57 @@ export const FriendManagementWidget = () => {
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              size="sm"
-              onClick={() => openDialog('discover')}
-            >
-              <UserPlus className="w-4 h-4 mr-1.5" />
-              Add Friends
-            </Button>
-            <Button
-              variant="default"
-              className="flex-1"
-              size="sm"
-              onClick={() => openDialog('friends')}
-            >
-              <Users className="w-4 h-4 mr-1.5" />
-              View All
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                size="sm"
+                onClick={() => openDialog('discover')}
+              >
+                <UserPlus className="w-4 h-4 mr-1.5" />
+                Add Friends
+              </Button>
+              <Button
+                variant="default"
+                className="flex-1"
+                size="sm"
+                onClick={() => openDialog('friends')}
+              >
+                <Users className="w-4 h-4 mr-1.5" />
+                View All
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setInviteDialogOpen(true)}
+                className="text-xs"
+              >
+                <Mail className="w-3 h-3 mr-1" />
+                Invite
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setContactSyncOpen(true)}
+                className="text-xs"
+              >
+                <ContactRound className="w-3 h-3 mr-1" />
+                Contacts
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPrivacyDialogOpen(true)}
+                className="text-xs"
+              >
+                <Shield className="w-3 h-3 mr-1" />
+                Privacy
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -84,6 +122,21 @@ export const FriendManagementWidget = () => {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         defaultTab={activeTab}
+      />
+
+      <InviteFriendsDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+      />
+
+      <PrivacySettingsDialog
+        open={privacyDialogOpen}
+        onOpenChange={setPrivacyDialogOpen}
+      />
+
+      <ContactSyncDialog
+        open={contactSyncOpen}
+        onOpenChange={setContactSyncOpen}
       />
     </>
   );

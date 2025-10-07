@@ -142,13 +142,14 @@ export const useNotifications = () => {
     }
   };
 
-  // Set up real-time subscription for new notifications
+  // Set up real-time subscription for new notifications and friend events
   useEffect(() => {
     const initializeRealtimeSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const channel = supabase
+      // Subscribe to notifications
+      const notificationsChannel = supabase
         .channel('notifications-changes')
         .on(
           'postgres_changes',
@@ -164,8 +165,59 @@ export const useNotifications = () => {
         )
         .subscribe();
 
+      // Subscribe to friend relationship changes
+      const friendsChannel = supabase
+        .channel('friend-relationship-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'user_relationships',
+          },
+          async (payload) => {
+            // Create notification when friend request is accepted
+            if (payload.eventType === 'UPDATE' && 
+                payload.new.status === 'accepted' && 
+                payload.old?.status === 'pending' &&
+                payload.new.follower_id === user.id) {
+              
+              setTimeout(async () => {
+                await supabase.from('notifications').insert({
+                  user_id: payload.new.follower_id,
+                  actor_id: payload.new.following_id,
+                  entity_id: payload.new.id,
+                  entity_type: 'friend_request',
+                  type: 'friend_accepted',
+                  message: 'accepted your friend request',
+                });
+                fetchNotifications();
+              }, 0);
+            }
+            // Create notification when receiving a new friend request
+            else if (payload.eventType === 'INSERT' && 
+                     payload.new.status === 'pending' &&
+                     payload.new.following_id === user.id) {
+              
+              setTimeout(async () => {
+                await supabase.from('notifications').insert({
+                  user_id: payload.new.following_id,
+                  actor_id: payload.new.follower_id,
+                  entity_id: payload.new.id,
+                  entity_type: 'friend_request',
+                  type: 'friend_request',
+                  message: 'sent you a friend request',
+                });
+                fetchNotifications();
+              }, 0);
+            }
+          }
+        )
+        .subscribe();
+
       return () => {
-        supabase.removeChannel(channel);
+        supabase.removeChannel(notificationsChannel);
+        supabase.removeChannel(friendsChannel);
       };
     };
 
