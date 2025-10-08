@@ -27,7 +27,7 @@ export const FriendManagementDialog = ({
       </DialogHeader>
       
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className={`w-full grid grid-cols-4 ${isMobile ? "h-9 p-0.5 gap-0.5" : "h-11 p-1 gap-1"}`}>
+        <TabsList className={`grid grid-cols-4 ${isMobile ? "h-9 p-0.5 gap-0.5 mx-4" : "h-11 p-1 gap-1 mx-6"}`}>
           <TabsTrigger value="friends" className={isMobile ? "text-[11px] px-1 min-w-0" : "text-sm px-3"}>
             <Users className={isMobile ? "w-3 h-3 mr-0.5 flex-shrink-0" : "w-4 h-4 mr-1.5"} />
             <span className="truncate">{isMobile ? "Friend" : "Friends"}</span>
