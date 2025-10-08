@@ -25,12 +25,12 @@ const Header = () => {
     <SettingsProvider>
       <header 
         className={cn(
-          "py-4 px-responsive flex items-center justify-between max-w-4xl mx-auto w-full sticky z-10 transition-all duration-300",
+          "py-3 sm:py-4 px-responsive flex items-center justify-between gap-2 max-w-4xl mx-auto w-full sticky z-10 transition-all duration-300",
           "glass-card border-b",
           show ? 'top-0' : '-top-24'
         )}
       >
-        <div className="flex-1 flex items-center">
+        <div className="flex-1 flex items-center min-w-0">
           {!isMobile && (
             <div className="relative w-full max-w-[180px]">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -46,11 +46,11 @@ const Header = () => {
           )}
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tighter flex items-center">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter flex items-center flex-shrink-0">
           Day<span className="tracking-[-0.1em] text-gradient-primary">Won</span>
         </h1>
 
-        <div className="flex-1 flex justify-end items-center space-x-1">
+        <div className="flex-1 flex justify-end items-center gap-1 sm:gap-1.5 min-w-0">
           <ThemeToggle />
           <HapticButton />
           <HabitAddSheet
