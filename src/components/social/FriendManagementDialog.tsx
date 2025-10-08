@@ -22,31 +22,35 @@ export const FriendManagementDialog = ({
 
   const content = (
     <>
-      <DialogHeader className="px-6 pt-6">
-        <DialogTitle>Friend Management</DialogTitle>
+      <DialogHeader className={isMobile ? "px-4 pt-4" : "px-6 pt-6"}>
+        <DialogTitle className={isMobile ? "text-base" : "text-lg"}>Friend Management</DialogTitle>
       </DialogHeader>
       
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="w-full grid grid-cols-4 mx-6">
-          <TabsTrigger value="friends" className="text-xs">
-            <Users className="w-4 h-4 mr-1.5" />
-            Friends
+        <TabsList className={`w-full grid grid-cols-4 ${isMobile ? "mx-4 h-9" : "mx-6 h-10"}`}>
+          <TabsTrigger value="friends" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
+            <Users className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
+            <span className="hidden sm:inline">Friends</span>
+            <span className="sm:hidden">👥</span>
           </TabsTrigger>
-          <TabsTrigger value="pending" className="text-xs">
-            <UserPlus className="w-4 h-4 mr-1.5" />
-            Requests
+          <TabsTrigger value="pending" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
+            <UserPlus className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
+            <span className="hidden sm:inline">Requests</span>
+            <span className="sm:hidden">📬</span>
           </TabsTrigger>
-          <TabsTrigger value="suggestions" className="text-xs">
-            <Sparkles className="w-4 h-4 mr-1.5" />
-            Suggestions
+          <TabsTrigger value="suggestions" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
+            <Sparkles className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
+            <span className="hidden sm:inline">Suggestions</span>
+            <span className="sm:hidden">✨</span>
           </TabsTrigger>
-          <TabsTrigger value="discover" className="text-xs">
-            <Search className="w-4 h-4 mr-1.5" />
-            Find
+          <TabsTrigger value="discover" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
+            <Search className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
+            <span className="hidden sm:inline">Find</span>
+            <span className="sm:hidden">🔍</span>
           </TabsTrigger>
         </TabsList>
 
-        <div className="px-6 pb-6">
+        <div className={isMobile ? "px-4 pb-4" : "px-6 pb-6"}>
           <TabsContent value="friends" className="mt-4">
             <FriendList />
           </TabsContent>
@@ -73,10 +77,7 @@ export const FriendManagementDialog = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[85vh] p-0">
-          <SheetHeader className="px-6 pt-6">
-            <SheetTitle>Friend Management</SheetTitle>
-          </SheetHeader>
+        <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl p-0 pb-safe-mobile">
           {content}
         </SheetContent>
       </Sheet>

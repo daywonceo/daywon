@@ -25,38 +25,39 @@ export const FriendManagementWidget = () => {
   return (
     <>
       <Card className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm border-border/50">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">Friends & Connections</h3>
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <h3 className="font-semibold text-sm sm:text-base">Friends & Connections</h3>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => openDialog('friends')}
+              className="h-8 w-8 sm:h-9 sm:w-9"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
             <div
-              className="p-3 rounded-lg bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
+              className="p-2.5 sm:p-3 rounded-lg bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
               onClick={() => openDialog('friends')}
             >
-              <div className="text-2xl font-bold text-primary">{friends.length}</div>
-              <div className="text-xs text-muted-foreground">Friends</div>
+              <div className="text-xl sm:text-2xl font-bold text-primary">{friends.length}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Friends</div>
             </div>
             
             <div
-              className="p-3 rounded-lg bg-orange-500/5 cursor-pointer hover:bg-orange-500/10 transition-colors relative"
+              className="p-2.5 sm:p-3 rounded-lg bg-orange-500/5 cursor-pointer hover:bg-orange-500/10 transition-colors relative"
               onClick={() => openDialog('pending')}
             >
-              <div className="text-2xl font-bold text-orange-600">{pendingRequests.length}</div>
-              <div className="text-xs text-muted-foreground">Requests</div>
+              <div className="text-xl sm:text-2xl font-bold text-orange-600">{pendingRequests.length}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Requests</div>
               {pendingRequests.length > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-orange-500">
+                <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center p-0 text-[9px] sm:text-[10px] bg-orange-500">
                   {pendingRequests.length}
                 </Badge>
               )}

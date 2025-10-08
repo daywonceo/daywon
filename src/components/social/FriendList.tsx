@@ -88,63 +88,68 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-3">
-          <Users className="text-blue-600 dark:text-blue-400" size={20} />
+      <div className="text-center mb-4 sm:mb-6">
+        <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-2 sm:mb-3">
+          <Users className="text-blue-600 dark:text-blue-400" size={18} />
         </div>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Social Network</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Connect and motivate each other</p>
+        <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">Social Network</h2>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Connect and motivate each other</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      {/* Tabs - Mobile Optimized */}
+      <div className="flex gap-1 sm:gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-x-auto">
         <button
           onClick={() => setActiveTab('friends')}
-          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+          className={`flex-1 min-w-[90px] px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
             activeTab === 'friends' 
               ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          Friends ({friends.length})
+          <span className="hidden sm:inline">Friends</span>
+          <span className="sm:hidden">👥</span>
+          <span className="ml-1">({friends.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('pending')}
-          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+          className={`flex-1 min-w-[90px] px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
             activeTab === 'pending' 
               ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          Requests ({pendingRequests.length})
+          <span className="hidden sm:inline">Requests</span>
+          <span className="sm:hidden">📬</span>
+          <span className="ml-1">({pendingRequests.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('discover')}
-          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+          className={`flex-1 min-w-[90px] px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
             activeTab === 'discover' 
               ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          Discover
+          <span className="hidden sm:inline">Discover</span>
+          <span className="sm:hidden">🔍</span>
         </button>
       </div>
       
-      {/* Search */}
+      {/* Search - Mobile Optimized */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input 
-          placeholder="Search friends..." 
+          placeholder="Search..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700"
+          className="pl-9 sm:pl-10 pr-3 h-9 sm:h-10 text-sm bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700"
         />
       </div>
       
-      {/* Items List */}
-      <div className="space-y-3">
+      {/* Items List - Mobile Optimized */}
+      <div className="space-y-2 sm:space-y-3 max-h-[60vh] overflow-y-auto px-1">
         {friendsLoading || profilesLoading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
@@ -159,45 +164,45 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
             
             return (
               <Card key={item.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="relative">
-                        <Avatar className="h-10 w-10 ring-2 ring-green-100 dark:ring-green-800/50">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                      <div className="relative flex-shrink-0">
+                        <Avatar className="h-9 w-9 sm:h-10 sm:w-10 ring-2 ring-green-100 dark:ring-green-800/50">
                           <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={displayName} />
-                          <AvatarFallback className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-sm font-semibold">
+                          <AvatarFallback className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs sm:text-sm font-semibold">
                             {displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${getStatusColor(status)} border-2 border-white dark:border-gray-800 rounded-full`}></div>
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 ${getStatusColor(status)} border-2 border-white dark:border-gray-800 rounded-full`}></div>
                       </div>
-                      <div>
-                        <p className="font-bold text-sm text-gray-900 dark:text-white">{displayName}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white truncate">{displayName}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate">
                           {getStatusText(status)}
-                          {'mutual_habits' in item && item.mutual_habits && ` • ${item.mutual_habits} mutual habits`}
+                          {'mutual_habits' in item && item.mutual_habits && ` • ${item.mutual_habits} mutual`}
                         </p>
                       </div>
                     </div>
                     
-                    {/* Action buttons based on tab */}
-                    <div className="flex gap-2">
+                    {/* Action buttons - Mobile Optimized */}
+                    <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                       {activeTab === 'friends' && (
                         <>
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="rounded-full h-9 w-9 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                            className="rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                           >
-                            <MessageCircle size={16} />
+                            <MessageCircle size={14} className="sm:w-4 sm:h-4" />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => removeFriend(item.id)}
-                            className="rounded-full h-9 w-9 p-0 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                            className="rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
                           >
-                            <UserX size={16} />
+                            <UserX size={14} className="sm:w-4 sm:h-4" />
                           </Button>
                         </>
                       )}
@@ -208,17 +213,17 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
                             variant="ghost" 
                             size="sm" 
                             onClick={() => acceptFriendRequest(item.id)}
-                            className="rounded-full h-9 w-9 p-0 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                            className="rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
                           >
-                            <UserCheck size={16} />
+                            <UserCheck size={14} className="sm:w-4 sm:h-4" />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => declineFriendRequest(item.id)}
-                            className="rounded-full h-9 w-9 p-0 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                            className="rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
                           >
-                            <UserX size={16} />
+                            <UserX size={14} className="sm:w-4 sm:h-4" />
                           </Button>
                         </>
                       )}
@@ -228,9 +233,9 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
                           variant="ghost" 
                           size="sm" 
                           onClick={() => sendFriendRequest(item.id)}
-                          className="rounded-full h-9 w-9 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                          className="rounded-full h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                         >
-                          <UserPlus size={16} />
+                          <UserPlus size={14} className="sm:w-4 sm:h-4" />
                         </Button>
                       )}
                     </div>
