@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      best_friends: {
+        Row: {
+          friend_id: string
+          id: string
+          pinned_at: string
+          position: number
+          user_id: string
+        }
+        Insert: {
+          friend_id: string
+          id?: string
+          pinned_at?: string
+          position?: number
+          user_id: string
+        }
+        Update: {
+          friend_id?: string
+          id?: string
+          pinned_at?: string
+          position?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      blocked_users: {
+        Row: {
+          blocked_at: string
+          blocked_id: string
+          blocker_id: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_at?: string
+          blocked_id: string
+          blocker_id: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_at?: string
+          blocked_id?: string
+          blocker_id?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       challenge_chat: {
         Row: {
           challenge_id: string
@@ -414,6 +462,27 @@ export type Database = {
           inviter_id?: string
           status?: string
           token?: string
+        }
+        Relationships: []
+      }
+      friend_request_limits: {
+        Row: {
+          id: string
+          last_request_date: string
+          requests_sent_today: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_request_date?: string
+          requests_sent_today?: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_request_date?: string
+          requests_sent_today?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -1574,7 +1643,7 @@ export type Database = {
         Returns: number
       }
       can_send_friend_request: {
-        Args: { target_user_id: string }
+        Args: { sender_id: string }
         Returns: boolean
       }
       check_username_availability: {
@@ -1640,6 +1709,15 @@ export type Database = {
           username: string
         }[]
       }
+      get_mutual_friends: {
+        Args: { user_a: string; user_b: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_public_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1661,6 +1739,10 @@ export type Database = {
           target_count: number
           target_description: string
         }[]
+      }
+      increment_friend_request_count: {
+        Args: { sender_id: string }
+        Returns: undefined
       }
       merge_duplicate_habits: {
         Args: {
