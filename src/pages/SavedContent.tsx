@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,10 +13,11 @@ import { useReflections } from "@/hooks/useReflections";
 import { useSavedDevotions } from "@/hooks/useSavedDevotions";
 import { useSavedSermons } from "@/hooks/useSavedSermons";
 import { useSavedRecipes } from "@/hooks/useSavedRecipes";
-import { Trash2, BookOpen, Heart, Utensils, Church, Quote } from "lucide-react";
+import { Trash2, BookOpen, Heart, Utensils, Church, Quote, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 const SavedContent = () => {
+  const navigate = useNavigate();
   const { savedVerses, isLoading: versesLoading, deleteSavedVerse } = useSavedVerses();
   const { reflections, isLoading: reflectionsLoading, deleteReflection } = useReflections();
   const { savedDevotions, isLoading: devotionsLoading, deleteSavedDevotion } = useSavedDevotions();
@@ -71,6 +73,18 @@ const SavedContent = () => {
       <Header />
       
       <main className="flex-grow px-responsive pb-safe-mobile pt-6 max-w-4xl mx-auto w-full">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </div>
+        
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gradient-primary mb-2">
             Saved Content
