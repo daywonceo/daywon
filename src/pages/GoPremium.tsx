@@ -19,8 +19,10 @@ const GoPremium = () => {
       features: [
         "Track up to 5 habits",
         "Join up to 2 social groups",
-        "Access daily Bible verses, habit tips, and basic charts",
-        "Free forever"
+        "Access daily Bible verses & devotions",
+        "Basic habit statistics",
+        "Community challenges",
+        "Standard friend requests"
       ]
     },
     {
@@ -32,11 +34,17 @@ const GoPremium = () => {
       color: "blue",
       isPopular: true,
       features: [
-        "Unlimited habits",
-        "Join/create unlimited groups",
-        "Connect fitness + wellness APIs (Strava, WHOOP, Apple Screen Time)",
-        "Access guided packs: workouts, meditations, recipes, Bible passages",
-        "Full habit analytics + streak protection",
+        "Unlimited habits with advanced tracking",
+        "Join/create unlimited groups & challenges",
+        "AI-powered workout & meal planning",
+        "Connect fitness APIs (Strava, WHOOP, Apple Health)",
+        "Email friend invitations & contact sync",
+        "Advanced privacy controls",
+        "Full habit analytics & streak protection",
+        "Saved verses, devotions & reflections",
+        "Custom workout builder & progress tracking",
+        "Nutrition recipes & meal plans",
+        "Priority support",
         "7-day free trial (no card needed)"
       ]
     },
@@ -49,7 +57,9 @@ const GoPremium = () => {
       isLifetime: true,
       features: [
         "All premium features forever",
-        "Add \"Founding Supporter\" badge to profile"
+        "Add \"Founding Supporter\" badge to profile",
+        "Early access to new features",
+        "Support Day Won's mission"
       ]
     }
   ];
