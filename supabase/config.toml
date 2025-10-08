@@ -1,5 +1,8 @@
 project_id = "ncjbvdbkulnekwsjzicq"
 
+[functions.send-friend-invitation]
+verify_jwt = true
+
 [functions.generate-weekly-summary]
 verify_jwt = true
 
