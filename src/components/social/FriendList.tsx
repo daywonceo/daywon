@@ -108,9 +108,7 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          <span className="hidden sm:inline">Friends</span>
-          <span className="sm:hidden">👥</span>
-          <span className="ml-1">({friends.length})</span>
+          Friends ({friends.length})
         </button>
         <button
           onClick={() => setActiveTab('pending')}
@@ -120,9 +118,7 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          <span className="hidden sm:inline">Requests</span>
-          <span className="sm:hidden">📬</span>
-          <span className="ml-1">({pendingRequests.length})</span>
+          Requests ({pendingRequests.length})
         </button>
         <button
           onClick={() => setActiveTab('discover')}
@@ -132,8 +128,7 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          <span className="hidden sm:inline">Discover</span>
-          <span className="sm:hidden">🔍</span>
+          Discover
         </button>
       </div>
       
@@ -250,7 +245,6 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
       {/* No Results */}
       {filteredItems.length === 0 && searchTerm && !friendsLoading && !profilesLoading && (
         <div className="text-center py-8">
-          <div className="text-gray-400 mb-2">🔍</div>
           <p className="text-sm text-gray-500">No results found matching "{searchTerm}"</p>
         </div>
       )}
@@ -258,9 +252,6 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
       {/* Empty States */}
       {filteredItems.length === 0 && !searchTerm && !friendsLoading && !profilesLoading && (
         <div className="text-center py-8">
-          <div className="text-gray-400 mb-2">
-            {activeTab === 'friends' ? '👥' : activeTab === 'pending' ? '⏳' : '🌟'}
-          </div>
           <p className="text-sm text-gray-500">
             {activeTab === 'friends' ? "You haven't added any friends yet" :
              activeTab === 'pending' ? "No pending friend requests" :

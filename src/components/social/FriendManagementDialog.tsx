@@ -28,25 +28,21 @@ export const FriendManagementDialog = ({
       
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className={`w-full grid grid-cols-4 ${isMobile ? "mx-4 h-9" : "mx-6 h-10"}`}>
-          <TabsTrigger value="friends" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
-            <Users className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
-            <span className="hidden sm:inline">Friends</span>
-            <span className="sm:hidden">👥</span>
+          <TabsTrigger value="friends" className={isMobile ? "text-xs px-2" : "text-sm"}>
+            <Users className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
+            <span>Friends</span>
           </TabsTrigger>
-          <TabsTrigger value="pending" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
-            <UserPlus className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
-            <span className="hidden sm:inline">Requests</span>
-            <span className="sm:hidden">📬</span>
+          <TabsTrigger value="pending" className={isMobile ? "text-xs px-2" : "text-sm"}>
+            <UserPlus className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
+            <span>Requests</span>
           </TabsTrigger>
-          <TabsTrigger value="suggestions" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
-            <Sparkles className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
-            <span className="hidden sm:inline">Suggestions</span>
-            <span className="sm:hidden">✨</span>
+          <TabsTrigger value="suggestions" className={isMobile ? "text-xs px-2" : "text-sm"}>
+            <Sparkles className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
+            <span>Suggestions</span>
           </TabsTrigger>
-          <TabsTrigger value="discover" className={isMobile ? "text-[10px] px-1" : "text-xs"}>
-            <Search className={isMobile ? "w-3 h-3 mr-0.5" : "w-4 h-4 mr-1.5"} />
-            <span className="hidden sm:inline">Find</span>
-            <span className="sm:hidden">🔍</span>
+          <TabsTrigger value="discover" className={isMobile ? "text-xs px-2" : "text-sm"}>
+            <Search className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
+            <span>Find</span>
           </TabsTrigger>
         </TabsList>
 
