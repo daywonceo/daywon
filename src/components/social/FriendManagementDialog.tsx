@@ -27,22 +27,22 @@ export const FriendManagementDialog = ({
       </DialogHeader>
       
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className={`w-full grid grid-cols-4 ${isMobile ? "mx-4 h-9" : "mx-6 h-10"}`}>
-          <TabsTrigger value="friends" className={isMobile ? "text-xs px-2" : "text-sm"}>
-            <Users className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
-            <span>Friends</span>
+        <TabsList className={`w-full grid grid-cols-4 gap-1 ${isMobile ? "h-10 p-1" : "h-11 p-1"}`}>
+          <TabsTrigger value="friends" className={isMobile ? "text-xs px-1.5 min-w-0" : "text-sm px-3"}>
+            <Users className={isMobile ? "w-3.5 h-3.5 mr-1 flex-shrink-0" : "w-4 h-4 mr-1.5"} />
+            <span className="truncate">Friends</span>
           </TabsTrigger>
-          <TabsTrigger value="pending" className={isMobile ? "text-xs px-2" : "text-sm"}>
-            <UserPlus className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
-            <span>Requests</span>
+          <TabsTrigger value="pending" className={isMobile ? "text-xs px-1.5 min-w-0" : "text-sm px-3"}>
+            <UserPlus className={isMobile ? "w-3.5 h-3.5 mr-1 flex-shrink-0" : "w-4 h-4 mr-1.5"} />
+            <span className="truncate">Requests</span>
           </TabsTrigger>
-          <TabsTrigger value="suggestions" className={isMobile ? "text-xs px-2" : "text-sm"}>
-            <Sparkles className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
-            <span>Suggestions</span>
+          <TabsTrigger value="suggestions" className={isMobile ? "text-xs px-1.5 min-w-0" : "text-sm px-3"}>
+            <Sparkles className={isMobile ? "w-3.5 h-3.5 mr-1 flex-shrink-0" : "w-4 h-4 mr-1.5"} />
+            <span className="truncate">Suggest</span>
           </TabsTrigger>
-          <TabsTrigger value="discover" className={isMobile ? "text-xs px-2" : "text-sm"}>
-            <Search className={isMobile ? "w-3.5 h-3.5 mr-1" : "w-4 h-4 mr-1.5"} />
-            <span>Find</span>
+          <TabsTrigger value="discover" className={isMobile ? "text-xs px-1.5 min-w-0" : "text-sm px-3"}>
+            <Search className={isMobile ? "w-3.5 h-3.5 mr-1 flex-shrink-0" : "w-4 h-4 mr-1.5"} />
+            <span className="truncate">Find</span>
           </TabsTrigger>
         </TabsList>
 
