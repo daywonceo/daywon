@@ -1,14 +1,12 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Crown, Sparkles, Zap, BookmarkCheck } from "lucide-react";
+import { Check, Crown, Sparkles, Zap, User } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const GoPremium = () => {
-  const navigate = useNavigate();
   
   const plans = [
     {
@@ -83,7 +81,7 @@ const GoPremium = () => {
   };
 
   const getPlanIcon = (plan: typeof plans[0]) => {
-    if (plan.isDefault) return <BookmarkCheck className="w-8 h-8 text-primary" />;
+    if (plan.isDefault) return <User className="w-8 h-8 text-primary" />;
     if (plan.isPopular) return <Sparkles className="w-8 h-8 text-primary" />;
     if (plan.isLifetime) return <Crown className="w-8 h-8 text-accent" />;
     return null;
@@ -158,11 +156,6 @@ const GoPremium = () => {
                   variant={getButtonVariant(plan)}
                   size="lg"
                   className="w-full"
-                  onClick={() => {
-                    if (plan.isDefault) {
-                      navigate('/');
-                    }
-                  }}
                 >
                   {plan.isDefault ? "Current Plan" : 
                    plan.isLifetime ? "Get Lifetime Access" : 
@@ -180,22 +173,6 @@ const GoPremium = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        <div className="glass-card p-6 sm:p-8 text-center mb-8">
-          <h2 className="text-xl font-semibold mb-4">View Your Saved Content</h2>
-          <p className="text-muted-foreground mb-6">
-            Access all your saved verses, reflections, devotions, sermons, and recipes in one place
-          </p>
-          <Button 
-            onClick={() => navigate('/saved-content')}
-            variant="outline"
-            size="lg"
-            className="gap-2"
-          >
-            <BookmarkCheck className="w-5 h-5" />
-            View Saved Content
-          </Button>
         </div>
 
         <div className="text-center">

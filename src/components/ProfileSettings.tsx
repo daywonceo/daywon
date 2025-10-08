@@ -50,7 +50,9 @@ import {
   User,
   Save,
   HelpCircle,
+  BookmarkCheck,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileSettingsProps {
   open: boolean;
@@ -59,6 +61,7 @@ interface ProfileSettingsProps {
 
 const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>("menu");
   const { currentUserProfile, updateProfile } = useSocialProfiles();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -225,6 +228,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
 
   const menuItems = [
     { id: "profile", label: "Edit Profile", icon: User },
+    { id: "saved-content", label: "Saved Content", icon: BookmarkCheck },
     { id: "habits", label: "Adjust Habits", icon: Target },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "data-export", label: "Data Export", icon: Download },
@@ -385,6 +389,39 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                 </div>
               </CardContent>
             </Card>
+          </div>
+        );
+
+      case "saved-content":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Saved Content</h3>
+            <Card className="glass-card hover:shadow-glow transition-all cursor-pointer"
+              onClick={() => {
+                navigate('/saved-content');
+                onOpenChange(false);
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <BookmarkCheck className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">View All Saved Content</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Access your saved verses, reflections, devotions, sermons, and recipes
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </CardContent>
+            </Card>
+            <p className="text-sm text-muted-foreground">
+              All your saved spiritual content and recipes are organized in one place for easy access.
+            </p>
           </div>
         );
 
