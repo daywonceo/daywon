@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import CalendarPage from "./pages/CalendarPage";
 import Guidance from "./pages/Guidance";
 import GoPremium from "./pages/GoPremium";
+import SavedContent from "./pages/SavedContent";
 import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
@@ -203,9 +204,10 @@ const AppContent: React.FC = () => {
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/data-export" element={<DataExport />} />
         <Route path="/notifications" element={<Notifications />} />
-            <Route path="/advanced" element={<Advanced />} />
-            <Route path="/help" element={<Help />} />
+        <Route path="/advanced" element={<Advanced />} />
+        <Route path="/help" element={<Help />} />
         <Route path="/premium" element={<GoPremium />} />
+        <Route path="/saved-content" element={<SavedContent />} />
         <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
