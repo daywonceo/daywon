@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, Target } from 'lucide-react';
 import { useHabitStats } from '@/hooks/useHabitStats';
 import { useHabits } from '@/hooks/useHabits';
+import WeeklyProgressDetailModal from './WeeklyProgressDetailModal';
 
 interface CompletionRateCardProps {
   userHabits?: string[];
@@ -13,6 +13,7 @@ interface CompletionRateCardProps {
 const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) => {
   const { habits } = useHabits();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   
   // Use all active habits instead of just the default ones (exclude ended and archived)
   const activeHabitNames = userHabits || habits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
@@ -74,8 +75,12 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
   const style = getCompletionStyle(weeklyStats.percentage);
 
   return (
-    <Card className="glass-card group">
-      <CardContent className="p-6">
+    <>
+      <Card 
+        className="glass-card group cursor-pointer hover:shadow-lg transition-shadow" 
+        onClick={() => setShowDetailModal(true)}
+      >
+        <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${style.iconBg} transition-transform group-hover:scale-110 duration-300`}>
@@ -119,6 +124,13 @@ const CompletionRateCard: React.FC<CompletionRateCardProps> = ({ userHabits }) =
         </div>
       </CardContent>
     </Card>
+
+    <WeeklyProgressDetailModal 
+      open={showDetailModal}
+      onOpenChange={setShowDetailModal}
+      userHabits={activeHabitNames}
+    />
+    </>
   );
 };
 
