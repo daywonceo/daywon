@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { AppErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,22 +7,24 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Social from "./pages/Social";
-import Profile from "./pages/Profile";
-import NotFound from "./pages/NotFound";
-import CalendarPage from "./pages/CalendarPage";
-import Guidance from "./pages/Guidance";
-import GoPremium from "./pages/GoPremium";
-import SavedContent from "./pages/SavedContent";
-import GoOnboarding from "./pages/GoOnboarding";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
-import Integrations from "./pages/Integrations";
-import Analytics from "./pages/Analytics";
-import DataExport from "./pages/DataExport";
-import Notifications from "./pages/Notifications";
-import Help from "./pages/Help";
-import Advanced from "./pages/Advanced";
+import NotFound from "./pages/NotFound";
+
+// Lazy load heavy features
+const Social = lazy(() => import("./pages/Social"));
+const Profile = lazy(() => import("./pages/Profile"));
+const CalendarPage = lazy(() => import("./pages/CalendarPage"));
+const Guidance = lazy(() => import("./pages/Guidance"));
+const GoPremium = lazy(() => import("./pages/GoPremium"));
+const SavedContent = lazy(() => import("./pages/SavedContent"));
+const GoOnboarding = lazy(() => import("./pages/GoOnboarding"));
+const Integrations = lazy(() => import("./pages/Integrations"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const DataExport = lazy(() => import("./pages/DataExport"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const Help = lazy(() => import("./pages/Help"));
+const Advanced = lazy(() => import("./pages/Advanced"));
 
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -194,27 +196,33 @@ const AppContent: React.FC = () => {
 
   return (
     <AppIntegrationsWrapper>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/social" element={<Social />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/guidance" element={<Guidance />} />
-        <Route path="/integrations" element={<Integrations />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/data-export" element={<DataExport />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/advanced" element={<Advanced />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/premium" element={<GoPremium />} />
-        <Route path="/saved-content" element={<SavedContent />} />
-        <Route path="/onboarding" element={<SimpleOnboardingFlow />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={
+        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
+          <div className="text-lg">Loading...</div>
+        </div>
+      }>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/social" element={<Social />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/guidance" element={<Guidance />} />
+          <Route path="/integrations" element={<Integrations />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/data-export" element={<DataExport />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/advanced" element={<Advanced />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/premium" element={<GoPremium />} />
+          <Route path="/saved-content" element={<SavedContent />} />
+          <Route path="/onboarding" element={<GoOnboarding />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </AppIntegrationsWrapper>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -29,7 +29,7 @@ export const useFriends = () => {
   const { toast } = useToast();
 
   // Fetch friends and pending requests
-  const fetchFriends = async () => {
+  const fetchFriends = useCallback(async () => {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -139,10 +139,10 @@ export const useFriends = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   // Send friend request
-  const sendFriendRequest = async (userId: string) => {
+  const sendFriendRequest = useCallback(async (userId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
@@ -179,10 +179,10 @@ export const useFriends = () => {
         });
       }
     }
-  };
+  }, [toast, fetchFriends]);
 
   // Accept friend request
-  const acceptFriendRequest = async (userId: string) => {
+  const acceptFriendRequest = useCallback(async (userId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
@@ -218,10 +218,10 @@ export const useFriends = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, fetchFriends]);
 
   // Decline friend request
-  const declineFriendRequest = async (userId: string) => {
+  const declineFriendRequest = useCallback(async (userId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
@@ -248,10 +248,10 @@ export const useFriends = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, fetchFriends]);
 
   // Remove friend
-  const removeFriend = async (userId: string) => {
+  const removeFriend = useCallback(async (userId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
@@ -276,10 +276,10 @@ export const useFriends = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, fetchFriends]);
 
   // Cancel sent friend request
-  const cancelFriendRequest = async (userId: string) => {
+  const cancelFriendRequest = useCallback(async (userId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
@@ -306,10 +306,10 @@ export const useFriends = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast, fetchFriends]);
 
   // Get friend status with a user
-  const getFriendshipStatus = async (userId: string) => {
+  const getFriendshipStatus = useCallback(async (userId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
@@ -326,13 +326,14 @@ export const useFriends = () => {
       console.error('Error checking friendship status:', error);
       return null;
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchFriends();
-  }, []);
+  }, [fetchFriends]);
 
-  return {
+  // Memoize return values
+  const memoizedReturn = useMemo(() => ({
     friends,
     pendingRequests,
     sentRequests,
@@ -344,5 +345,19 @@ export const useFriends = () => {
     cancelFriendRequest,
     getFriendshipStatus,
     refetch: fetchFriends,
-  };
+  }), [
+    friends,
+    pendingRequests,
+    sentRequests,
+    loading,
+    sendFriendRequest,
+    acceptFriendRequest,
+    declineFriendRequest,
+    removeFriend,
+    cancelFriendRequest,
+    getFriendshipStatus,
+    fetchFriends
+  ]);
+
+  return memoizedReturn;
 };
