@@ -28,14 +28,16 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
     .filter(activity => activity.date === dateStr && activity.status === 'completed')
     .map(activity => ({
       name: activity.habitName,
-      streak: calculateStreakForDate(activity.habitName, date)
+      habitId: activity.habitId,
+      streak: calculateStreakForDate(activity.habitId, date)
     }));
 
   const failedHabits = habitActivities
     .filter(activity => activity.date === dateStr && activity.status === 'failed')
     .map(activity => ({
       name: activity.habitName,
-      streak: calculateStreakForDate(activity.habitName, date)
+      habitId: activity.habitId,
+      streak: calculateStreakForDate(activity.habitId, date)
     }));
 
   // Get real time spent and guidance activities
@@ -168,11 +170,11 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
             {completedHabits.length > 0 ? (
               <div className="space-y-2">
                 {completedHabits.map((habit, index) => (
-                  <div key={index} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                  <div key={`${habit.habitId}-${index}`} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
                     <span className="text-sm font-medium">{capitalizeHabitName(habit.name)}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      <Trophy className="h-3 w-3 mr-1" />
-                      {habit.streak} day streak
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Trophy className="h-3 w-3" />
+                      <span>{habit.streak} day{habit.streak !== 1 ? 's' : ''}</span>
                     </Badge>
                   </div>
                 ))}
