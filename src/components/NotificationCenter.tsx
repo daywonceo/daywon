@@ -281,7 +281,7 @@ export const NotificationCenter: React.FC = () => {
                   <div
                     key={notification.id}
                     className={`flex items-start gap-3 p-3 rounded-lg border ${
-                      notification.is_read ? 'bg-background' : 'bg-blue-50 border-blue-200'
+                      notification.is_read ? 'bg-background' : 'bg-notification-unread border-notification-border'
                     }`}
                   >
                     {getNotificationIcon(notification.type)}

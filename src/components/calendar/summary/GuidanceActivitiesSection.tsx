@@ -21,19 +21,19 @@ interface GuidanceActivitiesSectionProps {
 const getActivityIcon = (type: string) => {
   switch (type) {
     case "verse":
-      return <BookOpen className="h-4 w-4 text-purple-500" />;
+      return <BookOpen className="h-4 w-4 text-accent" />;
     case "recipe":
-      return <ChefHat className="h-4 w-4 text-orange-500" />;
+      return <ChefHat className="h-4 w-4 text-warning" />;
     case "workout":
-      return <Dumbbell className="h-4 w-4 text-blue-500" />;
+      return <Dumbbell className="h-4 w-4 text-primary" />;
     case "reflection":
-      return <MessageCircle className="h-4 w-4 text-teal-500" />;
+      return <MessageCircle className="h-4 w-4 text-secondary" />;
     case "devotion":
-      return <Church className="h-4 w-4 text-purple-600" />;
+      return <Church className="h-4 w-4 text-accent" />;
     case "sermon":
-      return <Play className="h-4 w-4 text-indigo-500" />;
+      return <Play className="h-4 w-4 text-primary" />;
     default:
-      return <Heart className="h-4 w-4 text-gray-500" />;
+      return <Heart className="h-4 w-4 text-muted-foreground" />;
   }
 };
 
@@ -72,7 +72,7 @@ export const GuidanceActivitiesSection = ({ activities, loading }: GuidanceActiv
   return (
     <div>
       <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-        <Heart className="h-5 w-5 text-purple-500" />
+        <Heart className="h-5 w-5 text-accent" />
         Guidance Activities
       </h3>
       {loading ? (

@@ -80,6 +80,15 @@ export default {
 					medium: 'hsl(var(--completion-medium))',
 					high: 'hsl(var(--completion-high))'
 				},
+				status: {
+					online: 'hsl(var(--status-online))',
+					away: 'hsl(var(--status-away))',
+					offline: 'hsl(var(--status-offline))',
+				},
+				notification: {
+					unread: 'hsl(var(--notification-unread))',
+					border: 'hsl(var(--notification-border))',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

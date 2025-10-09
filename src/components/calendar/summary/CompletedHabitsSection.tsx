@@ -16,7 +16,7 @@ export const CompletedHabitsSection = ({ habits }: CompletedHabitsSectionProps) 
   return (
     <div>
       <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-        <CheckCircle className="h-5 w-5 text-green-500" />
+        <CheckCircle className="h-5 w-5 text-success" />
         Habits Completed
       </h3>
       {habits.length > 0 ? (
@@ -24,7 +24,7 @@ export const CompletedHabitsSection = ({ habits }: CompletedHabitsSectionProps) 
           {habits.map((habit, index) => (
             <div 
               key={`${habit.habitId}-${index}`} 
-              className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800"
+              className="flex items-center justify-between bg-success/10 p-3 rounded-lg border border-success/20"
             >
               <span className="text-sm font-medium">{capitalizeHabitName(habit.name)}</span>
               <Badge variant="secondary" className="flex items-center gap-1">

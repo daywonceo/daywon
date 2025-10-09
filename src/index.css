@@ -58,6 +58,15 @@
     --completion-medium: 24 75% 55%;
     --completion-high: 151 40% 28%;
     
+    /* Semantic status colors */
+    --status-online: 151 45% 40%;
+    --status-away: 24 75% 55%;
+    --status-offline: 0 0% 50%;
+    
+    /* Notification colors */
+    --notification-unread: 151 30% 95%;
+    --notification-border: 151 40% 80%;
+    
     /* Layout */
     --radius: 0.75rem;
     --radius-sm: 0.5rem;
