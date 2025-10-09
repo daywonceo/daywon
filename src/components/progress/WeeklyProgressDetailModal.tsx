@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, Calendar } from 'lucide-react';
 import { useHabits } from '@/hooks/useHabits';
 import { getHabitActivities } from '@/utils/habitActivity';
-import { startOfWeek, endOfDay, format, eachDayOfInterval, startOfDay } from 'date-fns';
+import { endOfDay, eachDayOfInterval, startOfDay, subDays } from 'date-fns';
 
 interface WeeklyProgressDetailModalProps {
   open: boolean;
@@ -29,8 +29,8 @@ const WeeklyProgressDetailModal: React.FC<WeeklyProgressDetailModalProps> = ({
 
   // Calculate weekly stats for each habit
   const habitStats = activeHabits?.map(habit => {
-    const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
     const weekEnd = endOfDay(new Date());
+    const weekStart = startOfDay(subDays(new Date(), 6)); // Last 7 days including today
     const allActivities = getHabitActivities();
     const habitActivities = allActivities.filter(
       a => a.habitId === habit.id && 
