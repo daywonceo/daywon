@@ -12,7 +12,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="max-w-md w-full text-center space-y-4">
-        <div className="text-red-500 text-6xl mb-4">⚠️</div>
+        <div className="text-destructive text-6xl mb-4">⚠️</div>
         <h2 className="text-2xl font-bold text-foreground">Something went wrong</h2>
         <p className="text-muted-foreground">
           We encountered an unexpected error. Don't worry, your data is safe.
