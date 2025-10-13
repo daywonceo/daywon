@@ -96,8 +96,8 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                     >
                       <div />
                       {activity.categories.map((habit) => (
-                        <div key={habit} className="flex items-center justify-center">
-                          <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground/70 text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                        <div key={habit} className="flex items-start justify-center min-h-[2.5rem]">
+                          <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground/70 dark:text-muted-foreground text-center break-words hyphens-auto leading-tight px-0.5">
                             {habit}
                           </span>
                         </div>
