@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import CreateChallengeModal from './CreateChallengeModal';
 import ChallengeManager from './ChallengeManager';
@@ -10,6 +8,7 @@ import { useChallenges } from '@/hooks/useChallenges';
 import GroupsHeader from './challenges/GroupsHeader';
 import GroupsNavigation from './challenges/GroupsNavigation';
 import ChallengesTabContent from './challenges/ChallengesTabContent';
+import TeamsTabContent from './teams/TeamsTabContent';
 
 const Groups = () => {
   const [activeTab, setActiveTab] = useState<'challenges' | 'discover' | 'manage' | 'teams'>('challenges');
@@ -146,15 +145,7 @@ const Groups = () => {
       )}
 
       {activeTab === 'teams' && (
-        <Card className="bg-card backdrop-blur-sm border">
-          <CardContent className="p-8 text-center">
-            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="font-semibold mb-2">Teams Coming Soon</h3>
-            <p className="text-sm text-muted-foreground">
-              Team management and formation features will be available soon!
-            </p>
-          </CardContent>
-        </Card>
+        <TeamsTabContent challenges={challenges} />
       )}
 
       {/* Create Challenge Modal */}
