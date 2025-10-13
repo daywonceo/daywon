@@ -25,6 +25,7 @@ interface OptimizedChallengeListProps {
   onShare?: (challengeId: string) => void;
   onFavorite?: (challengeId: string) => void;
   onQuickProgress?: (challengeId: string) => void;
+  onInviteFriends?: (challengeId: string) => void;
 }
 
 const OptimizedChallengeList: React.FC<OptimizedChallengeListProps> = ({
@@ -35,6 +36,7 @@ const OptimizedChallengeList: React.FC<OptimizedChallengeListProps> = ({
   onShare,
   onFavorite,
   onQuickProgress,
+  onInviteFriends,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'created_at' | 'participant_count' | 'end_date'>('created_at');
@@ -237,6 +239,7 @@ const OptimizedChallengeList: React.FC<OptimizedChallengeListProps> = ({
                 onShare={onShare}
                 onFavorite={onFavorite}
                 onQuickProgress={onQuickProgress}
+                onInviteFriends={onInviteFriends}
                 loading={loading}
               />
             ))}
