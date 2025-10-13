@@ -40,6 +40,7 @@ interface ChallengeCardProps {
   onShare?: (challengeId: string) => void;
   onFavorite?: (challengeId: string) => void;
   onQuickProgress?: (challengeId: string) => void;
+  onInviteFriends?: (challengeId: string) => void;
   loading?: boolean;
   isSelected?: boolean;
   onSelect?: (challengeId: string) => void;
@@ -54,6 +55,7 @@ const ChallengeCard = ({
   onShare,
   onFavorite,
   onQuickProgress,
+  onInviteFriends,
   loading,
   isSelected,
   onSelect,
@@ -189,6 +191,7 @@ const ChallengeCard = ({
             onLeave={onLeave}
             onFavorite={onFavorite}
             onQuickProgress={onQuickProgress}
+            onInviteFriends={onInviteFriends}
           />
 
           {/* Selection indicator */}

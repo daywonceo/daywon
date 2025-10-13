@@ -10,6 +10,7 @@ interface ChallengesTabContentProps {
   onShare: (id: string) => void;
   onFavorite: (id: string) => void;
   onQuickProgress: (id: string) => void;
+  onInviteFriends?: (id: string) => void;
 }
 
 const ChallengesTabContent = ({
@@ -19,6 +20,7 @@ const ChallengesTabContent = ({
   onShare,
   onFavorite,
   onQuickProgress,
+  onInviteFriends,
 }: ChallengesTabContentProps) => {
   return (
     <div className="space-y-4">
@@ -40,6 +42,7 @@ const ChallengesTabContent = ({
         onShare={onShare}
         onFavorite={onFavorite}
         onQuickProgress={onQuickProgress}
+        onInviteFriends={onInviteFriends}
       />
     </div>
   );

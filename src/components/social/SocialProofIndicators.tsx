@@ -1,14 +1,13 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   TrendingUp, 
   Users, 
   Flame, 
   Star,
-  UserPlus,
-  Clock
+  Clock,
+  Award
 } from 'lucide-react';
+import FriendsInChallenge from './challenges/FriendsInChallenge';
 
 interface SocialProofIndicatorsProps {
   challenge: {
@@ -23,6 +22,7 @@ interface SocialProofIndicatorsProps {
     popularity_score?: number;
     time_left_days?: number;
     completion_rate?: number;
+    created_at?: string;
   };
   className?: string;
 }
@@ -33,69 +33,43 @@ const SocialProofIndicators: React.FC<SocialProofIndicatorsProps> = ({
 }) => {
   const {
     participant_count = 0,
-    friends_participating = [],
     is_trending = false,
     popularity_score = 0,
     time_left_days = 0,
     completion_rate = 0,
+    created_at,
   } = challenge;
 
-  const renderFriendsIndicator = () => {
-    if (friends_participating.length === 0) return null;
-
-    const displayedFriends = friends_participating.slice(0, 3);
-    const remainingCount = friends_participating.length - 3;
-
-    return (
-      <div className="flex items-center space-x-1">
-        <UserPlus size={12} className="text-blue-500" />
-        <div className="flex -space-x-1">
-          {displayedFriends.map((friend) => (
-            <Avatar key={friend.id} className="w-4 h-4 border border-white dark:border-gray-800">
-              <AvatarImage src={friend.avatar_url} />
-              <AvatarFallback className="text-xs">
-                {friend.display_name?.charAt(0) || '?'}
-              </AvatarFallback>
-            </Avatar>
-          ))}
-          {remainingCount > 0 && (
-            <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900 border border-white dark:border-gray-800 flex items-center justify-center">
-              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                +{remainingCount}
-              </span>
-            </div>
-          )}
-        </div>
-        <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-          {friends_participating.length === 1 
-            ? `${friends_participating[0].display_name} joined`
-            : `${friends_participating.length} friends joined`
-          }
-        </span>
-      </div>
-    );
-  };
-
   const renderPopularityIndicator = () => {
-    if (popularity_score < 10) return null;
+    if (participant_count < 10) return null;
 
     let label = '';
+    let icon = Star;
     let color = '';
     
-    if (popularity_score >= 50) {
-      label = 'Hot';
-      color = 'text-red-500';
-    } else if (popularity_score >= 25) {
+    if (participant_count > 100) {
+      label = 'Top 5% most popular';
+      icon = Award;
+      color = 'text-status-warning';
+    } else if (participant_count > 50) {
+      label = 'Top 10% most popular';
+      icon = TrendingUp;
+      color = 'text-primary';
+    } else if (participant_count > 20) {
       label = 'Popular';
-      color = 'text-orange-500';
+      icon = Flame;
+      color = 'text-status-warning';
     } else {
       label = 'Growing';
-      color = 'text-green-500';
+      icon = TrendingUp;
+      color = 'text-status-success';
     }
+
+    const Icon = icon;
 
     return (
       <div className={`flex items-center space-x-1 ${color}`}>
-        <Flame size={12} />
+        <Icon size={12} />
         <span className="text-xs font-medium">{label}</span>
       </div>
     );
@@ -105,30 +79,37 @@ const SocialProofIndicators: React.FC<SocialProofIndicatorsProps> = ({
     if (!is_trending) return null;
 
     return (
-      <div className="flex items-center space-x-1 text-purple-500">
+      <div className="flex items-center space-x-1 text-primary">
         <TrendingUp size={12} />
         <span className="text-xs font-medium">Trending</span>
       </div>
     );
   };
 
-  const renderParticipantCount = () => {
-    if (participant_count === 0) return null;
+  const renderRecentJoins = () => {
+    const createdDate = created_at ? new Date(created_at) : null;
+    const now = new Date();
+    const daysSinceCreated = createdDate 
+      ? Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
 
-    return (
-      <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
-        <Users size={12} />
-        <span className="text-xs">
-          {participant_count} participant{participant_count !== 1 ? 's' : ''}
-        </span>
-      </div>
-    );
+    if (daysSinceCreated !== null && daysSinceCreated <= 7 && participant_count >= 10) {
+      return (
+        <div className="flex items-center space-x-1 text-status-success">
+          <Users size={12} />
+          <span className="text-xs font-medium">
+            {participant_count} joined this week
+          </span>
+        </div>
+      );
+    }
+    return null;
   };
 
   const renderUrgencyIndicator = () => {
-    if (time_left_days > 7) return null;
+    if (!time_left_days || time_left_days > 7) return null;
 
-    const urgencyColor = time_left_days <= 2 ? 'text-red-500' : 'text-orange-500';
+    const urgencyColor = time_left_days <= 2 ? 'text-status-error' : 'text-status-warning';
     const urgencyText = time_left_days <= 1 ? 'Ending soon!' : `${time_left_days} days left`;
 
     return (
@@ -143,7 +124,7 @@ const SocialProofIndicators: React.FC<SocialProofIndicatorsProps> = ({
     if (completion_rate === 0 || completion_rate > 90) return null;
 
     return (
-      <div className="flex items-center space-x-1 text-yellow-600 dark:text-yellow-400">
+      <div className="flex items-center space-x-1 text-accent">
         <Star size={12} />
         <span className="text-xs">{completion_rate}% complete rate</span>
       </div>
@@ -151,13 +132,18 @@ const SocialProofIndicators: React.FC<SocialProofIndicatorsProps> = ({
   };
 
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      {renderFriendsIndicator()}
-      {renderTrendingIndicator()}
-      {renderPopularityIndicator()}
-      {renderParticipantCount()}
-      {renderUrgencyIndicator()}
-      {renderCompletionRate()}
+    <div className={`space-y-2 ${className}`}>
+      {/* Friends Participating */}
+      <FriendsInChallenge challengeId={challenge.id} maxDisplay={3} />
+
+      {/* Other Indicators */}
+      <div className="flex flex-wrap items-center gap-2">
+        {renderTrendingIndicator()}
+        {renderPopularityIndicator()}
+        {renderRecentJoins()}
+        {renderUrgencyIndicator()}
+        {renderCompletionRate()}
+      </div>
     </div>
   );
 };

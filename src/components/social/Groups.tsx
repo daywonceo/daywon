@@ -9,6 +9,7 @@ import GroupsHeader from './challenges/GroupsHeader';
 import GroupsNavigation from './challenges/GroupsNavigation';
 import ChallengesTabContent from './challenges/ChallengesTabContent';
 import TeamsTabContent from './teams/TeamsTabContent';
+import InviteToChallengeModal from './challenges/InviteToChallengeModal';
 
 const Groups = () => {
   const [activeTab, setActiveTab] = useState<'challenges' | 'discover' | 'manage' | 'teams'>('challenges');
@@ -17,6 +18,8 @@ const Groups = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedChallenges, setSelectedChallenges] = useState<string[]>([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteModalChallenge, setInviteModalChallenge] = useState<{ id: string; title: string } | null>(null);
   const { challenges, loading, joinChallenge, leaveChallenge, refreshChallenges } = useChallenges();
 
   const handleViewDetails = (challengeId: string) => {
@@ -58,11 +61,18 @@ const Groups = () => {
   };
 
   const handleQuickProgress = (challengeId: string) => {
-    // Quick progress logging
     toast({
       title: "Progress logged",
       description: "Your progress has been updated",
     });
+  };
+
+  const handleInviteFriends = (challengeId: string) => {
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (challenge) {
+      setInviteModalChallenge({ id: challenge.id, title: challenge.title });
+      setShowInviteModal(true);
+    }
   };
 
   const handleJoin = async (id: string) => {
@@ -128,6 +138,7 @@ const Groups = () => {
           onShare={handleShare}
           onFavorite={handleFavorite}
           onQuickProgress={handleQuickProgress}
+          onInviteFriends={handleInviteFriends}
         />
       )}
 
@@ -164,6 +175,16 @@ const Groups = () => {
           onJoin={handleJoin}
           onLeave={handleLeave}
           loading={loading}
+        />
+      )}
+
+      {/* Invite Friends Modal */}
+      {inviteModalChallenge && (
+        <InviteToChallengeModal
+          open={showInviteModal}
+          onOpenChange={setShowInviteModal}
+          challengeId={inviteModalChallenge.id}
+          challengeTitle={inviteModalChallenge.title}
         />
       )}
     </div>

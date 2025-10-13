@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Heart, Plus } from 'lucide-react';
+import { MessageCircle, Heart, Plus, UserPlus } from 'lucide-react';
 
 interface ChallengeCardActionsProps {
   challengeId: string;
@@ -15,6 +15,7 @@ interface ChallengeCardActionsProps {
   onLeave: (id: string) => void;
   onFavorite?: (id: string) => void;
   onQuickProgress?: (id: string) => void;
+  onInviteFriends?: (id: string) => void;
 }
 
 const ChallengeCardActions = ({
@@ -30,6 +31,7 @@ const ChallengeCardActions = ({
   onLeave,
   onFavorite,
   onQuickProgress,
+  onInviteFriends,
 }: ChallengeCardActionsProps) => {
   return (
     <>
@@ -81,6 +83,18 @@ const ChallengeCardActions = ({
             >
               <MessageCircle size={12} className="mr-1" />
               Chat
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onInviteFriends?.(challengeId);
+              }}
+              className="text-xs text-muted-foreground hover:text-primary px-2"
+            >
+              <UserPlus size={12} className="mr-1" />
+              Invite
             </Button>
             <Button
               variant="ghost"
