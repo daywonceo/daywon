@@ -1,74 +1,24 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Target, Users, Trophy, Clock, Plus } from 'lucide-react';
+import { Trophy, Plus } from 'lucide-react';
 import { useChallengeManagement } from '@/hooks/useChallengeManagement';
 import { format, addDays } from 'date-fns';
 import QuickChallengeTemplates from './QuickChallengeTemplates';
+import ChallengeTypeSelector, { CHALLENGE_TYPES } from './challenges/ChallengeTypeSelector';
+import ChallengeBasicForm from './challenges/ChallengeBasicForm';
+import ChallengeScheduleForm from './challenges/ChallengeScheduleForm';
+import ChallengeParticipationForm from './challenges/ChallengeParticipationForm';
 
 interface CreateChallengeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
-
-const CHALLENGE_TYPES = [
-  {
-    id: 'habit_streak',
-    label: 'Habit Streak',
-    description: 'Build a consistent habit over time',
-    icon: '🔥',
-    defaultUnit: 'days',
-    unitOptions: ['days'],
-  },
-  {
-    id: 'workout_count',
-    label: 'Workout Challenge',
-    description: 'Complete a target number of workouts',
-    icon: '💪',
-    defaultUnit: 'workouts',
-    unitOptions: ['workouts', 'sessions'],
-  },
-  {
-    id: 'steps',
-    label: 'Steps Challenge',
-    description: 'Reach a daily or total step goal',
-    icon: '👟',
-    defaultUnit: 'steps',
-    unitOptions: ['steps', 'miles', 'kilometers'],
-  },
-  {
-    id: 'reading',
-    label: 'Reading Challenge',
-    description: 'Read for a target amount of time or pages',
-    icon: '📚',
-    defaultUnit: 'minutes',
-    unitOptions: ['minutes', 'hours', 'pages', 'books'],
-  },
-  {
-    id: 'meditation',
-    label: 'Meditation Challenge',
-    description: 'Build a meditation practice',
-    icon: '🧘‍♀️',
-    defaultUnit: 'sessions',
-    unitOptions: ['sessions', 'minutes', 'hours'],
-  },
-  {
-    id: 'custom',
-    label: 'Custom Challenge',
-    description: 'Create your own unique challenge',
-    icon: '🎯',
-    defaultUnit: 'points',
-    unitOptions: ['points', 'times', 'units'],
-  },
-];
 
 const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallengeModalProps) => {
   const [selectedType, setSelectedType] = useState<string>('');
@@ -220,39 +170,10 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
 
         {/* Challenge Type Selection */}
         {!selectedType && !showTemplates && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <Button type="button" variant="ghost" onClick={handleBack}>
-                ← Back to Templates
-              </Button>
-            </div>
-
-            <div className="text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Choose the type of challenge you want to create
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {CHALLENGE_TYPES.map((type) => (
-                <Card
-                  key={type.id}
-                  className="cursor-pointer hover:shadow-md transition-all duration-200 hover:scale-105 bg-white/90 dark:bg-gray-800/90"
-                  onClick={() => handleTypeSelect(type.id)}
-                >
-                  <CardContent className="p-4 text-center">
-                    <div className="text-3xl mb-2">{type.icon}</div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                      {type.label}
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {type.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <ChallengeTypeSelector
+            onSelect={handleTypeSelect}
+            onBack={handleBack}
+          />
         )}
 
         {/* Challenge Details */}
@@ -269,158 +190,35 @@ const CreateChallengeModal = ({ open, onOpenChange, onSuccess }: CreateChallenge
             </div>
 
             {/* Basic Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center space-x-2">
-                  <Target size={18} />
-                  <span>Challenge Details</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Challenge Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Enter a catchy title for your challenge"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Describe your challenge and motivate participants"
-                    rows={3}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="target_value">Target Goal *</Label>
-                    <Input
-                      id="target_value"
-                      type="number"
-                      value={formData.target_value}
-                      onChange={(e) => handleInputChange('target_value', parseInt(e.target.value))}
-                      min="1"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="target_unit">Unit</Label>
-                    <Select
-                      value={formData.target_unit}
-                      onValueChange={(value) => handleInputChange('target_unit', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedChallengeType.unitOptions.map((unit) => (
-                          <SelectItem key={unit} value={unit}>
-                            {unit}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ChallengeBasicForm
+              formData={{
+                title: formData.title,
+                description: formData.description,
+                target_value: formData.target_value,
+                target_unit: formData.target_unit,
+              }}
+              unitOptions={selectedChallengeType.unitOptions}
+              onChange={handleInputChange}
+            />
 
             {/* Dates */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center space-x-2">
-                  <Calendar size={18} />
-                  <span>Schedule</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="start_date">Start Date *</Label>
-                    <Input
-                      id="start_date"
-                      type="date"
-                      value={formData.start_date}
-                      onChange={(e) => handleInputChange('start_date', e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="end_date">End Date *</Label>
-                    <Input
-                      id="end_date"
-                      type="date"
-                      value={formData.end_date}
-                      onChange={(e) => handleInputChange('end_date', e.target.value)}
-                      min={formData.start_date}
-                      required
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ChallengeScheduleForm
+              formData={{
+                start_date: formData.start_date,
+                end_date: formData.end_date,
+              }}
+              onChange={handleInputChange}
+            />
 
             {/* Participation Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center space-x-2">
-                  <Users size={18} />
-                  <span>Participation</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="max_participants">Max Participants (optional)</Label>
-                  <Input
-                    id="max_participants"
-                    type="number"
-                    value={formData.max_participants}
-                    onChange={(e) => handleInputChange('max_participants', e.target.value)}
-                    placeholder="Leave empty for unlimited"
-                    min="1"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Leave empty for unlimited participants
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Team-based Challenge</Label>
-                    <p className="text-xs text-gray-500">
-                      Allow participants to form teams
-                    </p>
-                  </div>
-                  <Switch
-                    checked={formData.is_team_based}
-                    onCheckedChange={(checked) => handleInputChange('is_team_based', checked)}
-                  />
-                </div>
-
-                {formData.is_team_based && (
-                  <div>
-                    <Label htmlFor="max_team_size">Max Team Size</Label>
-                    <Input
-                      id="max_team_size"
-                      type="number"
-                      value={formData.max_team_size}
-                      onChange={(e) => handleInputChange('max_team_size', parseInt(e.target.value))}
-                      min="2"
-                      max="20"
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <ChallengeParticipationForm
+              formData={{
+                max_participants: formData.max_participants,
+                is_team_based: formData.is_team_based,
+                max_team_size: formData.max_team_size,
+              }}
+              onChange={handleInputChange}
+            />
 
             {/* Rules (Optional) */}
             <Card>
