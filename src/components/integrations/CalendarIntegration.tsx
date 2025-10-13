@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { Calendar, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const CalendarIntegration: React.FC = () => {
   const { isConnected, connectIntegration, disconnectIntegration, updateIntegrationSettings, getIntegration, triggerSync } = useIntegrations();
@@ -19,21 +20,38 @@ export const CalendarIntegration: React.FC = () => {
   const handleConnect = async () => {
     setIsConnecting(true);
     try {
-      toast({
-        title: "OAuth Required",
-        description: "Google Calendar integration requires OAuth setup in a production environment",
+      // Initiate Google OAuth flow with Calendar scope
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          scopes: 'https://www.googleapis.com/auth/calendar',
+          redirectTo: `${window.location.origin}/integrations`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
       });
-      
-      // For demo purposes, simulate connection
-      await connectIntegration('calendar', 'demo_token', undefined, undefined, {
-        syncToCalendar: true,
-        createReminders: true,
-        defaultCalendar: 'primary',
-        reminderMinutes: 15,
-        syncCompletions: false,
-      });
+
+      if (error) {
+        toast({
+          title: "Connection Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Redirecting to Google",
+          description: "Please authorize calendar access",
+        });
+      }
     } catch (error) {
       console.error('Calendar connection error:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to Google Calendar",
+        variant: "destructive",
+      });
     } finally {
       setIsConnecting(false);
     }
