@@ -80,7 +80,7 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
                 </div>
               </div>
               <p className="text-xl font-bold text-primary mb-1">{profile.totalHabitsCompleted}</p>
-              <p className="text-xs text-muted-foreground font-medium">Completed</p>
+              <p className="text-xs text-muted-foreground font-medium">Challenges</p>
             </div>
           </div>
         </div>

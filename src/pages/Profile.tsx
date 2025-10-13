@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,6 +24,7 @@ import { useHabitScoring } from "@/hooks/useHabitScoring";
 import { useFriends } from "@/hooks/useFriends";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const Profile = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMobileEditor, setShowMobileEditor] = useState(false);
   const [showIntegrations, setShowIntegrations] = useState(false);
+  const [completedChallenges, setCompletedChallenges] = useState(0);
   const { signOut, session, user } = useAuth();
   
   // Debug auth state
@@ -39,6 +41,25 @@ const Profile = () => {
   const { streakStats, todayStats } = useHabitStats();
   const { calculateHabitScore } = useHabitScoring();
   const { friends } = useFriends();
+
+  // Fetch completed challenges count
+  useEffect(() => {
+    const fetchCompletedChallenges = async () => {
+      if (!user?.id) return;
+      
+      const { count, error } = await supabase
+        .from('challenge_participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('status', 'completed');
+      
+      if (!error && count !== null) {
+        setCompletedChallenges(count);
+      }
+    };
+    
+    fetchCompletedChallenges();
+  }, [user?.id]);
   
   const handleSignOut = async () => {
     try {
@@ -72,7 +93,7 @@ const Profile = () => {
       topHabit: "Active"
     })),
     daysActive: Math.floor((new Date().getTime() - new Date(currentUserProfile?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24)),
-    totalHabitsCompleted: todayStats.completedCount,
+    totalHabitsCompleted: completedChallenges,
     weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100)
   };
 
