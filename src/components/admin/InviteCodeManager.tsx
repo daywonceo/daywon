@@ -117,47 +117,51 @@ export const InviteCodeManager = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
           <Shield className="h-5 w-5" />
           Day Won Member Invite Codes
         </CardTitle>
-        <CardDescription>
-          Generate and manage exclusive invite codes for Day Won Members (Max 25 unused codes)
+        <CardDescription className="text-sm">
+          Generate and manage exclusive invite codes (Max 25 unused)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-4">
-            <Badge variant="secondary">{unusedCount} Available</Badge>
-            <Badge variant="outline">{usedCount} Used</Badge>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="text-xs sm:text-sm">{unusedCount} Available</Badge>
+            <Badge variant="outline" className="text-xs sm:text-sm">{usedCount} Used</Badge>
           </div>
           <Button
             onClick={generateInviteCode}
             disabled={generating || unusedCount >= 25}
             size="sm"
+            className="w-full sm:w-auto"
           >
             <Plus className="h-4 w-4 mr-2" />
             Generate Code
           </Button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {inviteCodes.map((code) => (
             <div
               key={code.id}
-              className="flex items-center justify-between p-3 border rounded-lg"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 border rounded-lg bg-card"
             >
-              <div className="flex-1">
-                <p className="font-mono text-sm font-semibold">{code.code}</p>
-                <p className="text-xs text-muted-foreground">
+              <div className="flex-1 min-w-0">
+                <p className="font-mono text-xs sm:text-sm font-semibold break-all">{code.code}</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   {code.is_used 
                     ? `Used on ${new Date(code.used_at!).toLocaleDateString()}`
                     : `Expires ${new Date(code.expires_at).toLocaleDateString()}`
                   }
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={code.is_used ? 'secondary' : 'default'}>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <Badge 
+                  variant={code.is_used ? 'secondary' : 'default'}
+                  className="text-xs"
+                >
                   {code.is_used ? 'Used' : 'Active'}
                 </Badge>
                 {!code.is_used && (
@@ -165,6 +169,7 @@ export const InviteCodeManager = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => copyInviteLink(code.code)}
+                    className="h-8 w-8 p-0"
                   >
                     <Copy className="h-4 w-4" />
                   </Button>

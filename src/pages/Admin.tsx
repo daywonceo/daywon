@@ -20,13 +20,13 @@ const Admin = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 container max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
+      <main className="flex-1 container max-w-4xl mx-auto px-4 py-6 sm:py-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6">Admin Panel</h1>
         
         {/* User ID Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <User className="h-5 w-5" />
               Your User ID
             </CardTitle>
@@ -35,8 +35,8 @@ const Admin = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 p-3 bg-muted rounded-lg font-mono text-sm overflow-x-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <code className="flex-1 p-3 bg-muted rounded-lg font-mono text-xs sm:text-sm overflow-x-auto break-all">
                 {user?.id || 'Not logged in'}
               </code>
               <Button
@@ -44,16 +44,20 @@ const Admin = () => {
                 size="sm"
                 onClick={copyUserId}
                 disabled={!user?.id}
+                className="w-full sm:w-auto"
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-4 w-4 mr-2 sm:mr-0" />
+                <span className="sm:hidden">Copy User ID</span>
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              Run this SQL in Supabase to become admin:
-            </p>
-            <code className="block mt-2 p-3 bg-muted rounded-lg font-mono text-xs overflow-x-auto">
-              INSERT INTO user_roles (user_id, role) VALUES ('{user?.id}', 'admin');
-            </code>
+            <div className="mt-4 space-y-2">
+              <p className="text-xs text-muted-foreground">
+                Run this SQL in Supabase to become admin:
+              </p>
+              <code className="block p-3 bg-muted rounded-lg font-mono text-xs overflow-x-auto">
+                INSERT INTO user_roles (user_id, role) VALUES ('{user?.id}', 'admin');
+              </code>
+            </div>
           </CardContent>
         </Card>
 
