@@ -120,22 +120,34 @@ export const synchronizeHabits = async (forceSync: boolean = false): Promise<boo
             .maybeSingle();
 
           if (existingActivity) {
-            // Update existing activity
-            const { error: updateError } = await supabase
+            // CRITICAL: Never overwrite a "completed" status
+            // First, fetch the current status from the server
+            const { data: currentActivity } = await supabase
               .from('habit_activities')
-              .update({
-                status: activity.status,
-                habit_name: activity.habitName,
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', existingActivity.id);
+              .select('status')
+              .eq('id', existingActivity.id)
+              .single();
 
-            if (updateError) {
-              console.error(`❌ Failed to update activity for ${activity.habitName} on ${activity.date}:`, updateError);
-              continue;
+            // Only update if the current status is NOT completed, OR if we're also trying to set it to completed
+            if (currentActivity?.status !== 'completed' || activity.status === 'completed') {
+              const { error: updateError } = await supabase
+                .from('habit_activities')
+                .update({
+                  status: activity.status,
+                  habit_name: activity.habitName,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', existingActivity.id);
+
+              if (updateError) {
+                console.error(`❌ Failed to update activity for ${activity.habitName} on ${activity.date}:`, updateError);
+                continue;
+              }
+
+              console.log(`✅ Updated activity for ${activity.habitName} on ${activity.date} (${currentActivity?.status} → ${activity.status})`);
+            } else {
+              console.log(`🔒 Protected completed status for ${activity.habitName} on ${activity.date} - ignoring ${activity.status} update`);
             }
-
-            console.log(`✅ Updated activity for ${activity.habitName} on ${activity.date}`);
           } else {
             // Create new activity
             const { error: insertError } = await supabase
@@ -207,8 +219,16 @@ export const synchronizeHabits = async (forceSync: boolean = false): Promise<boo
         };
         
         if (existingIndex >= 0) {
-          // Update existing local activity with server data (server is source of truth)
-          mergedActivities[existingIndex] = localActivity;
+          // CRITICAL: Never overwrite a "completed" status with anything else
+          const currentLocal = mergedActivities[existingIndex];
+          
+          if (currentLocal.status === 'completed' && localActivity.status !== 'completed') {
+            console.log(`🔒 Protected local completed status for ${currentLocal.habitName} on ${currentLocal.date} - ignoring server ${localActivity.status}`);
+            // Keep the local completed status, don't overwrite with server data
+          } else {
+            // Safe to update: either local is not completed, or server is also completed
+            mergedActivities[existingIndex] = localActivity;
+          }
         } else {
           // Add new activity from server
           mergedActivities.push(localActivity);
