@@ -3,7 +3,8 @@ import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Trophy, Users, Calendar } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Users, Calendar, Sparkles } from "lucide-react";
 
 interface ProfileData {
   name: string;
@@ -12,6 +13,7 @@ interface ProfileData {
   friendCount: number;
   daysActive: number;
   totalHabitsCompleted: number;
+  isDayWonMember?: boolean;
 }
 
 interface ProfileHeaderProps {
@@ -43,8 +45,16 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
           </div>
           
           {/* Enhanced Name Section */}
-          <div className="mb-6 space-y-1">
-            <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{profile.name}</h2>
+          <div className="mb-6 space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{profile.name}</h2>
+              {profile.isDayWonMember && (
+                <Badge variant="default" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Day Won Member
+                </Badge>
+              )}
+            </div>
             <p className="text-muted-foreground bg-muted/50 px-3 py-1 rounded-full text-sm">@{profile.username}</p>
           </div>
           

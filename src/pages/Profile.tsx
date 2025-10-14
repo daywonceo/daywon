@@ -94,7 +94,8 @@ const Profile = () => {
     })),
     daysActive: Math.floor((new Date().getTime() - new Date(currentUserProfile?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24)),
     totalHabitsCompleted: completedChallenges,
-    weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100)
+    weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100),
+    isDayWonMember: currentUserProfile?.is_day_won_member || false
   };
 
 

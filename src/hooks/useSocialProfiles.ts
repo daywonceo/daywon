@@ -12,6 +12,8 @@ export interface UserProfile {
   last_active: string;
   created_at: string;
   username?: string | null;
+  is_day_won_member?: boolean;
+  day_won_member_since?: string;
 }
 
 export interface UpdateProfileData {

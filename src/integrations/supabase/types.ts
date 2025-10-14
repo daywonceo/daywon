@@ -754,6 +754,39 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          is_used: boolean | null
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       meal_plans: {
         Row: {
           created_at: string
@@ -981,10 +1014,12 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          day_won_member_since: string | null
           display_name: string | null
           email: string | null
           focus_areas: string[] | null
           id: string
+          is_day_won_member: boolean | null
           last_active: string | null
           name_changed_at: string | null
           onboarding_complete: boolean | null
@@ -1000,10 +1035,12 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          day_won_member_since?: string | null
           display_name?: string | null
           email?: string | null
           focus_areas?: string[] | null
           id: string
+          is_day_won_member?: boolean | null
           last_active?: string | null
           name_changed_at?: string | null
           onboarding_complete?: boolean | null
@@ -1019,10 +1056,12 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          day_won_member_since?: string | null
           display_name?: string | null
           email?: string | null
           focus_areas?: string[] | null
           id?: string
+          is_day_won_member?: boolean | null
           last_active?: string | null
           name_changed_at?: string | null
           onboarding_complete?: boolean | null
@@ -1493,6 +1532,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_top_habits: {
         Row: {
           created_at: string
@@ -1740,6 +1800,13 @@ export type Database = {
           target_description: string
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       increment_friend_request_count: {
         Args: { sender_id: string }
         Returns: undefined
@@ -1755,6 +1822,10 @@ export type Database = {
       normalize_habit_name: {
         Args: { habit_name: string }
         Returns: string
+      }
+      redeem_invite_code: {
+        Args: { p_code: string }
+        Returns: Json
       }
       resume_habit: {
         Args: { p_habit: string }
@@ -1812,7 +1883,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1939,6 +2010,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
