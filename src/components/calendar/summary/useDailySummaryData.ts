@@ -14,6 +14,12 @@ export const useDailySummaryData = (date: Date | null) => {
   const [actualTimeSpent, setActualTimeSpent] = useState<number>(0);
   const [sectionBreakdown, setSectionBreakdown] = useState<Record<string, number>>({});
   
+  // ALWAYS call hooks unconditionally at the top level
+  const dateStr = date?.toISOString().split('T')[0] || '';
+  const { getSessionForDate } = useAppSessions();
+  const { activities: guidanceActivities, loading: guidanceLoading } = useGuidanceActivity(dateStr);
+  
+  // Now we can do the early return AFTER all hooks are called
   if (!date) {
     return {
       completedHabits: [],
@@ -26,7 +32,6 @@ export const useDailySummaryData = (date: Date | null) => {
   }
 
   const habitActivities = getHabitActivities();
-  const dateStr = date.toISOString().split('T')[0];
   
   const completedHabits: HabitData[] = habitActivities
     .filter(activity => activity.date === dateStr && activity.status === 'completed')
@@ -43,9 +48,6 @@ export const useDailySummaryData = (date: Date | null) => {
       habitId: activity.habitId,
       streak: calculateStreakForDate(activity.habitId, date)
     }));
-
-  const { getSessionForDate } = useAppSessions();
-  const { activities: guidanceActivities, loading: guidanceLoading } = useGuidanceActivity(dateStr);
   
   useEffect(() => {
     const getSessionData = async () => {
