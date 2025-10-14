@@ -345,8 +345,8 @@ export const AnalyticsDashboard: React.FC = () => {
               <LineChart data={analyticsData.trends.weeklyCompletion}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={(value) => `${value}%`} />
+                <Tooltip formatter={(value) => `${value}%`} />
                 <Line 
                   type="monotone" 
                   dataKey="completion" 
