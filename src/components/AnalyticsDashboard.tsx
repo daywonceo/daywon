@@ -175,7 +175,7 @@ export const AnalyticsDashboard: React.FC = () => {
     const habitPerformance = Object.entries(categoryStats)
       .map(([name, stats]) => ({
         name,
-        completion: stats.total > 0 ? (stats.completed / stats.total) * 100 : 0,
+        completion: stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
         completed: stats.completed,
         total: stats.total
       }))
@@ -369,9 +369,12 @@ export const AnalyticsDashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={analyticsData.trends.habitPerformance}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <XAxis dataKey="name" hide />
+                <YAxis tickFormatter={(value) => `${value}%`} />
+                <Tooltip 
+                  formatter={(value, name, props) => [`${value}%`, 'Completion']}
+                  labelFormatter={(label, payload) => payload?.[0]?.payload?.name || label}
+                />
                 <Bar dataKey="completion" fill="#82ca9d" />
               </BarChart>
             </ResponsiveContainer>
