@@ -323,6 +323,17 @@ export const HelpCenter: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-3 mb-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => window.history.back()}
+          className="text-xs sm:text-sm"
+        >
+          ← Back
+        </Button>
+      </div>
+      
       <div className="text-center space-y-1 sm:space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold">Help Center</h1>
         <p className="text-sm sm:text-base text-muted-foreground px-4">
