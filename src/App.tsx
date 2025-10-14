@@ -26,7 +26,7 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const Help = lazy(() => import("./pages/Help"));
 const Advanced = lazy(() => import("./pages/Advanced"));
 const RedeemInvite = lazy(() => import("./pages/RedeemInvite"));
-const Admin = lazy(() => import("./pages/Admin"));
+
 
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -221,7 +221,7 @@ const AppContent: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/redeem" element={<RedeemInvite />} />
-          <Route path="/admin" element={<Admin />} />
+          
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

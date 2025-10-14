@@ -30,6 +30,7 @@ import { toast } from "@/hooks/use-toast";
 import { DataExportCenter } from "@/components/DataExportCenter";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { HelpCenter } from "@/components/HelpCenter";
+import { InviteCodeManager } from "@/components/admin/InviteCodeManager";
 import {
   Settings,
   Target,
@@ -226,6 +227,26 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     ));
   };
 
+  // Check admin status
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  
+  React.useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!currentUserProfile?.id) return;
+      
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', currentUserProfile.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      setIsAdmin(!!data);
+    };
+    
+    checkAdminStatus();
+  }, [currentUserProfile?.id]);
+
   const menuItems = [
     { id: "profile", label: "Edit Profile", icon: User },
     { id: "saved-content", label: "Saved Content", icon: BookmarkCheck },
@@ -233,6 +254,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "data-export", label: "Data Export", icon: Download },
     { id: "help", label: "Help Center", icon: HelpCircle },
+    ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: Shield }] : []),
     { id: "privacy", label: "Privacy & Security", icon: Shield },
     { id: "account", label: "Account Settings", icon: Settings },
     { id: "about", label: "About & Legal", icon: FileText },
@@ -621,6 +643,56 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+        );
+
+      case "admin":
+        return (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold">Admin Panel</h3>
+            
+            {/* User ID Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <User className="h-4 w-4" />
+                  Your User ID
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <code className="flex-1 p-3 bg-muted rounded-lg font-mono text-xs overflow-x-auto break-all">
+                    {currentUserProfile?.id || 'Not logged in'}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (currentUserProfile?.id) {
+                        navigator.clipboard.writeText(currentUserProfile.id);
+                        toast({
+                          title: "Copied!",
+                          description: "User ID copied to clipboard",
+                        });
+                      }
+                    }}
+                    disabled={!currentUserProfile?.id}
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    Run this SQL in Supabase to become admin:
+                  </p>
+                  <code className="block p-3 bg-muted rounded-lg font-mono text-xs overflow-x-auto">
+                    INSERT INTO user_roles (user_id, role) VALUES ('{currentUserProfile?.id}', 'admin');
+                  </code>
+                </div>
+              </CardContent>
+            </Card>
+
+            <InviteCodeManager />
           </div>
         );
 
