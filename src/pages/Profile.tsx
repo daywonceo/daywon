@@ -197,11 +197,11 @@ const Profile = () => {
                   Manage Connected Apps
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
-                <DialogHeader>
-                  <DialogTitle>Connected Apps & Integrations</DialogTitle>
+              <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[85vh] overflow-hidden p-4 sm:p-6">
+                <DialogHeader className="pb-3">
+                  <DialogTitle className="text-lg sm:text-xl">Connected Apps & Integrations</DialogTitle>
                 </DialogHeader>
-                <div className="overflow-y-auto max-h-[60vh]">
+                <div className="overflow-y-auto max-h-[70vh] -mx-4 sm:mx-0 px-4 sm:px-0">
                   <IntegrationsPage />
                 </div>
               </DialogContent>
