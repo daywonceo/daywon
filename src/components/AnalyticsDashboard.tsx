@@ -153,7 +153,7 @@ export const AnalyticsDashboard: React.FC = () => {
       
       weeklyData.push({
         date: format(date, 'MMM dd'),
-        completion: total > 0 ? (completed / total) * 100 : 0,
+        completion: total > 0 ? Math.round((completed / total) * 100) : 0,
         completed,
         total
       });
