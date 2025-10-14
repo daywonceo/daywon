@@ -61,16 +61,16 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
           
           {/* Enhanced Name Section */}
           <div className="mb-6 space-y-2">
-            <div className="flex items-center justify-center gap-2">
-              <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{profile.name}</h2>
-              {profile.isDayWonMember && (
+            <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">{profile.name}</h2>
+            <p className="text-muted-foreground bg-muted/50 px-3 py-1 rounded-full text-sm">@{profile.username}</p>
+            {profile.isDayWonMember && (
+              <div className="flex justify-center">
                 <Badge variant="default" className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 hover:from-yellow-500 hover:to-yellow-700 border-0 shadow-lg shadow-yellow-500/30">
                   <Sparkles className="h-3 w-3 mr-1" />
                   Day Won Member
                 </Badge>
-              )}
-            </div>
-            <p className="text-muted-foreground bg-muted/50 px-3 py-1 rounded-full text-sm">@{profile.username}</p>
+              </div>
+            )}
           </div>
           
           {/* Enhanced Stats Grid */}
