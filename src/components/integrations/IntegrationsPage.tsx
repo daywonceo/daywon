@@ -217,10 +217,18 @@ export const IntegrationsPage: React.FC = () => {
       </div>
 
       <Tabs defaultValue="available" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="available">Available</TabsTrigger>
-          <TabsTrigger value="connected">Connected ({integrations.filter(i => i.is_connected).length})</TabsTrigger>
-          <TabsTrigger value="logs">Sync History</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="available" className="text-xs sm:text-sm px-2 sm:px-4 py-2">
+            Available
+          </TabsTrigger>
+          <TabsTrigger value="connected" className="text-xs sm:text-sm px-2 sm:px-4 py-2">
+            <span className="hidden sm:inline">Connected ({integrations.filter(i => i.is_connected).length})</span>
+            <span className="sm:hidden">({integrations.filter(i => i.is_connected).length})</span>
+          </TabsTrigger>
+          <TabsTrigger value="logs" className="text-xs sm:text-sm px-2 sm:px-4 py-2">
+            <span className="hidden sm:inline">Sync History</span>
+            <span className="sm:hidden">History</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="available" className="space-y-6">
