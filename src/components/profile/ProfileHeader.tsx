@@ -1,10 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Users, Calendar, Sparkles } from "lucide-react";
+import { DayWonMembersModal } from "./DayWonMembersModal";
 
 interface ProfileData {
   name: string;
@@ -21,6 +22,8 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
+  const [showDayWonMembers, setShowDayWonMembers] = useState(false);
+  
   return (
     <Card className={`glass-card group relative overflow-hidden ${
       profile.isDayWonMember 
@@ -65,13 +68,22 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
             <p className="text-muted-foreground bg-muted/50 px-3 py-1 rounded-full text-sm">@{profile.username}</p>
             {profile.isDayWonMember && (
               <div className="flex justify-center">
-                <Badge variant="default" className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 hover:from-yellow-500 hover:to-yellow-700 border-0 shadow-lg shadow-yellow-500/30">
+                <Badge 
+                  variant="default" 
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 hover:from-yellow-500 hover:to-yellow-700 border-0 shadow-lg shadow-yellow-500/30 cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => setShowDayWonMembers(true)}
+                >
                   <Sparkles className="h-3 w-3 mr-1" />
                   Day Won Member
                 </Badge>
               </div>
             )}
           </div>
+          
+          <DayWonMembersModal 
+            open={showDayWonMembers} 
+            onOpenChange={setShowDayWonMembers} 
+          />
           
           {/* Enhanced Stats Grid */}
           <div className="grid grid-cols-3 gap-6 w-full max-w-sm">
