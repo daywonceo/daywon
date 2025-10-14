@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getHabitActivities } from "@/utils/habitActivity";
 import { calculateStreakForDate } from "@/utils/habitStreaks";
 import { useGuidanceActivity } from "@/hooks/useGuidanceActivity";
@@ -19,39 +19,48 @@ export const useDailySummaryData = (date: Date | null) => {
   const { getSessionForDate } = useAppSessions();
   const { activities: guidanceActivities, loading: guidanceLoading } = useGuidanceActivity(dateStr);
   
-  // Now we can do the early return AFTER all hooks are called
-  if (!date) {
+  // Calculate habit data using useMemo to avoid recreating on every render
+  const { completedHabits, failedHabits } = useMemo(() => {
+    if (!date) {
+      return {
+        completedHabits: [],
+        failedHabits: []
+      };
+    }
+
+    const habitActivities = getHabitActivities();
+    const dateString = date.toISOString().split('T')[0];
+    
+    const completed: HabitData[] = habitActivities
+      .filter(activity => activity.date === dateString && activity.status === 'completed')
+      .map(activity => ({
+        name: activity.habitName,
+        habitId: activity.habitId,
+        streak: calculateStreakForDate(activity.habitId, date)
+      }));
+
+    const failed: HabitData[] = habitActivities
+      .filter(activity => activity.date === dateString && activity.status === 'failed')
+      .map(activity => ({
+        name: activity.habitName,
+        habitId: activity.habitId,
+        streak: calculateStreakForDate(activity.habitId, date)
+      }));
+
     return {
-      completedHabits: [],
-      failedHabits: [],
-      actualTimeSpent: 0,
-      sectionBreakdown: {},
-      guidanceActivities: [],
-      guidanceLoading: false
+      completedHabits: completed,
+      failedHabits: failed
     };
-  }
-
-  const habitActivities = getHabitActivities();
+  }, [date]);
   
-  const completedHabits: HabitData[] = habitActivities
-    .filter(activity => activity.date === dateStr && activity.status === 'completed')
-    .map(activity => ({
-      name: activity.habitName,
-      habitId: activity.habitId,
-      streak: calculateStreakForDate(activity.habitId, date)
-    }));
-
-  const failedHabits: HabitData[] = habitActivities
-    .filter(activity => activity.date === dateStr && activity.status === 'failed')
-    .map(activity => ({
-      name: activity.habitName,
-      habitId: activity.habitId,
-      streak: calculateStreakForDate(activity.habitId, date)
-    }));
-  
+  // ALWAYS call useEffect unconditionally
   useEffect(() => {
     const getSessionData = async () => {
-      if (!date) return;
+      if (!date) {
+        setActualTimeSpent(0);
+        setSectionBreakdown({});
+        return;
+      }
       
       const dateStr = date.toISOString().split('T')[0];
       const stored = localStorage.getItem('appTimeSession');
