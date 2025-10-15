@@ -651,9 +651,9 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                       <Card className="text-center py-12">
                         <CardContent>
                           <div className="flex flex-col items-center">
-                            {habitFilter === 'active' && <CheckCircle2 className="h-12 w-12 text-gray-400 mb-4" />}
-                            {habitFilter === 'ended' && <Target className="h-12 w-12 text-gray-400 mb-4" />}
-                            {habitFilter === 'trash' && <Trash2 className="h-12 w-12 text-gray-400 mb-4" />}
+                            {habitFilter === 'active' && <CheckCircle2 className="h-5 w-5 text-muted-foreground mb-4" />}
+                            {habitFilter === 'ended' && <Target className="h-5 w-5 text-muted-foreground mb-4" />}
+                            {habitFilter === 'trash' && <Trash2 className="h-5 w-5 text-muted-foreground mb-4" />}
                             <h3 className="text-lg font-semibold mb-2">
                               {habitFilter === 'active' && 'No Active Habits'}
                               {habitFilter === 'ended' && 'No Ended Habits'}
