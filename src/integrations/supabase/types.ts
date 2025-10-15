@@ -1028,7 +1028,7 @@ export type Database = {
           status: string | null
           updated_at: string
           user_intent: string | null
-          username: string
+          username: string | null
           username_history: Json | null
         }
         Insert: {
@@ -1049,7 +1049,7 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_intent?: string | null
-          username: string
+          username?: string | null
           username_history?: Json | null
         }
         Update: {
@@ -1070,7 +1070,7 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_intent?: string | null
-          username?: string
+          username?: string | null
           username_history?: Json | null
         }
         Relationships: []
