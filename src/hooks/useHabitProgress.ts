@@ -18,11 +18,6 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
   const { habits } = useHabits();
   
   const progressData = useMemo(() => {
-    // Safety check: return empty array if habits not loaded yet
-    if (!habits || habits.length === 0) {
-      return [];
-    }
-    
     const activities = getHabitActivities();
     const now = new Date();
     
