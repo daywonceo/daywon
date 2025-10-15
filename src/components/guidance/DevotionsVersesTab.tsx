@@ -8,7 +8,10 @@ import { RefreshCw, ToggleLeft, ToggleRight } from "lucide-react";
 import VerseCard from "./VerseCard";
 import TranslationSelector from "./TranslationSelector";
 import CategorySelector from "./CategorySelector";
+import DevotionsSearchBar from "./DevotionsSearchBar";
+import SearchResults from "./SearchResults";
 import { useBibleVerses } from "@/hooks/useBibleVerses";
+import { useBibleSearch } from "@/hooks/useBibleSearch";
 
 interface DevotionsVersesTabProps {
   selectedTranslation: string;
@@ -30,6 +33,8 @@ const DevotionsVersesTab = ({
   onTranslationDialogOpenChange
 }: DevotionsVersesTabProps) => {
   const [isFullPassage, setIsFullPassage] = useState(false);
+  const [searchMode, setSearchMode] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   const {
     bibleVerses,
@@ -38,14 +43,70 @@ const DevotionsVersesTab = ({
     fetchBibleVerses
   } = useBibleVerses(selectedTranslation, selectedCategory, isFullPassage);
 
+  const {
+    searchResults,
+    isSearching,
+    searchError,
+    searchBible,
+    highlightKeyword
+  } = useBibleSearch();
+
   const handleTranslationChange = (translation: string) => {
     onTranslationChange(translation);
     onTranslationDialogOpenChange(false);
   };
 
+  const handleSearch = (keyword: string) => {
+    setSearchKeyword(keyword);
+    if (keyword.trim()) {
+      setSearchMode(true);
+      searchBible(keyword, selectedTranslation);
+    } else {
+      setSearchMode(false);
+    }
+  };
+
   return (
     <div className="animate-fade-in">
-      <div className="space-y-4">
+      <div className="mb-4">
+        <DevotionsSearchBar 
+          onSearch={handleSearch}
+          isSearching={isSearching}
+        />
+      </div>
+
+      {searchMode ? (
+        <div className="space-y-4">
+          <div className="mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchMode(false);
+                setSearchKeyword("");
+              }}
+              className="text-sm h-9"
+            >
+              ← Back to Curated Verses
+            </Button>
+          </div>
+          
+          {searchError && (
+            <Card className="mb-6 border-red-200 dark:border-red-800">
+              <CardContent className="p-3">
+                <p className="text-red-600 dark:text-red-400 text-sm">{searchError}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          <SearchResults 
+            results={searchResults}
+            keyword={searchKeyword}
+            highlightKeyword={highlightKeyword}
+          />
+        </div>
+      ) : (
+        <div className="space-y-4">
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               Curated Daily Verses
@@ -121,9 +182,9 @@ const DevotionsVersesTab = ({
           </div>
 
           {versesError && (
-            <Card className="mb-4 border-destructive">
+            <Card className="mb-4 border-red-200 dark:border-red-800">
               <CardContent className="p-3">
-                <p className="text-destructive text-sm">{versesError}</p>
+                <p className="text-red-600 dark:text-red-400 text-sm">{versesError}</p>
               </CardContent>
             </Card>
           )}
@@ -151,6 +212,7 @@ const DevotionsVersesTab = ({
             )}
           </div>
         </div>
+      )}
     </div>
   );
 };

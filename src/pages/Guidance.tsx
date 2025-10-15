@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SearchBar from "@/components/guidance/SearchBar";
 import GuidanceTabs from "@/components/guidance/GuidanceTabs";
 import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 
@@ -41,6 +42,16 @@ const Guidance = () => {
       </div>
       
       <main className="px-responsive py-8 pb-safe-mobile max-w-4xl mx-auto w-full">
+
+        {showSearchBar && (
+          <div className="mb-8">
+            <SearchBar 
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+          </div>
+        )}
+
         <FeatureErrorBoundary featureName="Guidance">
           <GuidanceTabs
             searchQuery={searchQuery}
