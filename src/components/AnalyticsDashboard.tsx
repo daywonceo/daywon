@@ -131,6 +131,16 @@ export const AnalyticsDashboard: React.FC = () => {
       return activityDate >= habitCreated;
     });
     
+    // Calculate days each habit should have been tracked
+    const calculateExpectedDays = (habitId: string): number => {
+      const habitCreated = habitCreationDates.get(habitId);
+      if (!habitCreated) return Math.ceil((periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      
+      const effectiveStart = habitCreated > periodStart ? habitCreated : periodStart;
+      const daysSinceCreation = Math.ceil((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      return Math.max(1, daysSinceCreation);
+    };
+    
     const completedActivities = validActivities.filter(a => a.status === 'completed').length;
     const totalActivities = validActivities.length;
     const completionRate = totalActivities > 0 ? (completedActivities / totalActivities) * 100 : 0;
@@ -159,25 +169,38 @@ export const AnalyticsDashboard: React.FC = () => {
       });
     }
 
-    // Habit category performance - use validActivities
-    const categoryStats: { [key: string]: { completed: number; total: number } } = {};
+    // Habit category performance - properly calculate completion vs expected days
+    const categoryStats: { [key: string]: { completed: number; expected: number; habitId: string } } = {};
+    
+    // Group activities by habit
+    const activitiesByHabit = new Map<string, any[]>();
     validActivities.forEach(activity => {
-      const category = activity.habit_name || 'Other';
-      if (!categoryStats[category]) {
-        categoryStats[category] = { completed: 0, total: 0 };
+      const habitName = activity.habit_name || 'Other';
+      if (!activitiesByHabit.has(habitName)) {
+        activitiesByHabit.set(habitName, []);
       }
-      categoryStats[category].total++;
-      if (activity.status === 'completed') {
-        categoryStats[category].completed++;
-      }
+      activitiesByHabit.get(habitName)!.push(activity);
+    });
+    
+    // Calculate stats for each habit
+    activitiesByHabit.forEach((habitActivities, habitName) => {
+      const habitId = habitActivities[0]?.habit_id;
+      const expectedDays = calculateExpectedDays(habitId);
+      const completedCount = habitActivities.filter(a => a.status === 'completed').length;
+      
+      categoryStats[habitName] = {
+        completed: completedCount,
+        expected: expectedDays,
+        habitId
+      };
     });
 
     const habitPerformance = Object.entries(categoryStats)
       .map(([name, stats]) => ({
         name,
-        completion: stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
+        completion: stats.expected > 0 ? Math.round((stats.completed / stats.expected) * 100) : 0,
         completed: stats.completed,
-        total: stats.total
+        total: stats.expected
       }))
       .sort((a, b) => b.completion - a.completion)
       .slice(0, 5);
