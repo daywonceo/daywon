@@ -48,85 +48,36 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       return { startDate, endDate };
     };
 
-    // Helper function to count completions in date range, accounting for habit creation dates
-    const countCompletions = (startDate: Date, endDate: Date, referenceHabits: string[]) => {
-      let completed = 0;
-      let totalPossible = 0;
+    // Helper function to count completions based on ACTUAL tracked habits (not theoretical possible)
+    const countCompletions = (startDate: Date, endDate: Date) => {
+      const startStr = startDate.toISOString().split('T')[0];
+      const endStr = endDate.toISOString().split('T')[0];
       
-      // Build maps of habit names to their IDs and creation dates
-      const habitIdMap = new Map<string, string>();
-      const habitCreationMap = new Map<string, Date>();
-      
-      referenceHabits.forEach(habitName => {
-        const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
-        if (habit) {
-          habitIdMap.set(habitName, habit.id);
-          if (habit.created_at) {
-            habitCreationMap.set(habitName, new Date(habit.created_at));
-          }
-        }
+      // Filter activities within the date range
+      const periodActivities = activities.filter(a => {
+        return a.date >= startStr && a.date <= endStr;
       });
       
-      const currentDate = new Date(startDate);
-      while (currentDate <= endDate) {
-        const dateStr = currentDate.toISOString().split('T')[0];
-        
-        referenceHabits.forEach(habitName => {
-          // Check if this habit existed on this date
-          const habitCreated = habitCreationMap.get(habitName);
-          if (habitCreated && currentDate < habitCreated) {
-            // Habit didn't exist yet on this date, don't count it
-            return;
-          }
-          
-          totalPossible++;
-          
-          // Look for completed activity using habit_id (preferred) or habit name (fallback)
-          const habitId = habitIdMap.get(habitName);
-          const activity = activities.find(a => {
-            const dateMatches = a.date === dateStr;
-            const statusMatches = a.status === 'completed';
-            
-            if (!dateMatches || !statusMatches) return false;
-            
-            // Try matching by habit_id first (most reliable)
-            if (habitId && a.habitId === habitId) {
-              return true;
-            }
-            
-            // Fallback to name matching (case insensitive)
-            return a.habitName?.toLowerCase() === habitName.toLowerCase();
-          });
-          
-          if (activity) {
-            completed++;
-          }
-        });
-        
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
+      const completed = periodActivities.filter(a => a.status === 'completed').length;
+      const total = periodActivities.length;
       
-      return { completed, totalPossible };
+      return { completed, totalPossible: total };
     };
 
     // Calculate progress for different periods
     const periods: ProgressPeriod[] = [];
 
-    // This week vs last week (using current habits for both periods)
+    // This week vs last week
     const thisWeek = getDateRange("week", 0);
     const lastWeek = getDateRange("week", 7);
-    const thisWeekData = countCompletions(thisWeek.startDate, thisWeek.endDate, userHabits);
-    const lastWeekData = countCompletions(lastWeek.startDate, lastWeek.endDate, userHabits);
+    const thisWeekData = countCompletions(thisWeek.startDate, thisWeek.endDate);
+    const lastWeekData = countCompletions(lastWeek.startDate, lastWeek.endDate);
     
-    // Calculate consistent total possible for fair comparison
-    const weekDays = Math.ceil((thisWeek.endDate.getTime() - thisWeek.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const weekTotalPossible = userHabits.length * weekDays;
-    
-    const thisWeekPercentage = weekTotalPossible > 0 
-      ? (thisWeekData.completed / weekTotalPossible) * 100 
+    const thisWeekPercentage = thisWeekData.totalPossible > 0 
+      ? (thisWeekData.completed / thisWeekData.totalPossible) * 100 
       : 0;
-    const lastWeekPercentage = weekTotalPossible > 0 
-      ? (lastWeekData.completed / weekTotalPossible) * 100 
+    const lastWeekPercentage = lastWeekData.totalPossible > 0 
+      ? (lastWeekData.completed / lastWeekData.totalPossible) * 100 
       : 0;
     const weeklyChange = thisWeekPercentage - lastWeekPercentage;
 
@@ -135,26 +86,22 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       percentage: `${Math.abs(Math.round(weeklyChange))}%`,
       trend: weeklyChange >= 0 ? 'up' : 'down',
       completedCount: thisWeekData.completed,
-      totalPossible: weekTotalPossible,
+      totalPossible: thisWeekData.totalPossible,
       previousCompletedCount: lastWeekData.completed,
-      previousTotalPossible: weekTotalPossible
+      previousTotalPossible: lastWeekData.totalPossible
     });
 
-    // This month vs last month (using current habits for both periods)
+    // This month vs last month
     const thisMonth = getDateRange("month", 0);
     const lastMonth = getDateRange("month", 30);
-    const thisMonthData = countCompletions(thisMonth.startDate, thisMonth.endDate, userHabits);
-    const lastMonthData = countCompletions(lastMonth.startDate, lastMonth.endDate, userHabits);
+    const thisMonthData = countCompletions(thisMonth.startDate, thisMonth.endDate);
+    const lastMonthData = countCompletions(lastMonth.startDate, lastMonth.endDate);
     
-    // Calculate consistent total possible for fair comparison
-    const monthDays = Math.ceil((thisMonth.endDate.getTime() - thisMonth.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const monthTotalPossible = userHabits.length * monthDays;
-    
-    const thisMonthPercentage = monthTotalPossible > 0 
-      ? (thisMonthData.completed / monthTotalPossible) * 100 
+    const thisMonthPercentage = thisMonthData.totalPossible > 0 
+      ? (thisMonthData.completed / thisMonthData.totalPossible) * 100 
       : 0;
-    const lastMonthPercentage = monthTotalPossible > 0 
-      ? (lastMonthData.completed / monthTotalPossible) * 100 
+    const lastMonthPercentage = lastMonthData.totalPossible > 0 
+      ? (lastMonthData.completed / lastMonthData.totalPossible) * 100 
       : 0;
     const monthlyChange = thisMonthPercentage - lastMonthPercentage;
 
@@ -163,26 +110,22 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       percentage: `${Math.abs(Math.round(monthlyChange))}%`,
       trend: monthlyChange >= 0 ? 'up' : 'down',
       completedCount: thisMonthData.completed,
-      totalPossible: monthTotalPossible,
+      totalPossible: thisMonthData.totalPossible,
       previousCompletedCount: lastMonthData.completed,
-      previousTotalPossible: monthTotalPossible
+      previousTotalPossible: lastMonthData.totalPossible
     });
 
-    // Last 6 months vs previous 6 months (using current habits for both periods)
-    const last6Months = getDateRange("year", 0); // Use year logic but limit to 6 months data
+    // Last 6 months vs previous 6 months
+    const last6Months = getDateRange("year", 0);
     const previous6Months = getDateRange("year", 180);
-    const last6MonthsData = countCompletions(last6Months.startDate, last6Months.endDate, userHabits);
-    const previous6MonthsData = countCompletions(previous6Months.startDate, previous6Months.endDate, userHabits);
+    const last6MonthsData = countCompletions(last6Months.startDate, last6Months.endDate);
+    const previous6MonthsData = countCompletions(previous6Months.startDate, previous6Months.endDate);
     
-    // Calculate consistent total possible for fair comparison (6 months = ~180 days)
-    const sixMonthsDays = Math.ceil((last6Months.endDate.getTime() - last6Months.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const sixMonthsTotalPossible = userHabits.length * sixMonthsDays;
-    
-    const last6MonthsPercentage = sixMonthsTotalPossible > 0 
-      ? (last6MonthsData.completed / sixMonthsTotalPossible) * 100 
+    const last6MonthsPercentage = last6MonthsData.totalPossible > 0 
+      ? (last6MonthsData.completed / last6MonthsData.totalPossible) * 100 
       : 0;
-    const previous6MonthsPercentage = sixMonthsTotalPossible > 0 
-      ? (previous6MonthsData.completed / sixMonthsTotalPossible) * 100 
+    const previous6MonthsPercentage = previous6MonthsData.totalPossible > 0 
+      ? (previous6MonthsData.completed / previous6MonthsData.totalPossible) * 100 
       : 0;
     const sixMonthChange = last6MonthsPercentage - previous6MonthsPercentage;
 
@@ -191,26 +134,22 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       percentage: `${Math.abs(Math.round(sixMonthChange))}%`,
       trend: sixMonthChange >= 0 ? 'up' : 'down',
       completedCount: last6MonthsData.completed,
-      totalPossible: sixMonthsTotalPossible,
+      totalPossible: last6MonthsData.totalPossible,
       previousCompletedCount: previous6MonthsData.completed,
-      previousTotalPossible: sixMonthsTotalPossible
+      previousTotalPossible: previous6MonthsData.totalPossible
     });
 
-    // This year vs last year (using current habits for both periods)
+    // This year vs last year
     const thisYear = getDateRange("year", 0);
     const lastYear = getDateRange("year", 365);
-    const thisYearData = countCompletions(thisYear.startDate, thisYear.endDate, userHabits);
-    const lastYearData = countCompletions(lastYear.startDate, lastYear.endDate, userHabits);
+    const thisYearData = countCompletions(thisYear.startDate, thisYear.endDate);
+    const lastYearData = countCompletions(lastYear.startDate, lastYear.endDate);
     
-    // Calculate consistent total possible for fair comparison
-    const yearDays = Math.ceil((thisYear.endDate.getTime() - thisYear.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const yearTotalPossible = userHabits.length * yearDays;
-    
-    const thisYearPercentage = yearTotalPossible > 0 
-      ? (thisYearData.completed / yearTotalPossible) * 100 
+    const thisYearPercentage = thisYearData.totalPossible > 0 
+      ? (thisYearData.completed / thisYearData.totalPossible) * 100 
       : 0;
-    const lastYearPercentage = yearTotalPossible > 0 
-      ? (lastYearData.completed / yearTotalPossible) * 100 
+    const lastYearPercentage = lastYearData.totalPossible > 0 
+      ? (lastYearData.completed / lastYearData.totalPossible) * 100 
       : 0;
     const yearlyChange = thisYearPercentage - lastYearPercentage;
 
@@ -219,9 +158,9 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       percentage: `${Math.abs(Math.round(yearlyChange))}%`,
       trend: yearlyChange >= 0 ? 'up' : 'down',
       completedCount: thisYearData.completed,
-      totalPossible: yearTotalPossible,
+      totalPossible: thisYearData.totalPossible,
       previousCompletedCount: lastYearData.completed,
-      previousTotalPossible: yearTotalPossible
+      previousTotalPossible: lastYearData.totalPossible
     });
 
     return periods;
