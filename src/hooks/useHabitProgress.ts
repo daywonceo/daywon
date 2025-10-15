@@ -53,12 +53,17 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       let completed = 0;
       let totalPossible = 0;
       
-      // Build a map of habit names to their creation dates from habits data
+      // Build maps of habit names to their IDs and creation dates
+      const habitIdMap = new Map<string, string>();
       const habitCreationMap = new Map<string, Date>();
+      
       referenceHabits.forEach(habitName => {
         const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
-        if (habit?.created_at) {
-          habitCreationMap.set(habitName, new Date(habit.created_at));
+        if (habit) {
+          habitIdMap.set(habitName, habit.id);
+          if (habit.created_at) {
+            habitCreationMap.set(habitName, new Date(habit.created_at));
+          }
         }
       });
       
@@ -66,27 +71,33 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       while (currentDate <= endDate) {
         const dateStr = currentDate.toISOString().split('T')[0];
         
-        referenceHabits.forEach(habit => {
+        referenceHabits.forEach(habitName => {
           // Check if this habit existed on this date
-          const habitCreated = habitCreationMap.get(habit);
+          const habitCreated = habitCreationMap.get(habitName);
           if (habitCreated && currentDate < habitCreated) {
             // Habit didn't exist yet on this date, don't count it
             return;
           }
           
           totalPossible++;
-          // NEW RULE: Only explicitly completed habits count as success
-          // Missing check-ins (no activity) are treated as incomplete
+          
+          // Look for completed activity using habit_id (preferred) or habit name (fallback)
+          const habitId = habitIdMap.get(habitName);
           const activity = activities.find(a => {
-            if (a.habitId) {
-              // Find the habit_id for this habit name
-              const referenceActivity = activities.find(ref => ref.habitName === habit && ref.habitId);
-              if (referenceActivity) {
-                return a.habitId === referenceActivity.habitId && a.date === dateStr && a.status === 'completed';
-              }
+            const dateMatches = a.date === dateStr;
+            const statusMatches = a.status === 'completed';
+            
+            if (!dateMatches || !statusMatches) return false;
+            
+            // Try matching by habit_id first (most reliable)
+            if (habitId && a.habitId === habitId) {
+              return true;
             }
-            return a.habitName === habit && a.date === dateStr && a.status === 'completed';
+            
+            // Fallback to name matching (case insensitive)
+            return a.habitName?.toLowerCase() === habitName.toLowerCase();
           });
+          
           if (activity) {
             completed++;
           }
