@@ -32,6 +32,8 @@ const WeeklyProgressDetailModal: React.FC<WeeklyProgressDetailModalProps> = ({
     const weekEnd = endOfDay(new Date());
     const weekStart = startOfDay(subDays(new Date(), 6)); // Last 7 days including today
     const allActivities = getHabitActivities();
+    
+    // Filter activities for this specific habit within the week
     const habitActivities = allActivities.filter(
       a => a.habitId === habit.id && 
       new Date(a.date) >= weekStart && 
@@ -39,9 +41,13 @@ const WeeklyProgressDetailModal: React.FC<WeeklyProgressDetailModalProps> = ({
       a.status === 'completed'
     );
 
-    const daysInWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
+    // Calculate expected days: only count days from habit creation or week start (whichever is later)
+    const habitCreated = new Date(habit.created_at);
+    const effectiveStart = habitCreated > weekStart ? habitCreated : weekStart;
+    const daysInPeriod = eachDayOfInterval({ start: effectiveStart, end: weekEnd });
+    
     const completedDays = habitActivities.length;
-    const totalDays = daysInWeek.length;
+    const totalDays = daysInPeriod.length;
     const percentage = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
 
     return {

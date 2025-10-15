@@ -9,28 +9,37 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
   const { habits } = useHabits();
   const stats = useMemo(() => {
     try {
-      const now = new Date();
-      const activities = getHabitActivities();
-    
+    const now = new Date();
+    const activities = getHabitActivities();
+  
     // Get user-aware time window for weekly stats (7 days or since account creation)
-    const { startDate: weekStartDate, totalDaysAvailable: weekDays } = getUserTimeWindowSync("week");
+    const { startDate: weekStartDate } = getUserTimeWindowSync("week");
     
-    // Calculate completion stats for the user's available period (max 7 days for weekly)
+    // Calculate completion stats considering habit creation dates
     let completedCount = 0;
     let totalPossible = 0;
     
-    // Generate all dates from start to now (limited to 7 days max for weekly)
-    const actualWeekDays = Math.min(weekDays, 7);
-    
-    for (let dayOffset = 0; dayOffset < actualWeekDays; dayOffset++) {
-      const checkDate = new Date(now);
-      checkDate.setDate(now.getDate() - dayOffset);
-      const dateStr = checkDate.toISOString().split('T')[0];
+    // For each habit, calculate expected days from creation date
+    userHabits.forEach(habit => {
+      const habitRecord = habits?.find(h => h.name.toLowerCase() === habit.toLowerCase());
+      const habitCreated = habitRecord?.created_at ? new Date(habitRecord.created_at) : null;
       
-      userHabits.forEach(habit => {
-        totalPossible++;
-        // NEW RULE: Only explicitly completed habits count as success
-        // Missing check-ins are treated as incomplete
+      // Determine the effective start date for this habit (later of week start or habit creation)
+      const effectiveStart = habitCreated && habitCreated > weekStartDate ? habitCreated : weekStartDate;
+      
+      // Calculate how many days this habit should have been tracked
+      const daysSinceStart = Math.floor((now.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const expectedDays = Math.min(daysSinceStart, 7); // Cap at 7 days for weekly
+      
+      totalPossible += expectedDays;
+      
+      // Count completed days within the expected period
+      for (let dayOffset = 0; dayOffset < expectedDays; dayOffset++) {
+        const checkDate = new Date(now);
+        checkDate.setDate(now.getDate() - dayOffset);
+        const dateStr = checkDate.toISOString().split('T')[0];
+        
+        // Only count explicitly completed activities
         const activity = activities.find(a => {
           if (a.habitId) {
             // Find the habit_id for this habit name
@@ -44,9 +53,8 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
         if (activity) {
           completedCount++;
         }
-        // Note: No activity found (empty) is treated as not completed (no increment)
-      });
-    }
+      }
+    });
     
     const weeklyCompletionRate = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
     

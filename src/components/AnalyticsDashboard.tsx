@@ -141,9 +141,13 @@ export const AnalyticsDashboard: React.FC = () => {
       return Math.max(1, daysSinceCreation);
     };
     
+    // Calculate total expected activities for all habits
+    const totalExpectedActivities = habits
+      .filter(h => h.status === 'active')
+      .reduce((sum, habit) => sum + calculateExpectedDays(habit.id), 0);
+    
     const completedActivities = validActivities.filter(a => a.status === 'completed').length;
-    const totalActivities = validActivities.length;
-    const completionRate = totalActivities > 0 ? (completedActivities / totalActivities) * 100 : 0;
+    const completionRate = totalExpectedActivities > 0 ? (completedActivities / totalExpectedActivities) * 100 : 0;
     
     // Calculate streaks (simplified)
     const activeStreaks = habits.filter(h => h.status === 'active').length; // Simplified for demo
@@ -151,21 +155,28 @@ export const AnalyticsDashboard: React.FC = () => {
     const totalAppUsage = sessions.reduce((sum, session) => sum + (session.total_time_minutes || 0), 0);
     const appUsageHours = Math.round(totalAppUsage / 60 * 10) / 10;
 
-    // Weekly completion trends - respect habit creation dates
+    // Weekly completion trends - calculate expected vs actual completion per day
     const weeklyData = [];
     for (let i = 6; i >= 0; i--) {
       const date = subDays(new Date(), i);
+      const dateStr = format(date, 'yyyy-MM-dd');
+      
+      // Count how many habits should be tracked on this day
+      const expectedHabitsForDay = habits.filter(habit => {
+        const habitCreated = habitCreationDates.get(habit.id);
+        return habit.status === 'active' && (!habitCreated || date >= habitCreated);
+      }).length;
+      
       const dayActivities = validActivities.filter(a => 
-        format(new Date(a.activity_date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+        format(new Date(a.activity_date), 'yyyy-MM-dd') === dateStr
       );
       const completed = dayActivities.filter(a => a.status === 'completed').length;
-      const total = dayActivities.length;
       
       weeklyData.push({
         date: format(date, 'MMM dd'),
-        completion: total > 0 ? Math.round((completed / total) * 100) : 0,
+        completion: expectedHabitsForDay > 0 ? Math.round((completed / expectedHabitsForDay) * 100) : 0,
         completed,
-        total
+        total: expectedHabitsForDay
       });
     }
 
