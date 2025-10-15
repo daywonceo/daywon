@@ -114,12 +114,12 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
       className={cn(
         "w-14 h-14 sm:w-20 sm:h-20 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors relative",
         status === "completed" 
-          ? "border-green-800 hover:bg-green-200/50" 
+          ? "border-success hover:bg-success/10" 
           : status === "failed"
-          ? "border-red-500 hover:bg-red-100/50"
-          : "border-gray-300 hover:bg-gray-100",
+          ? "border-destructive hover:bg-destructive/10"
+          : "border-border hover:bg-muted",
         activeHabit === category && activityIndex === 0
-          ? "ring-2 ring-blue-500 ring-offset-2"
+          ? "ring-2 ring-primary ring-offset-2"
           : ""
       )}
       onClick={async () => {
@@ -138,23 +138,23 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
       aria-label={`${category} habit ${status === "completed" ? "completed" : status === "failed" ? "failed" : "not completed"}`}
     >
       {status === "completed" && (
-        <div className="w-4/5 h-4/5 bg-green-800 rounded-md flex items-center justify-center animate-checkmark relative">
+        <div className="w-4/5 h-4/5 bg-success rounded-md flex items-center justify-center animate-checkmark relative">
           {showStreak ? (
-            <span className="text-white font-bold text-sm sm:text-lg leading-none text-center">
+            <span className="text-success-foreground font-bold text-sm sm:text-lg leading-none text-center">
               {formattedStreak}
             </span>
           ) : (
-            <Check size={24} className="text-white sm:hidden" />
+            <Check size={24} className="text-success-foreground sm:hidden" />
           )}
           {!showStreak && (
-            <Check size={32} className="text-white hidden sm:block" />
+            <Check size={32} className="text-success-foreground hidden sm:block" />
           )}
         </div>
       )}
       {status === "failed" && (
-        <div className="w-4/5 h-4/5 rounded-md border-2 border-red-500 flex items-center justify-center">
-          <X size={24} className="text-red-500 sm:hidden" />
-          <X size={32} className="text-red-500 hidden sm:block" />
+        <div className="w-4/5 h-4/5 rounded-md border-2 border-destructive flex items-center justify-center">
+          <X size={24} className="text-destructive sm:hidden" />
+          <X size={32} className="text-destructive hidden sm:block" />
         </div>
       )}
     </div>

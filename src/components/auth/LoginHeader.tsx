@@ -24,21 +24,21 @@ const LoginHeader: React.FC<LoginHeaderProps> = ({ isSignUp, showForgotPassword 
   return (
     <CardHeader className="text-center pb-4">
       <div className="flex justify-center mb-4">
-        <div className="relative">
-          {isSignUp ? (
-            <UserPlus className="w-16 h-16 text-blue-500" />
-          ) : (
-            <LogIn className="w-16 h-16 text-green-500" />
-          )}
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-blue-400 rounded-full animate-ping" />
-        </div>
+      <div className="relative">
+        {isSignUp ? (
+          <UserPlus className="w-16 h-16 text-primary" />
+        ) : (
+          <LogIn className="w-16 h-16 text-primary" />
+        )}
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary/50 rounded-full animate-ping" />
       </div>
-      <CardTitle className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-        {getTitle()}
-      </CardTitle>
-      <p className="text-gray-600 dark:text-gray-300 mt-2">
-        {getSubtitle()}
-      </p>
+    </div>
+    <CardTitle className="text-3xl font-bold text-gradient-primary">
+      {getTitle()}
+    </CardTitle>
+    <p className="text-muted-foreground mt-2">
+      {getSubtitle()}
+    </p>
     </CardHeader>
   );
 };

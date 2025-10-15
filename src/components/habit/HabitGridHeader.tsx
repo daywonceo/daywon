@@ -15,7 +15,7 @@ const HabitGridHeader: React.FC<HabitGridHeaderProps> = ({ habits }) => (
     {habits.map((habit) => (
       <div key={habit} className="text-center flex items-end justify-center min-h-[1.5rem]">
         <span
-          className="text-xs sm:text-sm px-0.5 leading-tight font-semibold text-green-800/90 dark:text-green-200 break-words hyphens-auto"
+          className="text-xs sm:text-sm px-0.5 leading-tight font-semibold text-primary break-words hyphens-auto"
           title={habit}
         >
           {habit}

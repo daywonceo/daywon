@@ -27,14 +27,14 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
   return (
     <Card className={`glass-card group relative overflow-hidden ${
       profile.isDayWonMember 
-        ? 'ring-4 ring-yellow-500/60 shadow-[0_0_30px_rgba(234,179,8,0.3)] border-yellow-500/40' 
+        ? 'ring-4 ring-warning/60 shadow-[0_0_30px_hsl(var(--warning)/0.3)] border-warning/40' 
         : ''
     }`}>
       {/* Animated background elements */}
       <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors duration-700"></div>
       <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors duration-700 delay-300"></div>
       {profile.isDayWonMember && (
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-yellow-600/5 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-warning/5 via-transparent to-warning/5 pointer-events-none"></div>
       )}
       
       <CardContent className="pt-8 pb-6 relative z-10">
@@ -42,13 +42,13 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
           {/* Enhanced Avatar Section */}
           <div className="relative mb-6 group/avatar">
             <div className={`absolute inset-0 rounded-full blur-md opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-500 ${
-              profile.isDayWonMember ? 'bg-yellow-500/30' : 'bg-primary/20'
+              profile.isDayWonMember ? 'bg-warning/30' : 'bg-primary/20'
             }`}></div>
             <div className="w-28 h-28 relative">
               <AspectRatio ratio={1/1}>
                 <Avatar className={`w-full h-full border-4 transition-colors duration-300 relative z-10 ${
                   profile.isDayWonMember 
-                    ? 'border-yellow-500/60 group-hover/avatar:border-yellow-500/80 shadow-lg shadow-yellow-500/20' 
+                    ? 'border-warning/60 group-hover/avatar:border-warning/80 shadow-lg shadow-warning/20' 
                     : 'border-primary/30 group-hover/avatar:border-primary/50'
                 }`}>
                   <AvatarImage src={profile.avatar} alt={profile.name} className="object-cover" />
@@ -58,7 +58,7 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
             </div>
             {/* Animated ring around avatar */}
             <div className={`absolute inset-0 rounded-full border-2 animate-pulse ${
-              profile.isDayWonMember ? 'border-yellow-500/40' : 'border-primary/20'
+              profile.isDayWonMember ? 'border-warning/40' : 'border-primary/20'
             }`}></div>
           </div>
           
@@ -70,7 +70,7 @@ const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
               <div className="flex justify-center">
                 <Badge 
                   variant="default" 
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-950 hover:from-yellow-500 hover:to-yellow-700 border-0 shadow-lg shadow-yellow-500/30 cursor-pointer transition-transform hover:scale-105"
+                  className="bg-warning text-warning-foreground hover:bg-warning/90 border-0 shadow-lg shadow-warning/30 cursor-pointer transition-transform hover:scale-105"
                   onClick={() => setShowDayWonMembers(true)}
                 >
                   <Sparkles className="h-3 w-3 mr-1" />
