@@ -204,6 +204,8 @@ export const AnalyticsDashboard: React.FC = () => {
       }))
       .sort((a, b) => b.completion - a.completion)
       .slice(0, 5);
+    
+    console.log('Analytics habit performance:', habitPerformance);
 
     // Find insights - use validActivities
     const dayOfWeekStats: { [key: string]: number } = {};
@@ -395,7 +397,13 @@ export const AnalyticsDashboard: React.FC = () => {
                 <XAxis dataKey="name" hide />
                 <YAxis tickFormatter={(value) => `${value}%`} />
                 <Tooltip 
-                  formatter={(value, name, props) => [`${value}%`, 'Completion']}
+                  formatter={(value, name, props) => {
+                    const data = props.payload;
+                    return [
+                      `${data.completed}/${data.total} (${value}%)`,
+                      'Completion'
+                    ];
+                  }}
                   labelFormatter={(label, payload) => payload?.[0]?.payload?.name || label}
                 />
                 <Bar dataKey="completion" fill="#82ca9d" />
