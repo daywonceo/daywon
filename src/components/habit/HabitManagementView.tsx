@@ -590,7 +590,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                               onClick={() => toggleCatchUpHabitStatus(dateStr, activity.habit_name)}
                               className="justify-start h-12 text-base font-medium"
                             >
-                              <CheckCircle2 className={`mr-3 h-5 w-5 ${
+                              <CheckCircle2 className={`mr-3 h-5 w-5 flex-shrink-0 ${
                                 activity.status === 'completed' ? 'text-white' : 'text-muted-foreground'
                               }`} />
                               {activity.habit_name}

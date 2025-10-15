@@ -239,11 +239,10 @@ const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps)
                         <Button
                           key={activity.habit_name}
                           variant={activity.status === 'completed' ? 'default' : 'outline'}
-                          size="sm"
                           onClick={() => toggleHabitStatus(dateStr, activity.habit_name)}
-                          className="justify-start h-10"
+                          className="justify-start h-12 text-base font-medium"
                         >
-                          <CheckCircle2 className={`mr-2 h-5 w-5 ${
+                          <CheckCircle2 className={`mr-3 h-5 w-5 flex-shrink-0 ${
                             activity.status === 'completed' ? 'text-white' : 'text-muted-foreground'
                           }`} />
                           {activity.habit_name}
