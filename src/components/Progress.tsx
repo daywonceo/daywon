@@ -7,10 +7,168 @@ import { useHabitProgress, ProgressPeriod } from "@/hooks/useHabitProgress";
 import { useEffect, useState } from "react";
 import { generateHabitReport } from "@/utils/habitReportGenerator";
 import { toast } from "@/hooks/use-toast";
+import { useHabits } from "@/hooks/useHabits";
+import { getHabitActivities } from "@/utils/habitActivity";
+import { Progress as ProgressBar } from "@/components/ui/progress";
 
 interface ProgressProps {
   userHabits?: string[];
 }
+
+const HabitBreakdownModal = ({ period }: { period: ProgressPeriod }) => {
+  const { habits } = useHabits();
+  const activities = getHabitActivities();
+  
+  // Calculate the date range for this period
+  const getDaysForPeriod = (periodName: string) => {
+    switch(periodName) {
+      case "FROM LAST WEEK": return 7;
+      case "FROM LAST MONTH": return 30;
+      case "FROM LAST 6 MONTHS": return 180;
+      case "FROM LAST YEAR": return 365;
+      default: return 7;
+    }
+  };
+  
+  const days = getDaysForPeriod(period.period);
+  const now = new Date();
+  const endDate = new Date(now);
+  const startDate = new Date(endDate);
+  startDate.setDate(endDate.getDate() - days + 1);
+  
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+  
+  // Calculate breakdown for each habit
+  const habitBreakdown = (habits || [])
+    .filter(habit => habit.status === 'active')
+    .map(habit => {
+      // Calculate possible days for this habit
+      const habitCreatedAt = new Date(habit.created_at);
+      let possibleDays = 0;
+      const currentDate = new Date(startDate);
+      
+      while (currentDate <= endDate) {
+        if (habitCreatedAt <= currentDate) {
+          possibleDays++;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      // Count completed activities for this habit
+      const completedActivities = activities.filter(a => 
+        (a.habitId === habit.id || a.habitName === habit.name) &&
+        a.status === 'completed' &&
+        a.date >= startStr &&
+        a.date <= endStr
+      );
+      
+      const completed = completedActivities.length;
+      const percentage = possibleDays > 0 ? (completed / possibleDays) * 100 : 0;
+      
+      return {
+        name: habit.name,
+        completed,
+        possible: possibleDays,
+        percentage: Math.round(percentage)
+      };
+    })
+    .filter(h => h.possible > 0)
+    .sort((a, b) => b.percentage - a.percentage);
+  
+  const getTimePeriodLabel = (periodName: string) => {
+    switch(periodName) {
+      case "FROM LAST WEEK": return "This Week";
+      case "FROM LAST MONTH": return "This Month";
+      case "FROM LAST 6 MONTHS": return "Last 6 Months";
+      case "FROM LAST YEAR": return "This Year";
+      default: return "Current Period";
+    }
+  };
+
+  return (
+    <DialogContent className="max-w-lg glass border-primary/20 pt-16 pb-6 px-6 pr-12 max-h-[85vh] overflow-y-auto">
+      <DialogHeader className="text-center space-y-1 mb-4">
+        <DialogTitle className="text-primary text-xl font-bold flex items-center justify-center gap-2">
+          <Calendar className="w-5 h-5" />
+          {getTimePeriodLabel(period.period)}
+        </DialogTitle>
+        <DialogDescription className="text-muted-foreground">
+          Breakdown of habit completion
+        </DialogDescription>
+      </DialogHeader>
+      
+      {/* Overall Stats */}
+      <div className="gradient-warm p-4 rounded-xl border border-primary/20 shadow-sm mb-4">
+        <div className="text-center space-y-2">
+          <div className="relative inline-block">
+            <div className="w-20 h-20 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md border-2 border-primary-light/30">
+              <div className="text-center">
+                <div className="text-white font-bold text-xl">{period.completedCount}</div>
+                <div className="text-white/80 text-xs">done</div>
+              </div>
+            </div>
+            <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1.5 shadow-sm border border-primary/20">
+              <Target className="w-3 h-3 text-primary" />
+            </div>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="text-sm text-muted-foreground">out of {period.totalPossible} possible</div>
+            <div className="bg-primary-light/30 rounded-full h-2 overflow-hidden border border-primary/30">
+              <div 
+                className="gradient-primary h-full transition-all duration-500 rounded-full"
+                style={{ width: `${Math.min((period.completedCount / period.totalPossible) * 100, 100)}%` }}
+              />
+            </div>
+            <div className="text-lg font-bold text-primary">
+              {Math.round((period.completedCount / period.totalPossible) * 100)}% completion
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Individual Habit Breakdown */}
+      <div className="space-y-3">
+        <h4 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+          <Info className="w-4 h-4 text-primary" />
+          Habit Breakdown
+        </h4>
+        
+        {habitBreakdown.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            No habit data available for this period
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {habitBreakdown.map((habit, index) => (
+              <div key={index} className="glass-card p-3 rounded-lg border border-border/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-foreground text-sm">{habit.name}</span>
+                  <span className="text-xs font-semibold text-primary">
+                    {habit.percentage}%
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2 mb-1">
+                  <ProgressBar value={habit.percentage} className="flex-1 h-2" />
+                </div>
+                
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 text-success" />
+                    {habit.completed} completed
+                  </span>
+                  <span>of {habit.possible} possible</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </DialogContent>
+  );
+};
 
 const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
   const currentPercentage = period.totalPossible > 0 ? (period.completedCount / period.totalPossible) * 100 : 0;
@@ -263,31 +421,49 @@ const Progress = ({ userHabits }: ProgressProps) => {
       <CardContent className="px-3 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto">
           {progressData.map((item) => (
-            <Dialog key={item.period}>
-              <DialogTrigger asChild>
-                <div 
-                  className="bg-green-50 p-3 sm:p-4 rounded-lg cursor-pointer hover:bg-green-100 transition-colors duration-200 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium text-xs sm:text-sm text-gray-700">
-                      {item.period}
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      {item.trend === "up" ? (
-                        <TrendingUp className="text-green-600" size={isMobile ? 16 : 20} />
-                      ) : (
-                        <TrendingDown className="text-red-500" size={isMobile ? 16 : 20} />
-                      )}
-                      <span className={`font-bold text-sm sm:text-base ${item.trend === "up" ? "text-green-600" : "text-red-500"}`}>
-                        {item.percentage}
-                      </span>
-                      <Info className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div key={item.period} className="flex gap-2">
+              {/* Main comparison card */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div 
+                    className="flex-1 bg-green-50 p-3 sm:p-4 rounded-lg cursor-pointer hover:bg-green-100 transition-colors duration-200 group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-xs sm:text-sm text-gray-700">
+                        {item.period}
+                      </div>
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        {item.trend === "up" ? (
+                          <TrendingUp className="text-green-600" size={isMobile ? 16 : 20} />
+                        ) : (
+                          <TrendingDown className="text-red-500" size={isMobile ? 16 : 20} />
+                        )}
+                        <span className={`font-bold text-sm sm:text-base ${item.trend === "up" ? "text-green-600" : "text-red-500"}`}>
+                          {item.percentage}
+                        </span>
+                        <Info className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </DialogTrigger>
-              <ComparisonModal period={item} />
-            </Dialog>
+                </DialogTrigger>
+                <ComparisonModal period={item} />
+              </Dialog>
+              
+              {/* Breakdown button */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0 border-primary/20 hover:bg-primary/10"
+                    title="View habit breakdown"
+                  >
+                    <Info className="w-4 h-4 text-primary" />
+                  </Button>
+                </DialogTrigger>
+                <HabitBreakdownModal period={item} />
+              </Dialog>
+            </div>
           ))}
         </div>
       </CardContent>
