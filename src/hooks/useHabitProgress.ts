@@ -2,6 +2,7 @@
 import { useMemo } from 'react';
 import { getHabitActivities } from '@/utils/habitActivity';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
+import { useHabits } from '@/hooks/useHabits';
 
 export interface ProgressPeriod {
   period: string;
@@ -14,6 +15,8 @@ export interface ProgressPeriod {
 }
 
 export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions", "Read"]) => {
+  const { habits } = useHabits();
+  
   const progressData = useMemo(() => {
     const activities = getHabitActivities();
     const now = new Date();
@@ -45,19 +48,32 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
       return { startDate, endDate };
     };
 
-    // Helper function to count completions in date range with consistent total possible
+    // Helper function to count completions in date range, accounting for habit creation dates
     const countCompletions = (startDate: Date, endDate: Date, referenceHabits: string[]) => {
-      const startStr = startDate.toISOString().split('T')[0];
-      const endStr = endDate.toISOString().split('T')[0];
-      
       let completed = 0;
       let totalPossible = 0;
+      
+      // Build a map of habit names to their creation dates from habits data
+      const habitCreationMap = new Map<string, Date>();
+      referenceHabits.forEach(habitName => {
+        const habit = habits?.find(h => h.name.toLowerCase() === habitName.toLowerCase());
+        if (habit?.created_at) {
+          habitCreationMap.set(habitName, new Date(habit.created_at));
+        }
+      });
       
       const currentDate = new Date(startDate);
       while (currentDate <= endDate) {
         const dateStr = currentDate.toISOString().split('T')[0];
         
         referenceHabits.forEach(habit => {
+          // Check if this habit existed on this date
+          const habitCreated = habitCreationMap.get(habit);
+          if (habitCreated && currentDate < habitCreated) {
+            // Habit didn't exist yet on this date, don't count it
+            return;
+          }
+          
           totalPossible++;
           // NEW RULE: Only explicitly completed habits count as success
           // Missing check-ins (no activity) are treated as incomplete
@@ -74,7 +90,6 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
           if (activity) {
             completed++;
           }
-          // Note: No activity found (empty) is treated as not completed (no increment)
         });
         
         currentDate.setDate(currentDate.getDate() + 1);
@@ -199,7 +214,7 @@ export const useHabitProgress = (userHabits: string[] = ["Workout", "Devotions",
     });
 
     return periods;
-  }, [userHabits.join(',')]);
+  }, [userHabits.join(','), habits]);
 
   return progressData;
 };
