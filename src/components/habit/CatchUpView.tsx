@@ -243,7 +243,7 @@ const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps)
                           onClick={() => toggleHabitStatus(dateStr, activity.habit_name)}
                           className="justify-start h-10"
                         >
-                          <CheckCircle2 className={`mr-2 h-4 w-4 ${
+                          <CheckCircle2 className={`mr-2 h-5 w-5 ${
                             activity.status === 'completed' ? 'text-white' : 'text-muted-foreground'
                           }`} />
                           {activity.habit_name}
