@@ -7,188 +7,251 @@ import { useHabitProgress, ProgressPeriod } from "@/hooks/useHabitProgress";
 import { useEffect, useState } from "react";
 import { generateHabitReport } from "@/utils/habitReportGenerator";
 import { toast } from "@/hooks/use-toast";
+import { useHabits } from "@/hooks/useHabits";
+import { getHabitActivities } from "@/utils/habitActivity";
+import { Progress as ProgressBar } from "@/components/ui/progress";
 
 interface ProgressProps {
   userHabits?: string[];
 }
 
-const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
-  const currentPercentage = period.totalPossible > 0 ? (period.completedCount / period.totalPossible) * 100 : 0;
-  const previousPercentage = period.previousTotalPossible > 0 ? (period.previousCompletedCount / period.previousTotalPossible) * 100 : 0;
-  
-  const getTimePeriodLabel = (periodName: string) => {
-    switch(periodName) {
-      case "FROM LAST WEEK": return { current: "This Week", previous: "Last Week" };
-      case "FROM LAST MONTH": return { current: "This Month", previous: "Last Month" };
-      case "FROM LAST 6 MONTHS": return { current: "Last 6 Months", previous: "Previous 6 Months" };
-      case "FROM LAST YEAR": return { current: "This Year", previous: "Last Year" };
-      default: return { current: "Current Period", previous: "Previous Period" };
-    }
-  };
+interface HabitBreakdown {
+  habitName: string;
+  completed: number;
+  possible: number;
+  percentage: number;
+}
 
-  const labels = getTimePeriodLabel(period.period);
-  const improvementText = period.trend === 'up' 
-    ? `You improved by ${period.percentage}!` 
-    : `You declined by ${period.percentage}.`;
+const HabitBreakdownModal = ({ 
+  period, 
+  open, 
+  onOpenChange 
+}: { 
+  period: ProgressPeriod | null; 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+}) => {
+  const { habits } = useHabits();
+  const [breakdown, setBreakdown] = useState<HabitBreakdown[]>([]);
+
+  useEffect(() => {
+    if (!period || !open) return;
+
+    const activities = getHabitActivities();
+    const now = new Date();
     
-  const getReasonsForChange = () => {
-    if (period.trend === 'up') {
-      return [
-        "More consistent daily check-ins",
-        "Better habit tracking routine", 
-        "Increased motivation and focus",
-        "Improved time management",
-        "Stronger habit formation"
-      ];
-    } else {
-      return [
-        "Missed daily check-ins",
-        "Inconsistent routine",
-        "External life stressors", 
-        "Need for better reminders",
-        "Habit difficulty adjustment needed"
-      ];
+    // Determine date range based on period
+    let days = 7;
+    let offset = 7;
+    if (period.period === "FROM LAST MONTH") {
+      days = 30;
+      offset = 0;
+    } else if (period.period === "FROM LAST 6 MONTHS") {
+      days = 180;
+      offset = 0;
+    } else if (period.period === "FROM LAST YEAR") {
+      days = 365;
+      offset = 0;
+    } else if (period.period === "FROM LAST WEEK") {
+      days = 7;
+      offset = 0;
     }
-  };
+
+    const endDate = new Date(now);
+    endDate.setDate(now.getDate() - (period.period === "FROM LAST WEEK" ? 0 : 0));
+    
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - days + 1);
+
+    const startStr = startDate.toISOString().split('T')[0];
+    const endStr = endDate.toISOString().split('T')[0];
+
+    // Calculate breakdown for each habit
+    const habitBreakdowns: HabitBreakdown[] = habits
+      .filter(h => h.status === 'active')
+      .map(habit => {
+        const habitCreatedAt = new Date(habit.created_at);
+        
+        // Count possible days for this habit
+        let possible = 0;
+        const currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+          if (habitCreatedAt <= currentDate) {
+            possible++;
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        // Count completed activities
+        const completed = activities.filter(a => 
+          (a.habitId === habit.id || a.habitName === habit.name) &&
+          a.date >= startStr && 
+          a.date <= endStr &&
+          a.status === 'completed'
+        ).length;
+
+        return {
+          habitName: habit.name,
+          completed,
+          possible,
+          percentage: possible > 0 ? (completed / possible) * 100 : 0
+        };
+      })
+      .sort((a, b) => b.percentage - a.percentage);
+
+    setBreakdown(habitBreakdowns);
+  }, [period, open, habits]);
+
+  if (!period) return null;
+
+  const currentPercentage = period.totalPossible > 0 
+    ? (period.completedCount / period.totalPossible) * 100 
+    : 0;
 
   return (
-    <DialogContent className="max-w-lg glass border-primary-light/30 pt-16 pb-6 px-6 pr-12 max-h-[85vh] overflow-y-auto">
-      <DialogHeader className="text-center space-y-1 mb-4">
-        <DialogTitle className="text-gradient-primary text-xl font-bold">
-          {period.period.replace('FROM ', '').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())} Comparison
-        </DialogTitle>
-        <DialogDescription className="text-muted-foreground">
-          Detailed breakdown of your habit progress
-        </DialogDescription>
-      </DialogHeader>
-      
-      {/* Main Progress Indicator */}
-      <div className="gradient-warm p-4 rounded-xl border border-primary-light/20 shadow-glow mb-4 mx-auto max-w-sm">
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-3">
-            {period.trend === "up" ? (
-              <div className="p-2 rounded-full bg-success/20 border border-success/30">
-                <TrendingUp className="text-success w-5 h-5" />
-              </div>
-            ) : (
-              <div className="p-2 rounded-full bg-destructive/20 border border-destructive/30">
-                <TrendingDown className="text-destructive w-5 h-5" />
-              </div>
-            )}
-            <span className={`text-2xl font-bold ${period.trend === "up" ? "text-success" : "text-destructive"}`}>
-              {period.percentage}
-            </span>
-          </div>
-          <p className={`font-medium text-sm ${period.trend === 'up' ? 'text-success' : 'text-destructive'}`}>
-            {improvementText}
-          </p>
-        </div>
-      </div>
-
-      {/* Period Comparison Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-4 max-w-md mx-auto">
-        {/* Current Period */}
-        <div className="glass-card p-3 border-primary/20 rounded-xl">
-          <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-1">
-              <Calendar className="w-3 h-3 text-primary" />
-              <h4 className="font-semibold text-primary text-xs">{labels.current}</h4>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Habit Breakdown - {period.period.replace("FROM ", "")}</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="p-4 glass-card rounded-lg">
+            <div className="text-sm text-muted-foreground mb-1">Overall Progress</div>
+            <div className="text-2xl font-bold mb-2">
+              {Math.round(currentPercentage)}%
             </div>
-            
-            <div className="space-y-1">
-              <div className="relative">
-                <div className="w-12 h-12 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-md border-2 border-primary-light/30">
-                  <div className="text-center">
-                    <div className="text-white font-bold text-sm">{period.completedCount}</div>
-                    <div className="text-white/80 text-xs">done</div>
+            <div className="text-sm text-muted-foreground">
+              {period.completedCount} completed out of {period.totalPossible} total tracking opportunities
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              ({breakdown.length} active habits × days in period)
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Habit Performance</h3>
+            {breakdown.map((habit, index) => (
+              <div key={index} className="p-3 glass-card rounded-lg space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">{habit.habitName}</div>
+                  <div className="text-sm font-semibold">
+                    {Math.round(habit.percentage)}%
                   </div>
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 bg-background rounded-full p-1 shadow-sm border border-primary-light/20">
-                  <Target className="w-2 h-2 text-muted-foreground" />
+                <ProgressBar value={habit.percentage} className="h-2" />
+                <div className="text-xs text-muted-foreground">
+                  {habit.completed} / {habit.possible} days completed
                 </div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">out of {period.totalPossible} possible</div>
-                <div className="bg-primary-light/30 rounded-full h-1.5 overflow-hidden border border-primary-light/40">
-                  <div 
-                    className="gradient-primary h-full transition-all duration-500 rounded-full"
-                    style={{ width: `${Math.min(currentPercentage, 100)}%` }}
-                  />
-                </div>
-                <div className="text-xs font-medium text-primary">
-                  {Math.round(currentPercentage)}% completion
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Previous Period */}
-        <div className="glass-card p-3 border-muted/30 rounded-xl">
-          <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-1">
-              <Calendar className="w-3 h-3 text-muted-foreground" />
-              <h4 className="font-semibold text-muted-foreground text-xs">{labels.previous}</h4>
-            </div>
-            
-            <div className="space-y-1">
-              <div className="relative">
-                <div className="w-12 h-12 mx-auto rounded-full bg-muted/20 flex items-center justify-center border-2 border-muted/30">
-                  <div className="text-center">
-                    <div className="text-muted-foreground font-bold text-sm">{period.previousCompletedCount}</div>
-                    <div className="text-muted-foreground/60 text-xs">done</div>
-                  </div>
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 bg-background rounded-full p-1 shadow-sm border border-muted/20">
-                  <Target className="w-2 h-2 text-muted-foreground" />
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">out of {period.previousTotalPossible} possible</div>
-                <div className="bg-muted/20 rounded-full h-1.5 overflow-hidden border border-muted/30">
-                  <div 
-                    className="bg-muted/60 h-full transition-all duration-500 rounded-full"
-                    style={{ width: `${Math.min(previousPercentage, 100)}%` }}
-                  />
-                </div>
-                <div className="text-xs font-medium text-muted-foreground">
-                  {Math.round(previousPercentage)}% completion
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Insights Section */}
-      <div className="space-y-3 max-w-md mx-auto">
-        <div className="gradient-subtle p-3 rounded-xl border border-primary-light/20">
-          <h4 className="font-semibold text-primary mb-2 flex items-center justify-center gap-2 text-sm">
-            <Info className="w-3 h-3" />
-            {period.trend === 'up' ? 'What Likely Helped' : 'Areas to Improve'}
-          </h4>
-          <div className="space-y-1">
-            {getReasonsForChange().slice(0, 3).map((reason, index) => (
-              <div key={index} className="flex items-start gap-2 p-2 rounded-lg bg-white/50">
-                <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${period.trend === 'up' ? 'bg-success' : 'bg-warning'}`} />
-                <span className="text-xs text-foreground/80">{reason}</span>
               </div>
             ))}
           </div>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-        {/* Motivational Message */}
-        <div className={`p-3 rounded-xl border text-center ${period.trend === 'up' 
-          ? 'bg-success/10 border-success/20' 
-          : 'bg-warning/10 border-warning/20'
+const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
+  const currentPercentage = period.totalPossible > 0 
+    ? (period.completedCount / period.totalPossible) * 100 
+    : 0;
+  const previousPercentage = period.previousTotalPossible > 0
+    ? (period.previousCompletedCount / period.previousTotalPossible) * 100
+    : 0;
+
+  const reasonForChange = () => {
+    if (period.trend === 'up') {
+      return "This improvement could be due to better consistency, more habits tracked, or increased motivation.";
+    } else {
+      return "This decline might be due to missed days, fewer habits tracked, or challenging circumstances.";
+    }
+  };
+
+  return (
+    <DialogContent className="max-w-2xl">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Target className="w-5 h-5" />
+          Progress Comparison - {period.period.replace("FROM ", "")}
+        </DialogTitle>
+        <DialogDescription>
+          Here's how your habit completion has changed
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="space-y-6 mt-4">
+        {/* Main Change Indicator */}
+        <div className={`p-6 rounded-lg ${
+          period.trend === 'up' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
         }`}>
-          <p className={`text-xs font-medium ${period.trend === 'up' ? 'text-success' : 'text-warning'}`}>
-            {period.trend === 'up' 
-              ? "🎉 Excellent progress! Your consistency is creating lasting change." 
-              : "💪 Small steps lead to big wins. Every day is a new opportunity to improve."}
+          <div className="flex items-center gap-3 mb-2">
+            {period.trend === 'up' ? (
+              <TrendingUp className="w-8 h-8 text-green-600" />
+            ) : (
+              <TrendingDown className="w-8 h-8 text-red-500" />
+            )}
+            <div>
+              <div className="text-sm text-muted-foreground">
+                {period.trend === 'up' ? 'Improved by' : 'Decreased by'}
+              </div>
+              <div className={`text-3xl font-bold ${
+                period.trend === 'up' ? 'text-green-600' : 'text-red-500'
+              }`}>
+                {period.percentage}
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mt-3">
+            {reasonForChange()}
           </p>
+        </div>
+
+        {/* Current vs Previous Comparison */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 glass-card rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              <div className="text-sm font-medium">Current Period</div>
+            </div>
+            <div className="text-2xl font-bold mb-1">
+              {Math.round(currentPercentage)}%
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {period.completedCount} / {period.totalPossible} completed
+            </div>
+          </div>
+
+          <div className="p-4 glass-card rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <div className="text-sm font-medium">Previous Period</div>
+            </div>
+            <div className="text-2xl font-bold mb-1">
+              {Math.round(previousPercentage)}%
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {period.previousCompletedCount} / {period.previousTotalPossible} completed
+            </div>
+          </div>
+        </div>
+
+        {/* Insights */}
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-start gap-2">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+            <div>
+              <div className="font-semibold text-sm text-blue-900 mb-1">
+                {period.trend === 'up' ? 'Keep up the great work!' : 'Stay motivated!'}
+              </div>
+              <p className="text-xs text-blue-800">
+                {period.trend === 'up' 
+                  ? 'Your consistency is paying off. Try to maintain this momentum!'
+                  : 'Everyone has challenging periods. Focus on one habit at a time to rebuild your momentum.'
+                }
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </DialogContent>
@@ -199,6 +262,8 @@ const Progress = ({ userHabits }: ProgressProps) => {
   const isMobile = useIsMobile();
   const progressData = useHabitProgress(userHabits);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [selectedPeriod, setSelectedPeriod] = useState<ProgressPeriod | null>(null);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
 
   // Listen for habit updates to refresh progress
   useEffect(() => {
@@ -263,34 +328,41 @@ const Progress = ({ userHabits }: ProgressProps) => {
       <CardContent className="px-3 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto">
           {progressData.map((item) => (
-            <Dialog key={item.period}>
-              <DialogTrigger asChild>
-                <div 
-                  className="bg-green-50 p-3 sm:p-4 rounded-lg cursor-pointer hover:bg-green-100 transition-colors duration-200 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium text-xs sm:text-sm text-gray-700">
-                      {item.period}
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      {item.trend === "up" ? (
-                        <TrendingUp className="text-green-600" size={isMobile ? 16 : 20} />
-                      ) : (
-                        <TrendingDown className="text-red-500" size={isMobile ? 16 : 20} />
-                      )}
-                      <span className={`font-bold text-sm sm:text-base ${item.trend === "up" ? "text-green-600" : "text-red-500"}`}>
-                        {item.percentage}
-                      </span>
-                      <Info className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+            <div key={item.period}>
+              <div 
+                className="bg-green-50 p-3 sm:p-4 rounded-lg cursor-pointer hover:bg-green-100 transition-colors duration-200 group"
+                onClick={() => {
+                  setSelectedPeriod(item);
+                  setBreakdownOpen(true);
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-medium text-xs sm:text-sm text-gray-700">
+                    {item.period}
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    {item.trend === "up" ? (
+                      <TrendingUp className="text-green-600" size={isMobile ? 16 : 20} />
+                    ) : (
+                      <TrendingDown className="text-red-500" size={isMobile ? 16 : 20} />
+                    )}
+                    <span className={`font-bold text-sm sm:text-base ${item.trend === "up" ? "text-green-600" : "text-red-500"}`}>
+                      {item.percentage}
+                    </span>
+                    <Info className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
-              </DialogTrigger>
-              <ComparisonModal period={item} />
-            </Dialog>
+              </div>
+            </div>
           ))}
         </div>
       </CardContent>
+      
+      <HabitBreakdownModal 
+        period={selectedPeriod}
+        open={breakdownOpen}
+        onOpenChange={setBreakdownOpen}
+      />
     </Card>
   );
 };
