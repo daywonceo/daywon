@@ -1,12 +1,15 @@
-import { TrendingDown, TrendingUp, Download, Info, Calendar, Target, CheckCircle, XCircle } from "lucide-react";
+import { TrendingDown, TrendingUp, Download, Info, Calendar, Target, CheckCircle, XCircle, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useHabitProgress, ProgressPeriod } from "@/hooks/useHabitProgress";
+import { useHabits } from "@/hooks/useHabits";
 import { useEffect, useState } from "react";
 import { generateHabitReport } from "@/utils/habitReportGenerator";
 import { toast } from "@/hooks/use-toast";
+import { getHabitActivities } from "@/utils/habitActivity";
 
 interface ProgressProps {
   userHabits?: string[];
@@ -195,6 +198,143 @@ const ComparisonModal = ({ period }: { period: ProgressPeriod }) => {
   );
 };
 
+const HabitBreakdownModal = ({ period }: { period: ProgressPeriod }) => {
+  const { habits } = useHabits();
+  const activities = getHabitActivities();
+  
+  const getDateRangeFromPeriod = (periodName: string) => {
+    const now = new Date();
+    let days = 7;
+    
+    switch(periodName) {
+      case "FROM LAST WEEK": days = 7; break;
+      case "FROM LAST MONTH": days = 30; break;
+      case "FROM LAST 6 MONTHS": days = 180; break;
+      case "FROM LAST YEAR": days = 365; break;
+    }
+    
+    const endDate = new Date(now);
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - days + 1);
+    
+    return { startDate, endDate };
+  };
+
+  const { startDate, endDate } = getDateRangeFromPeriod(period.period);
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+
+  // Calculate breakdown for each habit
+  const habitBreakdown = habits
+    .filter(habit => {
+      const habitCreatedAt = new Date(habit.created_at);
+      return habit.status === 'active' && habitCreatedAt <= endDate;
+    })
+    .map(habit => {
+      // Count completed activities for this habit
+      const habitActivities = activities.filter(a => 
+        a.habitName === habit.name && 
+        a.date >= startStr && 
+        a.date <= endStr &&
+        a.status === 'completed'
+      );
+      
+      // Calculate possible days (from habit creation or period start, whichever is later)
+      const habitCreatedAt = new Date(habit.created_at);
+      const effectiveStartDate = habitCreatedAt > startDate ? habitCreatedAt : startDate;
+      let possibleDays = 0;
+      const currentDate = new Date(effectiveStartDate);
+      
+      while (currentDate <= endDate) {
+        possibleDays++;
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      const completed = habitActivities.length;
+      const percentage = possibleDays > 0 ? (completed / possibleDays) * 100 : 0;
+      
+      return {
+        name: habit.name,
+        completed,
+        possible: possibleDays,
+        percentage: Math.round(percentage)
+      };
+    })
+    .sort((a, b) => b.percentage - a.percentage);
+
+  const overallPercentage = period.totalPossible > 0 
+    ? Math.round((period.completedCount / period.totalPossible) * 100) 
+    : 0;
+
+  return (
+    <DialogContent className="max-w-lg glass border-primary-light/30 pt-16 pb-6 px-6 pr-12 max-h-[85vh]">
+      <DialogHeader className="text-center space-y-1 mb-4">
+        <DialogTitle className="text-gradient-primary text-xl font-bold">
+          Habit Breakdown
+        </DialogTitle>
+        <DialogDescription className="text-muted-foreground">
+          {period.period.replace('FROM ', '').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+        </DialogDescription>
+      </DialogHeader>
+
+      {/* Overall Summary */}
+      <div className="gradient-warm p-4 rounded-xl border border-primary-light/20 shadow-glow mb-4">
+        <div className="text-center space-y-2">
+          <div className="text-2xl font-bold text-primary">{overallPercentage}%</div>
+          <div className="text-sm text-muted-foreground">
+            {period.completedCount} done out of {period.totalPossible} possible
+          </div>
+          <div className="bg-primary-light/30 rounded-full h-2 overflow-hidden border border-primary-light/40">
+            <div 
+              className="gradient-primary h-full transition-all duration-500 rounded-full"
+              style={{ width: `${Math.min(overallPercentage, 100)}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Individual Habit Breakdown */}
+      <ScrollArea className="max-h-[400px] pr-4">
+        <div className="space-y-3">
+          <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Individual Habits
+          </h4>
+          {habitBreakdown.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No habit data for this period
+            </div>
+          ) : (
+            habitBreakdown.map((habit, index) => (
+              <div 
+                key={index}
+                className="glass-card p-3 rounded-lg border-primary-light/20 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-sm text-foreground">{habit.name}</span>
+                  <span className="text-xs font-semibold text-primary">{habit.percentage}%</span>
+                </div>
+                
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{habit.completed} completed</span>
+                  <span>of {habit.possible} days</span>
+                </div>
+                
+                <div className="bg-primary-light/30 rounded-full h-1.5 overflow-hidden border border-primary-light/40">
+                  <div 
+                    className="gradient-primary h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${Math.min(habit.percentage, 100)}%` }}
+                  />
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </ScrollArea>
+    </DialogContent>
+  );
+};
+
 const Progress = ({ userHabits }: ProgressProps) => {
   const isMobile = useIsMobile();
   const progressData = useHabitProgress(userHabits);
@@ -263,31 +403,36 @@ const Progress = ({ userHabits }: ProgressProps) => {
       <CardContent className="px-3 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto">
           {progressData.map((item) => (
-            <Dialog key={item.period}>
-              <DialogTrigger asChild>
-                <div 
-                  className="bg-green-50 p-3 sm:p-4 rounded-lg cursor-pointer hover:bg-green-100 transition-colors duration-200 group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium text-xs sm:text-sm text-gray-700">
-                      {item.period}
+            <div key={item.period} className="relative">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div 
+                    className="bg-green-50 p-3 sm:p-4 rounded-lg cursor-pointer hover:bg-green-100 transition-colors duration-200 group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-xs sm:text-sm text-gray-700">
+                        {item.period}
+                      </div>
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        {item.trend === "up" ? (
+                          <TrendingUp className="text-green-600" size={isMobile ? 16 : 20} />
+                        ) : (
+                          <TrendingDown className="text-red-500" size={isMobile ? 16 : 20} />
+                        )}
+                        <span className={`font-bold text-sm sm:text-base ${item.trend === "up" ? "text-green-600" : "text-red-500"}`}>
+                          {item.percentage}
+                        </span>
+                        <BarChart3 className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-2">
-                      {item.trend === "up" ? (
-                        <TrendingUp className="text-green-600" size={isMobile ? 16 : 20} />
-                      ) : (
-                        <TrendingDown className="text-red-500" size={isMobile ? 16 : 20} />
-                      )}
-                      <span className={`font-bold text-sm sm:text-base ${item.trend === "up" ? "text-green-600" : "text-red-500"}`}>
-                        {item.percentage}
-                      </span>
-                      <Info className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {item.completedCount} done out of {item.totalPossible} possible
                     </div>
                   </div>
-                </div>
-              </DialogTrigger>
-              <ComparisonModal period={item} />
-            </Dialog>
+                </DialogTrigger>
+                <HabitBreakdownModal period={item} />
+              </Dialog>
+            </div>
           ))}
         </div>
       </CardContent>
