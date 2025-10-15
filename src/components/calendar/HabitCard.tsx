@@ -81,7 +81,7 @@ const HabitCard = ({ habit, activityData, color, icon: Icon, isCompletedToday, o
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button size="icon" variant="ghost" className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 ${isCompletedToday ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`} onClick={handleToggleComplete}>
+                    <Button size="icon" variant={isCompletedToday ? "success" : "ghost"} className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0`} onClick={handleToggleComplete}>
                         {isCompletedToday ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                     </Button>
                 </div>

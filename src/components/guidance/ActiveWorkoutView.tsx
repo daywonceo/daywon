@@ -383,7 +383,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             Create a workout plan first to start tracking your workouts.
           </p>
-          <Button onClick={onBack} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={onBack} variant="success">
             Back to Overview
           </Button>
         </CardContent>

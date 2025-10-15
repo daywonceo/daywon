@@ -26,7 +26,8 @@ const ActivityActions = ({ activity, isLoading, onTryThis, onSuggestAnother }: A
       <Button 
         onClick={onTryThis}
         disabled={!activity || isLoading}
-        className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+        variant="success"
+        className="flex items-center gap-2"
       >
         <Check className="w-4 h-4" />
         Try This

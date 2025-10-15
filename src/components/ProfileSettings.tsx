@@ -271,7 +271,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
               <Button 
                 onClick={handleSaveProfile} 
                 disabled={isUpdating || isCheckingUsername}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-success hover:bg-success/90"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {isUpdating ? 'Saving...' : 'Save Changes'}
@@ -452,7 +452,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Manage Your Habits</h3>
-              <Button size="sm" className="bg-green-600 hover:bg-green-700">
+              <Button size="sm" variant="success">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Habit
               </Button>
@@ -463,7 +463,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                   <div className="flex items-center space-x-3">
                     <Target className="w-5 h-5 text-gray-500" />
                     <span className="font-medium">{capitalizeHabitName(habit.name)}</span>
-                    {habit.active && <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>}
+                    {habit.active && <Badge className="bg-success/10 text-success border border-success/20">Active</Badge>}
                   </div>
                   <div className="flex items-center space-x-2">
                     <Switch
