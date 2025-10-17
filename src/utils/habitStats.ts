@@ -93,7 +93,17 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
         const daysSinceCreation = Math.floor((now.getTime() - habitStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         habitSpecificTotalDays = Math.min(daysSinceCreation, totalDaysAvailable);
         
-        console.log(`Habit "${habitName}" - Created: ${createdAt.toISOString().split('T')[0]}, Start: ${habitStartDate.toISOString().split('T')[0]}, Days since: ${daysSinceCreation}, Total for period: ${habitSpecificTotalDays}, Completed: ${completed}`);
+        console.log(`[${timeframe}] Habit "${habitName}":`, {
+          createdAt: createdAt.toISOString().split('T')[0],
+          startDate: habitStartDate.toISOString().split('T')[0],
+          daysSinceCreation,
+          habitSpecificTotalDays,
+          completed,
+          failed,
+          empty,
+          uniqueActivitiesCount: uniqueActivities.length,
+          statuses: uniqueActivities.map(a => `${a.date}:${a.status}`)
+        });
       }
       
       const recordedDays = uniqueActivities.length;
