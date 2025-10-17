@@ -20,6 +20,8 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
     
     // Get user-aware time window based on account creation date
     const { startDate, totalDaysAvailable } = getUserTimeWindowSync(timeframe);
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
     
     console.log(`Calculating habit stats for ${timeframe} - Start date: ${startDate.toISOString()}, Total days: ${totalDaysAvailable}`);
     
@@ -44,11 +46,14 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       habitCreationDates.set(habit.id, new Date(habit.created_at));
     });
     
-    // Filter activities by date
+    // Filter activities by date - only include activities within the exact timeframe
     const startDateStr = startDate.toISOString().split('T')[0];
-    const filteredActivities = activities.filter(
-      activity => activity.date >= startDateStr
-    );
+    const filteredActivities = activities.filter(activity => {
+      if (activity.date < startDateStr) return false;
+      // Don't include today unless specified
+      if (activity.date > todayStr) return false;
+      return true;
+    });
     
     // Get all unique habits (using habit_id as primary key, habitName as fallback)
     const habitMap = new Map<string, { habitName: string; createdAt: Date | null }>();
@@ -85,32 +90,35 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       const empty = uniqueActivities.filter(a => a.status === "empty").length;
       
       // Calculate TOTAL days from habit creation date (or timeframe start, whichever is later)
-      const now = new Date();
-      const todayStr = now.toISOString().split('T')[0];
       const hasCompletedToday = uniqueActivities.some(a => a.date === todayStr && a.status === 'completed');
       
+      // Calculate the number of days in this timeframe
       let calculatedTotal = totalDaysAvailable;
       
       if (createdAt) {
         // Use the later of: timeframe start OR habit creation date
         const effectiveStart = createdAt > startDate ? createdAt : startDate;
+        const effectiveStartStr = effectiveStart.toISOString().split('T')[0];
         
-        // Calculate actual days from effective start to now
+        // Count days from effective start to yesterday (not including today unless completed)
         const msPerDay = 1000 * 60 * 60 * 24;
-        const daysDiff = Math.floor((now.getTime() - effectiveStart.getTime()) / msPerDay);
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
         
-        // Total days = days elapsed + 1 (to include both start and end day)
-        // BUT: Only count today if the habit has been completed today
-        const actualDays = hasCompletedToday ? daysDiff + 1 : daysDiff;
+        const daysSinceStart = Math.floor((yesterday.getTime() - effectiveStart.getTime()) / msPerDay) + 1;
+        
+        // Only add today if the habit has been completed today
+        const totalWithToday = hasCompletedToday ? daysSinceStart + 1 : daysSinceStart;
         
         // Cap at the timeframe's total available days
-        calculatedTotal = Math.min(actualDays, totalDaysAvailable);
+        calculatedTotal = Math.min(Math.max(0, totalWithToday), totalDaysAvailable);
+      } else if (!hasCompletedToday) {
+        // If no creation date and today is not completed, use totalDaysAvailable - 1 to not count today
+        calculatedTotal = totalDaysAvailable;
       }
       
-      // CRITICAL FIX: Total should be AT LEAST the number of unique activity days
-      // This handles cases where activities were recorded before we tracked creation dates
-      // BUT: Never exceed the timeframe's total available days (e.g., 7 for week)
-      const total = Math.min(Math.max(uniqueActivities.length, calculatedTotal), totalDaysAvailable);
+      // The total should NEVER exceed totalDaysAvailable (e.g., max 7 for week)
+      const total = Math.min(calculatedTotal, totalDaysAvailable);
       
       // Percentage = completed / total (failed and empty don't count as completed)
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
