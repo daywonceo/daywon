@@ -167,6 +167,7 @@ export const AnalyticsDashboard: React.FC = () => {
       const dateStr = format(date, 'yyyy-MM-dd');
       
       // Count how many habits should be tracked on this day
+      // Only count habits that were created on or before this date
       const expectedHabitsForDay = habits.filter(habit => {
         const habitCreated = habitCreationDates.get(habit.id);
         return habit.status === 'active' && (!habitCreated || date >= habitCreated);
