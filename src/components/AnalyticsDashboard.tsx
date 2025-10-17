@@ -57,6 +57,21 @@ export const AnalyticsDashboard: React.FC = () => {
     if (user) {
       loadAnalyticsData();
     }
+    
+    // Listen for habit updates to refresh analytics in real-time
+    const handleHabitUpdate = () => {
+      if (user) {
+        loadAnalyticsData();
+      }
+    };
+    
+    window.addEventListener('habitUpdated', handleHabitUpdate);
+    window.addEventListener('habitStatusChanged', handleHabitUpdate);
+    
+    return () => {
+      window.removeEventListener('habitUpdated', handleHabitUpdate);
+      window.removeEventListener('habitStatusChanged', handleHabitUpdate);
+    };
   }, [user, selectedPeriod]);
 
   const loadAnalyticsData = async () => {
@@ -136,17 +151,22 @@ export const AnalyticsDashboard: React.FC = () => {
       return activityDate >= habitCreated;
     });
     
-    // Calculate days each habit should have been tracked
+    // Calculate days each habit should have been tracked within the period
     const calculateExpectedDays = (habitId: string): number => {
       const habitCreated = habitCreationDates.get(habitId);
-      if (!habitCreated) return Math.ceil((periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      if (!habitCreated) {
+        // If no creation date, use full period
+        return Math.ceil((periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      }
       
+      // Use the later of habit creation or period start
       const effectiveStart = habitCreated > periodStart ? habitCreated : periodStart;
       const daysSinceCreation = Math.ceil((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       return Math.max(1, daysSinceCreation);
     };
     
     // Calculate total expected activities for all habits
+    // This matches the logic in useHabitStats and habitStats.ts
     const totalExpectedActivities = habits
       .filter(h => h.status === 'active')
       .reduce((sum, habit) => sum + calculateExpectedDays(habit.id), 0);
@@ -161,6 +181,7 @@ export const AnalyticsDashboard: React.FC = () => {
     const appUsageHours = Math.round(totalAppUsage / 60 * 10) / 10;
 
     // Weekly completion trends - calculate expected vs actual completion per day
+    // This matches the logic in useHabitStats
     const weeklyData = [];
     for (let i = 6; i >= 0; i--) {
       const date = subDays(new Date(), i);
@@ -178,15 +199,21 @@ export const AnalyticsDashboard: React.FC = () => {
       );
       const completed = dayActivities.filter(a => a.status === 'completed').length;
       
+      // Calculate completion rate: completed / expected (not total activities)
+      const completionPercentage = expectedHabitsForDay > 0 
+        ? Math.round((completed / expectedHabitsForDay) * 100) 
+        : 0;
+      
       weeklyData.push({
         date: format(date, 'MMM dd'),
-        completion: expectedHabitsForDay > 0 ? Math.round((completed / expectedHabitsForDay) * 100) : 0,
+        completion: completionPercentage,
         completed,
         total: expectedHabitsForDay
       });
     }
 
     // Habit category performance - properly calculate completion vs expected days
+    // This matches the logic in habitStats.ts
     const categoryStats: { [key: string]: { completed: number; expected: number; habitId: string } } = {};
     
     // Group activities by habit
@@ -199,11 +226,23 @@ export const AnalyticsDashboard: React.FC = () => {
       activitiesByHabit.get(habitName)!.push(activity);
     });
     
-    // Calculate stats for each habit
+    // Calculate stats for each habit using the same logic as habitStats.ts
     activitiesByHabit.forEach((habitActivities, habitName) => {
       const habitId = habitActivities[0]?.habit_id;
       const expectedDays = calculateExpectedDays(habitId);
-      const completedCount = habitActivities.filter(a => a.status === 'completed').length;
+      
+      // Remove duplicate activities by date - keep the latest status
+      const uniqueActivityMap = new Map<string, any>();
+      habitActivities.forEach(activity => {
+        const dateKey = activity.activity_date;
+        const existing = uniqueActivityMap.get(dateKey);
+        if (!existing || activity.activity_date >= existing.activity_date) {
+          uniqueActivityMap.set(dateKey, activity);
+        }
+      });
+      
+      const uniqueActivities = Array.from(uniqueActivityMap.values());
+      const completedCount = uniqueActivities.filter(a => a.status === 'completed').length;
       
       categoryStats[habitName] = {
         completed: completedCount,
@@ -221,8 +260,6 @@ export const AnalyticsDashboard: React.FC = () => {
       }))
       .sort((a, b) => b.completion - a.completion)
       .slice(0, 5);
-    
-    console.log('Analytics habit performance:', habitPerformance);
 
     // Find insights - use validActivities
     const dayOfWeekStats: { [key: string]: number } = {};
