@@ -57,13 +57,13 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
 
   return (
     <Card className="mb-8 shadow-sm border-border">
-      <CardContent className="p-4 sm:p-8 md:p-10">
+      <CardContent className="p-3 sm:p-4 md:p-5">
         <div className="space-y-6">
           {/* Activity rows with dynamic columns */}
           {isLoading ? (
             // Enhanced loading skeleton
             Array.from({ length: 3 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="grid grid-cols-[3.5rem_repeat(3,3.5rem)] sm:grid-cols-[5rem_repeat(3,5rem)] gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto">
+              <div key={`skeleton-${index}`} className="grid grid-cols-[3.5rem_repeat(3,3.5rem)] sm:grid-cols-[5rem_repeat(3,5rem)] gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto">
                 {/* Day skeleton */}
                 <div className="flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20">
                   <Skeleton className="h-8 w-8 sm:h-12 sm:w-12 rounded-full" />
@@ -89,7 +89,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                   {/* Only show habit labels when habits change or for first row */}
                   {habitsChanged && (
                     <div 
-                      className="grid gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto"
+                      className="grid gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto"
                       style={{ 
                         gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
                       }}
@@ -107,7 +107,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                   
                   {/* Activity row */}
                   <div 
-                    className="grid gap-3 sm:gap-6 md:gap-8 items-center justify-center max-w-fit mx-auto"
+                    className="grid gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto"
                     style={{ 
                       gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
                     }}
