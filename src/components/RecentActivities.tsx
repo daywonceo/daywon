@@ -57,7 +57,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
 
   return (
     <Card className="mb-8 shadow-sm border-border">
-      <CardContent className="p-3 sm:p-4 md:p-5">
+      <CardContent className="px-2 py-3 sm:px-3 sm:py-4 md:px-4 md:py-5">
         <div className="space-y-6">
           {/* Activity rows with dynamic columns */}
           {isLoading ? (
