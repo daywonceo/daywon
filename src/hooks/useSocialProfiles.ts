@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { profileUpdateService } from '@/services/profileUpdateService';
 
 export interface UserProfile {
   id: string;
@@ -132,21 +133,16 @@ export const useSocialProfiles = () => {
     }
   };
 
-  // Update user status
+  // Update user status (optimized with debouncing)
   const updateStatus = async (status: 'online' | 'away' | 'offline') => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase
-        .from('profiles')
-        .update({ 
-          status,
-          last_active: new Date().toISOString(),
-        })
-        .eq('id', user.id);
+      // Queue the update instead of making immediate DB call
+      profileUpdateService.updateStatus(user.id, status);
 
-      // Update local state
+      // Update local state immediately for UI responsiveness
       if (currentUserProfile) {
         const updated = { ...currentUserProfile, status, last_active: new Date().toISOString() };
         setCurrentUserProfile(updated);
@@ -208,9 +204,19 @@ export const useSocialProfiles = () => {
     // Set user as online when component mounts
     updateStatus('online');
 
-    // Set user as offline when they leave
-    const handleBeforeUnload = () => {
-      updateStatus('offline');
+    // Set user as offline when they leave (flush immediately on unload)
+    const handleBeforeUnload = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Immediate update on unload, bypass queue
+        await supabase
+          .from('profiles')
+          .update({ 
+            status: 'offline',
+            last_active: new Date().toISOString(),
+          })
+          .eq('id', user.id);
+      }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -218,7 +224,10 @@ export const useSocialProfiles = () => {
     // Cleanup
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Queue offline status for cleanup
       updateStatus('offline');
+      // Flush pending updates
+      profileUpdateService.flush();
     };
   }, []);
 
