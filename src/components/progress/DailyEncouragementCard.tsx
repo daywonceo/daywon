@@ -302,7 +302,7 @@ const DailyEncouragementCard: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg gradient-primary transition-transform group-hover:scale-110 duration-300 shadow-sm">
-              <Heart className="h-5 w-5 text-primary-foreground" />
+              <Heart className="h-5 w-5 text-red-500" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground">
