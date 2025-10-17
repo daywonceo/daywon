@@ -116,7 +116,7 @@ const HabitActivityRow: React.FC<HabitActivityRowProps> = ({
   return (
     <div key={`activity-row-${activityIndex}`} className="contents">
       {/* Day number - simplified without photo upload capability */}
-      <div className="flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20">
+      <div className="flex items-center justify-center w-16 h-16 sm:w-22 sm:h-22">
         <ClickableDate
           day={activity.day}
           date={activityDate}

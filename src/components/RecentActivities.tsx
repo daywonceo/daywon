@@ -63,15 +63,15 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
           {isLoading ? (
             // Enhanced loading skeleton
             Array.from({ length: 3 }).map((_, index) => (
-              <div key={`skeleton-${index}`} className="grid grid-cols-[3.5rem_repeat(3,3.5rem)] sm:grid-cols-[5rem_repeat(3,5rem)] gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto">
+              <div key={`skeleton-${index}`} className="grid grid-cols-[4rem_repeat(3,4rem)] sm:grid-cols-[5.5rem_repeat(3,5.5rem)] gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto">
                 {/* Day skeleton */}
-                <div className="flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20">
-                  <Skeleton className="h-8 w-8 sm:h-12 sm:w-12 rounded-full" />
+                <div className="flex items-center justify-center w-16 h-16 sm:w-22 sm:h-22">
+                  <Skeleton className="h-10 w-10 sm:h-14 sm:w-14 rounded-full" />
                 </div>
                 {/* Habit status boxes skeleton */}
                 {userHabits.map((_, habitIndex) => (
-                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20">
-                    <Skeleton className="h-14 w-14 sm:h-20 sm:w-20 rounded-lg" />
+                  <div key={`skeleton-${index}-${habitIndex}`} className="flex items-center justify-center w-16 h-16 sm:w-22 sm:h-22">
+                    <Skeleton className="h-16 w-16 sm:h-22 sm:w-22 rounded-lg" />
                   </div>
                 ))}
               </div>
@@ -91,7 +91,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                     <div 
                       className="grid gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto"
                       style={{ 
-                        gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
+                        gridTemplateColumns: `4rem repeat(${activity.categories.length}, 4rem)` 
                       }}
                     >
                       <div />
@@ -109,7 +109,7 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                   <div 
                     className="grid gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto"
                     style={{ 
-                      gridTemplateColumns: `3.5rem repeat(${activity.categories.length}, 3.5rem)` 
+                      gridTemplateColumns: `4rem repeat(${activity.categories.length}, 4rem)` 
                     }}
                   >
                     <HabitActivityRow

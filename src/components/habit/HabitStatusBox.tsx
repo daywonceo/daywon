@@ -112,7 +112,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   return (
     <div
       className={cn(
-        "w-14 h-14 sm:w-20 sm:h-20 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors relative",
+        "w-16 h-16 sm:w-22 sm:h-22 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors relative",
         status === "completed" 
           ? "border-success hover:bg-success/10" 
           : status === "failed"
