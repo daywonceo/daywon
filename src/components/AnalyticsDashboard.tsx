@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { calculateStreaks } from '@/utils/shared/streakCalculations';
 
 interface AnalyticsData {
   overview: {
@@ -236,6 +237,29 @@ export const AnalyticsDashboard: React.FC = () => {
 
     const favoriteCategory = habitPerformance[0]?.name || 'Wellness';
 
+    // Calculate longest streak across all habits
+    let longestStreak = 0;
+    let longestStreakHabit = '';
+    
+    // Group activities by habit
+    const activitiesByHabitForStreak = new Map<string, any[]>();
+    validActivities.forEach(activity => {
+      const habitId = activity.habit_id;
+      if (!activitiesByHabitForStreak.has(habitId)) {
+        activitiesByHabitForStreak.set(habitId, []);
+      }
+      activitiesByHabitForStreak.get(habitId)!.push(activity);
+    });
+    
+    // Calculate streak for each habit and find the longest
+    activitiesByHabitForStreak.forEach((habitActivities, habitId) => {
+      const streakData = calculateStreaks(habitActivities);
+      if (streakData.longestStreak > longestStreak) {
+        longestStreak = streakData.longestStreak;
+        longestStreakHabit = habitActivities[0]?.habit_name || 'Unknown';
+      }
+    });
+
     return {
       overview: {
         totalHabits,
@@ -251,7 +275,7 @@ export const AnalyticsDashboard: React.FC = () => {
       },
       insights: {
         bestDay,
-        longestStreak: 15, // Simplified for demo
+        longestStreak,
         favoriteCategory,
         totalSocialPosts: posts.length
       }
