@@ -27,59 +27,52 @@ export const useHabitActivities = (habitList?: string[]) => {
       ? habitList
       : DEFAULT_HABITS;
 
-  const loadActivities = useCallback(async () => {
-    try {
+    const loadActivities = useCallback(async () => {
       setIsLoading(true);
+      try {
+        const dates = [
+          new Date(),
+          new Date(new Date().setDate(new Date().getDate() - 1)),
+          new Date(new Date().setDate(new Date().getDate() - 2))
+        ];
       
-      // Get recent dates (past 3 days including today)
-      const today = new Date();
-      const dates = [0, 1, 2].map(daysAgo => {
-        const date = new Date(today);
-        date.setDate(today.getDate() - daysAgo);
-        return date;
-      });
+        const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
       
-      // Format dates as YYYY-MM-DD strings
-      const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
-      
-      // Throttle sync to prevent excessive database calls
-      const now = Date.now();
-      const lastSync = parseInt(localStorage.getItem('lastHabitSync') || '0');
-      const syncThreshold = 30000; // 30 seconds
-      
-      if (now - lastSync > syncThreshold) {
-        try {
-          // Dynamically import to avoid circular dependencies
-          const { synchronizeHabits } = await import('@/utils/habitSynchronization');
-          await synchronizeHabits();
-          localStorage.setItem('lastHabitSync', now.toString());
-        } catch (syncError) {
-          console.error("Failed to sync habit data:", syncError);
-          // Continue with local data even if sync fails
+        // Fetch the habits for each specific date's month
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user?.id) {
+          setIsLoading(false);
+          return;
         }
-      }
-      
-      // Get all habit activities from V2 system (uses habit_id)
-      const storedActivities = getHabitActivities();
-      
-      // Fetch the habits for each specific date's month
-      const { data: { user } } = await supabase.auth.getUser();
-      const habitsForDates = await Promise.all(dates.map(async (date) => {
-        const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        if (!user?.id) return userHabits;
+        // Optimize: Fetch all needed months in one query
+        const monthsToFetch = [...new Set(dates.map(date => 
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        ))];
         
-        const { data } = await supabase
+        // Batch fetch all needed months at once
+        const { data: topHabitsData } = await supabase
           .from('user_top_habits')
-          .select('habits')
+          .select('month, habits')
           .eq('user_id', user.id)
-          .eq('month', monthStr)
-          .maybeSingle();
+          .in('month', monthsToFetch);
         
-        return data?.habits || userHabits;
-      }));
+        // Create a map for quick lookup
+        const topHabitsMap = new Map(
+          topHabitsData?.map(item => [item.month, item.habits]) || []
+        );
+        
+        // Get habits for each date from the map
+        const habitsForDates = dates.map(date => {
+          const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          return topHabitsMap.get(monthStr) || userHabits;
+        });
       
-      // Create activities for the past 3 days with date-specific habits
+        // Get stored activities
+        const storedActivities = getHabitActivities();
+      
+        // Create activities for the past 3 days with date-specific habits
       const newActivities = dates.map((date, index) => {
         const day = date.getDate();
         const dateStr = dateStrings[index];

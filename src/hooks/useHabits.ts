@@ -202,6 +202,8 @@ export function useHabits() {
 
   const { data: habits, isLoading, isError } = useQuery({
     queryKey,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    gcTime: 1000 * 60 * 15, // 15 minutes
     queryFn: async () => {
       if (!user?.id) return [];
       
@@ -219,8 +221,6 @@ export function useHabits() {
       return data;
     },
     enabled: !!user?.id,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: false
   });

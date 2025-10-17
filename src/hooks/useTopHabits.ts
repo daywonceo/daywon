@@ -36,11 +36,13 @@ export function useTopHabits() {
   const queryClient = useQueryClient();
   const month = getCurrentMonthString();
 
-  // Query for this user's top habits for this month
+  // Query for this user's top habits for this month with caching
   const { data: habits, isLoading, refetch } = useQuery({
     queryKey: ["topHabits", user?.id, month],
     enabled: !!user?.id,
     queryFn: () => fetchUserTopHabits(user!.id, month),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 
   const mutation = useMutation({
