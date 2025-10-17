@@ -86,7 +86,7 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       
       // Calculate TOTAL days from habit creation date (or timeframe start, whichever is later)
       const now = new Date();
-      let total = totalDaysAvailable;
+      let calculatedTotal = totalDaysAvailable;
       
       if (createdAt) {
         // Use the later of: timeframe start OR habit creation date
@@ -100,8 +100,13 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
         const actualDays = daysDiff + 1;
         
         // Cap at the timeframe's total available days
-        total = Math.min(actualDays, totalDaysAvailable);
+        calculatedTotal = Math.min(actualDays, totalDaysAvailable);
       }
+      
+      // CRITICAL FIX: Total should be AT LEAST the number of unique activity days
+      // This handles cases where activities were recorded before we tracked creation dates
+      // or if there are timezone discrepancies
+      const total = Math.max(uniqueActivities.length, calculatedTotal);
       
       // Percentage = completed / total (failed and empty don't count as completed)
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
