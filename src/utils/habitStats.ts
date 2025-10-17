@@ -123,6 +123,14 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       // TOTAL is the minimum of maxDays and actual days available
       const total = Math.min(maxDays, actualDaysAvailable);
       
+      // Calculate missing days (days with no activity recorded at all)
+      // These are days that exist in the window but have no activity record
+      const recordedDays = completed + failed + empty;
+      const missingDays = Math.max(0, total - recordedDays);
+      
+      // For display purposes, treat missing days as failed days
+      const displayFailed = failed + missingDays;
+      
       // Percentage = completed / total
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
@@ -139,7 +147,7 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       return {
         habitName,
         completed,
-        failed,
+        failed: displayFailed, // Use displayFailed which includes missing days
         empty,
         total,
         percentage,
