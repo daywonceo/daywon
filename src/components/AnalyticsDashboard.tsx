@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { calculateStreaks } from '@/utils/shared/streakCalculations';
+import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
 interface AnalyticsData {
   overview: {
@@ -80,17 +81,22 @@ export const AnalyticsDashboard: React.FC = () => {
     setLoading(true);
     try {
       const now = new Date();
-      const periodStart = selectedPeriod === 'week' 
-        ? startOfWeek(now)
-        : selectedPeriod === 'month'
-        ? startOfMonth(now)
-        : subDays(now, 365);
       
-      const periodEnd = selectedPeriod === 'week'
-        ? endOfWeek(now)
-        : selectedPeriod === 'month'
-        ? endOfMonth(now)
-        : now;
+      // Use the same time window calculation as the home page for weekly
+      let periodStart: Date;
+      let periodEnd: Date;
+      
+      if (selectedPeriod === 'week') {
+        const { startDate } = getUserTimeWindowSync("week");
+        periodStart = startDate;
+        periodEnd = now;
+      } else if (selectedPeriod === 'month') {
+        periodStart = startOfMonth(now);
+        periodEnd = endOfMonth(now);
+      } else {
+        periodStart = subDays(now, 365);
+        periodEnd = now;
+      }
 
       // Fetch all data in parallel
       const [
@@ -100,7 +106,7 @@ export const AnalyticsDashboard: React.FC = () => {
         postsResponse,
         sessionsResponse
       ] = await Promise.all([
-        supabase.from('habits').select('id, name, created_at, status, user_id').eq('user_id', user.id),
+        supabase.from('habits').select('id, name, created_at, status, user_id').eq('user_id', user.id).eq('status', 'active'),
         supabase.from('habit_activities').select('*')
           .eq('user_id', user.id)
           .gte('activity_date', format(periodStart, 'yyyy-MM-dd'))
@@ -151,28 +157,50 @@ export const AnalyticsDashboard: React.FC = () => {
       return activityDate >= habitCreated;
     });
     
-    // Calculate days each habit should have been tracked within the period
+    // Helper function to calculate expected days for a habit
     const calculateExpectedDays = (habitId: string): number => {
       const habitCreated = habitCreationDates.get(habitId);
       if (!habitCreated) {
-        // If no creation date, use full period
         return Math.ceil((periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       }
       
-      // Use the later of habit creation or period start
       const effectiveStart = habitCreated > periodStart ? habitCreated : periodStart;
       const daysSinceCreation = Math.ceil((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       return Math.max(1, daysSinceCreation);
     };
     
-    // Calculate total expected activities for all habits
-    // This matches the logic in useHabitStats and habitStats.ts
-    const totalExpectedActivities = habits
-      .filter(h => h.status === 'active')
-      .reduce((sum, habit) => sum + calculateExpectedDays(habit.id), 0);
+    // Calculate completion rate using the EXACT same method as useHabitStats
+    // This ensures the analytics dashboard matches the home page exactly
+    let completedCount = 0;
+    let totalPossible = 0;
     
-    const completedActivities = validActivities.filter(a => a.status === 'completed').length;
-    const completionRate = totalExpectedActivities > 0 ? (completedActivities / totalExpectedActivities) * 100 : 0;
+    // For each habit, calculate expected days and completed count
+    habits.filter(h => h.status === 'active').forEach(habit => {
+      const habitCreated = habitCreationDates.get(habit.id);
+      const effectiveStart = habitCreated && habitCreated > periodStart ? habitCreated : periodStart;
+      
+      // Calculate how many days this habit should have been tracked
+      const daysSinceStart = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const expectedDays = Math.max(1, daysSinceStart);
+      
+      totalPossible += expectedDays;
+      
+      // Count completed days for this habit
+      for (let dayOffset = 0; dayOffset < expectedDays; dayOffset++) {
+        const checkDate = new Date(periodEnd);
+        checkDate.setDate(periodEnd.getDate() - dayOffset);
+        const dateStr = checkDate.toISOString().split('T')[0];
+        
+        const activity = validActivities.find(a => 
+          a.habit_id === habit.id && a.activity_date === dateStr && a.status === 'completed'
+        );
+        if (activity) {
+          completedCount++;
+        }
+      }
+    });
+    
+    const completionRate = totalPossible > 0 ? (completedCount / totalPossible) * 100 : 0;
     
     // Calculate streaks (simplified)
     const activeStreaks = habits.filter(h => h.status === 'active').length; // Simplified for demo
