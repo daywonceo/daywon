@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, Calendar } from 'lucide-react';
 import { useHabits } from '@/hooks/useHabits';
 import { getHabitActivities } from '@/utils/habitActivity';
-import { endOfDay, eachDayOfInterval, startOfDay, subDays } from 'date-fns';
+import { startOfDay, subDays } from 'date-fns';
 
 interface WeeklyProgressDetailModalProps {
   open: boolean;
@@ -29,7 +29,7 @@ const WeeklyProgressDetailModal: React.FC<WeeklyProgressDetailModalProps> = ({
 
   // Calculate weekly stats for each habit
   const habitStats = activeHabits?.map(habit => {
-    const weekEnd = endOfDay(new Date());
+    const now = new Date();
     const weekStart = startOfDay(subDays(new Date(), 6)); // Last 7 days including today
     const allActivities = getHabitActivities();
     
@@ -37,17 +37,19 @@ const WeeklyProgressDetailModal: React.FC<WeeklyProgressDetailModalProps> = ({
     const habitActivities = allActivities.filter(
       a => a.habitId === habit.id && 
       new Date(a.date) >= weekStart && 
-      new Date(a.date) <= weekEnd &&
+      new Date(a.date) <= now &&
       a.status === 'completed'
     );
 
-    // Calculate expected days: only count days from habit creation or week start (whichever is later)
+    // Calculate expected days using the same logic as useHabitStats
     const habitCreated = new Date(habit.created_at);
     const effectiveStart = habitCreated > weekStart ? habitCreated : weekStart;
-    const daysInPeriod = eachDayOfInterval({ start: effectiveStart, end: weekEnd });
+    
+    // Calculate days since effective start (same as useHabitStats)
+    const daysSinceStart = Math.floor((now.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDays = Math.min(daysSinceStart, 7); // Cap at 7 days for weekly
     
     const completedDays = habitActivities.length;
-    const totalDays = daysInPeriod.length;
     const percentage = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
 
     return {
