@@ -62,7 +62,7 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
     
     // Calculate statistics for each habit
     const allHabitStats: HabitStats[] = Array.from(habitMap.entries()).map(([habitKey, { habitName, createdAt }]) => {
-      // Get all activities for this habit
+      // Get all activities for this habit (within the timeframe)
       const habitActivities = filteredActivities.filter(activity => {
         const activityKey = activity.habitId || activity.habitName;
         return activityKey === habitKey;
@@ -72,7 +72,6 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       const uniqueActivityMap = new Map<string, HabitActivity>();
       habitActivities.forEach(activity => {
         const existing = uniqueActivityMap.get(activity.date);
-        // Keep the activity with the latest creation (activities are usually ordered by creation)
         if (!existing || activity.date >= existing.date) {
           uniqueActivityMap.set(activity.date, activity);
         }
@@ -80,44 +79,34 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       
       const uniqueActivities = Array.from(uniqueActivityMap.values());
       
-      // Count completed, failed, and empty activities that were explicitly recorded
+      // Count only COMPLETED activities (not failed, not empty)
       const completed = uniqueActivities.filter(a => a.status === "completed").length;
       const failed = uniqueActivities.filter(a => a.status === "failed").length;
       const empty = uniqueActivities.filter(a => a.status === "empty").length;
       
-      // CRITICAL: Calculate total days only from habit creation date
-      let habitSpecificTotalDays = totalDaysAvailable;
+      // Calculate TOTAL days from habit creation date (or timeframe start, whichever is later)
+      const now = new Date();
+      let total = totalDaysAvailable;
+      
       if (createdAt) {
-        const habitStartDate = createdAt > startDate ? createdAt : startDate;
-        const now = new Date();
-        const daysSinceCreation = Math.floor((now.getTime() - habitStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        habitSpecificTotalDays = Math.min(daysSinceCreation, totalDaysAvailable);
+        // Use the later of: timeframe start OR habit creation date
+        const effectiveStart = createdAt > startDate ? createdAt : startDate;
         
-        console.log(`[${timeframe}] Habit "${habitName}":`, {
-          createdAt: createdAt.toISOString().split('T')[0],
-          startDate: habitStartDate.toISOString().split('T')[0],
-          daysSinceCreation,
-          habitSpecificTotalDays,
-          completed,
-          failed,
-          empty,
-          uniqueActivitiesCount: uniqueActivities.length,
-          statuses: uniqueActivities.map(a => `${a.date}:${a.status}`)
-        });
+        // Calculate actual days from effective start to now
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const daysDiff = Math.floor((now.getTime() - effectiveStart.getTime()) / msPerDay);
+        
+        // Total days = days elapsed + 1 (to include both start and end day)
+        const actualDays = daysDiff + 1;
+        
+        // Cap at the timeframe's total available days
+        total = Math.min(actualDays, totalDaysAvailable);
       }
       
-      const recordedDays = uniqueActivities.length;
-      const missedDays = Math.max(0, habitSpecificTotalDays - recordedDays);
-      const total = habitSpecificTotalDays;
+      // Percentage = completed / total (failed and empty don't count as completed)
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
-      // Ensure completed count never exceeds total
-      const safeCompleted = Math.min(completed, total);
-      
-      // For percentage calculation: only "completed" counts as success
-      // Failed, empty, and missed days all count as incomplete
-      const percentage = total > 0 ? Math.round((safeCompleted / total) * 100) : 0;
-      
-      // Automatic categorization based on completion percentage
+      // Auto-categorize
       let category: 'good' | 'bad' | 'in-progress';
       if (percentage >= 70) {
         category = 'good';
@@ -129,9 +118,9 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       
       return {
         habitName,
-        completed: safeCompleted,
+        completed,
         failed,
-        empty: empty + missedDays, // Include missed days as "empty"
+        empty: empty + Math.max(0, total - uniqueActivities.length),
         total,
         percentage,
         category
