@@ -17,13 +17,34 @@ export interface HabitStats {
 export const calculateHabitStats = async (timeframe: "week" | "month" | "year"): Promise<{ goodHabits: HabitStats[], badHabits: HabitStats[], inProgressHabits: HabitStats[] }> => {
   try {
     const activities = getHabitActivities();
-    
-    // Get user-aware time window based on account creation date
-    const { startDate, totalDaysAvailable } = getUserTimeWindowSync(timeframe);
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     
-    console.log(`Calculating habit stats for ${timeframe} - Start date: ${startDate.toISOString()}, Total days: ${totalDaysAvailable}`);
+    // Check if ANY habit has activity today
+    const hasAnyActivityToday = activities.some(a => a.date === todayStr);
+    
+    // Calculate the exact 7-day window
+    let startDate: Date;
+    let endDate: Date;
+    const daysToShow = 7;
+    
+    if (hasAnyActivityToday) {
+      // Include today, so go back 6 days
+      endDate = now;
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 6);
+    } else {
+      // Don't include today, so show yesterday and 6 days before that
+      endDate = new Date(now);
+      endDate.setDate(now.getDate() - 1);
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 7);
+    }
+    
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    console.log(`Calculating habit stats for ${timeframe} - Start: ${startDateStr}, End: ${endDateStr}, Days: ${daysToShow}`);
     
     // Fetch habits from database to get created_at dates
     const { data: { user } } = await supabase.auth.getUser();
@@ -46,13 +67,9 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       habitCreationDates.set(habit.id, new Date(habit.created_at));
     });
     
-    // Filter activities by date - only include activities within the exact timeframe
-    const startDateStr = startDate.toISOString().split('T')[0];
+    // Filter activities to ONLY include those within our exact 7-day window
     const filteredActivities = activities.filter(activity => {
-      if (activity.date < startDateStr) return false;
-      // Don't include today unless specified
-      if (activity.date > todayStr) return false;
-      return true;
+      return activity.date >= startDateStr && activity.date <= endDateStr;
     });
     
     // Get all unique habits (using habit_id as primary key, habitName as fallback)
@@ -84,44 +101,16 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       
       const uniqueActivities = Array.from(uniqueActivityMap.values());
       
-      // Count only COMPLETED activities (not failed, not empty)
+      // Count statuses
       const completed = uniqueActivities.filter(a => a.status === "completed").length;
       const failed = uniqueActivities.filter(a => a.status === "failed").length;
       const empty = uniqueActivities.filter(a => a.status === "empty").length;
       
-      // Calculate TOTAL days from habit creation date (or timeframe start, whichever is later)
-      const hasCompletedToday = uniqueActivities.some(a => a.date === todayStr && a.status === 'completed');
+      // TOTAL is ALWAYS 7 for weekly view - no exceptions
+      const total = 7;
       
-      // Calculate the number of days in this timeframe
-      let calculatedTotal = totalDaysAvailable;
-      
-      if (createdAt) {
-        // Use the later of: timeframe start OR habit creation date
-        const effectiveStart = createdAt > startDate ? createdAt : startDate;
-        const effectiveStartStr = effectiveStart.toISOString().split('T')[0];
-        
-        // Count days from effective start to yesterday (not including today unless completed)
-        const msPerDay = 1000 * 60 * 60 * 24;
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        const daysSinceStart = Math.floor((yesterday.getTime() - effectiveStart.getTime()) / msPerDay) + 1;
-        
-        // Only add today if the habit has been completed today
-        const totalWithToday = hasCompletedToday ? daysSinceStart + 1 : daysSinceStart;
-        
-        // Cap at the timeframe's total available days
-        calculatedTotal = Math.min(Math.max(0, totalWithToday), totalDaysAvailable);
-      } else if (!hasCompletedToday) {
-        // If no creation date and today is not completed, use totalDaysAvailable - 1 to not count today
-        calculatedTotal = totalDaysAvailable;
-      }
-      
-      // The total should NEVER exceed totalDaysAvailable (e.g., max 7 for week)
-      const total = Math.min(calculatedTotal, totalDaysAvailable);
-      
-      // Percentage = completed / total (failed and empty don't count as completed)
-      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+      // Percentage = completed / 7 (always)
+      const percentage = Math.round((completed / total) * 100);
       
       // Auto-categorize
       let category: 'good' | 'bad' | 'in-progress';
@@ -137,7 +126,7 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
         habitName,
         completed,
         failed,
-        empty: empty + Math.max(0, total - uniqueActivities.length),
+        empty,
         total,
         percentage,
         category
