@@ -20,31 +20,35 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     
-    // Check if ANY habit has activity today
-    const hasAnyActivityToday = activities.some(a => a.date === todayStr);
+    // Determine max days based on timeframe
+    const maxDays = timeframe === "week" ? 7 : timeframe === "month" ? 30 : 365;
     
-    // Calculate the exact 7-day window
-    let startDate: Date;
+    // Check if ANY habit has activity today (completed or failed)
+    const hasActivityToday = activities.some(a => 
+      a.date === todayStr && (a.status === "completed" || a.status === "failed")
+    );
+    
+    // Calculate date range - ALWAYS fixed window, never more than maxDays
     let endDate: Date;
-    const daysToShow = 7;
+    let startDate: Date;
     
-    if (hasAnyActivityToday) {
-      // Include today, so go back 6 days
+    if (hasActivityToday) {
+      // Include today, go back (maxDays - 1) days
       endDate = now;
       startDate = new Date(now);
-      startDate.setDate(now.getDate() - 6);
+      startDate.setDate(now.getDate() - (maxDays - 1));
     } else {
-      // Don't include today, so show yesterday and 6 days before that
+      // Don't include today, show yesterday and (maxDays - 1) days before that
       endDate = new Date(now);
       endDate.setDate(now.getDate() - 1);
-      startDate = new Date(now);
-      startDate.setDate(now.getDate() - 7);
+      startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - (maxDays - 1));
     }
     
     const startDateStr = startDate.toISOString().split('T')[0];
     const endDateStr = endDate.toISOString().split('T')[0];
     
-    console.log(`Calculating habit stats for ${timeframe} - Start: ${startDateStr}, End: ${endDateStr}, Days: ${daysToShow}`);
+    console.log(`Calculating habit stats for ${timeframe} - Start: ${startDateStr}, End: ${endDateStr}, Max Days: ${maxDays}`);
     
     // Fetch habits from database to get created_at dates
     const { data: { user } } = await supabase.auth.getUser();
@@ -67,7 +71,7 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       habitCreationDates.set(habit.id, new Date(habit.created_at));
     });
     
-    // Filter activities to ONLY include those within our exact 7-day window
+    // Filter activities to ONLY include those within our exact window
     const filteredActivities = activities.filter(activity => {
       return activity.date >= startDateStr && activity.date <= endDateStr;
     });
@@ -106,11 +110,21 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       const failed = uniqueActivities.filter(a => a.status === "failed").length;
       const empty = uniqueActivities.filter(a => a.status === "empty").length;
       
-      // TOTAL is ALWAYS 7 for weekly view - no exceptions
-      const total = 7;
+      // Calculate actual available days for this habit
+      // If habit was created within the window, only count days since creation
+      let actualDaysAvailable = maxDays;
+      if (createdAt && createdAt > startDate) {
+        // Habit was created within the window
+        const createdDateStr = createdAt.toISOString().split('T')[0];
+        const daysSinceCreation = Math.floor((new Date(endDateStr).getTime() - new Date(createdDateStr).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        actualDaysAvailable = Math.min(daysSinceCreation, maxDays);
+      }
       
-      // Percentage = completed / 7 (always)
-      const percentage = Math.round((completed / total) * 100);
+      // TOTAL is the minimum of maxDays and actual days available
+      const total = Math.min(maxDays, actualDaysAvailable);
+      
+      // Percentage = completed / total
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
       // Auto-categorize
       let category: 'good' | 'bad' | 'in-progress';
