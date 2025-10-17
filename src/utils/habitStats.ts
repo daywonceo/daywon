@@ -109,7 +109,8 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
       
       // CRITICAL FIX: Total should be AT LEAST the number of unique activity days
       // This handles cases where activities were recorded before we tracked creation dates
-      const total = Math.max(uniqueActivities.length, calculatedTotal);
+      // BUT: Never exceed the timeframe's total available days (e.g., 7 for week)
+      const total = Math.min(Math.max(uniqueActivities.length, calculatedTotal), totalDaysAvailable);
       
       // Percentage = completed / total (failed and empty don't count as completed)
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
