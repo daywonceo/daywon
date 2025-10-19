@@ -1,5 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,30 +53,62 @@ interface WorkoutRequest {
 }
 
 const fetchExercises = async (muscle: string, difficulty: string = 'beginner') => {
+  console.log(`Fetching exercises for muscle: ${muscle}, difficulty: ${difficulty}`);
+  
   try {
-    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/get-exercises`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
-      },
-      body: JSON.stringify({ muscle, difficulty })
-    });
-
-    if (!response.ok) {
-      console.error(`Failed to fetch exercises for ${muscle}: ${response.status}`);
-      return fallbackExercises[muscle as keyof typeof fallbackExercises] || [];
-    }
-
-    const exercises = await response.json();
+    // First, try to fetch from local exercise library
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
     
-    // If API returns empty or no exercises, use fallback
-    if (!exercises || exercises.length === 0) {
-      console.log(`No exercises returned for ${muscle}, using fallback`);
-      return fallbackExercises[muscle as keyof typeof fallbackExercises] || [];
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      const { data: libraryExercises, error } = await supabase
+        .from('exercise_library')
+        .select('*')
+        .eq('muscle_group', muscle)
+        .eq('difficulty', difficulty)
+        .limit(4);
+      
+      if (!error && libraryExercises && libraryExercises.length > 0) {
+        console.log(`Found ${libraryExercises.length} exercises in local library`);
+        // Transform to match expected format
+        return libraryExercises.map(ex => ({
+          name: ex.name,
+          type: ex.exercise_type,
+          muscle: ex.muscle_group,
+          equipment: ex.equipment,
+          difficulty: ex.difficulty,
+          instructions: ex.instructions
+        }));
+      }
     }
     
-    return exercises.slice(0, 4); // Limit to 4 exercises per muscle group
+    // If local library has no results, try external API via edge function
+    try {
+      const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/get-exercises`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+        },
+        body: JSON.stringify({ muscle, difficulty })
+      });
+
+      if (response.ok) {
+        const exercises = await response.json();
+        if (exercises && exercises.length > 0) {
+          console.log(`Fetched ${exercises.length} exercises from API`);
+          return exercises.slice(0, 4);
+        }
+      }
+    } catch (apiError) {
+      console.warn('External API call failed, using fallback');
+    }
+    
+    // Use fallback exercises
+    console.log(`Using fallback exercises for ${muscle}`);
+    return fallbackExercises[muscle as keyof typeof fallbackExercises] || [];
   } catch (error) {
     console.error(`Error fetching exercises for ${muscle}:`, error);
     return fallbackExercises[muscle as keyof typeof fallbackExercises] || [];

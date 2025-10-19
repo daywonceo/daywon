@@ -6,6 +6,12 @@ import { ArrowLeft } from "lucide-react";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions, WorkoutSession } from "@/hooks/useWorkoutSessions";
 import { useExercises } from "@/hooks/useExercises";
+import { 
+  startWorkoutSession, 
+  pauseWorkoutSession, 
+  resumeWorkoutSession, 
+  syncWorkoutDuration 
+} from "@/services/workoutSessionService";
 import { toast } from "@/components/ui/sonner";
 import { getWorkoutOptions } from "@/utils/workoutRotation";
 import TimerFailPrompt from "./TimerFailPrompt";
@@ -45,7 +51,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       const sessionDate = new Date(session.workout_date);
       const today = new Date();
       today.setHours(23, 59, 59, 999);
-      return sessionDate <= today && !session.is_completed && session.duration_minutes && session.duration_minutes > 0;
+      return sessionDate <= today && !session.is_completed && session.started_at;
     });
 
     if (activeSession) {
@@ -54,21 +60,55 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       setSelectedWorkoutType(activeSession.workout_type);
       setShowWorkoutSelection(false);
       setWorkoutStarted(true);
-      setStartTime(new Date(activeSession.created_at));
-      setElapsedTime(activeSession.duration_minutes * 60);
+      
+      // Calculate elapsed time from started_at timestamp
+      const startedAt = new Date(activeSession.started_at);
+      const now = new Date();
+      const totalElapsed = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
+      const pauseDuration = activeSession.total_pause_duration_seconds || 0;
+      const actualElapsed = Math.max(0, totalElapsed - pauseDuration);
+      
+      setStartTime(startedAt);
+      setElapsedTime(actualElapsed);
+      
+      // Check if currently paused
+      if (activeSession.paused_at) {
+        setIsTimerPaused(true);
+      }
     }
   }, [sessions]);
 
-  // Timer effect
+  // Timer effect - calculate from started_at timestamp
   useEffect(() => {
-    if (startTime && workoutStarted && !isTimerPaused) {
+    if (startTime && workoutStarted && !isTimerPaused && currentSession) {
       const interval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
-        setElapsedTime(elapsed);
+        const now = new Date();
+        const totalElapsed = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+        const pauseDuration = currentSession.total_pause_duration_seconds || 0;
+        const actualElapsed = Math.max(0, totalElapsed - pauseDuration);
+        setElapsedTime(actualElapsed);
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [startTime, workoutStarted, isTimerPaused]);
+  }, [startTime, workoutStarted, isTimerPaused, currentSession]);
+
+  // Sync workout duration to database every 30 seconds
+  useEffect(() => {
+    if (currentSession && workoutStarted && !isTimerPaused && elapsedTime > 0) {
+      const syncInterval = setInterval(async () => {
+        const durationMinutes = Math.floor(elapsedTime / 60);
+        if (durationMinutes > 0) {
+          try {
+            await syncWorkoutDuration(currentSession.user_id, currentSession.id, durationMinutes);
+            console.log('Synced workout duration:', durationMinutes, 'minutes');
+          } catch (error) {
+            console.error('Failed to sync workout duration:', error);
+          }
+        }
+      }, 30000); // Sync every 30 seconds
+      return () => clearInterval(syncInterval);
+    }
+  }, [currentSession, workoutStarted, isTimerPaused, elapsedTime]);
 
   // Timer fail check
   useEffect(() => {
@@ -164,30 +204,59 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     });
   };
 
-  const handleStartTimer = () => {
+  const handleStartTimer = async () => {
+    if (!currentSession) return;
+    
     const now = new Date();
     setStartTime(now);
     setWorkoutStarted(true);
     setIsTimerPaused(false);
     setElapsedTime(0);
-    console.log('Timer started at:', now);
-    toast.success("Workout timer started!");
-  };
-
-  const handlePauseTimer = () => {
-    setIsTimerPaused(true);
-    console.log('Timer paused at:', elapsedTime, 'seconds');
-    toast.info("Timer paused");
-  };
-
-  const handleResumeTimer = () => {
-    if (startTime) {
-      const pausedDuration = elapsedTime * 1000;
-      setStartTime(new Date(Date.now() - pausedDuration));
+    
+    try {
+      await startWorkoutSession(currentSession.user_id, currentSession.id);
+      console.log('Timer started at:', now);
+      toast.success("Workout timer started!");
+    } catch (error) {
+      console.error('Failed to start workout session:', error);
+      toast.error('Failed to start timer');
     }
-    setIsTimerPaused(false);
-    console.log('Timer resumed');
-    toast.success("Timer resumed!");
+  };
+
+  const handlePauseTimer = async () => {
+    if (!currentSession) return;
+    
+    setIsTimerPaused(true);
+    
+    try {
+      await pauseWorkoutSession(currentSession.user_id, currentSession.id);
+      console.log('Timer paused at:', elapsedTime, 'seconds');
+      toast.info("Timer paused");
+    } catch (error) {
+      console.error('Failed to pause workout session:', error);
+      toast.error('Failed to pause timer');
+    }
+  };
+
+  const handleResumeTimer = async () => {
+    if (!currentSession || !currentSession.paused_at) return;
+    
+    const pausedAt = new Date(currentSession.paused_at);
+    const now = new Date();
+    const pauseDurationSeconds = Math.floor((now.getTime() - pausedAt.getTime()) / 1000);
+    
+    try {
+      await resumeWorkoutSession(currentSession.user_id, currentSession.id, pauseDurationSeconds);
+      setIsTimerPaused(false);
+      console.log('Timer resumed after', pauseDurationSeconds, 'seconds pause');
+      toast.success("Timer resumed!");
+      
+      // Refresh session data to get updated total_pause_duration_seconds
+      await refetch();
+    } catch (error) {
+      console.error('Failed to resume workout session:', error);
+      toast.error('Failed to resume timer');
+    }
   };
 
   const handleStopWorkout = () => {

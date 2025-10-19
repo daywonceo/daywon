@@ -376,6 +376,48 @@ export type Database = {
         }
         Relationships: []
       }
+      exercise_library: {
+        Row: {
+          created_at: string | null
+          difficulty: string
+          equipment: string | null
+          exercise_type: string
+          id: string
+          image_url: string | null
+          instructions: string | null
+          muscle_group: string
+          name: string
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty?: string
+          equipment?: string | null
+          exercise_type?: string
+          id?: string
+          image_url?: string | null
+          instructions?: string | null
+          muscle_group: string
+          name: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          difficulty?: string
+          equipment?: string | null
+          exercise_type?: string
+          id?: string
+          image_url?: string | null
+          instructions?: string | null
+          muscle_group?: string
+          name?: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       exercise_logs: {
         Row: {
           created_at: string
@@ -1650,7 +1692,10 @@ export type Database = {
           id: string
           is_completed: boolean | null
           notes: string | null
+          paused_at: string | null
           planned_day_of_week: number | null
+          started_at: string | null
+          total_pause_duration_seconds: number | null
           updated_at: string
           user_id: string
           workout_date: string
@@ -1663,7 +1708,10 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           notes?: string | null
+          paused_at?: string | null
           planned_day_of_week?: number | null
+          started_at?: string | null
+          total_pause_duration_seconds?: number | null
           updated_at?: string
           user_id: string
           workout_date: string
@@ -1676,7 +1724,10 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           notes?: string | null
+          paused_at?: string | null
           planned_day_of_week?: number | null
+          started_at?: string | null
+          total_pause_duration_seconds?: number | null
           updated_at?: string
           user_id?: string
           workout_date?: string

@@ -9,6 +9,9 @@ export interface WorkoutSession {
   is_completed: boolean;
   notes: string | null;
   planned_day_of_week: number | null;
+  started_at: string | null;
+  paused_at: string | null;
+  total_pause_duration_seconds: number;
   created_at: string;
   updated_at: string;
 }
