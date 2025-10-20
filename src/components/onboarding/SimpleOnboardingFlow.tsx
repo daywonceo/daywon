@@ -504,8 +504,10 @@ export default function SimpleOnboardingFlow() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Choose your habits</CardTitle>
-              <p className="text-muted-foreground">
-                Tap a habit to set it up. Start with what matters most.
+              <p className="text-muted-foreground mt-2">
+                <span className="font-semibold text-foreground">First, pick your top 3 habits</span> that will be your main focus.
+                <br />
+                <span className="text-sm">You can add more habits after completing these.</span>
               </p>
             </div>
             <Button 
