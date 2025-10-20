@@ -98,6 +98,15 @@ export default function SimpleOnboardingFlow() {
         return rest;
       });
     } else {
+      // Check if already at 3 habits limit
+      if (selectedHabits.length >= 3) {
+        toast({
+          title: "Maximum habits reached",
+          description: "You can only select 3 habits during onboarding. You can add more habits later.",
+          variant: "destructive"
+        });
+        return;
+      }
       // Add habit and go to frequency style selection
       setCurrentHabitForFrequency(habitName);
       setStep('style');
@@ -503,9 +512,9 @@ export default function SimpleOnboardingFlow() {
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-3xl font-bold text-gradient-primary">Choose your habits</CardTitle>
           <p className="text-muted-foreground mt-2">
-            <span className="font-semibold text-foreground">First, pick your top 3 habits</span> - these will show up on your home screen.
+            <span className="font-semibold text-foreground">Pick your top 3 habits</span> - these will show up on your home screen.
             <br />
-            <span className="text-sm">You can add more habits after setting up these main ones.</span>
+            <span className="text-sm">Selected: {selectedHabits.length}/3</span>
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
