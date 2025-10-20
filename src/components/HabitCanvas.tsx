@@ -80,8 +80,10 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
         .order('activity_date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching activities:', error);
+        console.error('Error fetching canvas activities:', error);
       } else {
+        console.log('Canvas: Fetched activities:', data?.length || 0, 'completed habits in last 30 days');
+        console.log('Canvas: Sample activities:', data?.slice(0, 3));
         setActivities(data || []);
       }
       
