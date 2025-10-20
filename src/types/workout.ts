@@ -12,6 +12,9 @@ export interface WorkoutSession {
   started_at: string | null;
   paused_at: string | null;
   total_pause_duration_seconds: number;
+  energy_level?: 'low' | 'medium' | 'high' | null;
+  rpe_overall?: number | null;
+  workout_quality?: 'poor' | 'fair' | 'good' | 'excellent' | null;
   created_at: string;
   updated_at: string;
 }
@@ -28,5 +31,8 @@ export interface ExerciseLog {
   weight_lbs: number | null;
   difficulty: string | null;
   exercise_instructions: string | null;
+  rpe?: number | null;
+  rest_seconds?: number | null;
+  notes?: string | null;
   created_at: string;
 }

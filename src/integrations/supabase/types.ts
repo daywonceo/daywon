@@ -427,7 +427,10 @@ export type Database = {
           exercise_name: string
           id: string
           muscle_group: string | null
+          notes: string | null
           reps: number
+          rest_seconds: number | null
+          rpe: number | null
           sets: number
           user_id: string
           weight_lbs: number | null
@@ -441,7 +444,10 @@ export type Database = {
           exercise_name: string
           id?: string
           muscle_group?: string | null
+          notes?: string | null
           reps: number
+          rest_seconds?: number | null
+          rpe?: number | null
           sets: number
           user_id: string
           weight_lbs?: number | null
@@ -455,7 +461,10 @@ export type Database = {
           exercise_name?: string
           id?: string
           muscle_group?: string | null
+          notes?: string | null
           reps?: number
+          rest_seconds?: number | null
+          rpe?: number | null
           sets?: number
           user_id?: string
           weight_lbs?: number | null
@@ -1689,49 +1698,58 @@ export type Database = {
         Row: {
           created_at: string
           duration_minutes: number | null
+          energy_level: string | null
           id: string
           is_completed: boolean | null
           notes: string | null
           paused_at: string | null
           planned_day_of_week: number | null
+          rpe_overall: number | null
           started_at: string | null
           total_pause_duration_seconds: number | null
           updated_at: string
           user_id: string
           workout_date: string
           workout_plan_id: string | null
+          workout_quality: string | null
           workout_type: string
         }
         Insert: {
           created_at?: string
           duration_minutes?: number | null
+          energy_level?: string | null
           id?: string
           is_completed?: boolean | null
           notes?: string | null
           paused_at?: string | null
           planned_day_of_week?: number | null
+          rpe_overall?: number | null
           started_at?: string | null
           total_pause_duration_seconds?: number | null
           updated_at?: string
           user_id: string
           workout_date: string
           workout_plan_id?: string | null
+          workout_quality?: string | null
           workout_type: string
         }
         Update: {
           created_at?: string
           duration_minutes?: number | null
+          energy_level?: string | null
           id?: string
           is_completed?: boolean | null
           notes?: string | null
           paused_at?: string | null
           planned_day_of_week?: number | null
+          rpe_overall?: number | null
           started_at?: string | null
           total_pause_duration_seconds?: number | null
           updated_at?: string
           user_id?: string
           workout_date?: string
           workout_plan_id?: string | null
+          workout_quality?: string | null
           workout_type?: string
         }
         Relationships: [
@@ -1743,6 +1761,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      workout_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          difficulty: string
+          estimated_duration_minutes: number | null
+          exercises: Json
+          id: string
+          is_public: boolean | null
+          name: string
+          times_used: number | null
+          updated_at: string | null
+          user_id: string | null
+          workout_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          difficulty: string
+          estimated_duration_minutes?: number | null
+          exercises: Json
+          id?: string
+          is_public?: boolean | null
+          name: string
+          times_used?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          workout_type: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string
+          estimated_duration_minutes?: number | null
+          exercises?: Json
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          times_used?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          workout_type?: string
+        }
+        Relationships: []
       }
     }
     Views: {
