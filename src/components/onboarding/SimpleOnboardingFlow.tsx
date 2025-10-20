@@ -505,9 +505,9 @@ export default function SimpleOnboardingFlow() {
             <div>
               <CardTitle>Choose your habits</CardTitle>
               <p className="text-muted-foreground mt-2">
-                <span className="font-semibold text-foreground">First, pick your top 3 habits</span> that will be your main focus.
+                <span className="font-semibold text-foreground">First, pick your top 3 habits</span> - these will show up on your home screen.
                 <br />
-                <span className="text-sm">You can add more habits after completing these.</span>
+                <span className="text-sm">You can add more habits after setting up these main ones.</span>
               </p>
             </div>
             <Button 
