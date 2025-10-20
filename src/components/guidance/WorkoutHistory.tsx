@@ -1,21 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, Clock, Dumbbell, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Dumbbell, TrendingUp, Square } from "lucide-react";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
-import { format } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
+import WorkoutCompletion from "./WorkoutCompletion";
+import { toast } from "sonner";
 
 interface WorkoutHistoryProps {
   onBack: () => void;
 }
 
 const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
-  const { sessions } = useWorkoutSessions();
+  const { sessions, completeSession } = useWorkoutSessions();
+  const [completingSessionId, setCompletingSessionId] = useState<string | null>(null);
   
-  const completedSessions = sessions
-    .filter(s => s.is_completed)
-    .sort((a, b) => new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime());
+  // Show all sessions, but separate active and completed
+  const allSessions = [...sessions].sort((a, b) => 
+    new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime()
+  );
+  
+  const activeSessions = allSessions.filter(s => !s.is_completed && s.started_at);
+  const completedSessions = allSessions.filter(s => s.is_completed);
+
+  const handleEndWorkout = (sessionId: string) => {
+    setCompletingSessionId(sessionId);
+  };
+
+  const handleCompleteWorkout = async (
+    sessionId: string,
+    data: {
+      energyLevel?: 'low' | 'medium' | 'high';
+      rpeOverall?: number;
+      workoutQuality?: 'poor' | 'fair' | 'good' | 'excellent';
+    }
+  ) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session || !session.started_at) return;
+
+    // Calculate duration from started_at to now
+    const startTime = new Date(session.started_at);
+    const now = new Date();
+    const durationMinutes = Math.max(1, differenceInMinutes(now, startTime));
+
+    try {
+      await completeSession(sessionId, durationMinutes);
+      toast.success('Workout completed!');
+      setCompletingSessionId(null);
+    } catch (error) {
+      console.error('Error completing workout:', error);
+      toast.error('Failed to complete workout');
+    }
+  };
 
   const getQualityColor = (quality?: string) => {
     switch (quality) {
@@ -36,6 +73,38 @@ const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
     }
   };
 
+  // If showing completion screen
+  if (completingSessionId) {
+    const session = sessions.find(s => s.id === completingSessionId);
+    if (!session || !session.started_at) return null;
+
+    const startTime = new Date(session.started_at);
+    const now = new Date();
+    const elapsedSeconds = Math.max(0, differenceInMinutes(now, startTime) * 60);
+
+    return (
+      <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setCompletingSessionId(null)} 
+            className="h-8 w-8 p-0 sm:h-10 sm:w-10"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <h2 className="text-lg sm:text-xl font-bold text-primary">
+            Complete Workout
+          </h2>
+        </div>
+        <WorkoutCompletion
+          elapsedTime={elapsedSeconds}
+          onComplete={(data) => handleCompleteWorkout(completingSessionId, data)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
@@ -47,7 +116,60 @@ const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
         </h2>
       </div>
 
-      {completedSessions.length === 0 ? (
+      {/* Active Sessions */}
+      {activeSessions.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-primary">Active Workouts</h3>
+          {activeSessions.map((session) => {
+            const startTime = session.started_at ? new Date(session.started_at) : null;
+            const elapsedMinutes = startTime ? differenceInMinutes(new Date(), startTime) : 0;
+            
+            return (
+              <Card key={session.id} className="glass-card border-primary/30 shadow-lg">
+                <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-base sm:text-lg text-foreground truncate">
+                        {session.workout_type.replace(/_/g, ' ').toUpperCase()}
+                      </CardTitle>
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground mt-1">
+                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{format(new Date(session.workout_date), 'MMM dd, yyyy')}</span>
+                      </div>
+                    </div>
+                    <Badge className="bg-primary/20 text-primary text-xs flex-shrink-0">
+                      Active
+                    </Badge>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="space-y-2 sm:space-y-3 px-4 sm:px-6 pb-4 sm:pb-6">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium">
+                        {elapsedMinutes} minutes elapsed
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    variant="destructive"
+                    className="w-full h-11"
+                    onClick={() => handleEndWorkout(session.id)}
+                  >
+                    <Square className="w-4 h-4 mr-2" />
+                    End Workout
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Completed Sessions */}
+      {completedSessions.length === 0 && activeSessions.length === 0 ? (
         <Card className="glass-card">
           <CardContent className="p-6 sm:p-8 text-center">
             <Dumbbell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
@@ -59,8 +181,11 @@ const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
             </p>
           </CardContent>
         </Card>
-      ) : (
+      ) : completedSessions.length > 0 ? (
         <div className="space-y-3 sm:space-y-4">
+          {activeSessions.length > 0 && (
+            <h3 className="text-sm font-semibold text-primary mt-6">Completed Workouts</h3>
+          )}
           {completedSessions.map((session) => (
             <Card key={session.id} className="glass-card hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
@@ -121,7 +246,7 @@ const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
             </Card>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
