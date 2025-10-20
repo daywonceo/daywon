@@ -31,7 +31,8 @@ export const getWorkoutRotationOrder = (planType: string): string[] => {
     'full_body': ['full_body']
   };
   
-  return rotationOrders[planType] || [];
+  // Return the matching rotation or a default full body option
+  return rotationOrders[planType] || ['full_body', 'upper_body', 'lower_body'];
 };
 
 export const getRecommendedNextWorkout = (
