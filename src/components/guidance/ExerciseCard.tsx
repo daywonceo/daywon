@@ -77,6 +77,14 @@ const ExerciseCard = ({
     }
   };
 
+  const handleToggleForm = () => {
+    // If closing the form (showForm is true) and exercise isn't already completed, mark it complete
+    if (showForm && !isCompleted && onToggleComplete) {
+      onToggleComplete(exercise.name, true);
+    }
+    setShowForm(!showForm);
+  };
+
   return (
     <Card className={`transition-colors ${
       isCompleted 
@@ -132,7 +140,7 @@ const ExerciseCard = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowForm(!showForm)}
+                onClick={handleToggleForm}
                 disabled={isLoading}
                 className="h-8 w-8 p-0"
               >
