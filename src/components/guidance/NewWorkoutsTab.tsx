@@ -310,25 +310,25 @@ const NewWorkoutsTab = () => {
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20">
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-success/5 to-success/10">
           <CardContent className="p-4 text-center relative z-10">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 dark:bg-blue-800 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
-            <Clock className="w-6 h-6 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
-            <div className="text-2xl sm:text-3xl font-bold text-blue-700 dark:text-blue-300">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-success/20 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
+            <Clock className="w-6 h-6 mx-auto mb-2 text-success" />
+            <div className="text-2xl sm:text-3xl font-bold text-success">
               {averageMinutes}
             </div>
-            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">Avg Min</div>
+            <div className="text-xs text-success font-medium">Avg Min</div>
           </CardContent>
         </Card>
         
-        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20">
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-success/5 to-success/10">
           <CardContent className="p-4 text-center relative z-10">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200 dark:bg-purple-800 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
-            <TrendingUp className="w-6 h-6 mx-auto mb-2 text-purple-600 dark:text-purple-400" />
-            <div className="text-2xl sm:text-3xl font-bold text-purple-700 dark:text-purple-300">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-success/20 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
+            <TrendingUp className="w-6 h-6 mx-auto mb-2 text-success" />
+            <div className="text-2xl sm:text-3xl font-bold text-success">
               {totalCompletedWorkouts}
             </div>
-            <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">Total</div>
+            <div className="text-xs text-success font-medium">Total</div>
           </CardContent>
         </Card>
       </div>
