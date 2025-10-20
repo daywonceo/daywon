@@ -64,36 +64,36 @@ const NotificationScreen = ({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+    <div className="w-full max-w-md mx-auto p-4">
+      <Card className="glass-card">
         <CardHeader className="text-center pb-6">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <Bell className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 gradient-primary rounded-full flex items-center justify-center shadow-lg">
+              <Bell className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Habit Reminders
           </CardTitle>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Stay on track with helpful notifications
           </p>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {/* Enable Notifications */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-subtle rounded-lg">
             <div className="flex items-center gap-3">
               {preferences.enabled ? (
-                <Bell className="w-5 h-5 text-green-600" />
+                <Bell className="w-5 h-5 text-primary" />
               ) : (
-                <BellOff className="w-5 h-5 text-gray-400" />
+                <BellOff className="w-5 h-5 text-muted" />
               )}
               <div>
-                <p className="font-medium text-gray-800 dark:text-gray-200">
+                <p className="font-medium text-foreground">
                   Enable Reminders
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   Get reminded to complete your daily habits
                 </p>
               </div>
@@ -110,7 +110,7 @@ const NotificationScreen = ({
           {preferences.enabled && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-blue-600" />
+                <Clock className="w-4 h-4 text-secondary" />
                 <Label htmlFor="reminderTime" className="text-sm font-medium">
                   Default Reminder Time
                 </Label>
@@ -124,7 +124,7 @@ const NotificationScreen = ({
                 }
                 className="w-full"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 You can customize individual habit times later
               </p>
             </div>
@@ -144,7 +144,7 @@ const NotificationScreen = ({
               <Button 
                 onClick={handleContinue}
                 disabled={isLoading}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
+                className="gradient-primary text-primary-foreground"
               >
                 {isLoading ? "Saving..." : "Continue"}
                 <ChevronRight className="w-4 h-4 ml-2" />

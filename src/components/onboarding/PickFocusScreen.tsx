@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,12 +26,12 @@ interface PickFocusScreenProps {
 }
 
 const focusAreas = [
-  { id: "move", label: "Move More", icon: Dumbbell, color: "from-red-500 to-orange-500" },
-  { id: "sleep", label: "Sleep Better", icon: Moon, color: "from-indigo-500 to-purple-500" },
-  { id: "nutrition", label: "Eat Healthier", icon: Apple, color: "from-green-500 to-emerald-500" },
-  { id: "mindfulness", label: "Mindfulness & Prayer", icon: Heart, color: "from-pink-500 to-rose-500" },
-  { id: "learning", label: "Reading & Learning", icon: BookOpen, color: "from-blue-500 to-cyan-500" },
-  { id: "custom", label: "Custom", icon: Plus, color: "from-gray-500 to-slate-500" },
+  { id: "move", label: "Move More", icon: Dumbbell, color: "primary" },
+  { id: "sleep", label: "Sleep Better", icon: Moon, color: "secondary" },
+  { id: "nutrition", label: "Eat Healthier", icon: Apple, color: "accent" },
+  { id: "mindfulness", label: "Mindfulness & Prayer", icon: Heart, color: "primary" },
+  { id: "learning", label: "Reading & Learning", icon: BookOpen, color: "secondary" },
+  { id: "custom", label: "Custom", icon: Plus, color: "muted" },
 ];
 
 const PickFocusScreen = ({ 
@@ -86,13 +85,13 @@ const PickFocusScreen = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+    <div className="w-full max-w-2xl mx-auto p-4">
+      <Card className="glass-card">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Pick Your Focus
           </CardTitle>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             What areas of your life would you like to improve? Choose one or more.
           </p>
         </CardHeader>
@@ -110,26 +109,25 @@ const PickFocusScreen = ({
                   className={cn(
                     "p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden group",
                     isSelected 
-                      ? "border-green-500 bg-green-50 dark:bg-green-900/20 shadow-md" 
-                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm"
+                      ? "border-primary bg-primary-light/20 shadow-md" 
+                      : "border-border hover:border-primary/50 hover:shadow-sm"
                   )}
                 >
                   <div className="flex flex-col items-center space-y-3">
                     <div className={cn(
-                      "w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-r transition-all duration-200",
-                      area.color,
+                      "w-12 h-12 rounded-full flex items-center justify-center gradient-primary transition-all duration-200",
                       isSelected ? "scale-110" : "group-hover:scale-105"
                     )}>
-                      <Icon className="w-6 h-6 text-white" />
+                      <Icon className="w-6 h-6 text-primary-foreground" />
                     </div>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                    <span className="text-sm font-medium text-foreground text-center">
                       {area.label}
                     </span>
                   </div>
                   
                   {isSelected && (
                     <div className="absolute top-2 right-2">
-                      <Badge className="bg-green-500 text-white text-xs">✓</Badge>
+                      <Badge className="bg-primary text-primary-foreground text-xs">✓</Badge>
                     </div>
                   )}
                 </button>
@@ -139,7 +137,7 @@ const PickFocusScreen = ({
           
           {selectedAreas.length > 0 && (
             <div className="text-center">
-              <Badge variant="outline" className="text-green-600 border-green-200">
+              <Badge variant="outline" className="text-primary border-primary/30">
                 {selectedAreas.length} area{selectedAreas.length !== 1 ? 's' : ''} selected
               </Badge>
             </div>
@@ -158,7 +156,7 @@ const PickFocusScreen = ({
               <Button 
                 onClick={handleContinue} 
                 disabled={selectedAreas.length === 0 || isLoading}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
+                className="gradient-primary text-primary-foreground"
               >
                 {isLoading ? "Saving..." : "Continue"}
                 <ChevronRight className="w-4 h-4 ml-2" />

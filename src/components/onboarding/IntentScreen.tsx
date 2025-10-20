@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,12 +18,12 @@ interface IntentScreenProps {
 }
 
 const predefinedIntents = [
-  { text: "Feel better about myself", icon: Heart, color: "from-pink-500 to-rose-500" },
-  { text: "Reconnect with my faith", icon: Heart, color: "from-purple-500 to-indigo-500" },
-  { text: "Build consistency in my life", icon: Target, color: "from-blue-500 to-cyan-500" },
-  { text: "Improve my health", icon: Zap, color: "from-green-500 to-emerald-500" },
-  { text: "Be a better role model", icon: Target, color: "from-orange-500 to-red-500" },
-  { text: "Create positive change", icon: Zap, color: "from-yellow-500 to-orange-500" }
+  { text: "Feel better about myself", icon: Heart, color: "primary" },
+  { text: "Reconnect with my faith", icon: Heart, color: "secondary" },
+  { text: "Build consistency in my life", icon: Target, color: "accent" },
+  { text: "Improve my health", icon: Zap, color: "primary" },
+  { text: "Be a better role model", icon: Target, color: "secondary" },
+  { text: "Create positive change", icon: Zap, color: "accent" }
 ];
 
 const IntentScreen = ({
@@ -83,13 +82,13 @@ const IntentScreen = ({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+    <div className="w-full max-w-md mx-auto p-4">
+      <Card className="glass-card">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Set Your Intent
           </CardTitle>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Why are you starting this journey? Your reason will help motivate you.
           </p>
         </CardHeader>
@@ -107,25 +106,24 @@ const IntentScreen = ({
                   className={cn(
                     "w-full p-3 rounded-lg border-2 transition-all duration-200 text-left group",
                     isSelected 
-                      ? "border-green-500 bg-green-50 dark:bg-green-900/20 shadow-md" 
-                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm"
+                      ? "border-primary bg-primary-light/20 shadow-md" 
+                      : "border-border hover:border-primary/50 hover:shadow-sm"
                   )}
                 >
                   <div className="flex items-center space-x-3">
                     <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-r transition-all duration-200",
-                      predefined.color,
+                      "w-8 h-8 rounded-full flex items-center justify-center gradient-primary transition-all duration-200",
                       isSelected ? "scale-110" : "group-hover:scale-105"
                     )}>
-                      <Icon className="w-4 h-4 text-white" />
+                      <Icon className="w-4 h-4 text-primary-foreground" />
                     </div>
                     
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-foreground">
                       {predefined.text}
                     </span>
                     
                     {isSelected && (
-                      <div className="ml-auto text-green-500">✓</div>
+                      <div className="ml-auto text-primary">✓</div>
                     )}
                   </div>
                 </button>
@@ -134,7 +132,7 @@ const IntentScreen = ({
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <label className="text-sm font-medium text-muted-foreground">
               Or write your own:
             </label>
             <Input
@@ -147,7 +145,7 @@ const IntentScreen = ({
           
           {intent && (
             <div className="text-center">
-              <Badge variant="outline" className="text-green-600 border-green-200">
+              <Badge variant="outline" className="text-primary border-primary/30">
                 Intent set ✓
               </Badge>
             </div>
@@ -166,7 +164,7 @@ const IntentScreen = ({
               <Button 
                 onClick={handleContinue}
                 disabled={isLoading}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
+                className="gradient-primary text-primary-foreground"
               >
                 {isLoading ? "Saving..." : "Continue"}
                 <ChevronRight className="w-4 h-4 ml-2" />
