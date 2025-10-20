@@ -34,10 +34,15 @@ const WorkoutTimer = ({
     <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
       <CardContent className="p-4 sm:p-6 text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+          <Timer className={`w-5 h-5 sm:w-6 sm:h-6 text-primary ${workoutStarted && !isTimerPaused ? 'animate-pulse' : ''}`} />
           <span className="text-2xl sm:text-3xl font-mono font-bold text-primary">
             {formatTime(elapsedTime)}
           </span>
+          {workoutStarted && !isTimerPaused && (
+            <Badge className="ml-2 text-xs sm:text-sm bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30 animate-pulse">
+              Running
+            </Badge>
+          )}
           {isTimerPaused && (
             <Badge variant="secondary" className="ml-2 text-xs sm:text-sm">Paused</Badge>
           )}
