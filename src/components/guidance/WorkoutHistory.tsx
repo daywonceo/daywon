@@ -2,19 +2,30 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, Clock, Dumbbell, TrendingUp, Square } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Dumbbell, TrendingUp, Square, Trash2 } from "lucide-react";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 import { format, differenceInMinutes } from "date-fns";
 import WorkoutCompletion from "./WorkoutCompletion";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface WorkoutHistoryProps {
   onBack: () => void;
 }
 
 const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
-  const { sessions, completeSession } = useWorkoutSessions();
+  const { sessions, completeSession, deleteSession } = useWorkoutSessions();
   const [completingSessionId, setCompletingSessionId] = useState<string | null>(null);
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
   
   // Show all sessions, but separate active and completed
   const allSessions = [...sessions].sort((a, b) => 
@@ -51,6 +62,19 @@ const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
     } catch (error) {
       console.error('Error completing workout:', error);
       toast.error('Failed to complete workout');
+    }
+  };
+
+  const handleDeleteWorkout = async () => {
+    if (!deletingSessionId) return;
+
+    try {
+      await deleteSession(deletingSessionId);
+      toast.success('Workout deleted successfully');
+      setDeletingSessionId(null);
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      toast.error('Failed to delete workout');
     }
   };
 
@@ -242,11 +266,39 @@ const WorkoutHistory = ({ onBack }: WorkoutHistoryProps) => {
                     {session.notes}
                   </div>
                 )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeletingSessionId(session.id)}
+                  className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 mt-2"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Workout
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : null}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingSessionId} onOpenChange={(open) => !open && setDeletingSessionId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Workout?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this workout session and all associated exercise logs. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteWorkout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

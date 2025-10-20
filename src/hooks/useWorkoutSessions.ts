@@ -6,7 +6,8 @@ import { WorkoutSession, ExerciseLog } from '@/types/workout';
 import { 
   fetchWorkoutSessions, 
   createWorkoutSession, 
-  completeWorkoutSession 
+  completeWorkoutSession,
+  deleteWorkoutSession
 } from '@/services/workoutSessionService';
 import { logExercise } from '@/services/exerciseLogService';
 import { getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } from '@/utils/workoutUtils';
@@ -125,6 +126,27 @@ export const useWorkoutSessions = () => {
     }
   };
 
+  const deleteSession = async (sessionId: string) => {
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      await deleteWorkoutSession(user.id, sessionId);
+      await fetchSessions(); // Refresh the list after deletion
+    } catch (err: any) {
+      console.error('Error deleting workout session:', err);
+      setError(err.message || 'Failed to delete workout session');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSessions();
   }, [user]);
@@ -135,6 +157,7 @@ export const useWorkoutSessions = () => {
     error,
     createSession,
     completeSession,
+    deleteSession,
     logExercise: logExerciseForSession,
     refetch: fetchSessions,
     getPlannedWorkoutsForWeek: (startOfWeek: Date) => getPlannedWorkoutsForWeek(sessions, startOfWeek),

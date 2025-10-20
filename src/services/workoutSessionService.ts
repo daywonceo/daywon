@@ -236,3 +236,36 @@ export const syncWorkoutDuration = async (
     throw new Error(`Failed to sync duration: ${error.message}`);
   }
 };
+
+export const deleteWorkoutSession = async (
+  userId: string,
+  sessionId: string
+): Promise<void> => {
+  console.log('Deleting workout session:', sessionId);
+  
+  // First delete associated exercise logs
+  const { error: exerciseError } = await supabase
+    .from('exercise_logs')
+    .delete()
+    .eq('workout_session_id', sessionId)
+    .eq('user_id', userId);
+
+  if (exerciseError) {
+    console.error('Delete exercise logs error:', exerciseError);
+    throw new Error(`Failed to delete exercise logs: ${exerciseError.message}`);
+  }
+
+  // Then delete the workout session
+  const { error } = await supabase
+    .from('workout_sessions')
+    .delete()
+    .eq('id', sessionId)
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Delete session error:', error);
+    throw new Error(`Failed to delete session: ${error.message}`);
+  }
+
+  console.log('Workout session and exercise logs deleted successfully');
+};
