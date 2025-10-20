@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Target, Clock, TrendingUp, Calendar, Dumbbell } from "lucide-react";
-import { format } from "date-fns";
+import { AlertCircle, Target, Clock, TrendingUp, Calendar, Dumbbell, Square } from "lucide-react";
+import { format, differenceInMinutes } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import WorkoutPlanSelector from "./WorkoutPlanSelector";
 import ActiveWorkoutView from "./ActiveWorkoutView";
 import EnhancedWorkoutProgress from "./EnhancedWorkoutProgress";
@@ -21,12 +22,14 @@ import UpcomingWorkoutsCard from "./UpcomingWorkoutsCard";
 import RecentWorkoutsCard from "./RecentWorkoutsCard";
 import QuickActionsGrid from "./QuickActionsGrid";
 import WorkoutDetailModal from "./WorkoutDetailModal";
+import WorkoutCompletion from "./WorkoutCompletion";
 import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
   const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'history' | 'templates' | 'week-view' | 'schedule-workout' | 'manual-workout'>('overview');
   const [selectedWorkoutForDetail, setSelectedWorkoutForDetail] = useState<any>(null);
+  const [completingSessionId, setCompletingSessionId] = useState<string | null>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -37,7 +40,7 @@ const NewWorkoutsTab = () => {
 
   const { user } = useAuth();
   const { workoutPlans, isLoading: plansLoading, error: plansError } = useWorkoutPlans();
-  const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts } = useWorkoutSessions();
+  const { sessions, error: sessionsError, getPlannedWorkoutsForWeek, getCurrentWeekPlannedWorkouts, completeSession } = useWorkoutSessions();
 
 
   // Filter sessions to only include today or earlier dates
@@ -123,8 +126,44 @@ const NewWorkoutsTab = () => {
   }
 
   const handleWorkoutClick = (session: any) => {
-    // Open workout detail modal to show comprehensive information
-    setSelectedWorkoutForDetail(session);
+    // If session is active (not completed and has started), show end workout flow
+    if (!session.is_completed && session.started_at) {
+      setCompletingSessionId(session.id);
+    } else {
+      // Open workout detail modal to show comprehensive information
+      setSelectedWorkoutForDetail(session);
+    }
+  };
+
+  const handleEndWorkout = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    setCompletingSessionId(sessionId);
+  };
+
+  const handleCompleteWorkout = async (
+    sessionId: string,
+    data: {
+      energyLevel?: 'low' | 'medium' | 'high';
+      rpeOverall?: number;
+      workoutQuality?: 'poor' | 'fair' | 'good' | 'excellent';
+    }
+  ) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session || !session.started_at) return;
+
+    // Calculate duration from started_at to now
+    const startTime = new Date(session.started_at);
+    const now = new Date();
+    const durationMinutes = Math.max(1, differenceInMinutes(now, startTime));
+
+    try {
+      await completeSession(sessionId, durationMinutes);
+      toast.success('Workout completed!');
+      setCompletingSessionId(null);
+    } catch (error) {
+      console.error('Error completing workout:', error);
+      toast.error('Failed to complete workout');
+    }
   };
 
   if (currentView === 'plan-selector') {
@@ -211,6 +250,41 @@ const NewWorkoutsTab = () => {
         <PlannedWorkoutForm
           onClose={() => setCurrentView('week-view')}
           onSuccess={() => setCurrentView('week-view')}
+        />
+      </div>
+    );
+  }
+
+  // If showing completion screen for a specific workout
+  if (completingSessionId) {
+    const session = sessions.find(s => s.id === completingSessionId);
+    if (!session || !session.started_at) {
+      setCompletingSessionId(null);
+      return null;
+    }
+
+    const startTime = new Date(session.started_at);
+    const now = new Date();
+    const elapsedSeconds = Math.max(0, differenceInMinutes(now, startTime) * 60);
+
+    return (
+      <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setCompletingSessionId(null)} 
+            className="h-8 w-8 p-0 sm:h-10 sm:w-10"
+          >
+            ← Back
+          </Button>
+          <h2 className="text-lg sm:text-xl font-bold text-primary">
+            Complete Workout
+          </h2>
+        </div>
+        <WorkoutCompletion
+          elapsedTime={elapsedSeconds}
+          onComplete={(data) => handleCompleteWorkout(completingSessionId, data)}
         />
       </div>
     );
@@ -413,35 +487,63 @@ const NewWorkoutsTab = () => {
         <div>
           <h3 className="text-lg font-bold text-foreground mb-4">Recent Activity</h3>
           <div className="space-y-3">
-            {recentSessions.slice(0, 3).map((session) => (
-              <Card 
-                key={session.id}
-                onClick={() => handleWorkoutClick(session)}
-                className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-muted/30"
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-foreground truncate">
-                        {session.workout_type.replace(/_/g, ' ').toUpperCase()}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(session.workout_date), 'MMM dd, yyyy')}
-                      </p>
+            {recentSessions.slice(0, 3).map((session) => {
+              const isActive = !session.is_completed && session.started_at;
+              const elapsedMinutes = isActive && session.started_at
+                ? differenceInMinutes(new Date(), new Date(session.started_at))
+                : 0;
+
+              return (
+                <Card 
+                  key={session.id}
+                  onClick={() => handleWorkoutClick(session)}
+                  className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-muted/30"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground truncate">
+                          {session.workout_type.replace(/_/g, ' ').toUpperCase()}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(session.workout_date), 'MMM dd, yyyy')}
+                        </p>
+                        {isActive && (
+                          <p className="text-xs text-primary mt-1">
+                            <Clock className="w-3 h-3 inline mr-1" />
+                            {elapsedMinutes} min elapsed
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {session.is_completed ? (
+                          <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
+                            {session.duration_minutes || 0} min
+                          </Badge>
+                        ) : isActive ? (
+                          <>
+                            <Badge className="bg-primary/20 text-primary border-primary/30">
+                              Active
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={(e) => handleEndWorkout(session.id, e)}
+                              className="h-8 px-3"
+                            >
+                              <Square className="w-3 h-3 mr-1" />
+                              End
+                            </Button>
+                          </>
+                        ) : (
+                          <Badge variant="outline">Scheduled</Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-right">
-                      {session.is_completed ? (
-                        <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
-                          {session.duration_minutes || 0} min
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">In Progress</Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
