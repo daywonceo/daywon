@@ -12,6 +12,7 @@ import {
   resumeWorkoutSession, 
   syncWorkoutDuration 
 } from "@/services/workoutSessionService";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 import { getWorkoutOptions } from "@/utils/workoutRotation";
 import TimerFailPrompt from "./TimerFailPrompt";
@@ -271,13 +272,35 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     }
   };
 
-  const handleCompleteWorkout = async (customDuration?: number) => {
+  const handleCompleteWorkout = async (customDuration?: number, completionData?: {
+    energyLevel?: 'low' | 'medium' | 'high';
+    rpeOverall?: number;
+    workoutQuality?: 'poor' | 'fair' | 'good' | 'excellent';
+  }) => {
     if (!currentSession) return;
 
     const durationMinutes = customDuration || Math.max(1, Math.floor(elapsedTime / 60));
-    await completeSession(currentSession.id, durationMinutes);
-    toast.success(`Workout completed! Duration: ${durationMinutes} minutes`);
-    onBack();
+    
+    try {
+      // If we have completion data, update the session first
+      if (completionData) {
+        await supabase
+          .from('workout_sessions')
+          .update({
+            energy_level: completionData.energyLevel,
+            rpe_overall: completionData.rpeOverall,
+            workout_quality: completionData.workoutQuality
+          })
+          .eq('id', currentSession.id);
+      }
+      
+      await completeSession(currentSession.id, durationMinutes);
+      toast.success(`Workout completed! Duration: ${durationMinutes} minutes`);
+      onBack();
+    } catch (error) {
+      console.error('Error completing workout:', error);
+      toast.error('Failed to complete workout');
+    }
   };
 
   const handleManualTimeEntry = () => {
@@ -289,10 +312,10 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     }
   };
 
-  const handleLogExercise = async (exercise: any, sets: number, reps: number, weight?: number) => {
+  const handleLogExercise = async (exercise: any, sets: number, reps: number, weight?: number, rpe?: number, restSeconds?: number) => {
     if (!currentSession) return;
 
-    const log = await logExercise(currentSession.id, {
+    const exerciseData: any = {
       exercise_name: exercise.name,
       muscle_group: exercise.muscle,
       equipment: exercise.equipment,
@@ -301,11 +324,16 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       weight_lbs: weight,
       difficulty: exercise.difficulty,
       exercise_instructions: exercise.instructions
-    });
+    };
+
+    if (rpe !== undefined) exerciseData.rpe = rpe;
+    if (restSeconds !== undefined) exerciseData.rest_seconds = restSeconds;
+
+    const log = await logExercise(currentSession.id, exerciseData);
 
     if (log) {
       setExerciseLogs(prev => [...prev, { ...log, exercise }]);
-      toast.success("Exercise logged!");
+      toast.success("Set logged!");
     }
   };
 
@@ -425,7 +453,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         {workoutStarted && elapsedTime > 0 && (
           <WorkoutCompletion
             elapsedTime={elapsedTime}
-            onComplete={() => handleCompleteWorkout()}
+            onComplete={(completionData) => handleCompleteWorkout(undefined, completionData)}
           />
         )}
       </div>

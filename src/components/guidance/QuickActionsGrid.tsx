@@ -8,13 +8,19 @@ interface QuickActionsGridProps {
   onManagePlans: () => void;
   onManualWorkout: () => void;
   onWeekView: () => void;
+  onViewProgress?: () => void;
+  onViewHistory?: () => void;
+  onViewTemplates?: () => void;
 }
 
 const QuickActionsGrid = ({ 
   workoutPlansCount, 
   onManagePlans, 
   onManualWorkout, 
-  onWeekView 
+  onWeekView,
+  onViewProgress,
+  onViewHistory,
+  onViewTemplates
 }: QuickActionsGridProps) => {
   return (
     <>

@@ -14,6 +14,9 @@ export const logExercise = async (
     weight_lbs?: number;
     difficulty?: string;
     exercise_instructions?: string;
+    rpe?: number;
+    rest_seconds?: number;
+    notes?: string;
   }
 ): Promise<ExerciseLog> => {
   console.log('Logging exercise:', { ...exerciseData, sessionId, userId });

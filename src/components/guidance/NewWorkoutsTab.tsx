@@ -4,7 +4,9 @@ import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import WorkoutPlanSelector from "./WorkoutPlanSelector";
 import ActiveWorkoutView from "./ActiveWorkoutView";
-import WorkoutProgress from "./WorkoutProgress";
+import EnhancedWorkoutProgress from "./EnhancedWorkoutProgress";
+import WorkoutHistory from "./WorkoutHistory";
+import { WorkoutTemplatesLibrary } from "./WorkoutTemplatesLibrary";
 import WeekViewCalendar from "./WeekViewCalendar";
 import PlannedWorkoutForm from "./PlannedWorkoutForm";
 import ManualWorkoutCreator from "./ManualWorkoutCreator";
@@ -20,7 +22,7 @@ import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'week-view' | 'schedule-workout' | 'manual-workout'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'history' | 'templates' | 'week-view' | 'schedule-workout' | 'manual-workout'>('overview');
   const [selectedWorkoutForDetail, setSelectedWorkoutForDetail] = useState<any>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const now = new Date();
@@ -131,7 +133,30 @@ const NewWorkoutsTab = () => {
   }
 
   if (currentView === 'progress') {
-    return <WorkoutProgress onBack={() => setCurrentView('overview')} />;
+    return <EnhancedWorkoutProgress onBack={() => setCurrentView('overview')} />;
+  }
+
+  if (currentView === 'history') {
+    return <WorkoutHistory onBack={() => setCurrentView('overview')} />;
+  }
+
+  if (currentView === 'templates') {
+    return (
+      <div className="animate-fade-in space-y-6">
+        <WorkoutTemplatesLibrary 
+          onSelectTemplate={(template) => {
+            console.log('Selected template:', template);
+            setCurrentView('overview');
+          }}
+        />
+        <button
+          onClick={() => setCurrentView('overview')}
+          className="text-primary hover:text-primary/80 transition-colors"
+        >
+          ← Back to Overview
+        </button>
+      </div>
+    );
   }
 
   if (currentView === 'manual-workout') {
@@ -254,6 +279,9 @@ const NewWorkoutsTab = () => {
         onManagePlans={() => setCurrentView('plan-selector')}
         onManualWorkout={() => setCurrentView('manual-workout')}
         onWeekView={() => setCurrentView('week-view')}
+        onViewProgress={() => setCurrentView('progress')}
+        onViewHistory={() => setCurrentView('history')}
+        onViewTemplates={() => setCurrentView('templates')}
       />
 
       <WorkoutDetailModal

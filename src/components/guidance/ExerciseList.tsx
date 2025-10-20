@@ -6,7 +6,7 @@ interface ExerciseListProps {
   workoutPlan: any;
   exerciseLogs: any[];
   completedExercises: Set<string>;
-  onLogExercise: (exercise: any, sets: number, reps: number, weight?: number) => void;
+  onLogExercise: (exercise: any, sets: number, reps: number, weight?: number, rpe?: number, restSeconds?: number) => void;
   onToggleExerciseComplete: (exerciseName: string, completed: boolean) => void;
 }
 
