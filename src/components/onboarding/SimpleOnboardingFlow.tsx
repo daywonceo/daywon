@@ -26,6 +26,7 @@ import CanvasGrowthScreen from "./CanvasGrowthScreen";
 import PickFocusScreen from "./PickFocusScreen";
 import NotificationScreen from "./NotificationScreen";
 import IntentScreen from "./IntentScreen";
+import ProfileSetupScreen, { type ProfileSetupData } from "./ProfileSetupScreen";
 import { analytics } from "@/utils/analytics";
 import { OnboardingValidator } from "@/utils/onboardingValidator";
 import { useOnboardingPersistence } from "@/hooks/useOnboardingPersistence";
@@ -39,7 +40,7 @@ export default function SimpleOnboardingFlow() {
   const { createUserHabit, updateUserHabit } = useUserHabits();
   const { saveDraft, loadDraft, clearDraft } = useOnboardingPersistence();
   const [onboardingStartTime] = useState(Date.now());
-  const [step, setStep] = useState<'mission' | 'canvas' | 'focus' | 'notifications' | 'intent' | 'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('mission');
+  const [step, setStep] = useState<'mission' | 'canvas' | 'focus' | 'notifications' | 'intent' | 'select' | 'profile' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('mission');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
   const [currentHabitStyle, setCurrentHabitStyle] = useState<FrequencyStyle | null>(null);
@@ -56,6 +57,12 @@ export default function SimpleOnboardingFlow() {
     reminderTime: "08:00"
   });
   const [userIntent, setUserIntent] = useState("");
+  const [profileData, setProfileData] = useState<ProfileSetupData>({
+    username: "",
+    displayName: "",
+    bio: "",
+    avatarUrl: ""
+  });
 
   // Load saved draft on mount
   useEffect(() => {
@@ -207,8 +214,17 @@ export default function SimpleOnboardingFlow() {
     setStep('style');
   };
 
-  const handleContinueToConfirm = () => {
+  const handleContinueToProfile = () => {
+    setStep('profile');
+  };
+
+  const handleProfileComplete = (data: ProfileSetupData) => {
+    setProfileData(data);
     setStep('confirm');
+  };
+
+  const handleProfileBack = () => {
+    setStep('select');
   };
 
   const handleEditHabit = (habitName: string) => {
@@ -316,11 +332,21 @@ export default function SimpleOnboardingFlow() {
         }
       }
 
-      // Update profile to mark onboarding as complete
+      // Update profile with onboarding data
       if (createdHabits.length > 0) {
         await supabase
           .from('profiles')
-          .update({ onboarding_complete: true })
+          .update({ 
+            onboarding_complete: true,
+            username: profileData.username,
+            display_name: profileData.displayName,
+            bio: profileData.bio,
+            avatar_url: profileData.avatarUrl,
+            focus_areas: focusAreas,
+            user_intent: userIntent,
+            reminder_opt_in: notificationPreferences.enabled,
+            reminder_time: notificationPreferences.reminderTime
+          })
           .eq('id', user.id);
 
         // Track analytics for successful completion
@@ -470,6 +496,16 @@ export default function SimpleOnboardingFlow() {
     );
   }
 
+  if (step === 'profile') {
+    return (
+      <ProfileSetupScreen
+        onComplete={handleProfileComplete}
+        onBack={handleProfileBack}
+        initialData={profileData}
+      />
+    );
+  }
+
   if (step === 'confirm') {
     return (
       <ConfirmationScreen
@@ -478,7 +514,7 @@ export default function SimpleOnboardingFlow() {
         onEdit={handleEditHabit}
         onRemove={handleRemoveHabit}
         onConfirm={completeSetup}
-        onBack={() => setStep('select')}
+        onBack={() => setStep('profile')}
       />
     );
   }
@@ -609,7 +645,7 @@ export default function SimpleOnboardingFlow() {
         <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background/95 backdrop-blur border-t">
           <div className="w-full max-w-lg mx-auto">
             <Button 
-              onClick={handleContinueToConfirm}
+              onClick={handleContinueToProfile}
               className="w-full gradient-primary text-primary-foreground py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
               size="lg"
             >
