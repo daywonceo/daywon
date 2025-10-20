@@ -52,35 +52,56 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       const sessionDate = new Date(session.workout_date);
       const today = new Date();
       today.setHours(23, 59, 59, 999);
-      // Only resume if session has actually been started (has started_at timestamp)
-      return sessionDate <= today && !session.is_completed && session.started_at;
+      // Resume if session exists and is not completed
+      return sessionDate <= today && !session.is_completed;
     });
 
     if (activeSession) {
-      console.log('Found existing STARTED session:', activeSession);
+      console.log('Found existing session:', activeSession);
       setCurrentSession(activeSession);
       setSelectedWorkoutType(activeSession.workout_type);
       setShowWorkoutSelection(false);
-      setWorkoutStarted(true);
       
-      // Calculate elapsed time from started_at timestamp
-      const startedAt = new Date(activeSession.started_at);
-      const now = new Date();
-      const totalElapsed = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
-      const pauseDuration = activeSession.total_pause_duration_seconds || 0;
-      const actualElapsed = Math.max(0, totalElapsed - pauseDuration);
+      // If workout has been started (has started_at timestamp), resume the timer
+      if (activeSession.started_at) {
+        setWorkoutStarted(true);
+        
+        // Calculate elapsed time from started_at timestamp
+        const startedAt = new Date(activeSession.started_at);
+        const now = new Date();
+        const totalElapsed = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
+        const pauseDuration = activeSession.total_pause_duration_seconds || 0;
+        const actualElapsed = Math.max(0, totalElapsed - pauseDuration);
+        
+        setStartTime(startedAt);
+        setElapsedTime(actualElapsed);
+        
+        // Check if currently paused
+        if (activeSession.paused_at) {
+          setIsTimerPaused(true);
+        }
+      }
       
-      setStartTime(startedAt);
-      setElapsedTime(actualElapsed);
-      
-      // Check if currently paused
-      if (activeSession.paused_at) {
-        setIsTimerPaused(true);
+      // Generate workout plan immediately if we have an active plan
+      if (activePlan && activeSession.workout_type) {
+        generateWorkoutPlan(activePlan.plan_type, 'beginner')
+          .then(plan => {
+            if (plan && plan[activeSession.workout_type]) {
+              setWorkoutPlan(plan[activeSession.workout_type]);
+              setPlanGenerationFailed(false);
+            } else {
+              setPlanGenerationFailed(true);
+            }
+          })
+          .catch(() => {
+            setPlanGenerationFailed(true);
+          });
       }
     } else {
-      // No started session found, show selection screen
+      // No active session found, show selection screen
       setShowWorkoutSelection(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessions]);
 
   // Timer effect - calculate from started_at timestamp
