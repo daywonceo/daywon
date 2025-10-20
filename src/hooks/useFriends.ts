@@ -98,33 +98,39 @@ export const useFriends = () => {
 
       if (sentError) throw sentError;
 
-      // Format friends data
-      const formattedFriends = acceptedFriends?.map(rel => ({
-        id: (rel.profiles as any).id,
-        display_name: (rel.profiles as any).display_name,
-        avatar_url: (rel.profiles as any).avatar_url,
-        status: (rel.profiles as any).status,
-        last_active: (rel.profiles as any).last_active,
-        relationship_status: rel.status as 'accepted',
-      })) || [];
+      // Format friends data - filter out null profiles
+      const formattedFriends = acceptedFriends
+        ?.filter(rel => rel.profiles !== null)
+        ?.map(rel => ({
+          id: (rel.profiles as any).id,
+          display_name: (rel.profiles as any).display_name,
+          avatar_url: (rel.profiles as any).avatar_url,
+          status: (rel.profiles as any).status,
+          last_active: (rel.profiles as any).last_active,
+          relationship_status: rel.status as 'accepted',
+        })) || [];
 
-      const formattedPending = pendingFriends?.map(rel => ({
-        id: (rel.profiles as any).id,
-        display_name: (rel.profiles as any).display_name,
-        avatar_url: (rel.profiles as any).avatar_url,
-        status: (rel.profiles as any).status,
-        last_active: (rel.profiles as any).last_active,
-        relationship_status: rel.status as 'pending',
-      })) || [];
+      const formattedPending = pendingFriends
+        ?.filter(rel => rel.profiles !== null)
+        ?.map(rel => ({
+          id: (rel.profiles as any).id,
+          display_name: (rel.profiles as any).display_name,
+          avatar_url: (rel.profiles as any).avatar_url,
+          status: (rel.profiles as any).status,
+          last_active: (rel.profiles as any).last_active,
+          relationship_status: rel.status as 'pending',
+        })) || [];
 
-      const formattedSent = sentFriends?.map(rel => ({
-        id: (rel.profiles as any).id,
-        display_name: (rel.profiles as any).display_name,
-        avatar_url: (rel.profiles as any).avatar_url,
-        status: (rel.profiles as any).status,
-        last_active: (rel.profiles as any).last_active,
-        relationship_status: rel.status as 'pending',
-      })) || [];
+      const formattedSent = sentFriends
+        ?.filter(rel => rel.profiles !== null)
+        ?.map(rel => ({
+          id: (rel.profiles as any).id,
+          display_name: (rel.profiles as any).display_name,
+          avatar_url: (rel.profiles as any).avatar_url,
+          status: (rel.profiles as any).status,
+          last_active: (rel.profiles as any).last_active,
+          relationship_status: rel.status as 'pending',
+        })) || [];
 
       setFriends(formattedFriends);
       setPendingRequests(formattedPending);
