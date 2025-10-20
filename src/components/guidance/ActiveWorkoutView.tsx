@@ -39,6 +39,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const [manualMinutes, setManualMinutes] = useState<string>('');
   const [showWorkoutSelection, setShowWorkoutSelection] = useState(true);
   const [planGenerationFailed, setPlanGenerationFailed] = useState(false);
+  const [showCompletionScreen, setShowCompletionScreen] = useState(false);
   
   const { workoutPlans } = useWorkoutPlans();
   const { sessions, createSession, completeSession, logExercise, refetch } = useWorkoutSessions();
@@ -328,8 +329,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   const handleStopWorkout = () => {
     // Always show completion flow if workout was started
     if (workoutStarted && elapsedTime > 0) {
-      // Workout completion component will handle the rest
-      return;
+      setShowCompletionScreen(true);
     } else if (workoutStarted) {
       // Started but no time elapsed - just stop
       setStartTime(null);
@@ -440,6 +440,31 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
 
   // Active workout screen
   if (!showWorkoutSelection && currentSession && selectedWorkoutType) {
+    // Show completion screen if user clicked "End Workout"
+    if (showCompletionScreen) {
+      return (
+        <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowCompletionScreen(false)} 
+              className="h-8 w-8 p-0 sm:h-10 sm:w-10"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <h2 className="text-lg sm:text-xl font-bold text-primary">
+              Complete Workout
+            </h2>
+          </div>
+          <WorkoutCompletion
+            elapsedTime={elapsedTime}
+            onComplete={(completionData) => handleCompleteWorkout(undefined, completionData)}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -517,13 +542,6 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
               />
             )}
           </>
-        )}
-
-        {workoutStarted && elapsedTime > 0 && (
-          <WorkoutCompletion
-            elapsedTime={elapsedTime}
-            onComplete={(completionData) => handleCompleteWorkout(undefined, completionData)}
-          />
         )}
       </div>
     );
