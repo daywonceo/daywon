@@ -498,30 +498,15 @@ export default function SimpleOnboardingFlow() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 pb-20"> {/* Added bottom padding for sticky button */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Choose your habits</CardTitle>
-              <p className="text-muted-foreground mt-2">
-                <span className="font-semibold text-foreground">First, pick your top 3 habits</span> - these will show up on your home screen.
-                <br />
-                <span className="text-sm">You can add more habits after setting up these main ones.</span>
-              </p>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                console.log('Exit button clicked');
-                localStorage.setItem('onboardingCompleted', 'true');
-                window.location.href = '/';
-              }}
-            >
-              Exit
-            </Button>
-          </div>
+    <div className="w-full max-w-lg mx-auto p-4 pb-20">
+      <Card className="glass-card">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="text-3xl font-bold text-gradient-primary">Choose your habits</CardTitle>
+          <p className="text-muted-foreground mt-2">
+            <span className="font-semibold text-foreground">First, pick your top 3 habits</span> - these will show up on your home screen.
+            <br />
+            <span className="text-sm">You can add more habits after setting up these main ones.</span>
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Category Filter */}
@@ -613,10 +598,10 @@ export default function SimpleOnboardingFlow() {
       {/* Sticky Continue Button - Only show when all habits have frequency configs */}
       {selectedHabits.length > 0 && selectedHabits.every(habit => habitFrequencies[habit]) && (
         <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background/95 backdrop-blur border-t">
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full max-w-lg mx-auto">
             <Button 
               onClick={handleContinueToConfirm}
-              className="w-full min-h-[48px] text-lg font-medium"
+              className="w-full gradient-primary text-primary-foreground py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
               size="lg"
             >
               Continue with {selectedHabits.length} habit{selectedHabits.length === 1 ? '' : 's'}
