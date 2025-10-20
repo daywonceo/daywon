@@ -39,7 +39,7 @@ export default function SimpleOnboardingFlow() {
   const { createUserHabit, updateUserHabit } = useUserHabits();
   const { saveDraft, loadDraft, clearDraft } = useOnboardingPersistence();
   const [onboardingStartTime] = useState(Date.now());
-  const [step, setStep] = useState<'welcome' | 'mission' | 'canvas' | 'focus' | 'notifications' | 'intent' | 'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('welcome');
+  const [step, setStep] = useState<'mission' | 'canvas' | 'focus' | 'notifications' | 'intent' | 'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('mission');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
   const [currentHabitStyle, setCurrentHabitStyle] = useState<FrequencyStyle | null>(null);
@@ -352,21 +352,11 @@ export default function SimpleOnboardingFlow() {
   };
 
   // Early onboarding steps
-  if (step === 'welcome') {
-    return (
-      <WelcomeScreen
-        onNext={() => setStep('mission')}
-        onSkip={() => setStep('select')}
-      />
-    );
-  }
-
   if (step === 'mission') {
     return (
       <MissionScreen
         onNext={() => setStep('canvas')}
-        onBack={() => setStep('welcome')}
-        onSkip={() => setStep('select')}
+        isFirstStep={true}
       />
     );
   }

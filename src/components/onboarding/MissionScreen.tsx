@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 
 interface MissionScreenProps {
   onNext: () => void;
-  onBack: () => void;
-  onSkip: () => void;
+  onBack?: () => void;
+  onSkip?: () => void;
+  isFirstStep?: boolean;
 }
 
-const MissionScreen = ({ onNext, onBack, onSkip }: MissionScreenProps) => {
+const MissionScreen = ({ onNext, onBack, onSkip, isFirstStep = false }: MissionScreenProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -95,23 +96,23 @@ const MissionScreen = ({ onNext, onBack, onSkip }: MissionScreenProps) => {
           </div>
           
           <div className="flex justify-between pt-4">
-            <Button variant="outline" onClick={onBack}>
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
+            {!isFirstStep && onBack && (
+              <Button variant="outline" onClick={onBack}>
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            )}
             
-            <div className="flex gap-2">
-              <Button variant="ghost" onClick={onSkip}>
-                Skip
-              </Button>
-              <Button 
-                onClick={onNext}
-                className="gradient-primary text-primary-foreground"
-              >
-                Continue
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
+            <Button 
+              onClick={onNext}
+              className={cn(
+                "gradient-primary text-primary-foreground",
+                isFirstStep && "ml-auto"
+              )}
+            >
+              Continue
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
         </CardContent>
       </Card>
