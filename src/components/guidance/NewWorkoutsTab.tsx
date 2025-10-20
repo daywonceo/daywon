@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { AlertCircle, Target, Clock, TrendingUp, Calendar, Dumbbell } from "lucide-react";
+import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import WorkoutPlanSelector from "./WorkoutPlanSelector";
 import ActiveWorkoutView from "./ActiveWorkoutView";
@@ -239,50 +242,209 @@ const NewWorkoutsTab = () => {
   const totalCompletedWorkouts = filteredSessions.filter(s => s.is_completed).length;
 
   return (
-    <div className="animate-fade-in space-y-6">
-      <ActiveWorkoutAlert 
-        activeWorkoutSession={activeWorkoutSession}
-        onResumeClick={() => setCurrentView('active-workout')}
-      />
-
-      {!plansLoading && workoutPlans.length === 0 && (
-        <WelcomeCard
-          onCreatePlan={() => setCurrentView('plan-selector')}
-          onManualWorkout={() => setCurrentView('manual-workout')}
-        />
+    <div className="animate-fade-in space-y-6 pb-6">
+      {/* Hero Section with Active Workout Alert */}
+      {activeWorkoutSession && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-6 text-white shadow-xl">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxIDAgNiAyLjY5IDYgNnMtMi42OSA2LTYgNi02LTIuNjktNi02IDIuNjktNiA2LTZ6TTI0IDQyYzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-30"></div>
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
+              <span className="text-sm font-medium text-white/90">Active Workout</span>
+            </div>
+            <h3 className="text-xl font-bold mb-1">
+              {activeWorkoutSession.workout_type.replace(/_/g, ' ').toUpperCase()}
+            </h3>
+            <p className="text-white/80 text-sm mb-4">
+              Continue where you left off
+            </p>
+            <Button 
+              onClick={() => setCurrentView('active-workout')}
+              size="lg"
+              className="bg-white text-primary hover:bg-white/90 shadow-lg"
+            >
+              Resume Workout
+            </Button>
+          </div>
+        </div>
       )}
 
-      <WorkoutStatsCards
-        completedThisWeek={completedThisWeek}
-        averageMinutes={averageMinutes}
-        totalCompletedWorkouts={totalCompletedWorkouts}
-      />
+      {/* Welcome Card - Only show if no plans */}
+      {!plansLoading && workoutPlans.length === 0 && !activeWorkoutSession && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-8 text-white shadow-2xl">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxIDAgNiAyLjY5IDYgNnMtMi42OSA2LTYgNi02LTIuNjktNi02IDIuNjktNiA2LTZ6TTI0IDQyYzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20"></div>
+          <div className="relative text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Start Your Fitness Journey</h2>
+            <p className="text-white/90 mb-6">Create a workout plan or jump right into training</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                onClick={() => setCurrentView('plan-selector')}
+                size="lg"
+                className="bg-white text-purple-600 hover:bg-white/90 shadow-lg"
+              >
+                Create Workout Plan
+              </Button>
+              <Button 
+                onClick={() => setCurrentView('manual-workout')}
+                size="lg"
+                variant="outline"
+                className="border-white/20 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm"
+              >
+                Quick Manual Workout
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <UpcomingWorkoutsCard upcomingWorkouts={upcomingPlannedWorkouts} />
+      {/* Stats Overview */}
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20">
+          <CardContent className="p-4 text-center relative z-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-green-200 dark:bg-green-800 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
+            <Target className="w-6 h-6 mx-auto mb-2 text-green-600 dark:text-green-400" />
+            <div className="text-2xl sm:text-3xl font-bold text-green-700 dark:text-green-300">
+              {completedThisWeek}
+            </div>
+            <div className="text-xs text-green-600 dark:text-green-400 font-medium">This Week</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20">
+          <CardContent className="p-4 text-center relative z-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 dark:bg-blue-800 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
+            <Clock className="w-6 h-6 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
+            <div className="text-2xl sm:text-3xl font-bold text-blue-700 dark:text-blue-300">
+              {averageMinutes}
+            </div>
+            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">Avg Min</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20">
+          <CardContent className="p-4 text-center relative z-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200 dark:bg-purple-800 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
+            <TrendingUp className="w-6 h-6 mx-auto mb-2 text-purple-600 dark:text-purple-400" />
+            <div className="text-2xl sm:text-3xl font-bold text-purple-700 dark:text-purple-300">
+              {totalCompletedWorkouts}
+            </div>
+            <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">Total</div>
+          </CardContent>
+        </Card>
+      </div>
 
-      <ActivePlanCard
-        activePlan={activePlan}
-        activeWorkoutSession={activeWorkoutSession}
-        onStartWorkout={() => setCurrentView('active-workout')}
-        onViewProgress={() => setCurrentView('progress')}
-        onManagePlans={() => setCurrentView('plan-selector')}
-        hasInactivePlans={!plansLoading && workoutPlans.length > 0}
-      />
+      {/* Active Plan Section */}
+      {activePlan && (
+        <Card className="border-0 bg-gradient-to-br from-background to-muted/20 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span className="text-sm font-medium text-muted-foreground">Active Plan</span>
+                </div>
+                <h3 className="text-xl font-bold text-foreground">
+                  {activePlan.plan_type.replace(/_/g, ' ').toUpperCase()}
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {activePlan.name}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentView('plan-selector')}
+              >
+                Change
+              </Button>
+            </div>
+            <Button 
+              onClick={() => setCurrentView('active-workout')}
+              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md"
+              size="lg"
+            >
+              Start Workout
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-      <RecentWorkoutsCard 
-        recentSessions={recentSessions} 
-        onWorkoutClick={handleWorkoutClick}
-      />
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentView('progress')}
+          className="h-24 flex flex-col items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+        >
+          <TrendingUp className="w-6 h-6 text-primary" />
+          <span className="font-semibold">Track Progress</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          onClick={() => setCurrentView('history')}
+          className="h-24 flex flex-col items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+        >
+          <Calendar className="w-6 h-6 text-primary" />
+          <span className="font-semibold">History</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          onClick={() => setCurrentView('week-view')}
+          className="h-24 flex flex-col items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+        >
+          <Calendar className="w-6 h-6 text-primary" />
+          <span className="font-semibold">Week View</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          onClick={() => setCurrentView('templates')}
+          className="h-24 flex flex-col items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+        >
+          <Dumbbell className="w-6 h-6 text-primary" />
+          <span className="font-semibold">Templates</span>
+        </Button>
+      </div>
 
-      <QuickActionsGrid
-        workoutPlansCount={workoutPlans.length}
-        onManagePlans={() => setCurrentView('plan-selector')}
-        onManualWorkout={() => setCurrentView('manual-workout')}
-        onWeekView={() => setCurrentView('week-view')}
-        onViewProgress={() => setCurrentView('progress')}
-        onViewHistory={() => setCurrentView('history')}
-        onViewTemplates={() => setCurrentView('templates')}
-      />
+      {/* Recent Activity */}
+      {recentSessions.length > 0 && (
+        <div>
+          <h3 className="text-lg font-bold text-foreground mb-4">Recent Activity</h3>
+          <div className="space-y-3">
+            {recentSessions.slice(0, 3).map((session) => (
+              <Card 
+                key={session.id}
+                onClick={() => handleWorkoutClick(session)}
+                className="cursor-pointer hover:shadow-md transition-shadow border-0 bg-muted/30"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-foreground truncate">
+                        {session.workout_type.replace(/_/g, ' ').toUpperCase()}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {format(new Date(session.workout_date), 'MMM dd, yyyy')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      {session.is_completed ? (
+                        <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
+                          {session.duration_minutes || 0} min
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">In Progress</Badge>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       <WorkoutDetailModal
         open={!!selectedWorkoutForDetail}
