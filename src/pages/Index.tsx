@@ -4,6 +4,7 @@ import RecentActivities from "@/components/RecentActivities";
 import HabitStats from "@/components/HabitStats";
 import Progress from "@/components/Progress";
 import Footer from "@/components/Footer";
+import HabitCanvas from "@/components/HabitCanvas";
 import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -171,6 +172,11 @@ const Index = () => {
             <CompletionRateCard userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
             <MilestoneTracker userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
             <DailyEncouragementCard />
+          </div>
+
+          {/* Canvas Visualization */}
+          <div className="mb-6">
+            <HabitCanvas userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
           </div>
 
           {/* Modal for top 3 habits */}
