@@ -52,6 +52,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       const sessionDate = new Date(session.workout_date);
       const today = new Date();
       today.setHours(23, 59, 59, 999);
+      // Only resume if session has actually been started (has started_at timestamp)
       return sessionDate <= today && !session.is_completed && session.started_at;
     });
 
@@ -76,6 +77,9 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       if (activeSession.paused_at) {
         setIsTimerPaused(true);
       }
+    } else {
+      // No started session found, show selection screen
+      setShowWorkoutSelection(true);
     }
   }, [sessions]);
 
