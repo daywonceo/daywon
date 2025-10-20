@@ -46,16 +46,16 @@ const WorkoutSelectionScreen = ({
   const allWorkouts = workoutOptions;
 
   return (
-    <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
+    <div className="animate-fade-in space-y-4 sm:space-y-6 px-4 sm:px-2 pb-6">
       <div className="flex items-center gap-3 mb-4 sm:mb-6">
-        <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0">
+        <Button variant="ghost" size="sm" onClick={onBack} className="flex-shrink-0 -ml-2">
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <div className="min-w-0">
-          <h2 className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-400 truncate">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg sm:text-xl font-bold text-success truncate">
             Choose Your Workout
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-xs sm:text-sm text-muted-foreground truncate">
             From your {activePlan.name} plan
           </p>
         </div>
@@ -65,34 +65,34 @@ const WorkoutSelectionScreen = ({
       {recommendedWorkout && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Star className="w-5 h-5 text-yellow-500" />
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+            <Star className="w-4 h-4 sm:w-5 sm:h-5 text-warning flex-shrink-0" />
+            <h3 className="text-sm sm:text-base font-semibold text-foreground">
               Suggested Workout
             </h3>
           </div>
           
-          <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-gray-800 dark:text-gray-200 truncate">
+          <Card className="bg-success/5 border-success/20">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex-1 min-w-0 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base">
                       {recommendedWorkout.displayName}
                     </h4>
-                    <Badge variant="default" className="bg-green-600 text-xs flex-shrink-0">
+                    <Badge variant="default" className="bg-success text-xs flex-shrink-0">
                       Recommended
                     </Badge>
                   </div>
                   
                   {recommendedWorkout.lastCompleted ? (
-                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
                       <CheckCircle className="w-3 h-3 flex-shrink-0" />
                       <span className="truncate">
-                        Last completed: {formatLastCompleted(recommendedWorkout.lastCompleted)}
+                        Last: {formatLastCompleted(recommendedWorkout.lastCompleted)}
                       </span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
                       <Clock className="w-3 h-3 flex-shrink-0" />
                       <span>Not completed yet</span>
                     </div>
@@ -103,9 +103,9 @@ const WorkoutSelectionScreen = ({
                   onClick={() => onWorkoutSelect(recommendedWorkout.type)}
                   disabled={isLoading}
                   size="sm"
-                  className="flex-shrink-0 h-10 px-4 bg-green-600 hover:bg-green-700"
+                  className="flex-shrink-0 w-full sm:w-auto h-10 px-6 bg-success hover:bg-success/90"
                 >
-                  <Play className="w-4 h-4 mr-1" />
+                  <Play className="w-4 h-4 mr-2" />
                   Start
                 </Button>
               </div>
@@ -116,7 +116,7 @@ const WorkoutSelectionScreen = ({
 
       {/* All Workout Options Section */}
       <div className="space-y-3">
-        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+        <h3 className="text-sm sm:text-base font-semibold text-foreground">
           {recommendedWorkout ? "All Workout Options" : "Workout Options"}
         </h3>
         
@@ -126,33 +126,33 @@ const WorkoutSelectionScreen = ({
               key={workout.type}
               className={`transition-all duration-200 hover:shadow-md ${
                 workout.isRecommended 
-                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700" 
-                  : "bg-white dark:bg-gray-800"
+                  ? "bg-success/5 border-success/20" 
+                  : ""
               }`}
             >
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-200 truncate">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0 w-full sm:w-auto">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h4 className="font-semibold text-foreground text-sm sm:text-base">
                         {workout.displayName}
                       </h4>
                       {workout.isRecommended && (
-                        <Badge variant="default" className="bg-green-600 text-xs flex-shrink-0">
+                        <Badge variant="default" className="bg-success text-xs flex-shrink-0">
                           Recommended
                         </Badge>
                       )}
                     </div>
                     
                     {workout.lastCompleted ? (
-                      <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
                         <CheckCircle className="w-3 h-3 flex-shrink-0" />
                         <span className="truncate">
-                          Last completed: {formatLastCompleted(workout.lastCompleted)}
+                          Last: {formatLastCompleted(workout.lastCompleted)}
                         </span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
                         <Clock className="w-3 h-3 flex-shrink-0" />
                         <span>Not completed yet</span>
                       </div>
@@ -163,14 +163,14 @@ const WorkoutSelectionScreen = ({
                     onClick={() => onWorkoutSelect(workout.type)}
                     disabled={isLoading}
                     size="sm"
-                    className={`flex-shrink-0 h-10 px-4 ${
+                    className={`flex-shrink-0 w-full sm:w-auto h-10 px-6 ${
                       workout.isRecommended 
-                        ? "bg-green-600 hover:bg-green-700" 
+                        ? "bg-success hover:bg-success/90" 
                         : ""
                     }`}
                     variant={workout.isRecommended ? "default" : "outline"}
                   >
-                    <Play className="w-4 h-4 mr-1" />
+                    <Play className="w-4 h-4 mr-2" />
                     Start
                   </Button>
                 </div>
@@ -180,9 +180,9 @@ const WorkoutSelectionScreen = ({
         </div>
       </div>
 
-      <Card className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+      <Card className="bg-muted/50 border-border">
+        <CardContent className="p-3 sm:p-4 text-center">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             💡 Tip: The suggested workout follows your rotation pattern for optimal results.
           </p>
         </CardContent>
