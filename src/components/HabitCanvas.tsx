@@ -6,38 +6,38 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Palette, Sparkles } from "lucide-react";
 import { format, subDays, parseISO } from "date-fns";
 
-// Map habit categories to colors
+// Map habit categories to semantic colors
 const CATEGORY_COLORS = {
-  'Physical': 'bg-blue-500',
-  'Mental': 'bg-purple-500',
-  'Professional': 'bg-green-500',
-  'Financial': 'bg-yellow-500',
-  'Relational': 'bg-pink-500',
-  'Personal': 'bg-indigo-500',
-  'Spiritual': 'bg-cyan-500',
-  'Health': 'bg-red-500',
+  'Physical': 'bg-primary',
+  'Mental': 'bg-secondary',
+  'Professional': 'bg-accent',
+  'Financial': 'bg-primary/80',
+  'Relational': 'bg-secondary/80',
+  'Personal': 'bg-accent/80',
+  'Spiritual': 'bg-primary/60',
+  'Health': 'bg-secondary/60',
   'default': 'bg-primary'
 };
 
 const HABIT_NAME_COLORS: Record<string, string> = {
-  'workout': 'bg-blue-500',
-  'exercise': 'bg-blue-400',
-  'run': 'bg-blue-600',
-  'devotion': 'bg-purple-500',
-  'prayer': 'bg-purple-400',
-  'meditation': 'bg-purple-300',
-  'read': 'bg-green-500',
-  'journal': 'bg-green-400',
-  'write': 'bg-green-600',
-  'water': 'bg-cyan-500',
-  'sleep': 'bg-indigo-500',
-  'meal prep': 'bg-orange-500',
-  'cook': 'bg-orange-400',
-  'budget': 'bg-yellow-500',
-  'save': 'bg-yellow-600',
-  'friend': 'bg-pink-500',
-  'family': 'bg-pink-400',
-  'social': 'bg-pink-600',
+  'workout': 'bg-primary',
+  'exercise': 'bg-primary/90',
+  'run': 'bg-primary/80',
+  'devotion': 'bg-secondary',
+  'prayer': 'bg-secondary/90',
+  'meditation': 'bg-secondary/80',
+  'read': 'bg-accent',
+  'journal': 'bg-accent/90',
+  'write': 'bg-accent/80',
+  'water': 'bg-primary/70',
+  'sleep': 'bg-secondary/70',
+  'meal prep': 'bg-accent/70',
+  'cook': 'bg-accent/60',
+  'budget': 'bg-primary/50',
+  'save': 'bg-secondary/50',
+  'friend': 'bg-accent/50',
+  'family': 'bg-primary/40',
+  'social': 'bg-secondary/40',
 };
 
 interface HabitCanvasProps {

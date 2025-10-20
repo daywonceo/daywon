@@ -174,11 +174,6 @@ const Index = () => {
             <DailyEncouragementCard />
           </div>
 
-          {/* Canvas Visualization */}
-          <div className="mb-6">
-            <HabitCanvas userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-          </div>
-
           {/* Modal for top 3 habits */}
           <TopHabitsSelectorModal
             open={showHabitsModal}
@@ -218,6 +213,11 @@ const Index = () => {
             <HabitStats refreshTrigger={refreshTrigger} />
             <Progress userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
           </FeatureErrorBoundary>
+
+          {/* Canvas Visualization */}
+          <div className="mt-6">
+            <HabitCanvas userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+          </div>
         </main>
       </PullToRefresh>
       <AppEnhancements />
