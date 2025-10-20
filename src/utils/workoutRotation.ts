@@ -27,12 +27,12 @@ export const getWorkoutRotationOrder = (planType: string): string[] => {
   const rotationOrders: Record<string, string[]> = {
     'upper_lower': ['upper_body', 'lower_body'],
     'push_pull_legs': ['push', 'pull', 'legs'],
-    'body_part_split': ['chest_back', 'legs', 'shoulders_arms'],
+    'body_part_split': ['shoulders_arms', 'chest_back', 'legs'],
     'full_body': ['full_body']
   };
   
-  // Return the matching rotation or a default full body option
-  return rotationOrders[planType] || ['full_body', 'upper_body', 'lower_body'];
+  // Return the matching rotation, or if unknown, return body_part_split as default
+  return rotationOrders[planType] || rotationOrders['body_part_split'];
 };
 
 export const getRecommendedNextWorkout = (
