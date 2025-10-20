@@ -49,6 +49,17 @@ const ExerciseList = ({
     completedExercises.has(exercise.name)
   ).length;
 
+  // Sort exercises: incomplete first, completed at the bottom
+  const sortedExercises = [...workoutPlan.exercises].sort((a, b) => {
+    const aCompleted = completedExercises.has(a.name);
+    const bCompleted = completedExercises.has(b.name);
+    
+    // If both have same completion status, maintain original order
+    if (aCompleted === bCompleted) return 0;
+    // Move completed exercises to bottom
+    return aCompleted ? 1 : -1;
+  });
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -69,9 +80,9 @@ const ExerciseList = ({
       </div>
 
       <div className="space-y-3">
-        {workoutPlan.exercises.map((exercise: any, index: number) => (
+        {sortedExercises.map((exercise: any, index: number) => (
           <ExerciseCard
-            key={index}
+            key={exercise.name}
             exercise={exercise}
             onLog={onLogExercise}
             isLogged={exerciseLogs.some(log => log.exercise_name === exercise.name)}
