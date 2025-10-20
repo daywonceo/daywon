@@ -415,7 +415,10 @@ export default function SimpleOnboardingFlow() {
             <p className="text-muted-foreground mb-4">
               Your habits are ready. Time to make progress.
             </p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => {
+              localStorage.setItem('onboardingCompleted', 'true');
+              window.location.href = '/';
+            }}>
               Continue to App
             </Button>
           </CardContent>
