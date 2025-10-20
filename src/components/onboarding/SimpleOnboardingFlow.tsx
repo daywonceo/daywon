@@ -20,6 +20,12 @@ import TargetSettingsScreen, { type TargetSettings } from "./TargetSettingsScree
 import DayPickerScreen, { type DayPickerSettings } from "./DayPickerScreen";
 import DailyReminderScreen, { type DailyReminderSettings } from "./DailyReminderScreen";
 import ConfirmationScreen from "./ConfirmationScreen";
+import WelcomeScreen from "./WelcomeScreen";
+import MissionScreen from "./MissionScreen";
+import CanvasGrowthScreen from "./CanvasGrowthScreen";
+import PickFocusScreen from "./PickFocusScreen";
+import NotificationScreen from "./NotificationScreen";
+import IntentScreen from "./IntentScreen";
 import { analytics } from "@/utils/analytics";
 import { OnboardingValidator } from "@/utils/onboardingValidator";
 import { useOnboardingPersistence } from "@/hooks/useOnboardingPersistence";
@@ -33,7 +39,7 @@ export default function SimpleOnboardingFlow() {
   const { createUserHabit, updateUserHabit } = useUserHabits();
   const { saveDraft, loadDraft, clearDraft } = useOnboardingPersistence();
   const [onboardingStartTime] = useState(Date.now());
-  const [step, setStep] = useState<'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('select');
+  const [step, setStep] = useState<'welcome' | 'mission' | 'canvas' | 'focus' | 'notifications' | 'intent' | 'select' | 'style' | 'targets' | 'days' | 'daily' | 'frequency' | 'confirm' | 'complete'>('welcome');
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [currentHabitForFrequency, setCurrentHabitForFrequency] = useState<string>('');
   const [currentHabitStyle, setCurrentHabitStyle] = useState<FrequencyStyle | null>(null);
@@ -42,6 +48,14 @@ export default function SimpleOnboardingFlow() {
   const [currentDailySettings, setCurrentDailySettings] = useState<DailyReminderSettings | null>(null);
   const [habitFrequencies, setHabitFrequencies] = useState<Record<string, HabitFrequency>>({});
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // Additional state for new onboarding steps
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
+  const [notificationPreferences, setNotificationPreferences] = useState({
+    enabled: false,
+    reminderTime: "08:00"
+  });
+  const [userIntent, setUserIntent] = useState("");
 
   // Load saved draft on mount
   useEffect(() => {
@@ -336,6 +350,72 @@ export default function SimpleOnboardingFlow() {
       throw error;
     }
   };
+
+  // Early onboarding steps
+  if (step === 'welcome') {
+    return (
+      <WelcomeScreen
+        onNext={() => setStep('mission')}
+        onSkip={() => setStep('select')}
+      />
+    );
+  }
+
+  if (step === 'mission') {
+    return (
+      <MissionScreen
+        onNext={() => setStep('canvas')}
+        onBack={() => setStep('welcome')}
+        onSkip={() => setStep('select')}
+      />
+    );
+  }
+
+  if (step === 'canvas') {
+    return (
+      <CanvasGrowthScreen
+        onNext={() => setStep('focus')}
+        onBack={() => setStep('mission')}
+        onSkip={() => setStep('select')}
+      />
+    );
+  }
+
+  if (step === 'focus') {
+    return (
+      <PickFocusScreen
+        selectedAreas={focusAreas}
+        onSelectionChange={setFocusAreas}
+        onNext={() => setStep('notifications')}
+        onBack={() => setStep('canvas')}
+        onSkip={() => setStep('select')}
+      />
+    );
+  }
+
+  if (step === 'notifications') {
+    return (
+      <NotificationScreen
+        preferences={notificationPreferences}
+        onPreferencesChange={setNotificationPreferences}
+        onNext={() => setStep('intent')}
+        onBack={() => setStep('focus')}
+        onSkip={() => setStep('select')}
+      />
+    );
+  }
+
+  if (step === 'intent') {
+    return (
+      <IntentScreen
+        intent={userIntent}
+        onIntentChange={setUserIntent}
+        onNext={() => setStep('select')}
+        onBack={() => setStep('notifications')}
+        onSkip={() => setStep('select')}
+      />
+    );
+  }
 
   if (step === 'style') {
     const habitTemplate = HABIT_TEMPLATES.find(h => h.name === currentHabitForFrequency);
