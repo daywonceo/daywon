@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle, Plus, TrendingUp } from "lucide-react";
+import { CheckCircle, Plus, TrendingUp, X } from "lucide-react";
 import CollapsibleDescription from "./CollapsibleDescription";
 import { useExerciseSuggestions } from "@/hooks/useExerciseSuggestions";
 
@@ -15,6 +15,7 @@ interface ExerciseCardProps {
   isLogged: boolean;
   isCompleted?: boolean;
   onToggleComplete?: (exerciseName: string, completed: boolean) => void;
+  onRemove?: (exerciseName: string) => void;
 }
 
 const ExerciseCard = ({ 
@@ -22,7 +23,8 @@ const ExerciseCard = ({
   onLog, 
   isLogged, 
   isCompleted = false,
-  onToggleComplete 
+  onToggleComplete,
+  onRemove 
 }: ExerciseCardProps) => {
   const [sets, setSets] = useState<number>(3);
   const [reps, setReps] = useState<number>(10);
@@ -112,7 +114,18 @@ const ExerciseCard = ({
               </div>
             </div>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex gap-2">
+            {onRemove && !isLogged && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onRemove(exercise.name)}
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                title="Remove exercise"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
             {isLogged ? (
               <CheckCircle className="w-5 h-5 text-blue-600" />
             ) : (

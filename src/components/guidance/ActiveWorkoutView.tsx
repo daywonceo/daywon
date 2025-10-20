@@ -234,6 +234,28 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
     setPlanGenerationFailed(false);
   };
 
+  const handleRemoveExercise = (exerciseName: string) => {
+    if (!workoutPlan || !workoutPlan.exercises) return;
+    
+    const updatedExercises = workoutPlan.exercises.filter(
+      (exercise: any) => exercise.name !== exerciseName
+    );
+    
+    setWorkoutPlan({
+      ...workoutPlan,
+      exercises: updatedExercises
+    });
+    
+    // Also remove from completed exercises if it was completed
+    setCompletedExercises(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(exerciseName);
+      return newSet;
+    });
+    
+    toast.success(`${exerciseName} removed from workout`);
+  };
+
   const handleToggleExerciseComplete = (exerciseName: string, completed: boolean) => {
     setCompletedExercises(prev => {
       const newSet = new Set(prev);
@@ -491,6 +513,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
                 completedExercises={completedExercises}
                 onLogExercise={handleLogExercise}
                 onToggleExerciseComplete={handleToggleExerciseComplete}
+                onRemoveExercise={handleRemoveExercise}
               />
             )}
           </>

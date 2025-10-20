@@ -8,6 +8,7 @@ interface ExerciseListProps {
   completedExercises: Set<string>;
   onLogExercise: (exercise: any, sets: number, reps: number, weight?: number, rpe?: number, restSeconds?: number) => void;
   onToggleExerciseComplete: (exerciseName: string, completed: boolean) => void;
+  onRemoveExercise?: (exerciseName: string) => void;
 }
 
 const ExerciseList = ({ 
@@ -15,7 +16,8 @@ const ExerciseList = ({
   exerciseLogs, 
   completedExercises,
   onLogExercise,
-  onToggleExerciseComplete 
+  onToggleExerciseComplete,
+  onRemoveExercise 
 }: ExerciseListProps) => {
   if (!workoutPlan) {
     return (
@@ -75,6 +77,7 @@ const ExerciseList = ({
             isLogged={exerciseLogs.some(log => log.exercise_name === exercise.name)}
             isCompleted={completedExercises.has(exercise.name)}
             onToggleComplete={onToggleExerciseComplete}
+            onRemove={onRemoveExercise}
           />
         ))}
       </div>
