@@ -31,24 +31,24 @@ const WorkoutTimer = ({
   };
 
   return (
-    <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
-      <CardContent className="p-6 text-center">
+    <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+      <CardContent className="p-4 sm:p-6 text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Timer className="w-6 h-6 text-green-600" />
-          <span className="text-3xl font-mono font-bold text-green-700 dark:text-green-400">
+          <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+          <span className="text-2xl sm:text-3xl font-mono font-bold text-primary">
             {formatTime(elapsedTime)}
           </span>
           {isTimerPaused && (
-            <Badge variant="secondary" className="ml-2">Paused</Badge>
+            <Badge variant="secondary" className="ml-2 text-xs sm:text-sm">Paused</Badge>
           )}
         </div>
         
-        <div className="flex justify-center gap-2">
+        <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
           {!workoutStarted ? (
             <Button
               onClick={onStartTimer}
               size="lg"
-              className="bg-green-600 hover:bg-green-700"
+              className="w-full sm:w-auto h-11 sm:h-12"
             >
               <Play className="w-4 h-4 mr-2" />
               Start Workout
@@ -59,7 +59,8 @@ const WorkoutTimer = ({
                 <Button
                   onClick={onPauseTimer}
                   variant="outline"
-                  className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                  size="lg"
+                  className="w-full sm:w-auto h-11 sm:h-12"
                 >
                   <Pause className="w-4 h-4 mr-2" />
                   Pause
@@ -67,7 +68,8 @@ const WorkoutTimer = ({
               ) : (
                 <Button
                   onClick={onResumeTimer}
-                  className="bg-green-600 hover:bg-green-700"
+                  size="lg"
+                  className="w-full sm:w-auto h-11 sm:h-12"
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Resume
@@ -75,11 +77,12 @@ const WorkoutTimer = ({
               )}
               <Button
                 onClick={onStopWorkout}
-                variant="outline"
-                className="border-red-300 text-red-700 hover:bg-red-50"
+                variant="destructive"
+                size="lg"
+                className="w-full sm:w-auto h-11 sm:h-12"
               >
                 <Square className="w-4 h-4 mr-2" />
-                Stop
+                End Workout
               </Button>
             </>
           )}

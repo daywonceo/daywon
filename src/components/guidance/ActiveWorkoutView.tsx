@@ -154,9 +154,13 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
       // If no existing session, create a new one
       if (!session) {
         console.log('Creating new session...');
+        const today = new Date();
+        const localDateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        console.log('Using date:', localDateString);
+        
         session = await createSession({
           workout_plan_id: activePlan.id,
-          workout_date: new Date().toISOString().split('T')[0],
+          workout_date: localDateString,
           workout_type: workoutType
         });
         console.log('New session created:', session);
@@ -279,9 +283,12 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   };
 
   const handleStopWorkout = () => {
-    if (elapsedTime > 0) {
-      handleCompleteWorkout();
-    } else {
+    // Always show completion flow if workout was started
+    if (workoutStarted && elapsedTime > 0) {
+      // Workout completion component will handle the rest
+      return;
+    } else if (workoutStarted) {
+      // Started but no time elapsed - just stop
       setStartTime(null);
       setElapsedTime(0);
       setWorkoutStarted(false);
