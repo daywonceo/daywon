@@ -126,8 +126,8 @@ const NewWorkoutsTab = () => {
   }
 
   const handleWorkoutClick = (session: any) => {
-    // If session is active (not completed and has started), show end workout flow
-    if (!session.is_completed && session.started_at) {
+    // If session is not completed, show end workout flow
+    if (!session.is_completed) {
       setCompletingSessionId(session.id);
     } else {
       // Open workout detail modal to show comprehensive information
@@ -149,12 +149,16 @@ const NewWorkoutsTab = () => {
     }
   ) => {
     const session = sessions.find(s => s.id === sessionId);
-    if (!session || !session.started_at) return;
+    if (!session) return;
 
-    // Calculate duration from started_at to now
-    const startTime = new Date(session.started_at);
-    const now = new Date();
-    const durationMinutes = Math.max(1, differenceInMinutes(now, startTime));
+    // Calculate duration from started_at if available, otherwise use minimal duration
+    let durationMinutes = 1; // Default minimum
+    
+    if (session.started_at) {
+      const startTime = new Date(session.started_at);
+      const now = new Date();
+      durationMinutes = Math.max(1, differenceInMinutes(now, startTime));
+    }
 
     try {
       await completeSession(sessionId, durationMinutes);
@@ -258,14 +262,18 @@ const NewWorkoutsTab = () => {
   // If showing completion screen for a specific workout
   if (completingSessionId) {
     const session = sessions.find(s => s.id === completingSessionId);
-    if (!session || !session.started_at) {
+    if (!session) {
       setCompletingSessionId(null);
       return null;
     }
 
-    const startTime = new Date(session.started_at);
-    const now = new Date();
-    const elapsedSeconds = Math.max(0, differenceInMinutes(now, startTime) * 60);
+    // Calculate elapsed time - if workout was started, use that time, otherwise use 0
+    let elapsedSeconds = 0;
+    if (session.started_at) {
+      const startTime = new Date(session.started_at);
+      const now = new Date();
+      elapsedSeconds = Math.max(0, differenceInMinutes(now, startTime) * 60);
+    }
 
     return (
       <div className="animate-fade-in space-y-4 sm:space-y-6 px-2 sm:px-0">
@@ -488,8 +496,10 @@ const NewWorkoutsTab = () => {
           <h3 className="text-lg font-bold text-foreground mb-4">Recent Activity</h3>
           <div className="space-y-3">
             {recentSessions.slice(0, 3).map((session) => {
-              const isActive = !session.is_completed && session.started_at;
-              const elapsedMinutes = isActive && session.started_at
+              // Consider a session "in progress" if it's not completed
+              const isInProgress = !session.is_completed;
+              const hasStarted = session.started_at;
+              const elapsedMinutes = hasStarted
                 ? differenceInMinutes(new Date(), new Date(session.started_at))
                 : 0;
 
@@ -508,7 +518,7 @@ const NewWorkoutsTab = () => {
                         <p className="text-sm text-muted-foreground">
                           {format(new Date(session.workout_date), 'MMM dd, yyyy')}
                         </p>
-                        {isActive && (
+                        {hasStarted && isInProgress && (
                           <p className="text-xs text-primary mt-1">
                             <Clock className="w-3 h-3 inline mr-1" />
                             {elapsedMinutes} min elapsed
@@ -520,10 +530,10 @@ const NewWorkoutsTab = () => {
                           <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
                             {session.duration_minutes || 0} min
                           </Badge>
-                        ) : isActive ? (
+                        ) : (
                           <>
                             <Badge className="bg-primary/20 text-primary border-primary/30">
-                              Active
+                              {hasStarted ? 'Active' : 'Ready'}
                             </Badge>
                             <Button
                               size="sm"
@@ -535,8 +545,6 @@ const NewWorkoutsTab = () => {
                               End
                             </Button>
                           </>
-                        ) : (
-                          <Badge variant="outline">Scheduled</Badge>
                         )}
                       </div>
                     </div>
