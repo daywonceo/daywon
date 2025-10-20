@@ -280,7 +280,7 @@ const BoredTab = () => {
             {/* In Progress Activities */}
             {preferences.inProgressActivities.length > 0 && (
               <div className="mb-8">
-                <h5 className="font-medium mb-3 text-blue-600 dark:text-blue-400">Currently Working On</h5>
+                <h5 className="font-medium mb-3 text-primary">Currently Working On</h5>
                 <div className="grid gap-4">
                   {(expandedTabs.progressInProgress ? preferences.inProgressActivities : preferences.inProgressActivities.slice(0, 3)).map((activityId) => {
                     const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
@@ -321,7 +321,7 @@ const BoredTab = () => {
             {/* Completed Activities */}
             {preferences.completedActivities.length > 0 && (
               <div>
-                <h5 className="font-medium mb-3 text-green-600 dark:text-green-400">Completed Activities</h5>
+                <h5 className="font-medium mb-3 text-success">Completed Activities</h5>
                 <div className="grid gap-4">
                   {(expandedTabs.progressCompleted ? preferences.completedActivities : preferences.completedActivities.slice(0, 3)).map((activityId) => {
                     const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);

@@ -75,7 +75,7 @@ const ActivityFilters = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Zap className="w-4 h-4 text-yellow-500" />
+        <Zap className="w-4 h-4 text-warning" />
         <Select value={selectedEnergy} onValueChange={onEnergyChange}>
           <SelectTrigger className="w-36">
             <SelectValue>
@@ -99,7 +99,7 @@ const ActivityFilters = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Clock className="w-4 h-4 text-blue-500" />
+        <Clock className="w-4 h-4 text-primary" />
         <Select value={selectedTime} onValueChange={onTimeChange}>
           <SelectTrigger className="w-32">
             <SelectValue>

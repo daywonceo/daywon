@@ -35,7 +35,7 @@ const ActivityDisplay = ({ activity, isLoading }: ActivityDisplayProps) => {
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
               {activity.activity}
             </h2>
-            <div className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full text-sm font-medium">
+            <div className="inline-block px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
               {formatType(activity.type)}
             </div>
             

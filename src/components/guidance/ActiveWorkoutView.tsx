@@ -380,7 +380,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl font-bold text-green-800 dark:text-green-400 truncate">
+              <h2 className="text-lg sm:text-xl font-bold text-primary truncate">
                 {selectedWorkoutType.replace(/_/g, ' ').toUpperCase()}
               </h2>
               {!currentSession.workout_plan_id && (
@@ -404,12 +404,12 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         {currentSession.workout_plan_id && (
           <>
             {planGenerationFailed ? (
-              <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+              <Card className="bg-warning/10 border-warning/20">
                 <CardContent className="p-4 sm:p-6 text-center">
-                  <h3 className="font-semibold text-yellow-800 dark:text-yellow-400 mb-2">
+                  <h3 className="font-semibold text-warning mb-2">
                     Exercise List Temporarily Unavailable
                   </h3>
-                  <p className="text-yellow-700 dark:text-yellow-300 text-sm mb-4">
+                  <p className="text-warning-foreground text-sm mb-4">
                     The exercise database is currently at capacity, but you can still track your workout time and log exercises manually.
                   </p>
                   <Button
@@ -432,7 +432,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
                           });
                       }
                     }}
-                    className="border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+                    className="border-warning text-warning hover:bg-warning/10"
                   >
                     Try Loading Exercises Again
                   </Button>
@@ -467,7 +467,7 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <h2 className="text-xl font-bold text-green-800 dark:text-green-400">
+        <h2 className="text-xl font-bold text-primary">
           No Active Plan
         </h2>
       </div>

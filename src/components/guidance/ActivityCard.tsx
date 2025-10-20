@@ -74,7 +74,7 @@ const ActivityCard = ({
             variant="ghost"
             size="sm"
             onClick={handleFavorite}
-            className={`ml-2 ${isFavorite ? 'text-yellow-500' : 'text-gray-400'}`}
+            className={`ml-2 ${isFavorite ? 'text-warning' : 'text-muted-foreground'}`}
           >
             <Star className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
           </Button>
@@ -105,7 +105,7 @@ const ActivityCard = ({
           className={`w-full ${
             isCompleted 
               ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' 
-              : 'bg-green-600 hover:bg-green-700'
+              : 'bg-success hover:opacity-90'
           }`}
         >
           {isCompleted ? "Completed!" : "Mark as Done"}

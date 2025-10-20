@@ -89,7 +89,7 @@ const CustomWorkoutBuilder = ({ exercises, onExercisesChange }: CustomWorkoutBui
                   variant="ghost"
                   size="sm"
                   onClick={() => removeExercise(index)}
-                  className="text-red-500 hover:text-red-700 p-1 sm:p-2"
+                  className="text-destructive hover:opacity-80 p-1 sm:p-2"
                 >
                   <X className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>

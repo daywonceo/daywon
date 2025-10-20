@@ -24,19 +24,19 @@ const ActiveWorkoutAlert = ({ activeWorkoutSession, onResumeClick }: ActiveWorko
   if (!isActuallyInProgress) return null;
 
   return (
-    <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800">
+    <Card className="bg-warning/10 border-warning/20">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Timer className="w-6 h-6 text-orange-600" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <Timer className="w-6 h-6 text-warning" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full animate-pulse"></div>
             </div>
             <div>
-              <h3 className="font-semibold text-orange-800 dark:text-orange-400">
+              <h3 className="font-semibold text-warning">
                 Workout In Progress
               </h3>
-              <p className="text-sm text-orange-600 dark:text-orange-300">
+              <p className="text-sm text-warning-foreground">
                 {activeWorkoutSession.workout_type.replace(/_/g, ' ').toUpperCase()} • Timer running
               </p>
             </div>
@@ -44,7 +44,7 @@ const ActiveWorkoutAlert = ({ activeWorkoutSession, onResumeClick }: ActiveWorko
           <Button
             onClick={onResumeClick}
             size="sm"
-            className="bg-orange-600 hover:bg-orange-700 text-white"
+            className="bg-warning text-warning-foreground hover:opacity-90"
           >
             <Play className="w-4 h-4 mr-2" />
             Resume

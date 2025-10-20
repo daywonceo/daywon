@@ -47,7 +47,7 @@ const CollapsibleDescription = ({
           variant="ghost"
           size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-2 h-auto p-0 text-xs text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+          className="mt-2 h-auto p-0 text-xs text-primary hover:opacity-80"
         >
           {isExpanded ? (
             <>

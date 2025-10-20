@@ -41,7 +41,7 @@ const DevotionModal = ({ devotion, isOpen, onClose, onSave }: DevotionModalProps
         <DialogHeader className="space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
-              <DialogTitle className="text-xl font-bold text-green-800 dark:text-green-400 leading-tight">
+              <DialogTitle className="text-xl font-bold text-primary leading-tight">
                 {devotion.title}
               </DialogTitle>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -53,7 +53,7 @@ const DevotionModal = ({ devotion, isOpen, onClose, onSave }: DevotionModalProps
                 variant="ghost"
                 size="sm"
                 onClick={onSave}
-                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0"
+                className="text-destructive hover:bg-destructive/10 flex-shrink-0"
                 aria-label="Save devotion"
               >
                 <Heart className="w-5 h-5" />
@@ -62,10 +62,10 @@ const DevotionModal = ({ devotion, isOpen, onClose, onSave }: DevotionModalProps
           </div>
           
           <div className="flex items-center gap-2">
-            <span className="inline-block px-3 py-1 text-sm bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
+            <span className="inline-block px-3 py-1 text-sm bg-success/10 text-success rounded-full">
               {devotion.category}
             </span>
-            <span className="text-sm font-medium text-green-600 dark:text-green-400">
+            <span className="text-sm font-medium text-success">
               Key Verse: {devotion.verse}
             </span>
           </div>
