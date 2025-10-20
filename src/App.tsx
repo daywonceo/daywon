@@ -149,19 +149,56 @@ const AppIntegrationsWrapper: React.FC<{ children: React.ReactNode }> = ({ child
 
 const AppContent: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [checkingHabits, setCheckingHabits] = useState(true);
   const { user, loading } = useAuth();
 
   useEffect(() => {
     setupReducedMotion();
     
     // Check if onboarding should be shown
-    if (user && !loading) {
-      // Check both localStorage and current route
-      const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-      const isOnboardingRoute = window.location.pathname === '/onboarding';
-      const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false' || isOnboardingRoute;
-      setShowOnboarding(shouldShowOnboarding);
-    }
+    const checkOnboardingStatus = async () => {
+      if (user && !loading) {
+        const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+        const isOnboardingRoute = window.location.pathname === '/onboarding';
+        
+        // If user is on the /onboarding route, always show it
+        if (isOnboardingRoute) {
+          setShowOnboarding(true);
+          setCheckingHabits(false);
+          return;
+        }
+        
+        // Check if user has any existing habits
+        try {
+          const { data: habits } = await import('./integrations/supabase/client').then(m => 
+            m.supabase
+              .from('habits')
+              .select('id')
+              .eq('user_id', user.id)
+              .limit(1)
+          );
+          
+          // If user has habits, skip onboarding
+          if (habits && habits.length > 0) {
+            localStorage.setItem('onboardingCompleted', 'true');
+            setShowOnboarding(false);
+          } else {
+            // New user with no habits - show onboarding if not completed
+            const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
+            setShowOnboarding(shouldShowOnboarding);
+          }
+        } catch (error) {
+          console.error('Error checking habits:', error);
+          // On error, fall back to localStorage check
+          const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
+          setShowOnboarding(shouldShowOnboarding);
+        }
+        
+        setCheckingHabits(false);
+      }
+    };
+    
+    checkOnboardingStatus();
   }, [user, loading]);
 
   const handleOnboardingComplete = () => {
@@ -172,8 +209,8 @@ const AppContent: React.FC = () => {
     setShowOnboarding(false);
   };
 
-  // Show loading while checking auth status
-  if (loading) {
+  // Show loading while checking auth status or habits
+  if (loading || checkingHabits) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-lg">Loading...</div>
