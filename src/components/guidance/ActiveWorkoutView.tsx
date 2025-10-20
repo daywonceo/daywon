@@ -128,7 +128,14 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
   }, [workoutStarted, startTime, elapsedTime]);
 
   const handleWorkoutTypeSelection = async (workoutType: string) => {
-    if (!activePlan) return;
+    console.log('handleWorkoutTypeSelection called with:', workoutType);
+    console.log('Active plan:', activePlan);
+    
+    if (!activePlan) {
+      console.error('No active plan found!');
+      toast.error('No active workout plan. Please create a plan first.');
+      return;
+    }
 
     try {
       console.log('Creating session for workout type:', workoutType);
@@ -142,13 +149,17 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
                (!s.duration_minutes || s.duration_minutes === 0);
       });
 
+      console.log('Existing session found:', session);
+
       // If no existing session, create a new one
       if (!session) {
+        console.log('Creating new session...');
         session = await createSession({
           workout_plan_id: activePlan.id,
           workout_date: new Date().toISOString().split('T')[0],
           workout_type: workoutType
         });
+        console.log('New session created:', session);
       }
 
       if (session) {
@@ -176,10 +187,13 @@ const ActiveWorkoutView = ({ onBack }: ActiveWorkoutViewProps) => {
           setPlanGenerationFailed(true);
           toast.info('Exercise database temporarily unavailable. You can still track your workout time manually.');
         }
+      } else {
+        console.error('Failed to create or find session');
+        toast.error('Failed to create workout session. Please try again.');
       }
     } catch (error) {
       console.error('Error creating workout session:', error);
-      toast.error('Failed to create workout session');
+      toast.error('Failed to create workout session: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
