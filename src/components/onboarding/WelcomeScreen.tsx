@@ -42,24 +42,14 @@ const WelcomeScreen = ({ onNext, onSkip }: WelcomeScreenProps) => {
             Welcome to your journey of growth and transformation. Let's build habits that align with your values and help you flourish.
           </p>
           
-          <div className="space-y-3">
-            <Button 
-              onClick={onNext}
-              className="w-full gradient-primary text-primary-foreground py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              size="lg"
-            >
-              Continue
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              onClick={onSkip}
-              className="w-full text-muted-foreground hover:text-foreground"
-            >
-              Skip for now
-            </Button>
-          </div>
+          <Button 
+            onClick={onNext}
+            className="w-full gradient-primary text-primary-foreground py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            size="lg"
+          >
+            Continue
+            <ChevronRight className="w-5 h-5 ml-2" />
+          </Button>
         </CardContent>
       </Card>
     </div>
