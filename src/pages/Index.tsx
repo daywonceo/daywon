@@ -215,9 +215,11 @@ const Index = () => {
           </FeatureErrorBoundary>
 
           {/* Canvas Visualization */}
-          <div className="mt-2">
-            <HabitCanvas userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-          </div>
+          <FeatureErrorBoundary featureName="Canvas Visualization">
+            <div className="mt-2">
+              <HabitCanvas userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
+            </div>
+          </FeatureErrorBoundary>
         </main>
       </PullToRefresh>
       <AppEnhancements />
