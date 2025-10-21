@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Palette, Sparkles } from "lucide-react";
+import { Palette, Sparkles, Calendar, TrendingUp } from "lucide-react";
 import { format, subDays, parseISO } from "date-fns";
 
 // Map habit categories to semantic colors
@@ -51,24 +53,29 @@ interface HabitActivity {
   status: string;
 }
 
+type TimeRange = 7 | 30 | 90;
+
 export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [animatedTiles, setAnimatedTiles] = useState<number[]>([]);
   const [activities, setActivities] = useState<HabitActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<TimeRange>(30);
+  const [selectedTile, setSelectedTile] = useState<typeof tiles[0] | null>(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Fetch last 30 days of completed habit activities
+  // Fetch habit activities based on time range
   useEffect(() => {
     if (!user) return;
 
     const fetchActivities = async () => {
       const endDate = format(new Date(), 'yyyy-MM-dd');
-      const startDate = format(subDays(new Date(), 30), 'yyyy-MM-dd');
+      const startDate = format(subDays(new Date(), timeRange), 'yyyy-MM-dd');
       
       const { data, error } = await supabase
         .from('habit_activities')
@@ -82,8 +89,6 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
       if (error) {
         console.error('Error fetching canvas activities:', error);
       } else {
-        console.log('Canvas: Fetched activities:', data?.length || 0, 'completed habits in last 30 days');
-        console.log('Canvas: Sample activities:', data?.slice(0, 3));
         setActivities(data || []);
       }
       
@@ -91,7 +96,7 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
     };
 
     fetchActivities();
-  }, [user]);
+  }, [user, timeRange]);
   
   // Create tiles data - each completed habit adds a colored tile
   const tiles = activities.slice(0, 60).map((activity, index) => {
@@ -127,9 +132,19 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
     }
   }, [tiles.length]);
 
+  // Calculate stats
+  const totalCompleted = tiles.length;
+  const uniqueHabits = new Set(tiles.map(t => t.habitName)).size;
+  const completionRate = Math.round((totalCompleted / timeRange) * 100);
+  
   // Fill remaining slots with empty tiles
   const totalTiles = 60;
   const emptyTilesCount = Math.max(0, totalTiles - tiles.length);
+
+  const handleTileClick = (tile: typeof tiles[0]) => {
+    setSelectedTile(tile);
+    setShowDetailDialog(true);
+  };
 
   if (isLoading) {
     return (
@@ -154,22 +169,49 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
       "glass-card transition-all duration-700",
       isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
     )}>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 space-y-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Palette className="w-5 h-5 text-primary" />
             Your Canvas
           </CardTitle>
-          {tiles.length > 0 && (
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="font-semibold text-primary">{completionPercentage}%</span> complete
-            </div>
-          )}
         </div>
-        <p className="text-xs text-muted-foreground">
-          Each colored tile represents a completed habit - watch your masterpiece grow!
-        </p>
+        
+        {/* Time range selector */}
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-muted-foreground" />
+          <div className="flex gap-1">
+            {([7, 30, 90] as TimeRange[]).map((range) => (
+              <Button
+                key={range}
+                variant={timeRange === range ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTimeRange(range)}
+                className="h-7 text-xs"
+              >
+                {range}d
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats row */}
+        {tiles.length > 0 && (
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="bg-muted/30 rounded-lg p-2 text-center">
+              <div className="font-semibold text-primary">{totalCompleted}</div>
+              <div className="text-muted-foreground">Completed</div>
+            </div>
+            <div className="bg-muted/30 rounded-lg p-2 text-center">
+              <div className="font-semibold text-primary">{uniqueHabits}</div>
+              <div className="text-muted-foreground">Habits</div>
+            </div>
+            <div className="bg-muted/30 rounded-lg p-2 text-center">
+              <div className="font-semibold text-primary">{completionRate}%</div>
+              <div className="text-muted-foreground">Rate</div>
+            </div>
+          </div>
+        )}
       </CardHeader>
       
       <CardContent>
@@ -181,10 +223,11 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
               {tiles.map((tile, index) => (
                 <div
                   key={tile.id}
+                  onClick={() => handleTileClick(tile)}
                   className={cn(
                     "aspect-square rounded transition-all duration-500",
                     tile.color,
-                    "shadow-sm hover:scale-110 hover:shadow-lg cursor-pointer",
+                    "shadow-sm hover:scale-110 hover:shadow-lg cursor-pointer hover:ring-2 hover:ring-primary/50",
                     "transform",
                     animatedTiles.includes(index) 
                       ? "scale-100 opacity-100" 
@@ -219,13 +262,46 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
 
         {/* Legend */}
         {tiles.length > 0 && (
-          <div className="mt-3 pt-3 border-t">
+          <div className="mt-3 pt-3 border-t flex items-center justify-center gap-1">
+            <TrendingUp className="w-3 h-3 text-muted-foreground" />
             <p className="text-xs text-muted-foreground text-center">
-              Last 30 days • {tiles.length} habits completed
+              Last {timeRange} days • {tiles.length} habits completed • Click tiles for details
             </p>
           </div>
         )}
       </CardContent>
+
+      {/* Detail Dialog */}
+      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className={cn("w-4 h-4 rounded", selectedTile?.color)} />
+              {selectedTile?.habitName}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-muted/30 rounded-lg p-3">
+                <div className="text-xs text-muted-foreground mb-1">Date</div>
+                <div className="font-semibold">
+                  {selectedTile && format(parseISO(selectedTile.date), 'MMMM d, yyyy')}
+                </div>
+              </div>
+              <div className="bg-muted/30 rounded-lg p-3">
+                <div className="text-xs text-muted-foreground mb-1">Day</div>
+                <div className="font-semibold">
+                  {selectedTile && format(parseISO(selectedTile.date), 'EEEE')}
+                </div>
+              </div>
+            </div>
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-center">
+              <Sparkles className="w-5 h-5 text-primary mx-auto mb-1" />
+              <div className="text-sm font-medium">Completed Successfully</div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
