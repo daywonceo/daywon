@@ -71,11 +71,17 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
 
   // Fetch habit activities based on time range
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      console.log('[HabitCanvas] No user, skipping fetch');
+      setIsLoading(false);
+      return;
+    }
 
     const fetchActivities = async () => {
+      console.log('[HabitCanvas] Fetching activities for user:', user.id);
       const endDate = format(new Date(), 'yyyy-MM-dd');
       const startDate = format(subDays(new Date(), timeRange), 'yyyy-MM-dd');
+      console.log('[HabitCanvas] Date range:', startDate, 'to', endDate);
       
       const { data, error } = await supabase
         .from('habit_activities')
@@ -87,8 +93,10 @@ export default function HabitCanvas({ userHabits }: HabitCanvasProps) {
         .order('activity_date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching canvas activities:', error);
+        console.error('[HabitCanvas] Error fetching activities:', error);
+        setActivities([]);
       } else {
+        console.log('[HabitCanvas] Fetched activities:', data?.length || 0);
         setActivities(data || []);
       }
       
