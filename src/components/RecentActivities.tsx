@@ -94,7 +94,12 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
                         gridTemplateColumns: `4rem repeat(${activity.categories.length}, 4rem)` 
                       }}
                     >
-                      <div />
+                      {/* Date label */}
+                      <div className="flex items-end justify-center min-h-[1.5rem]">
+                        <span className="text-[10px] sm:text-xs font-semibold text-primary text-center break-words hyphens-auto leading-tight px-0.5">
+                          Date
+                        </span>
+                      </div>
                       {activity.categories.map((habit) => (
                         <div key={habit} className="flex items-end justify-center min-h-[1.5rem]">
                           <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground/70 dark:text-muted-foreground text-center break-words hyphens-auto leading-tight px-0.5">
