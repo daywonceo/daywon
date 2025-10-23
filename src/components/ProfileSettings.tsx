@@ -39,6 +39,7 @@ import {
   Mail,
   Share2,
   Bell,
+  BellOff,
   Moon,
   Globe,
   Trash2,
@@ -54,6 +55,7 @@ import {
   BookmarkCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useHaptics } from "@/contexts/HapticsContext";
 
 interface ProfileSettingsProps {
   open: boolean;
@@ -65,6 +67,7 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>("menu");
   const { currentUserProfile, updateProfile } = useSocialProfiles();
+  const { hapticsEnabled, toggleHaptics } = useHaptics();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Profile editing states
@@ -570,6 +573,23 @@ const ProfileSettings = ({ open, onOpenChange }: ProfileSettingsProps) => {
                       <p className="text-sm text-gray-500">Toggle dark/light theme</p>
                     </div>
                     <Switch />
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {hapticsEnabled ? <Bell className="w-4 h-4 text-muted-foreground" /> : <BellOff className="w-4 h-4 text-muted-foreground" />}
+                      <div>
+                        <p className="font-medium">Haptic Feedback</p>
+                        <p className="text-sm text-gray-500">Vibration feedback for interactions</p>
+                      </div>
+                    </div>
+                    <Switch 
+                      checked={hapticsEnabled}
+                      onCheckedChange={toggleHaptics}
+                    />
                   </div>
                 </CardContent>
               </Card>

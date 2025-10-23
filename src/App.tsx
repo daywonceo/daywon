@@ -29,6 +29,7 @@ const RedeemInvite = lazy(() => import("./pages/RedeemInvite"));
 
 
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { HapticsProvider } from "./contexts/HapticsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineIndicator } from "./utils/offlineStorage";
 import SimpleOnboardingFlow from "./components/onboarding/SimpleOnboardingFlow";
@@ -274,19 +275,21 @@ const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <SettingsProvider>
-            <AccessibilityProvider>
-              <TooltipProvider>
-                <GlobalErrorHandler />
-                <BrowserRouter>
-                  <div id="main-content" role="main">
-                    <Toaster />
-                    <Sonner />
-                    <OfflineIndicator />
-                    <AppContent />
-                  </div>
-                </BrowserRouter>
-              </TooltipProvider>
-            </AccessibilityProvider>
+            <HapticsProvider>
+              <AccessibilityProvider>
+                <TooltipProvider>
+                  <GlobalErrorHandler />
+                  <BrowserRouter>
+                    <div id="main-content" role="main">
+                      <Toaster />
+                      <Sonner />
+                      <OfflineIndicator />
+                      <AppContent />
+                    </div>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </AccessibilityProvider>
+            </HapticsProvider>
           </SettingsProvider>
         </AuthProvider>
       </QueryClientProvider>

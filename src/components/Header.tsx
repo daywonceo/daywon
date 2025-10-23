@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ThemeToggle from "./ThemeToggle";
-import HapticButton from "./HapticButton";
 import { useState } from "react";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
@@ -37,7 +36,6 @@ const Header = () => {
 
         <div className="flex-1 flex justify-end items-center gap-1 sm:gap-1.5 min-w-0">
           <ThemeToggle />
-          <HapticButton />
           <HabitAddSheet
             trigger={
               <Button 
