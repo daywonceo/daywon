@@ -86,8 +86,8 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
               
               return (
                 <div key={activityIndex} className="space-y-2">
-                  {/* Only show habit labels when habits change or for first row */}
-                  {habitsChanged && (
+                  {/* Show habit labels for first row or when habits change */}
+                  {(activityIndex === 0 || habitsChanged) && (
                     <div 
                       className="grid gap-2 sm:gap-3 md:gap-4 items-center justify-center max-w-fit mx-auto"
                       style={{ 
