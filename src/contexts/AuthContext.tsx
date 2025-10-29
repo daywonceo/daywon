@@ -24,26 +24,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
-    let initializing = true;
     
-    // Set up auth state listener FIRST with performance optimization
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
-        // Only update state if session actually changed
-        if (!initializing) {
-          const newUser = session?.user ?? null;
-          const currentUserId = user?.id;
-          const currentAccessToken = session?.access_token;
-          
-          // Only update if there's a real change
-          if (currentUserId !== newUser?.id || currentAccessToken !== session?.access_token) {
-            setSession(session);
-            setUser(newUser);
-          }
-        }
-        
+        setSession(session);
+        setUser(session?.user ?? null);
         setLoading(false);
         
         // Cache user creation date for habit calculations
@@ -59,44 +47,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // THEN check for existing session with deduplication
-    const sessionKey = 'initial_session_fetch';
-    const lastFetch = sessionStorage.getItem(sessionKey);
-    const now = Date.now();
-    
-    if (!lastFetch || now - parseInt(lastFetch) > 300000) { // 5 minutes
-      sessionStorage.setItem(sessionKey, now.toString());
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
       
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!mounted) return;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-        initializing = false;
-        
-        // Cache user creation date for habit calculations
-        if (session?.user?.created_at) {
-          localStorage.setItem('user_creation_date', session.user.created_at);
-        }
-        
-        // Store Spotify tokens if available
-        if (session?.provider_token && session?.provider_refresh_token) {
-          localStorage.setItem('spotify_access_token', session.provider_token);
-          localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
-        }
-      }).catch(error => {
-        console.error('Error fetching session:', error);
-        if (mounted) {
-          setLoading(false);
-          initializing = false;
-        }
-      });
-    } else {
-      // Use cached session without API call
+      setSession(session);
+      setUser(session?.user ?? null);
       setLoading(false);
-      initializing = false;
-    }
+      
+      // Cache user creation date for habit calculations
+      if (session?.user?.created_at) {
+        localStorage.setItem('user_creation_date', session.user.created_at);
+      }
+      
+      // Store Spotify tokens if available
+      if (session?.provider_token && session?.provider_refresh_token) {
+        localStorage.setItem('spotify_access_token', session.provider_token);
+        localStorage.setItem('spotify_refresh_token', session.provider_refresh_token);
+      }
+    }).catch(error => {
+      console.error('Error fetching session:', error);
+      if (mounted) {
+        setLoading(false);
+      }
+    });
 
     return () => {
       mounted = false;
