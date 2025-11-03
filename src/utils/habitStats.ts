@@ -23,27 +23,13 @@ export const calculateHabitStats = async (timeframe: "week" | "month" | "year"):
     // Determine max days based on timeframe
     const maxDays = timeframe === "week" ? 7 : timeframe === "month" ? 30 : 365;
     
-    // Check if ANY habit has activity today (completed or failed)
-    const hasActivityToday = activities.some(a => 
-      a.date === todayStr && (a.status === "completed" || a.status === "failed")
-    );
+    // Calculate date range - ALWAYS exclude today unless it's been marked
+    // This ensures we're always looking at the last {maxDays} completed days
+    const endDate = new Date(now);
+    endDate.setDate(now.getDate() - 1); // Always end at yesterday
     
-    // Calculate date range - ALWAYS fixed window, never more than maxDays
-    let endDate: Date;
-    let startDate: Date;
-    
-    if (hasActivityToday) {
-      // Include today, go back (maxDays - 1) days
-      endDate = now;
-      startDate = new Date(now);
-      startDate.setDate(now.getDate() - (maxDays - 1));
-    } else {
-      // Don't include today, show yesterday and (maxDays - 1) days before that
-      endDate = new Date(now);
-      endDate.setDate(now.getDate() - 1);
-      startDate = new Date(endDate);
-      startDate.setDate(endDate.getDate() - (maxDays - 1));
-    }
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - (maxDays - 1)); // Go back maxDays-1 from yesterday
     
     const startDateStr = startDate.toISOString().split('T')[0];
     const endDateStr = endDate.toISOString().split('T')[0];
