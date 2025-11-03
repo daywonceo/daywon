@@ -82,7 +82,7 @@ export const AnalyticsDashboard: React.FC = () => {
     try {
       const now = new Date();
       
-      // Use the same time window calculation as the home page for weekly
+      // Calculate period based on selection
       let periodStart: Date;
       let periodEnd: Date;
       
@@ -91,9 +91,10 @@ export const AnalyticsDashboard: React.FC = () => {
         periodStart = startDate;
         periodEnd = now;
       } else if (selectedPeriod === 'month') {
-        // Use last 30 days instead of calendar month
-        periodStart = subDays(now, 29); // 29 days ago + today = 30 days
-        periodEnd = now;
+        // For month view, show last 30 completed days (excluding today if not marked)
+        // This ensures we always show a full 30 days of trackable data
+        periodStart = subDays(now, 30);
+        periodEnd = subDays(now, 1); // End at yesterday to exclude today
       } else {
         periodStart = subDays(now, 365);
         periodEnd = now;
@@ -170,47 +171,25 @@ export const AnalyticsDashboard: React.FC = () => {
       return Math.max(1, daysSinceCreation);
     };
     
-    // Calculate completion rate using the EXACT same method as useHabitStats
-    // This ensures the analytics dashboard matches the home page exactly
+    // Calculate completion rate - count actual completed days vs expected days in period
     let completedCount = 0;
     let totalPossible = 0;
     
-    const todayStr = new Date().toISOString().split('T')[0];
-    
-    // For each habit, calculate expected days and completed count
+    // For each habit, calculate how many days it should have been tracked in this period
     habits.filter(h => h.status === 'active').forEach(habit => {
       const habitCreated = habitCreationDates.get(habit.id);
       const effectiveStart = habitCreated && habitCreated > periodStart ? habitCreated : periodStart;
       
-      // Calculate how many days this habit should have been tracked
+      // Calculate how many days this habit should have been tracked in the period
       const daysSinceStart = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      
-      // Check if today has been marked (completed or failed)
-      const todayActivity = validActivities.find(a => 
-        a.habit_id === habit.id && a.activity_date === todayStr
-      );
-      
-      // Determine if we should include today in calculations
-      const includesToday = todayActivity && (todayActivity.status === 'completed' || todayActivity.status === 'failed');
-      
-      // Calculate expected days and starting offset
-      let expectedDays: number;
-      let startOffset: number;
-      
-      if (includesToday) {
-        expectedDays = Math.max(1, daysSinceStart);
-        startOffset = 0; // Start from today
-      } else {
-        expectedDays = Math.max(1, daysSinceStart - 1);
-        startOffset = 1; // Start from yesterday
-      }
+      const expectedDays = Math.max(1, daysSinceStart);
       
       totalPossible += expectedDays;
       
-      // Count completed days for this habit
+      // Count completed days for this habit within the period
       for (let i = 0; i < expectedDays; i++) {
         const checkDate = new Date(periodEnd);
-        checkDate.setDate(periodEnd.getDate() - (startOffset + i));
+        checkDate.setDate(periodEnd.getDate() - i);
         const dateStr = checkDate.toISOString().split('T')[0];
         
         const activity = validActivities.find(a => 
