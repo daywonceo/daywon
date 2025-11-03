@@ -286,6 +286,17 @@ export const AnalyticsDashboard: React.FC = () => {
         const completed = stats.completed.size;
         const completion = expectedDays > 0 ? Math.round((completed / expectedDays) * 100) : 0;
         
+        console.log(`📊 Habit Performance: ${name}`, {
+          periodStart: format(periodStart, 'yyyy-MM-dd'),
+          periodEnd: format(periodEnd, 'yyyy-MM-dd'),
+          habitCreated: format(habitCreated, 'yyyy-MM-dd'),
+          effectiveStart: format(effectiveStart, 'yyyy-MM-dd'),
+          expectedDays,
+          completed,
+          completion: `${completion}%`,
+          display: `${completed}/${expectedDays}`
+        });
+        
         return {
           name,
           completion,
