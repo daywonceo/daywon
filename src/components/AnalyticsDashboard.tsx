@@ -91,8 +91,9 @@ export const AnalyticsDashboard: React.FC = () => {
         periodStart = startDate;
         periodEnd = now;
       } else if (selectedPeriod === 'month') {
-        periodStart = startOfMonth(now);
-        periodEnd = endOfMonth(now);
+        // Use last 30 days instead of calendar month
+        periodStart = subDays(now, 29); // 29 days ago + today = 30 days
+        periodEnd = now;
       } else {
         periodStart = subDays(now, 365);
         periodEnd = now;
