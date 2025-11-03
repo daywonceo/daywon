@@ -183,24 +183,33 @@ export const AnalyticsDashboard: React.FC = () => {
       
       // Calculate how many days this habit should have been tracked
       const daysSinceStart = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      let expectedDays = Math.max(1, daysSinceStart);
       
       // Check if today has been marked (completed or failed)
       const todayActivity = validActivities.find(a => 
         a.habit_id === habit.id && a.activity_date === todayStr
       );
       
-      // If today hasn't been marked (no activity or empty status), don't count it
-      if (!todayActivity || (todayActivity.status !== 'completed' && todayActivity.status !== 'failed')) {
-        expectedDays = Math.max(1, expectedDays - 1);
+      // Determine if we should include today in calculations
+      const includesToday = todayActivity && (todayActivity.status === 'completed' || todayActivity.status === 'failed');
+      
+      // Calculate expected days and starting offset
+      let expectedDays: number;
+      let startOffset: number;
+      
+      if (includesToday) {
+        expectedDays = Math.max(1, daysSinceStart);
+        startOffset = 0; // Start from today
+      } else {
+        expectedDays = Math.max(1, daysSinceStart - 1);
+        startOffset = 1; // Start from yesterday
       }
       
       totalPossible += expectedDays;
       
       // Count completed days for this habit
-      for (let dayOffset = 0; dayOffset < expectedDays; dayOffset++) {
+      for (let i = 0; i < expectedDays; i++) {
         const checkDate = new Date(periodEnd);
-        checkDate.setDate(periodEnd.getDate() - dayOffset);
+        checkDate.setDate(periodEnd.getDate() - (startOffset + i));
         const dateStr = checkDate.toISOString().split('T')[0];
         
         const activity = validActivities.find(a => 
