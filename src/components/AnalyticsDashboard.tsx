@@ -254,52 +254,45 @@ export const AnalyticsDashboard: React.FC = () => {
       });
     }
 
-    // Habit category performance - properly calculate completion vs expected days
-    // This matches the logic in habitStats.ts
-    const categoryStats: { [key: string]: { completed: number; expected: number; habitId: string } } = {};
+    // Habit category performance - calculate actual completion for each habit
+    const habitStats = new Map<string, { completed: Set<string>; habitId: string; created: Date }>();
     
-    // Group activities by habit
-    const activitiesByHabit = new Map<string, any[]>();
+    // Group activities by habit and collect unique completed dates
     validActivities.forEach(activity => {
       const habitName = activity.habit_name || 'Other';
-      if (!activitiesByHabit.has(habitName)) {
-        activitiesByHabit.set(habitName, []);
+      if (!habitStats.has(habitName)) {
+        habitStats.set(habitName, {
+          completed: new Set<string>(),
+          habitId: activity.habit_id,
+          created: habitCreationDates.get(activity.habit_id) || periodStart
+        });
       }
-      activitiesByHabit.get(habitName)!.push(activity);
+      
+      if (activity.status === 'completed') {
+        habitStats.get(habitName)!.completed.add(activity.activity_date);
+      }
     });
     
-    // Calculate stats for each habit using the same logic as habitStats.ts
-    activitiesByHabit.forEach((habitActivities, habitName) => {
-      const habitId = habitActivities[0]?.habit_id;
-      const expectedDays = calculateExpectedDays(habitId);
-      
-      // Remove duplicate activities by date - keep the latest status
-      const uniqueActivityMap = new Map<string, any>();
-      habitActivities.forEach(activity => {
-        const dateKey = activity.activity_date;
-        const existing = uniqueActivityMap.get(dateKey);
-        if (!existing || activity.activity_date >= existing.activity_date) {
-          uniqueActivityMap.set(dateKey, activity);
-        }
-      });
-      
-      const uniqueActivities = Array.from(uniqueActivityMap.values());
-      const completedCount = uniqueActivities.filter(a => a.status === 'completed').length;
-      
-      categoryStats[habitName] = {
-        completed: completedCount,
-        expected: expectedDays,
-        habitId
-      };
-    });
-
-    const habitPerformance = Object.entries(categoryStats)
-      .map(([name, stats]) => ({
-        name,
-        completion: stats.expected > 0 ? Math.round((stats.completed / stats.expected) * 100) : 0,
-        completed: stats.completed,
-        total: stats.expected
-      }))
+    const habitPerformance = Array.from(habitStats.entries())
+      .map(([name, stats]) => {
+        // Calculate expected days for this specific habit within the period
+        const habitCreated = stats.created;
+        const effectiveStart = habitCreated > periodStart ? habitCreated : periodStart;
+        
+        // Days between effectiveStart and periodEnd (inclusive)
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const expectedDays = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / msPerDay) + 1;
+        
+        const completed = stats.completed.size;
+        const completion = expectedDays > 0 ? Math.round((completed / expectedDays) * 100) : 0;
+        
+        return {
+          name,
+          completion,
+          completed,
+          total: expectedDays
+        };
+      })
       .sort((a, b) => b.completion - a.completion)
       .slice(0, 5);
 
