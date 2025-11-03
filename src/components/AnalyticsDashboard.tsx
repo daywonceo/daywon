@@ -175,30 +175,43 @@ export const AnalyticsDashboard: React.FC = () => {
     let completedCount = 0;
     let totalPossible = 0;
     
+    console.log('📊 Analytics Period:', { 
+      start: format(periodStart, 'yyyy-MM-dd'), 
+      end: format(periodEnd, 'yyyy-MM-dd'),
+      selectedPeriod 
+    });
+    
     // For each habit, calculate how many days it should have been tracked in this period
     habits.filter(h => h.status === 'active').forEach(habit => {
       const habitCreated = habitCreationDates.get(habit.id);
       const effectiveStart = habitCreated && habitCreated > periodStart ? habitCreated : periodStart;
       
-      // Calculate how many days this habit should have been tracked in the period
-      const daysSinceStart = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      const expectedDays = Math.max(1, daysSinceStart);
+      // Count only the dates between effectiveStart and periodEnd (inclusive)
+      const activities = validActivities.filter(a => {
+        const activityDate = new Date(a.activity_date);
+        return a.habit_id === habit.id && 
+               activityDate >= effectiveStart && 
+               activityDate <= periodEnd &&
+               a.status === 'completed';
+      });
+      
+      const completed = activities.length;
+      
+      // Calculate expected days in the period
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const expectedDays = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / msPerDay) + 1;
+      
+      console.log(`📈 Habit: ${habit.name}`, {
+        habitCreated: habitCreated ? format(habitCreated, 'yyyy-MM-dd') : 'unknown',
+        effectiveStart: format(effectiveStart, 'yyyy-MM-dd'),
+        periodEnd: format(periodEnd, 'yyyy-MM-dd'),
+        expectedDays,
+        completed,
+        activitiesFound: activities.map(a => a.activity_date).sort()
+      });
       
       totalPossible += expectedDays;
-      
-      // Count completed days for this habit within the period
-      for (let i = 0; i < expectedDays; i++) {
-        const checkDate = new Date(periodEnd);
-        checkDate.setDate(periodEnd.getDate() - i);
-        const dateStr = checkDate.toISOString().split('T')[0];
-        
-        const activity = validActivities.find(a => 
-          a.habit_id === habit.id && a.activity_date === dateStr && a.status === 'completed'
-        );
-        if (activity) {
-          completedCount++;
-        }
-      }
+      completedCount += completed;
     });
     
     const completionRate = totalPossible > 0 ? (completedCount / totalPossible) * 100 : 0;
