@@ -331,6 +331,56 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
     }
   };
 
+  const markAllCompleteForDay = async (dateStr: string) => {
+    if (!user) return;
+
+    const dayActivities = catchUpActivities[dateStr] || [];
+    const incompleteHabits = dayActivities.filter(a => a.status !== 'completed');
+    
+    if (incompleteHabits.length === 0) {
+      toast({
+        title: "All habits already complete!",
+        description: `${format(new Date(dateStr), 'MMM d')}`,
+      });
+      return;
+    }
+
+    try {
+      const activityDate = new Date(dateStr + 'T00:00:00');
+      
+      // Mark all incomplete habits as complete
+      for (const activity of incompleteHabits) {
+        await recordHabitActivity(activity.habit_name, 'completed', activityDate);
+        
+        // Dispatch event for each habit
+        window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+          detail: { category: activity.habit_name, status: 'completed', date: dateStr } 
+        }));
+      }
+
+      // Update local state
+      setCatchUpActivities(prev => ({
+        ...prev,
+        [dateStr]: prev[dateStr].map(activity => ({
+          ...activity,
+          status: 'completed' as const
+        }))
+      }));
+
+      toast({
+        title: "All habits marked complete!",
+        description: `${incompleteHabits.length} habits completed for ${format(new Date(dateStr), 'MMM d')}`,
+      });
+    } catch (error) {
+      console.error('Error marking all complete:', error);
+      toast({
+        title: "Error updating habits",
+        description: "Could not mark all habits complete. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleHabitSelected = async (habitName: string) => {
     // Remove duplicate check - simplified approach
     try {
@@ -577,9 +627,20 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                               <Badge variant="secondary" className="text-xs font-medium">Today</Badge>
                             )}
                           </div>
-                          <span className="text-sm sm:text-base text-muted-foreground font-medium">
-                            {dayActivities.filter(a => a.status === 'completed').length}/{dayActivities.length}
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm sm:text-base text-muted-foreground font-medium">
+                              {dayActivities.filter(a => a.status === 'completed').length}/{dayActivities.length}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => markAllCompleteForDay(dateStr)}
+                              className="h-9 text-sm"
+                            >
+                              <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                              Mark All
+                            </Button>
+                          </div>
                         </div>
                         
                         <div className="grid grid-cols-1 gap-3">
