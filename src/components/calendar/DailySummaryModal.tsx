@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { useDailySummaryData } from "./summary/useDailySummaryData";
 import { CompletedHabitsSection } from "./summary/CompletedHabitsSection";
 import { FailedHabitsSection } from "./summary/FailedHabitsSection";
@@ -21,7 +21,8 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
     actualTimeSpent,
     sectionBreakdown,
     guidanceActivities,
-    guidanceLoading
+    guidanceLoading,
+    handleToggleHabit
   } = useDailySummaryData(date);
 
   if (!date) return null;
@@ -29,6 +30,10 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
   const formatDate = (date: Date) => {
     return format(date, "EEEE, MMMM d, yyyy");
   };
+
+  // Check if date is within last 30 days
+  const daysAgo = differenceInDays(new Date(), date);
+  const canEdit = daysAgo >= 0 && daysAgo <= 30;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -44,12 +49,30 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
         </DialogHeader>
 
         <div className="space-y-6">
-          <CompletedHabitsSection habits={completedHabits} />
+          {canEdit && daysAgo > 0 && (
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
+              <p className="text-xs text-muted-foreground text-center">
+                💡 Click on any habit below to mark it as complete or incomplete
+              </p>
+            </div>
+          )}
+          
+          <CompletedHabitsSection 
+            habits={completedHabits} 
+            canEdit={canEdit}
+            onToggle={handleToggleHabit}
+            date={date}
+          />
 
           {failedHabits.length > 0 && (
             <>
               <Separator />
-              <FailedHabitsSection habits={failedHabits} />
+              <FailedHabitsSection 
+                habits={failedHabits}
+                canEdit={canEdit}
+                onToggle={handleToggleHabit}
+                date={date}
+              />
             </>
           )}
 

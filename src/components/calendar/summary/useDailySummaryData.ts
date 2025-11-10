@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
-import { getHabitActivities } from "@/utils/habitActivity";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { getHabitActivities, recordHabitActivity } from "@/utils/habitActivity";
 import { calculateStreakForDate } from "@/utils/habitStreaks";
 import { useGuidanceActivity } from "@/hooks/useGuidanceActivity";
 import { useAppSessions } from "@/hooks/useAppSessions";
+import { toast } from "@/hooks/use-toast";
 
-interface HabitData {
+export interface HabitData {
   name: string;
   habitId: string;
   streak: number;
@@ -13,6 +14,7 @@ interface HabitData {
 export const useDailySummaryData = (date: Date | null) => {
   const [actualTimeSpent, setActualTimeSpent] = useState<number>(0);
   const [sectionBreakdown, setSectionBreakdown] = useState<Record<string, number>>({});
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // ALWAYS call hooks unconditionally at the top level
   const dateStr = date?.toISOString().split('T')[0] || '';
@@ -51,7 +53,39 @@ export const useDailySummaryData = (date: Date | null) => {
       completedHabits: completed,
       failedHabits: failed
     };
-  }, [date]);
+  }, [date, refreshTrigger]);
+
+  const handleToggleHabit = useCallback(async (habitName: string, currentStatus: 'completed' | 'failed', date: Date) => {
+    const newStatus = currentStatus === 'completed' ? 'empty' : 'completed';
+    
+    try {
+      await recordHabitActivity(habitName, newStatus, date);
+      
+      // Trigger refresh
+      setRefreshTrigger(prev => prev + 1);
+      
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+        detail: { 
+          category: habitName, 
+          status: newStatus, 
+          date: date.toISOString().split('T')[0] 
+        } 
+      }));
+      
+      toast({
+        title: newStatus === 'completed' ? "Habit marked complete!" : "Habit unmarked",
+        description: habitName,
+      });
+    } catch (error) {
+      console.error('Error toggling habit:', error);
+      toast({
+        title: "Error updating habit",
+        description: "Could not update your habit. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }, []);
   
   // ALWAYS call useEffect unconditionally
   useEffect(() => {
@@ -106,6 +140,7 @@ export const useDailySummaryData = (date: Date | null) => {
     actualTimeSpent,
     sectionBreakdown,
     guidanceActivities,
-    guidanceLoading
+    guidanceLoading,
+    handleToggleHabit
   };
 };
