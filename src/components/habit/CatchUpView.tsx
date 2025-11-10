@@ -186,6 +186,57 @@ const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps)
     }
   };
 
+  const markAllComplete = async (dateStr: string) => {
+    if (!user) return;
+
+    const dayActivities = activities[dateStr] || [];
+    const incompleteHabits = dayActivities.filter(a => a.status !== 'completed');
+    
+    if (incompleteHabits.length === 0) {
+      toast({
+        title: "All habits already complete!",
+        description: `${format(new Date(dateStr), 'MMM d')}`,
+      });
+      return;
+    }
+
+    try {
+      const { recordHabitActivity } = await import('@/utils/habitActivity');
+      const activityDate = new Date(dateStr + 'T00:00:00');
+      
+      // Mark all incomplete habits as complete
+      for (const activity of incompleteHabits) {
+        await recordHabitActivity(activity.habit_name, 'completed', activityDate);
+        
+        // Dispatch event for each habit
+        window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
+          detail: { category: activity.habit_name, status: 'completed', date: dateStr } 
+        }));
+      }
+
+      // Update local state
+      setActivities(prev => ({
+        ...prev,
+        [dateStr]: prev[dateStr].map(activity => ({
+          ...activity,
+          status: 'completed' as const
+        }))
+      }));
+
+      toast({
+        title: "All habits marked complete!",
+        description: `${incompleteHabits.length} habits completed for ${format(new Date(dateStr), 'MMM d')}`,
+      });
+    } catch (error) {
+      console.error('Error marking all complete:', error);
+      toast({
+        title: "Error updating habits",
+        description: "Could not mark all habits complete. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -229,9 +280,20 @@ const CatchUpView = ({ open, onClose, userHabits, allHabits }: CatchUpViewProps)
                           <Badge variant="secondary" className="text-xs">Today</Badge>
                         )}
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {dayActivities.filter(a => a.status === 'completed').length}/{dayActivities.length}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground">
+                          {dayActivities.filter(a => a.status === 'completed').length}/{dayActivities.length}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => markAllComplete(dateStr)}
+                          className="h-8 text-xs"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                          Mark All
+                        </Button>
+                      </div>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
