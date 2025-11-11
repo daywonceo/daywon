@@ -38,84 +38,12 @@ import {
 
 const integrationConfigs = [
   {
-    type: 'apple_health',
-    name: 'Apple Health',
-    description: 'Sync comprehensive health data from your iPhone including steps, workouts, heart rate, and sleep',
-    icon: Smartphone,
-    category: 'health',
-    features: ['Step tracking', 'Workout detection', 'Heart rate monitoring', 'Sleep analysis', 'Auto habit completion']
-  },
-  {
     type: 'myfitnesspal',
     name: 'MyFitnessPal',
     description: 'Track nutrition habits with automatic food logging and calorie goal sync',
     icon: Utensils,
     category: 'nutrition',
     features: ['Food logging', 'Calorie tracking', 'Nutrition goals', 'Water intake', 'Auto habit completion']
-  },
-  {
-    type: 'fitbit',
-    name: 'Fitbit',
-    description: 'Connect your Fitbit device for comprehensive fitness and health tracking',
-    icon: Watch,
-    category: 'fitness',
-    features: ['Steps & distance', 'Heart rate', 'Sleep tracking', 'Exercise detection', 'Goal automation']
-  },
-  {
-    type: 'todoist',
-    name: 'Todoist',
-    description: 'Sync your tasks and projects to automatically complete productivity habits',
-    icon: CheckSquare,
-    category: 'productivity',
-    features: ['Task completion tracking', 'Project sync', 'Habit task creation', 'Goal automation']
-  },
-  {
-    type: 'rescuetime',
-    name: 'RescueTime',
-    description: 'Monitor digital wellness with automatic screen time and productivity tracking',
-    icon: Clock,
-    category: 'productivity',
-    features: ['Screen time tracking', 'App usage monitoring', 'Productivity scoring', 'Focus goals']
-  },
-  {
-    type: 'headspace',
-    name: 'Headspace',
-    description: 'Track meditation, mindfulness, and sleep wellness activities automatically',
-    icon: Brain,
-    category: 'wellness',
-    features: ['Meditation tracking', 'Sleep monitoring', 'Mindfulness exercises', 'Wellness goals']
-  },
-  {
-    type: 'discord',
-    name: 'Discord',
-    description: 'Share your habit achievements and milestones with your Discord community',
-    icon: MessageSquare,
-    category: 'social',
-    features: ['Achievement sharing', 'Community challenges', 'Milestone celebrations', 'Progress updates']
-  },
-  {
-    type: 'philips_hue',
-    name: 'Philips Hue',
-    description: 'Create immersive lighting experiences that respond to your habit achievements',
-    icon: Lightbulb,
-    category: 'smart_home',
-    features: ['Celebration lighting', 'Workout ambience', 'Sleep schedule automation', 'Motivational themes']
-  },
-  {
-    type: 'google_home',
-    name: 'Google Home',
-    description: 'Automate your smart home environment based on habit schedules and achievements',
-    icon: Home,
-    category: 'smart_home',
-    features: ['Voice announcements', 'Routine automation', 'Climate control', 'Achievement celebrations']
-  },
-  {
-    type: 'spotify',
-    name: 'Spotify',
-    description: 'Connect to Spotify for workout playlist recommendations and music-based habit tracking',
-    icon: Music,
-    category: 'entertainment',
-    features: ['Workout playlists', 'Music habit tracking', 'Auto-generated playlists']
   },
   {
     type: 'google_fit',
@@ -134,12 +62,20 @@ const integrationConfigs = [
     features: ['Calendar sync', 'Habit scheduling', 'Smart reminders']
   },
   {
-    type: 'zapier',
-    name: 'Zapier',
-    description: 'Connect to 5000+ apps through Zapier webhooks and automations',
-    icon: Zap,
-    category: 'automation',
-    features: ['Custom webhooks', 'Habit triggers', 'External app sync']
+    type: 'todoist',
+    name: 'Todoist',
+    description: 'Sync your tasks and projects to automatically complete productivity habits',
+    icon: CheckSquare,
+    category: 'productivity',
+    features: ['Task completion tracking', 'Project sync', 'Habit task creation', 'Goal automation']
+  },
+  {
+    type: 'headspace',
+    name: 'Headspace',
+    description: 'Track meditation, mindfulness, and sleep wellness activities automatically',
+    icon: Brain,
+    category: 'wellness',
+    features: ['Meditation tracking', 'Sleep monitoring', 'Mindfulness exercises', 'Wellness goals']
   }
 ];
 
