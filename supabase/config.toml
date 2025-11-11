@@ -44,3 +44,9 @@ verify_jwt = false
 
 [functions.oauth-strava-callback]
 verify_jwt = false
+
+[functions.integrations-authorize]
+verify_jwt = true
+
+[functions.integrations-callback]
+verify_jwt = false
