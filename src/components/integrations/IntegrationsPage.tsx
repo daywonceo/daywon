@@ -166,6 +166,14 @@ export const IntegrationsPage: React.FC = () => {
           {Object.entries(categorizedIntegrations).map(([category, categoryIntegrations]) => {
             const CategoryIcon = categoryIcons[category as keyof typeof categoryIcons];
             
+            // Filter out connected integrations from available list
+            const availableIntegrations = categoryIntegrations.filter(
+              integration => !isConnected(integration.type)
+            );
+            
+            // Don't render category if no available integrations
+            if (availableIntegrations.length === 0) return null;
+            
             return (
               <div key={category} className="space-y-4">
                 <div className="flex items-center gap-2">
@@ -174,9 +182,8 @@ export const IntegrationsPage: React.FC = () => {
                 </div>
                 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {categoryIntegrations.map((integration) => {
+                  {availableIntegrations.map((integration) => {
                     const IntegrationIcon = integration.icon;
-                    const connected = isConnected(integration.type);
                     
                     return (
                       <Card key={integration.type} className="glass-card border-primary/20">
@@ -188,8 +195,8 @@ export const IntegrationsPage: React.FC = () => {
                               </div>
                               <div>
                                 <CardTitle className="text-lg">{integration.name}</CardTitle>
-                                <Badge variant={connected ? "default" : "secondary"} className="mt-1">
-                                  {connected ? "Connected" : "Available"}
+                                <Badge variant="secondary" className="mt-1">
+                                  Available
                                 </Badge>
                               </div>
                             </div>
