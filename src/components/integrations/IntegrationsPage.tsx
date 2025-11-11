@@ -4,36 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIntegrations } from '@/hooks/useIntegrations';
-import { SpotifyIntegration } from './SpotifyIntegration';
-import { GoogleFitIntegration } from './GoogleFitIntegration';
-import { CalendarIntegration } from './CalendarIntegration';
-import { ZapierIntegration } from './ZapierIntegration';
-import { AppleHealthIntegration } from './AppleHealthIntegration';
-import { MyFitnessPalIntegration } from './MyFitnessPalIntegration';
-import { FitbitIntegration } from './FitbitIntegration';
 import { TodoistIntegration } from './TodoistIntegration';
-import { RescueTimeIntegration } from './RescueTimeIntegration';
-import { HeadspaceIntegration } from './HeadspaceIntegration';
-import { DiscordIntegration } from './DiscordIntegration';
-import { PhilipsHueIntegration } from './PhilipsHueIntegration';
-import { GoogleHomeIntegration } from './GoogleHomeIntegration';
-import { SyncLogsSection } from './SyncLogsSection';
+import { StravaIntegration } from './StravaIntegration';
 import { 
-  Music, 
   Activity, 
-  Calendar, 
-  Zap,
-  Settings,
-  Smartphone,
-  Cloud,
-  Watch,
-  Utensils,
   CheckSquare,
-  Clock,
-  Brain,
-  MessageSquare,
-  Lightbulb,
-  Home
+  Cloud
 } from 'lucide-react';
 
 const integrationConfigs = [
@@ -60,47 +36,18 @@ export const IntegrationsPage: React.FC = () => {
 
   const getIntegrationComponent = (type: string) => {
     switch (type) {
-      case 'apple_health':
-        return <AppleHealthIntegration />;
-      case 'myfitnesspal':
-        return <MyFitnessPalIntegration />;
-      case 'fitbit':
-        return <FitbitIntegration />;
       case 'todoist':
         return <TodoistIntegration />;
-      case 'rescuetime':
-        return <RescueTimeIntegration />;
-      case 'headspace':
-        return <HeadspaceIntegration />;
-      case 'discord':
-        return <DiscordIntegration />;
-      case 'philips_hue':
-        return <PhilipsHueIntegration />;
-      case 'google_home':
-        return <GoogleHomeIntegration />;
-      case 'spotify':
-        return <SpotifyIntegration />;
-      case 'google_fit':
-        return <GoogleFitIntegration />;
-      case 'calendar':
-        return <CalendarIntegration />;
-      case 'zapier':
-        return <ZapierIntegration />;
+      case 'strava':
+        return <StravaIntegration />;
       default:
         return null;
     }
   };
 
   const categoryIcons = {
-    health: Smartphone,
-    nutrition: Utensils,
     fitness: Activity,
     productivity: CheckSquare,
-    wellness: Brain,
-    social: MessageSquare,
-    smart_home: Home,
-    entertainment: Music,
-    automation: Zap,
   };
 
   const categorizedIntegrations = integrationConfigs.reduce((acc, integration) => {

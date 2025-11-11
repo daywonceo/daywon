@@ -38,3 +38,9 @@ verify_jwt = true
 
 [functions.smart-recommendations]
 verify_jwt = true
+
+[functions.oauth-todoist-callback]
+verify_jwt = false
+
+[functions.oauth-strava-callback]
+verify_jwt = false

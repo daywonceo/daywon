@@ -3,27 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { useToast } from '@/hooks/use-toast';
-import { CheckSquare, Target, Zap, Settings, Calendar } from 'lucide-react';
+import { Activity, Target, Zap, Settings, CheckCircle2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 
-export const TodoistIntegration: React.FC = () => {
+export const StravaIntegration: React.FC = () => {
   const { disconnectIntegration, isConnected, triggerSync, getIntegration } = useIntegrations();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState({
-    syncTasks: true,
-    syncProjects: true,
-    autoCompleteTaskHabits: true,
-    createHabitTasks: true,
-    projectFilter: '',
-    completedTasksAsHabits: true
+    syncActivities: true,
+    activityTypes: ['Run', 'Ride', 'Swim', 'Workout'],
+    createHabitsFromActivities: true,
   });
 
-  const connected = isConnected('todoist');
-  const integration = getIntegration('todoist');
+  const connected = isConnected('strava');
+  const integration = getIntegration('strava');
 
   const handleConnect = async () => {
     try {
@@ -31,51 +27,54 @@ export const TodoistIntegration: React.FC = () => {
       if (!user) {
         toast({
           title: "Authentication Required",
-          description: "Please log in to connect Todoist",
+          description: "Please log in to connect Strava",
           variant: "destructive",
         });
         return;
       }
 
-      const clientId = import.meta.env.VITE_TODOIST_CLIENT_ID || '3d8fa6f59e824c0e8e5c3c5e5c5e5c5e';
-      const redirectUri = `https://ncjbvdbkulnekwsjzicq.supabase.co/functions/v1/oauth-todoist-callback`;
+      const clientId = import.meta.env.VITE_STRAVA_CLIENT_ID || '138959';
+      const redirectUri = `https://ncjbvdbkulnekwsjzicq.supabase.co/functions/v1/oauth-strava-callback`;
       
       // Create state parameter with user ID
       const state = btoa(JSON.stringify({ userId: user.id }));
       
-      const authUrl = `https://todoist.com/oauth/authorize?` +
+      const authUrl = `https://www.strava.com/oauth/authorize?` +
         `client_id=${clientId}&` +
-        `scope=data:read_write,data:delete&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `response_type=code&` +
+        `approval_prompt=auto&` +
+        `scope=read,activity:read_all&` +
         `state=${state}`;
 
       window.location.href = authUrl;
     } catch (error) {
-      console.error('Todoist connection error:', error);
+      console.error('Strava connection error:', error);
       toast({
         title: "Connection Failed",
-        description: "Unable to connect to Todoist. Please try again.",
+        description: "Unable to connect to Strava. Please try again.",
         variant: "destructive",
       });
     }
   };
 
   const handleDisconnect = async () => {
-    const success = await disconnectIntegration('todoist');
+    const success = await disconnectIntegration('strava');
     if (success) {
       toast({
         title: "Disconnected",
-        description: "Todoist has been disconnected.",
+        description: "Strava has been disconnected.",
       });
     }
   };
 
   const handleSync = async () => {
     setIsLoading(true);
-    const success = await triggerSync('todoist', 'bidirectional');
+    const success = await triggerSync('strava', 'import');
     if (success) {
       toast({
         title: "Sync Started",
-        description: "Your Todoist tasks and habits are being synced.",
+        description: "Your Strava activities are being synced.",
       });
     }
     setIsLoading(false);
@@ -93,7 +92,7 @@ export const TodoistIntegration: React.FC = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Badge variant="default" className="gap-1">
-            <CheckSquare className="w-3 h-3" />
+            <CheckCircle2 className="w-3 h-3" />
             Connected
           </Badge>
           <div className="flex gap-2">
@@ -116,20 +115,17 @@ export const TodoistIntegration: React.FC = () => {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Todoist Settings</DialogTitle>
+                  <DialogTitle>Strava Settings</DialogTitle>
                   <DialogDescription>
-                    Configure how Todoist tasks and habits are synchronized
+                    Configure how Strava activities are synchronized
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-3">
-                    <div className="text-sm font-medium">Data Sync</div>
+                    <div className="text-sm font-medium">Activity Sync</div>
                     {Object.entries({
-                      syncTasks: 'Sync task completion',
-                      syncProjects: 'Sync project organization',
-                      autoCompleteTaskHabits: 'Auto-complete task-based habits',
-                      createHabitTasks: 'Create Todoist tasks for habits',
-                      completedTasksAsHabits: 'Track completed tasks as productivity habits'
+                      syncActivities: 'Sync completed activities',
+                      createHabitsFromActivities: 'Auto-create habits from activities',
                     }).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
                         <Label>{label}</Label>
@@ -142,16 +138,6 @@ export const TodoistIntegration: React.FC = () => {
                         </Button>
                       </div>
                     ))}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="project-filter">Project Filter (optional)</Label>
-                    <Input
-                      id="project-filter"
-                      placeholder="Filter by project name"
-                      value={settings.projectFilter}
-                      onChange={(e) => setSettings(prev => ({ ...prev, projectFilter: e.target.value }))}
-                    />
                   </div>
                 </div>
               </DialogContent>
@@ -167,9 +153,11 @@ export const TodoistIntegration: React.FC = () => {
           }
         </div>
         
-        <div className="text-xs text-muted-foreground">
-          Project filter: {integration?.integration_settings?.projectFilter || 'All projects'}
-        </div>
+        {integration?.integration_settings?.athlete && (
+          <div className="text-xs text-muted-foreground">
+            Athlete: {integration.integration_settings.athlete.firstname} {integration.integration_settings.athlete.lastname}
+          </div>
+        )}
         
         <Button
           size="sm"
@@ -177,7 +165,7 @@ export const TodoistIntegration: React.FC = () => {
           onClick={handleDisconnect}
           className="w-full"
         >
-          Disconnect Todoist
+          Disconnect Strava
         </Button>
       </div>
     );
@@ -186,16 +174,16 @@ export const TodoistIntegration: React.FC = () => {
   return (
     <div className="space-y-3">
       <div className="text-xs text-muted-foreground">
-        Connect Todoist to automatically sync tasks with your productivity habits
+        Connect Strava to automatically track your runs, rides, and other activities as habits
       </div>
       
       <div className="space-y-2">
         <div className="text-xs font-medium">What we'll sync:</div>
         <div className="flex flex-wrap gap-1">
           {[
-            { icon: CheckSquare, label: 'Tasks' },
-            { icon: Target, label: 'Goals' },
-            { icon: Calendar, label: 'Projects' }
+            { icon: Activity, label: 'Activities' },
+            { icon: Target, label: 'Stats' },
+            { icon: CheckCircle2, label: 'Achievements' }
           ].map(({ icon: Icon, label }) => (
             <Badge key={label} variant="secondary" className="gap-1 text-xs">
               <Icon className="w-3 h-3" />
@@ -209,8 +197,8 @@ export const TodoistIntegration: React.FC = () => {
         onClick={handleConnect}
         className="w-full gap-2"
       >
-        <CheckSquare className="w-4 h-4" />
-        Connect with Todoist
+        <Activity className="w-4 h-4" />
+        Connect with Strava
       </Button>
     </div>
   );
