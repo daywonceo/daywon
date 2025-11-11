@@ -38,30 +38,6 @@ import {
 
 const integrationConfigs = [
   {
-    type: 'myfitnesspal',
-    name: 'MyFitnessPal',
-    description: 'Track nutrition habits with automatic food logging and calorie goal sync',
-    icon: Utensils,
-    category: 'nutrition',
-    features: ['Food logging', 'Calorie tracking', 'Nutrition goals', 'Water intake', 'Auto habit completion']
-  },
-  {
-    type: 'google_fit',
-    name: 'Google Fit',
-    description: 'Sync fitness data including steps, workouts, and health metrics',
-    icon: Activity,
-    category: 'fitness',
-    features: ['Step tracking', 'Workout sync', 'Health metrics', 'Auto habit completion']
-  },
-  {
-    type: 'calendar',
-    name: 'Google Calendar',
-    description: 'Sync habits with your calendar and get habit reminders',
-    icon: Calendar,
-    category: 'productivity',
-    features: ['Calendar sync', 'Habit scheduling', 'Smart reminders']
-  },
-  {
     type: 'todoist',
     name: 'Todoist',
     description: 'Sync your tasks and projects to automatically complete productivity habits',
@@ -70,12 +46,12 @@ const integrationConfigs = [
     features: ['Task completion tracking', 'Project sync', 'Habit task creation', 'Goal automation']
   },
   {
-    type: 'headspace',
-    name: 'Headspace',
-    description: 'Track meditation, mindfulness, and sleep wellness activities automatically',
-    icon: Brain,
-    category: 'wellness',
-    features: ['Meditation tracking', 'Sleep monitoring', 'Mindfulness exercises', 'Wellness goals']
+    type: 'strava',
+    name: 'Strava',
+    description: 'Automatically sync your runs, rides, and other athletic activities',
+    icon: Activity,
+    category: 'fitness',
+    features: ['Activity tracking', 'Exercise logging', 'Distance & pace sync', 'Auto habit completion']
   }
 ];
 
