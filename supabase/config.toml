@@ -50,3 +50,6 @@ verify_jwt = true
 
 [functions.integrations-callback]
 verify_jwt = false
+
+[functions.integrations-webhooks]
+verify_jwt = false
