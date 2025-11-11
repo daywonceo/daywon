@@ -84,7 +84,7 @@ export function ConnectionsSettings() {
     if (connected) {
       toast({
         title: 'Connection successful!',
-        description: `Your ${connected} account has been connected.`,
+        description: `Connected to ${connected.charAt(0).toUpperCase() + connected.slice(1)}. New activity will auto-complete linked habits.`,
       });
       // Clean up URL
       window.history.replaceState({}, '', '/settings/connections');
@@ -219,9 +219,9 @@ export function ConnectionsSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Connected Apps</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Connect your apps</h2>
         <p className="text-muted-foreground mt-1">
-          Connect your favorite apps to automatically track habits
+          Authorize on the app — we'll never ask for your password.
         </p>
       </div>
 
@@ -266,7 +266,7 @@ export function ConnectionsSettings() {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
                   <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
                   <span>
-                    We only log new activity after you connect. No history is imported.
+                    We only log new activity from the moment you connect.
                   </span>
                 </div>
 

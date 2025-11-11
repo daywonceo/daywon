@@ -19,7 +19,7 @@ export function useRevokeIntegration(provider: 'todoist' | 'strava') {
 
       toast({
         title: 'Disconnected',
-        description: `${provider.charAt(0).toUpperCase() + provider.slice(1)} has been disconnected`,
+        description: `Disconnected from ${provider.charAt(0).toUpperCase() + provider.slice(1)}. You can reconnect anytime.`,
       });
 
       return { success: true };

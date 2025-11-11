@@ -296,7 +296,7 @@ export function ManageIntegrationDrawer({
 
       toast({
         title: 'Disconnected',
-        description: `${providerName} has been disconnected`,
+        description: `Disconnected from ${providerName}. You can reconnect anytime.`,
       });
 
       onOpenChange(false);
@@ -424,7 +424,7 @@ export function ManageIntegrationDrawer({
                 <div className="flex items-start gap-2 text-xs text-muted-foreground">
                   <ExternalLink className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                   <span>
-                    Only new activity after you connect is tracked. No historical data is imported.
+                    We only log new activity from the moment you connect.
                   </span>
                 </div>
               </CardContent>
