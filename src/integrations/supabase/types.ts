@@ -766,6 +766,95 @@ export type Database = {
         }
         Relationships: []
       }
+      integration_events: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          dedupe_hash: string
+          event_type: string
+          external_id: string
+          id: string
+          payload: Json
+          processed: boolean | null
+          processed_at: string | null
+          provider: string
+          tags: string[] | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          dedupe_hash: string
+          event_type: string
+          external_id: string
+          id?: string
+          payload: Json
+          processed?: boolean | null
+          processed_at?: string | null
+          provider: string
+          tags?: string[] | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          dedupe_hash?: string
+          event_type?: string
+          external_id?: string
+          id?: string
+          payload?: Json
+          processed?: boolean | null
+          processed_at?: string | null
+          provider?: string
+          tags?: string[] | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      integration_rules: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          habit_id: string
+          id: string
+          match_type: string
+          match_value: string
+          provider: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          habit_id: string
+          id?: string
+          match_type: string
+          match_value: string
+          provider: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          habit_id?: string
+          id?: string
+          match_type?: string
+          match_value?: string
+          provider?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_rules_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integration_sync_logs: {
         Row: {
           completed_at: string | null
@@ -1425,12 +1514,18 @@ export type Database = {
         Row: {
           access_token: string | null
           access_token_encrypted: string | null
+          connected_at: string | null
           created_at: string
           id: string
+          ignore_before: string | null
+          integration_scopes: string[] | null
           integration_settings: Json | null
+          integration_status: string | null
           integration_type: string
           is_connected: boolean
           last_sync_at: string | null
+          last_synced_at: string | null
+          provider_user_id: string | null
           refresh_token: string | null
           refresh_token_encrypted: string | null
           token_expires_at: string | null
@@ -1440,12 +1535,18 @@ export type Database = {
         Insert: {
           access_token?: string | null
           access_token_encrypted?: string | null
+          connected_at?: string | null
           created_at?: string
           id?: string
+          ignore_before?: string | null
+          integration_scopes?: string[] | null
           integration_settings?: Json | null
+          integration_status?: string | null
           integration_type: string
           is_connected?: boolean
           last_sync_at?: string | null
+          last_synced_at?: string | null
+          provider_user_id?: string | null
           refresh_token?: string | null
           refresh_token_encrypted?: string | null
           token_expires_at?: string | null
@@ -1455,12 +1556,18 @@ export type Database = {
         Update: {
           access_token?: string | null
           access_token_encrypted?: string | null
+          connected_at?: string | null
           created_at?: string
           id?: string
+          ignore_before?: string | null
+          integration_scopes?: string[] | null
           integration_settings?: Json | null
+          integration_status?: string | null
           integration_type?: string
           is_connected?: boolean
           last_sync_at?: string | null
+          last_synced_at?: string | null
+          provider_user_id?: string | null
           refresh_token?: string | null
           refresh_token_encrypted?: string | null
           token_expires_at?: string | null
@@ -1816,18 +1923,12 @@ export type Database = {
         Args: { p_as_of_date?: string; p_user_habit_id: string }
         Returns: number
       }
-      can_send_friend_request: {
-        Args: { sender_id: string }
-        Returns: boolean
-      }
+      can_send_friend_request: { Args: { sender_id: string }; Returns: boolean }
       check_username_availability: {
         Args: { username_input: string }
         Returns: Json
       }
-      delete_habit_forever: {
-        Args: { p_habit: string }
-        Returns: undefined
-      }
+      delete_habit_forever: { Args: { p_habit: string }; Returns: undefined }
       discover_potential_friends: {
         Args: { search_query?: string }
         Returns: {
@@ -1836,10 +1937,7 @@ export type Database = {
           id: string
         }[]
       }
-      end_habit_today: {
-        Args: { p_habit: string }
-        Returns: undefined
-      }
+      end_habit_today: { Args: { p_habit: string }; Returns: undefined }
       find_or_create_habit: {
         Args: {
           p_category?: string
@@ -1859,7 +1957,7 @@ export type Database = {
         }[]
       }
       get_connected_profiles: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           bio: string
@@ -1893,7 +1991,7 @@ export type Database = {
         }[]
       }
       get_public_profiles: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           bio: string
@@ -1933,18 +2031,9 @@ export type Database = {
         }
         Returns: undefined
       }
-      normalize_habit_name: {
-        Args: { habit_name: string }
-        Returns: string
-      }
-      redeem_invite_code: {
-        Args: { p_code: string }
-        Returns: Json
-      }
-      resume_habit: {
-        Args: { p_habit: string }
-        Returns: undefined
-      }
+      normalize_habit_name: { Args: { habit_name: string }; Returns: string }
+      redeem_invite_code: { Args: { p_code: string }; Returns: Json }
+      resume_habit: { Args: { p_habit: string }; Returns: undefined }
       search_connected_profiles: {
         Args: { search_query: string }
         Returns: {
