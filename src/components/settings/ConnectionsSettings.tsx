@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
 import { CheckSquare, Activity } from 'lucide-react';
+import { ManageIntegrationDrawer } from './ManageIntegrationDrawer';
 
 interface Integration {
   id: string;
@@ -15,6 +16,7 @@ interface Integration {
   is_connected: boolean;
   connected_at: string | null;
   last_synced_at: string | null;
+  integration_scopes?: string[];
 }
 
 interface ProviderConfig {
@@ -48,6 +50,8 @@ export function ConnectionsSettings() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectingProvider, setConnectingProvider] = useState<string | null>(null);
+  const [manageDrawerOpen, setManageDrawerOpen] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<{ id: string; name: string } | null>(null);
 
   const fetchIntegrations = async () => {
     if (!user) return;
@@ -190,11 +194,18 @@ export function ConnectionsSettings() {
   };
 
   const handleManage = (providerId: string) => {
-    // TODO: Open manage dialog/modal
-    toast({
-      title: 'Manage integration',
-      description: 'Integration management coming soon!',
-    });
+    const provider = providers.find(p => p.id === providerId);
+    if (provider) {
+      setSelectedProvider({ id: provider.id, name: provider.name });
+      setManageDrawerOpen(true);
+    }
+  };
+
+  const handleReauthorize = () => {
+    if (selectedProvider) {
+      setManageDrawerOpen(false);
+      handleConnect(selectedProvider.id);
+    }
   };
 
   if (loading) {
@@ -287,6 +298,17 @@ export function ConnectionsSettings() {
           );
         })}
       </div>
+
+      {selectedProvider && (
+        <ManageIntegrationDrawer
+          open={manageDrawerOpen}
+          onOpenChange={setManageDrawerOpen}
+          providerId={selectedProvider.id}
+          providerName={selectedProvider.name}
+          integration={getIntegration(selectedProvider.id)}
+          onReauthorize={handleReauthorize}
+        />
+      )}
     </div>
   );
 }
