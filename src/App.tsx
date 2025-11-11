@@ -26,6 +26,7 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const Help = lazy(() => import("./pages/Help"));
 const Advanced = lazy(() => import("./pages/Advanced"));
 const RedeemInvite = lazy(() => import("./pages/RedeemInvite"));
+const SettingsConnections = lazy(() => import("./pages/SettingsConnections"));
 
 
 import { SettingsProvider } from "./contexts/SettingsContext";
@@ -259,6 +260,7 @@ const AppContent: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/redeem" element={<RedeemInvite />} />
+          <Route path="/settings/connections" element={<SettingsConnections />} />
           
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
