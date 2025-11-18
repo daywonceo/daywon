@@ -138,33 +138,51 @@ export const useDailySummaryData = (date: Date | null) => {
     getSessionData();
   }, [date, completedHabits.length, getSessionForDate]);
 
-  // Get untracked habits (all default habits that haven't been tracked)
+  // Get untracked habits (all habits - default + user-created - that haven't been tracked)
   const untrackedHabits = useMemo(() => {
     if (!date) return [];
     
     const dateStr = format(date, 'yyyy-MM-dd');
     const activities = getHabitActivities();
-    const allHabits = getHabitCategories();
+    const defaultHabits = getHabitCategories();
+    
+    // Get all unique habit names from both default habits and user habits
+    const allHabitNames = new Set<string>();
+    
+    // Add default habits
+    defaultHabits.forEach(name => allHabitNames.add(name.toLowerCase()));
+    
+    // Add user-created habits
+    userHabits?.forEach(uh => {
+      if (uh.habit?.name && uh.is_active) {
+        allHabitNames.add(uh.habit.name.toLowerCase());
+      }
+    });
     
     // Get all habits that are not completed or failed on this date
-    return allHabits
-      .filter(habitName => {
+    return Array.from(allHabitNames)
+      .filter(habitNameLower => {
         const activity = activities.find(
-          a => a.habitName.toLowerCase() === habitName.toLowerCase() && a.date === dateStr
+          a => a.habitName.toLowerCase() === habitNameLower && a.date === dateStr
         );
         return !activity || activity.status === 'empty';
       })
-      .map(habitName => {
-        // Find the habit ID from activities or user habits
+      .map(habitNameLower => {
+        // Find the habit ID and proper casing from activities or user habits
         const existingActivity = activities.find(
-          a => a.habitName.toLowerCase() === habitName.toLowerCase()
+          a => a.habitName.toLowerCase() === habitNameLower
         );
         const userHabit = userHabits?.find(
-          uh => uh.habit?.name.toLowerCase() === habitName.toLowerCase()
+          uh => uh.habit?.name.toLowerCase() === habitNameLower
         );
         
+        // Get the properly cased name
+        const properName = existingActivity?.habitName || 
+                          userHabit?.habit?.name || 
+                          habitNameLower;
+        
         return {
-          name: habitName,
+          name: properName,
           habitId: existingActivity?.habitId || userHabit?.habit_id || '',
           streak: 0
         };
