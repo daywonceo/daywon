@@ -5,6 +5,7 @@ import { format, differenceInDays } from "date-fns";
 import { useDailySummaryData } from "./summary/useDailySummaryData";
 import { CompletedHabitsSection } from "./summary/CompletedHabitsSection";
 import { FailedHabitsSection } from "./summary/FailedHabitsSection";
+import { UntrackedHabitsSection } from "./summary/UntrackedHabitsSection";
 import { TimeSpentSection } from "./summary/TimeSpentSection";
 import { GuidanceActivitiesSection } from "./summary/GuidanceActivitiesSection";
 
@@ -18,6 +19,7 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
   const {
     completedHabits,
     failedHabits,
+    untrackedHabits,
     actualTimeSpent,
     sectionBreakdown,
     guidanceActivities,
@@ -69,6 +71,18 @@ const DailySummaryModal = ({ date, isOpen, onClose }: DailySummaryModalProps) =>
               <Separator />
               <FailedHabitsSection 
                 habits={failedHabits}
+                canEdit={canEdit}
+                onToggle={handleToggleHabit}
+                date={date}
+              />
+            </>
+          )}
+
+          {untrackedHabits.length > 0 && (
+            <>
+              <Separator />
+              <UntrackedHabitsSection 
+                habits={untrackedHabits}
                 canEdit={canEdit}
                 onToggle={handleToggleHabit}
                 date={date}

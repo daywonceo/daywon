@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { format } from "date-fns";
 import { getHabitActivities, recordHabitActivity } from "@/utils/habitActivity";
 import { calculateStreakForDate } from "@/utils/habitStreaks";
 import { useGuidanceActivity } from "@/hooks/useGuidanceActivity";
 import { useAppSessions } from "@/hooks/useAppSessions";
+import { useUserHabits } from "@/hooks/useUserHabits";
 import { toast } from "@/hooks/use-toast";
 
 export interface HabitData {
@@ -20,6 +22,7 @@ export const useDailySummaryData = (date: Date | null) => {
   const dateStr = date?.toISOString().split('T')[0] || '';
   const { getSessionForDate } = useAppSessions();
   const { activities: guidanceActivities, loading: guidanceLoading } = useGuidanceActivity(dateStr);
+  const { userHabits } = useUserHabits();
   
   // Calculate habit data using useMemo to avoid recreating on every render
   const { completedHabits, failedHabits } = useMemo(() => {
@@ -134,9 +137,31 @@ export const useDailySummaryData = (date: Date | null) => {
     getSessionData();
   }, [date, completedHabits.length, getSessionForDate]);
 
+  // Get untracked habits (neither completed nor failed)
+  const untrackedHabits = useMemo(() => {
+    if (!date || !userHabits) return [];
+    
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const activities = getHabitActivities();
+    
+    return userHabits
+      .filter(userHabit => {
+        const activity = activities.find(
+          a => a.habitId === userHabit.habit_id && a.date === dateStr
+        );
+        return !activity || activity.status === 'empty';
+      })
+      .map(userHabit => ({
+        name: userHabit.habit?.name || '',
+        habitId: userHabit.habit_id,
+        streak: 0
+      }));
+  }, [date, userHabits, refreshTrigger]);
+
   return {
     completedHabits,
     failedHabits,
+    untrackedHabits,
     actualTimeSpent,
     sectionBreakdown,
     guidanceActivities,
