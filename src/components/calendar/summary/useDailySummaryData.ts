@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { format } from "date-fns";
 import { getHabitActivities, recordHabitActivity } from "@/utils/habitActivity";
 import { calculateStreakForDate } from "@/utils/habitStreaks";
+import { getHabitCategories } from "@/utils/habitCategories";
 import { useGuidanceActivity } from "@/hooks/useGuidanceActivity";
 import { useAppSessions } from "@/hooks/useAppSessions";
 import { useUserHabits } from "@/hooks/useUserHabits";
@@ -137,25 +138,37 @@ export const useDailySummaryData = (date: Date | null) => {
     getSessionData();
   }, [date, completedHabits.length, getSessionForDate]);
 
-  // Get untracked habits (neither completed nor failed)
+  // Get untracked habits (all default habits that haven't been tracked)
   const untrackedHabits = useMemo(() => {
-    if (!date || !userHabits) return [];
+    if (!date) return [];
     
     const dateStr = format(date, 'yyyy-MM-dd');
     const activities = getHabitActivities();
+    const allHabits = getHabitCategories();
     
-    return userHabits
-      .filter(userHabit => {
+    // Get all habits that are not completed or failed on this date
+    return allHabits
+      .filter(habitName => {
         const activity = activities.find(
-          a => a.habitId === userHabit.habit_id && a.date === dateStr
+          a => a.habitName.toLowerCase() === habitName.toLowerCase() && a.date === dateStr
         );
         return !activity || activity.status === 'empty';
       })
-      .map(userHabit => ({
-        name: userHabit.habit?.name || '',
-        habitId: userHabit.habit_id,
-        streak: 0
-      }));
+      .map(habitName => {
+        // Find the habit ID from activities or user habits
+        const existingActivity = activities.find(
+          a => a.habitName.toLowerCase() === habitName.toLowerCase()
+        );
+        const userHabit = userHabits?.find(
+          uh => uh.habit?.name.toLowerCase() === habitName.toLowerCase()
+        );
+        
+        return {
+          name: habitName,
+          habitId: existingActivity?.habitId || userHabit?.habit_id || '',
+          streak: 0
+        };
+      });
   }, [date, userHabits, refreshTrigger]);
 
   return {
