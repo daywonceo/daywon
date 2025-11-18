@@ -618,7 +618,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                     
                     return (
                       <div key={dateStr} className="border-2 rounded-xl p-4 sm:p-5 space-y-4 bg-card">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
                             <h3 className="font-semibold text-base sm:text-lg">
                               {format(date, 'EEEE, MMM d')}
@@ -635,7 +635,7 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
                               variant="outline"
                               size="sm"
                               onClick={() => markAllCompleteForDay(dateStr)}
-                              className="h-9 text-sm"
+                              className="h-9 text-sm whitespace-nowrap"
                             >
                               <CheckCircle2 className="h-4 w-4 mr-1.5" />
                               Mark All
