@@ -159,43 +159,46 @@ const AppContent: React.FC = () => {
     
     // Check if onboarding should be shown
     const checkOnboardingStatus = async () => {
-      if (user && !loading) {
-        const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-        const isOnboardingRoute = window.location.pathname === '/onboarding';
-        
-        // If user is on the /onboarding route, always show it
-        if (isOnboardingRoute) {
-          setShowOnboarding(true);
-          setCheckingHabits(false);
-          return;
-        }
-        
-        // Check if user has any existing habits
-        try {
-          const { data: habits } = await import('./integrations/supabase/client').then(m => 
-            m.supabase
-              .from('habits')
-              .select('id')
-              .eq('user_id', user.id)
-              .limit(1)
-          );
+      try {
+        if (user && !loading) {
+          const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+          const isOnboardingRoute = window.location.pathname === '/onboarding';
           
-          // If user has habits, skip onboarding
-          if (habits && habits.length > 0) {
-            localStorage.setItem('onboardingCompleted', 'true');
-            setShowOnboarding(false);
-          } else {
-            // New user with no habits - show onboarding if not completed
+          // If user is on the /onboarding route, always show it
+          if (isOnboardingRoute) {
+            setShowOnboarding(true);
+            setCheckingHabits(false);
+            return;
+          }
+          
+          // Check if user has any existing habits
+          try {
+            const { data: habits } = await import('./integrations/supabase/client').then(m => 
+              m.supabase
+                .from('habits')
+                .select('id')
+                .eq('user_id', user.id)
+                .limit(1)
+            );
+            
+            // If user has habits, skip onboarding
+            if (habits && habits.length > 0) {
+              localStorage.setItem('onboardingCompleted', 'true');
+              setShowOnboarding(false);
+            } else {
+              // New user with no habits - show onboarding if not completed
+              const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
+              setShowOnboarding(shouldShowOnboarding);
+            }
+          } catch (error) {
+            console.error('Error checking habits:', error);
+            // On error, fall back to localStorage check
             const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
             setShowOnboarding(shouldShowOnboarding);
           }
-        } catch (error) {
-          console.error('Error checking habits:', error);
-          // On error, fall back to localStorage check
-          const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
-          setShowOnboarding(shouldShowOnboarding);
         }
-        
+      } finally {
+        // Always set checkingHabits to false, even if there's no user or an error
         setCheckingHabits(false);
       }
     };
