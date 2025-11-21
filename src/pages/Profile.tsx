@@ -79,17 +79,17 @@ const Profile = () => {
     recencyScore: 0
   };
   
-  // Get real profile data
+  // Get real profile data - only set avatar if we have the actual avatar_url
   const profile = {
     name: currentUserProfile?.display_name || "User",
     username: currentUserProfile?.username || "user",
-    avatar: currentUserProfile?.avatar_url || "/lovable-uploads/dba09bea-3695-42d9-b2ba-6da163dee57a.png",
+    avatar: currentUserProfile?.avatar_url || "",
     friendCount: friends.length,
     habitScore: monthlyHabitScore,
     mostConsistentHabit: streakStats.longestStreakHabit || "No habits yet",
     bestFriends: friends.slice(0, 3).map(friend => ({
       name: friend.display_name || "Friend",
-      avatar: friend.avatar_url || "/lovable-uploads/5038ae63-519f-4a32-b22c-944e409ac585.png",
+      avatar: friend.avatar_url || "",
       topHabit: "Active"
     })),
     daysActive: Math.floor((new Date().getTime() - new Date(currentUserProfile?.created_at || new Date()).getTime()) / (1000 * 60 * 60 * 24)),
@@ -97,6 +97,9 @@ const Profile = () => {
     weeklyGoalCompletion: Math.round((todayStats.completedCount / Math.max(todayStats.totalHabits, 1)) * 100),
     isDayWonMember: currentUserProfile?.is_day_won_member || false
   };
+
+  // Don't render ProfileHeader until we have the actual profile data loaded
+  const isProfileLoaded = currentUserProfile !== null;
 
 
   // Mobile Profile Editor
@@ -122,7 +125,7 @@ const Profile = () => {
         </div>
         
         <div className="space-y-8 px-2">
-          <ProfileHeader profile={profile} />
+          {isProfileLoaded && <ProfileHeader profile={profile} />}
           
           {/* Friends & Connections Section */}
           <FriendManagementWidget />
