@@ -166,8 +166,9 @@ export const AnalyticsDashboard: React.FC = () => {
     const appUsageHours = Math.round(totalAppUsage / 60 * 10) / 10;
 
     const weeklyData = [];
+    const today = new Date();
     for (let i = 6; i >= 0; i--) {
-      const date = subDays(new Date(), i);
+      const date = subDays(today, i);
       const dateStr = format(date, 'yyyy-MM-dd');
       
       const expectedHabitsForDay = habits.filter(habit => {
@@ -175,7 +176,8 @@ export const AnalyticsDashboard: React.FC = () => {
         return habit.status === 'active' && (!habitCreated || date >= habitCreated);
       }).length;
       
-      const dayActivities = validActivities.filter(a => 
+      // Use allActivities instead of validActivities to include all days
+      const dayActivities = allActivities.filter(a => 
         format(new Date(a.activity_date), 'yyyy-MM-dd') === dateStr
       );
       const completed = dayActivities.filter(a => a.status === 'completed').length;
