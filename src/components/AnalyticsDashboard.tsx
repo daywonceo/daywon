@@ -9,7 +9,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { calculateStreaks } from '@/utils/shared/streakCalculations';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AnalyticsData {
   overview: {
@@ -127,6 +128,65 @@ export const AnalyticsDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadReport = () => {
+    if (!analyticsData) return;
+
+    // Generate CSV content
+    const csvContent = [
+      ['Day Won Analytics Report'],
+      [`Generated: ${format(new Date(), 'MMMM dd, yyyy HH:mm')}`],
+      [`Period: ${selectedPeriod}`],
+      [''],
+      ['Overview Metrics'],
+      ['Metric', 'Value'],
+      ['Active Habits', analyticsData.overview.totalHabits],
+      ['Active Streaks', analyticsData.overview.activeStreaks],
+      ['Completion Rate', `${analyticsData.overview.completionRate.toFixed(1)}%`],
+      ['Total Workouts', analyticsData.overview.totalWorkouts],
+      ['App Usage (Hours)', analyticsData.overview.appUsageHours],
+      [''],
+      ['Weekly Completion'],
+      ['Date', 'Completion %', 'Completed', 'Total'],
+      ...analyticsData.trends.weeklyCompletion.map(d => [
+        d.date,
+        d.completion,
+        d.completed,
+        d.total
+      ]),
+      [''],
+      ['Habit Performance'],
+      ['Habit', 'Completion %', 'Completed', 'Total'],
+      ...analyticsData.trends.habitPerformance.map(h => [
+        h.name,
+        h.completion,
+        h.completed,
+        h.total
+      ]),
+      [''],
+      ['Insights'],
+      ['Best Day', analyticsData.insights.bestDay],
+      ['Best Day Completion Rate', `${analyticsData.insights.bestDayPercentage}%`],
+      ['Current Streak', `${analyticsData.insights.currentStreak} days`],
+      ['Current Streak Habit', analyticsData.insights.currentStreakHabit],
+      ['Top Habit', analyticsData.insights.favoriteCategory],
+      ['Top Habit Completion', `${analyticsData.insights.topHabitPercentage}%`],
+      ['Social Posts', analyticsData.insights.totalSocialPosts]
+    ];
+
+    const csv = csvContent.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `day-won-analytics-${selectedPeriod}-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast.success('Analytics report downloaded');
   };
 
   const processAnalyticsData = (habits: any[], activities: any[], allActivities: any[], workouts: any[], posts: any[], sessions: any[], periodStart: Date, periodEnd: Date): AnalyticsData => {
@@ -353,6 +413,15 @@ export const AnalyticsDashboard: React.FC = () => {
         </div>
         
         <div className="flex gap-1.5">
+          <Button
+            onClick={downloadReport}
+            variant="outline"
+            size="sm"
+            className="text-xs h-8 px-3"
+          >
+            <Download className="h-3.5 w-3.5 mr-1.5" />
+            Download Report
+          </Button>
           {(['week', 'month', 'year'] as const).map((period) => (
             <Button
               key={period}
