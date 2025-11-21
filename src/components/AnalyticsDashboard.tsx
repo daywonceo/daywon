@@ -166,9 +166,9 @@ export const AnalyticsDashboard: React.FC = () => {
     const appUsageHours = Math.round(totalAppUsage / 60 * 10) / 10;
 
     const weeklyData = [];
-    const today = new Date();
+    const yesterday = subDays(new Date(), 1);
     for (let i = 6; i >= 0; i--) {
-      const date = subDays(today, i);
+      const date = subDays(yesterday, i);
       const dateStr = format(date, 'yyyy-MM-dd');
       
       const expectedHabitsForDay = habits.filter(habit => {
