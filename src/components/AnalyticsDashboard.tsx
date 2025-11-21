@@ -1,26 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  TrendingUp, 
-  Calendar, 
-  Target, 
-  Clock, 
-  Award,
-  Activity,
-  Users,
-  BarChart3,
-  Zap,
-  Heart,
-  ArrowLeft
-} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { format, subDays } from 'date-fns';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { calculateStreaks } from '@/utils/shared/streakCalculations';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
@@ -45,11 +29,8 @@ interface AnalyticsData {
   };
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'];
-
 export const AnalyticsDashboard: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month');
@@ -59,7 +40,6 @@ export const AnalyticsDashboard: React.FC = () => {
       loadAnalyticsData();
     }
     
-    // Listen for habit updates to refresh analytics in real-time
     const handleHabitUpdate = () => {
       if (user) {
         loadAnalyticsData();
@@ -82,7 +62,6 @@ export const AnalyticsDashboard: React.FC = () => {
     try {
       const now = new Date();
       
-      // Calculate period based on selection
       let periodStart: Date;
       let periodEnd: Date;
       
@@ -91,16 +70,13 @@ export const AnalyticsDashboard: React.FC = () => {
         periodStart = startDate;
         periodEnd = now;
       } else if (selectedPeriod === 'month') {
-        // For month view, show last 30 completed days (excluding today if not marked)
-        // This ensures we always show a full 30 days of trackable data
         periodStart = subDays(now, 30);
-        periodEnd = subDays(now, 1); // End at yesterday to exclude today
+        periodEnd = subDays(now, 1);
       } else {
         periodStart = subDays(now, 365);
         periodEnd = now;
       }
 
-      // Fetch all data in parallel
       const [
         habitsResponse,
         activitiesResponse,
@@ -130,7 +106,6 @@ export const AnalyticsDashboard: React.FC = () => {
       const posts = postsResponse.data || [];
       const sessions = sessionsResponse.data || [];
 
-      // Process data for analytics
       const analytics = processAnalyticsData(habits, activities, workouts, posts, sessions, periodStart, periodEnd);
       setAnalyticsData(analytics);
       
@@ -142,51 +117,27 @@ export const AnalyticsDashboard: React.FC = () => {
   };
 
   const processAnalyticsData = (habits: any[], activities: any[], workouts: any[], posts: any[], sessions: any[], periodStart: Date, periodEnd: Date): AnalyticsData => {
-    // Create a map of habit creation dates
     const habitCreationDates = new Map<string, Date>();
     habits.forEach(habit => {
       habitCreationDates.set(habit.id, new Date(habit.created_at));
     });
     
-    // Calculate overview metrics - only include habits from their creation date
     const totalHabits = habits.filter(h => h.status === 'active').length;
     
-    // Filter activities to only include those after habit creation
     const validActivities = activities.filter(activity => {
       const habitCreated = habitCreationDates.get(activity.habit_id);
-      if (!habitCreated) return true; // Include if we can't find creation date
+      if (!habitCreated) return true;
       const activityDate = new Date(activity.activity_date);
       return activityDate >= habitCreated;
     });
     
-    // Helper function to calculate expected days for a habit
-    const calculateExpectedDays = (habitId: string): number => {
-      const habitCreated = habitCreationDates.get(habitId);
-      if (!habitCreated) {
-        return Math.ceil((periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      }
-      
-      const effectiveStart = habitCreated > periodStart ? habitCreated : periodStart;
-      const daysSinceCreation = Math.ceil((periodEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      return Math.max(1, daysSinceCreation);
-    };
-    
-    // Calculate completion rate - count actual completed days vs expected days in period
     let completedCount = 0;
     let totalPossible = 0;
     
-    console.log('📊 Analytics Period:', { 
-      start: format(periodStart, 'yyyy-MM-dd'), 
-      end: format(periodEnd, 'yyyy-MM-dd'),
-      selectedPeriod 
-    });
-    
-    // For each habit, calculate how many days it should have been tracked in this period
     habits.filter(h => h.status === 'active').forEach(habit => {
       const habitCreated = habitCreationDates.get(habit.id);
       const effectiveStart = habitCreated && habitCreated > periodStart ? habitCreated : periodStart;
       
-      // Count only the dates between effectiveStart and periodEnd (inclusive)
       const activities = validActivities.filter(a => {
         const activityDate = new Date(a.activity_date);
         return a.habit_id === habit.id && 
@@ -196,41 +147,24 @@ export const AnalyticsDashboard: React.FC = () => {
       });
       
       const completed = activities.length;
-      
-      // Calculate expected days in the period
       const msPerDay = 1000 * 60 * 60 * 24;
       const expectedDays = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / msPerDay) + 1;
-      
-      console.log(`📈 Habit: ${habit.name}`, {
-        habitCreated: habitCreated ? format(habitCreated, 'yyyy-MM-dd') : 'unknown',
-        effectiveStart: format(effectiveStart, 'yyyy-MM-dd'),
-        periodEnd: format(periodEnd, 'yyyy-MM-dd'),
-        expectedDays,
-        completed,
-        activitiesFound: activities.map(a => a.activity_date).sort()
-      });
       
       totalPossible += expectedDays;
       completedCount += completed;
     });
     
     const completionRate = totalPossible > 0 ? (completedCount / totalPossible) * 100 : 0;
-    
-    // Calculate streaks (simplified)
-    const activeStreaks = habits.filter(h => h.status === 'active').length; // Simplified for demo
+    const activeStreaks = habits.filter(h => h.status === 'active').length;
     
     const totalAppUsage = sessions.reduce((sum, session) => sum + (session.total_time_minutes || 0), 0);
     const appUsageHours = Math.round(totalAppUsage / 60 * 10) / 10;
 
-    // Weekly completion trends - calculate expected vs actual completion per day
-    // This matches the logic in useHabitStats
     const weeklyData = [];
     for (let i = 6; i >= 0; i--) {
       const date = subDays(new Date(), i);
       const dateStr = format(date, 'yyyy-MM-dd');
       
-      // Count how many habits should be tracked on this day
-      // Only count habits that were created on or before this date
       const expectedHabitsForDay = habits.filter(habit => {
         const habitCreated = habitCreationDates.get(habit.id);
         return habit.status === 'active' && (!habitCreated || date >= habitCreated);
@@ -241,7 +175,6 @@ export const AnalyticsDashboard: React.FC = () => {
       );
       const completed = dayActivities.filter(a => a.status === 'completed').length;
       
-      // Calculate completion rate: completed / expected (not total activities)
       const completionPercentage = expectedHabitsForDay > 0 
         ? Math.round((completed / expectedHabitsForDay) * 100) 
         : 0;
@@ -254,10 +187,8 @@ export const AnalyticsDashboard: React.FC = () => {
       });
     }
 
-    // Habit category performance - calculate actual completion for each habit
     const habitStats = new Map<string, { completed: Set<string>; habitId: string; created: Date }>();
     
-    // Group activities by habit and collect unique completed dates
     validActivities.forEach(activity => {
       const habitName = activity.habit_name || 'Other';
       if (!habitStats.has(habitName)) {
@@ -275,27 +206,14 @@ export const AnalyticsDashboard: React.FC = () => {
     
     const habitPerformance = Array.from(habitStats.entries())
       .map(([name, stats]) => {
-        // Calculate expected days for this specific habit within the period
         const habitCreated = stats.created;
         const effectiveStart = habitCreated > periodStart ? habitCreated : periodStart;
         
-        // Days between effectiveStart and periodEnd (inclusive)
         const msPerDay = 1000 * 60 * 60 * 24;
         const expectedDays = Math.floor((periodEnd.getTime() - effectiveStart.getTime()) / msPerDay) + 1;
         
         const completed = stats.completed.size;
         const completion = expectedDays > 0 ? Math.round((completed / expectedDays) * 100) : 0;
-        
-        console.log(`📊 Habit Performance: ${name}`, {
-          periodStart: format(periodStart, 'yyyy-MM-dd'),
-          periodEnd: format(periodEnd, 'yyyy-MM-dd'),
-          habitCreated: format(habitCreated, 'yyyy-MM-dd'),
-          effectiveStart: format(effectiveStart, 'yyyy-MM-dd'),
-          expectedDays,
-          completed,
-          completion: `${completion}%`,
-          display: `${completed}/${expectedDays}`
-        });
         
         return {
           name,
@@ -307,7 +225,6 @@ export const AnalyticsDashboard: React.FC = () => {
       .sort((a, b) => b.completion - a.completion)
       .slice(0, 5);
 
-    // Find insights - use validActivities
     const dayOfWeekStats: { [key: string]: number } = {};
     validActivities.forEach(activity => {
       if (activity.status === 'completed') {
@@ -321,11 +238,7 @@ export const AnalyticsDashboard: React.FC = () => {
 
     const favoriteCategory = habitPerformance[0]?.name || 'Wellness';
 
-    // Calculate longest streak across all habits
     let longestStreak = 0;
-    let longestStreakHabit = '';
-    
-    // Group activities by habit
     const activitiesByHabitForStreak = new Map<string, any[]>();
     validActivities.forEach(activity => {
       const habitId = activity.habit_id;
@@ -335,12 +248,10 @@ export const AnalyticsDashboard: React.FC = () => {
       activitiesByHabitForStreak.get(habitId)!.push(activity);
     });
     
-    // Calculate streak for each habit and find the longest
-    activitiesByHabitForStreak.forEach((habitActivities, habitId) => {
+    activitiesByHabitForStreak.forEach((habitActivities) => {
       const streakData = calculateStreaks(habitActivities);
       if (streakData.longestStreak > longestStreak) {
         longestStreak = streakData.longestStreak;
-        longestStreakHabit = habitActivities[0]?.habit_name || 'Unknown';
       }
     });
 
@@ -354,7 +265,7 @@ export const AnalyticsDashboard: React.FC = () => {
       },
       trends: {
         weeklyCompletion: weeklyData,
-        monthlyProgress: weeklyData, // Simplified for demo
+        monthlyProgress: weeklyData,
         habitPerformance
       },
       insights: {
@@ -368,12 +279,12 @@ export const AnalyticsDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="space-y-6">
-          <div className="h-8 bg-gray-200 rounded animate-pulse" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded animate-pulse" />
+      <div className="max-w-7xl mx-auto p-3 sm:p-4">
+        <div className="space-y-3">
+          <div className="h-6 bg-muted/50 rounded animate-pulse w-48" />
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-20 bg-muted/50 rounded animate-pulse" />
             ))}
           </div>
         </div>
@@ -383,204 +294,188 @@ export const AnalyticsDashboard: React.FC = () => {
 
   if (!analyticsData) {
     return (
-      <div className="max-w-6xl mx-auto p-6 text-center">
-        <p className="text-muted-foreground">No analytics data available</p>
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 text-center">
+        <p className="text-muted-foreground text-sm">No analytics data available</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/profile')}
-            className="shrink-0"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">
-              Insights into your habits, progress, and wellness journey
-            </p>
-          </div>
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 space-y-3">
+      {/* Compact Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Analytics</h1>
+          <p className="text-sm text-muted-foreground">Track your progress and insights</p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {(['week', 'month', 'year'] as const).map((period) => (
-            <button
+            <Button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-3 py-1 rounded-md text-sm capitalize ${
-                selectedPeriod === period
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted hover:bg-muted/80'
-              }`}
+              variant={selectedPeriod === period ? "default" : "outline"}
+              size="sm"
+              className="capitalize text-xs h-8 px-3"
             >
               {period}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active Habits</p>
-                <p className="text-2xl font-bold">{analyticsData.overview.totalHabits}</p>
-              </div>
-              <Target className="w-8 h-8 text-green-600" />
-            </div>
+      {/* Compact Overview Grid - No Icons */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
+        <Card className="border-border/50">
+          <CardContent className="p-3">
+            <p className="text-xs text-muted-foreground mb-1">Active Habits</p>
+            <p className="text-xl font-bold">{analyticsData.overview.totalHabits}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Completion Rate</p>
-                <p className="text-2xl font-bold">{analyticsData.overview.completionRate.toFixed(1)}%</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-blue-600" />
-            </div>
+        <Card className="border-border/50">
+          <CardContent className="p-3">
+            <p className="text-xs text-muted-foreground mb-1">Completion</p>
+            <p className="text-xl font-bold">{analyticsData.overview.completionRate.toFixed(1)}%</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active Streaks</p>
-                <p className="text-2xl font-bold">{analyticsData.overview.activeStreaks}</p>
-              </div>
-              <Zap className="w-8 h-8 text-yellow-600" />
-            </div>
+        <Card className="border-border/50">
+          <CardContent className="p-3">
+            <p className="text-xs text-muted-foreground mb-1">Streaks</p>
+            <p className="text-xl font-bold">{analyticsData.overview.activeStreaks}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Workouts</p>
-                <p className="text-2xl font-bold">{analyticsData.overview.totalWorkouts}</p>
-              </div>
-              <Heart className="w-8 h-8 text-red-600" />
-            </div>
+        <Card className="border-border/50">
+          <CardContent className="p-3">
+            <p className="text-xs text-muted-foreground mb-1">Workouts</p>
+            <p className="text-xl font-bold">{analyticsData.overview.totalWorkouts}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">App Usage</p>
-                <p className="text-2xl font-bold">{analyticsData.overview.appUsageHours}h</p>
-              </div>
-              <Clock className="w-8 h-8 text-purple-600" />
-            </div>
+        <Card className="border-border/50">
+          <CardContent className="p-3">
+            <p className="text-xs text-muted-foreground mb-1">App Time</p>
+            <p className="text-xl font-bold">{analyticsData.overview.appUsageHours}h</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Weekly Completion Trend</CardTitle>
-            <CardDescription>
-              Your habit completion rate over the last 7 days
-            </CardDescription>
+      {/* Compact Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <Card className="border-border/50">
+          <CardHeader className="pb-2 px-4 pt-3">
+            <CardTitle className="text-base">Weekly Completion</CardTitle>
+            <CardDescription className="text-xs">Last 7 days</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3 px-4">
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={analyticsData.trends.weeklyCompletion}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis tickFormatter={(value) => `${value}%`} />
-                <Tooltip formatter={(value) => `${value}%`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="hsl(var(--muted-foreground))"
+                  style={{ fontSize: '10px' }}
+                  tickMargin={8}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))"
+                  style={{ fontSize: '10px' }}
+                  domain={[0, 100]}
+                  tickMargin={8}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px',
+                    fontSize: '12px'
+                  }}
+                />
                 <Line 
                   type="monotone" 
                   dataKey="completion" 
-                  stroke="#8884d8" 
+                  stroke="hsl(var(--primary))" 
                   strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--primary))', r: 3 }}
+                  activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Habit Performance</CardTitle>
-            <CardDescription>
-              Completion rates by habit category
-            </CardDescription>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2 px-4 pt-3">
+            <CardTitle className="text-base">Habit Performance</CardTitle>
+            <CardDescription className="text-xs">Top 5 habits</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-3 px-4">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={analyticsData.trends.habitPerformance}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" hide />
-                <YAxis tickFormatter={(value) => `${value}%`} />
-                <Tooltip 
-                  formatter={(value, name, props) => {
-                    const data = props.payload;
-                    return [
-                      `${data.completed}/${data.total} (${value}%)`,
-                      'Completion'
-                    ];
-                  }}
-                  labelFormatter={(label, payload) => payload?.[0]?.payload?.name || label}
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="hsl(var(--muted-foreground))"
+                  style={{ fontSize: '9px' }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  tickMargin={4}
                 />
-                <Bar dataKey="completion" fill="#82ca9d" />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))"
+                  style={{ fontSize: '10px' }}
+                  domain={[0, 100]}
+                  tickMargin={8}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value: any) => [`${value}%`, 'Completion']}
+                />
+                <Bar 
+                  dataKey="completion" 
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      {/* Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="w-5 h-5" />
-            Personal Insights
-          </CardTitle>
-          <CardDescription>
-            Key patterns and achievements from your data
-          </CardDescription>
+      {/* Compact Insights Grid - No Icons */}
+      <Card className="border-border/50">
+        <CardHeader className="pb-2 px-4 pt-3">
+          <CardTitle className="text-base">Insights</CardTitle>
+          <CardDescription className="text-xs">Your key highlights</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center p-4 border rounded-lg">
-              <Calendar className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-              <div className="font-semibold">Best Day</div>
-              <div className="text-sm text-muted-foreground">{analyticsData.insights.bestDay}</div>
+        <CardContent className="pb-3 px-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            <div className="p-2.5 rounded-md bg-muted/30">
+              <p className="text-xs text-muted-foreground">Best Day</p>
+              <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.bestDay}</p>
             </div>
             
-            <div className="text-center p-4 border rounded-lg">
-              <Zap className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
-              <div className="font-semibold">Longest Streak</div>
-              <div className="text-sm text-muted-foreground">{analyticsData.insights.longestStreak} days</div>
+            <div className="p-2.5 rounded-md bg-muted/30">
+              <p className="text-xs text-muted-foreground">Longest Streak</p>
+              <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.longestStreak} days</p>
             </div>
             
-            <div className="text-center p-4 border rounded-lg">
-              <Target className="w-8 h-8 mx-auto mb-2 text-green-600" />
-              <div className="font-semibold">Top Category</div>
-              <div className="text-sm text-muted-foreground">{analyticsData.insights.favoriteCategory}</div>
+            <div className="p-2.5 rounded-md bg-muted/30">
+              <p className="text-xs text-muted-foreground">Top Habit</p>
+              <p className="text-sm font-semibold mt-0.5 line-clamp-1">{analyticsData.insights.favoriteCategory}</p>
             </div>
             
-            <div className="text-center p-4 border rounded-lg">
-              <Users className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-              <div className="font-semibold">Social Posts</div>
-              <div className="text-sm text-muted-foreground">{analyticsData.insights.totalSocialPosts}</div>
+            <div className="p-2.5 rounded-md bg-muted/30">
+              <p className="text-xs text-muted-foreground">Social Posts</p>
+              <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.totalSocialPosts}</p>
             </div>
           </div>
         </CardContent>
