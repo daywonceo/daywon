@@ -152,11 +152,6 @@ const Profile = () => {
                       View detailed habit insights, progress trends, and performance metrics
                     </p>
                   </div>
-                  <div className="pt-2 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground">
-                      Weekly completion: <span className="font-semibold text-foreground">{profile.weeklyGoalCompletion}%</span>
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
 
