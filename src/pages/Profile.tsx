@@ -173,11 +173,6 @@ const Profile = () => {
                       Access conversational AI coach, content generation, and smart recommendations
                     </p>
                   </div>
-                  <div className="pt-2 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground">
-                      4 AI tools available
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
             </div>
