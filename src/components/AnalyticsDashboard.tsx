@@ -80,6 +80,7 @@ export const AnalyticsDashboard: React.FC = () => {
       const [
         habitsResponse,
         activitiesResponse,
+        allActivitiesResponse,
         workoutsResponse,
         postsResponse,
         sessionsResponse
@@ -89,6 +90,9 @@ export const AnalyticsDashboard: React.FC = () => {
           .eq('user_id', user.id)
           .gte('activity_date', format(periodStart, 'yyyy-MM-dd'))
           .lte('activity_date', format(periodEnd, 'yyyy-MM-dd')),
+        supabase.from('habit_activities').select('*')
+          .eq('user_id', user.id)
+          .order('activity_date', { ascending: false }),
         supabase.from('workout_sessions').select('*')
           .eq('user_id', user.id)
           .gte('workout_date', format(periodStart, 'yyyy-MM-dd')),
@@ -102,11 +106,12 @@ export const AnalyticsDashboard: React.FC = () => {
 
       const habits = habitsResponse.data || [];
       const activities = activitiesResponse.data || [];
+      const allActivities = allActivitiesResponse.data || [];
       const workouts = workoutsResponse.data || [];
       const posts = postsResponse.data || [];
       const sessions = sessionsResponse.data || [];
 
-      const analytics = processAnalyticsData(habits, activities, workouts, posts, sessions, periodStart, periodEnd);
+      const analytics = processAnalyticsData(habits, activities, allActivities, workouts, posts, sessions, periodStart, periodEnd);
       setAnalyticsData(analytics);
       
     } catch (error) {
@@ -116,7 +121,7 @@ export const AnalyticsDashboard: React.FC = () => {
     }
   };
 
-  const processAnalyticsData = (habits: any[], activities: any[], workouts: any[], posts: any[], sessions: any[], periodStart: Date, periodEnd: Date): AnalyticsData => {
+  const processAnalyticsData = (habits: any[], activities: any[], allActivities: any[], workouts: any[], posts: any[], sessions: any[], periodStart: Date, periodEnd: Date): AnalyticsData => {
     const habitCreationDates = new Map<string, Date>();
     habits.forEach(habit => {
       habitCreationDates.set(habit.id, new Date(habit.created_at));
@@ -240,7 +245,9 @@ export const AnalyticsDashboard: React.FC = () => {
 
     let currentStreak = 0;
     const activitiesByHabitForStreak = new Map<string, any[]>();
-    validActivities.forEach(activity => {
+    
+    // Use all activities for accurate streak calculation
+    allActivities.forEach(activity => {
       const habitId = activity.habit_id;
       if (!activitiesByHabitForStreak.has(habitId)) {
         activitiesByHabitForStreak.set(habitId, []);
