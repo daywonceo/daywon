@@ -415,10 +415,7 @@ export const AnalyticsDashboard: React.FC = () => {
                   dataKey="name" 
                   stroke="hsl(var(--muted-foreground))"
                   style={{ fontSize: '9px' }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                  tickMargin={4}
+                  hide={true}
                 />
                 <YAxis 
                   stroke="hsl(var(--muted-foreground))"
