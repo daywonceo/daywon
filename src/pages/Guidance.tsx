@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/guidance/SearchBar";
 import GuidanceTabs from "@/components/guidance/GuidanceTabs";
-import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
+import { FeatureErrorBoundary } from "@/lib/errors/ErrorHandler";
 
 const Guidance = () => {
   const [searchQuery, setSearchQuery] = useState("");
