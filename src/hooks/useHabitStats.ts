@@ -6,8 +6,30 @@ import { useHabits } from '@/hooks/useHabits';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
 
 export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "Read"]) => {
-  const { habits } = useHabits();
+  const { habits, isLoading } = useHabits();
   const stats = useMemo(() => {
+    // Wait for habits to load before calculating to prevent incorrect initial values
+    if (isLoading || !habits) {
+      return {
+        weeklyStats: {
+          completedCount: 0,
+          totalPossible: 0,
+          percentage: 0
+        },
+        streakStats: {
+          bestStreak: 0,
+          bestStreakHabit: '',
+          currentStreaks: [],
+          longestStreak: 0,
+          longestStreakHabit: ''
+        },
+        todayStats: {
+          completedCount: 0,
+          totalHabits: userHabits.length
+        }
+      };
+    }
+    
     try {
     const now = new Date();
     const activities = getHabitActivities();
@@ -140,7 +162,7 @@ export const useHabitStats = (userHabits: string[] = ["Workout", "Devotions", "R
         }
       };
     }
-  }, [userHabits.join(','), habits]);
+  }, [userHabits.join(','), habits, isLoading]);
 
   return stats;
 };
