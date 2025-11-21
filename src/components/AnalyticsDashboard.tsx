@@ -23,7 +23,7 @@ interface AnalyticsData {
   };
   insights: {
     bestDay: string;
-    longestStreak: number;
+    currentStreak: number;
     favoriteCategory: string;
     totalSocialPosts: number;
   };
@@ -238,7 +238,7 @@ export const AnalyticsDashboard: React.FC = () => {
 
     const favoriteCategory = habitPerformance[0]?.name || 'Wellness';
 
-    let longestStreak = 0;
+    let currentStreak = 0;
     const activitiesByHabitForStreak = new Map<string, any[]>();
     validActivities.forEach(activity => {
       const habitId = activity.habit_id;
@@ -250,8 +250,8 @@ export const AnalyticsDashboard: React.FC = () => {
     
     activitiesByHabitForStreak.forEach((habitActivities) => {
       const streakData = calculateStreaks(habitActivities);
-      if (streakData.longestStreak > longestStreak) {
-        longestStreak = streakData.longestStreak;
+      if (streakData.currentStreak > currentStreak) {
+        currentStreak = streakData.currentStreak;
       }
     });
 
@@ -270,7 +270,7 @@ export const AnalyticsDashboard: React.FC = () => {
       },
       insights: {
         bestDay,
-        longestStreak,
+        currentStreak,
         favoriteCategory,
         totalSocialPosts: posts.length
       }
@@ -464,8 +464,8 @@ export const AnalyticsDashboard: React.FC = () => {
             </div>
             
             <div className="p-2.5 rounded-md bg-muted/30">
-              <p className="text-xs text-muted-foreground">Longest Streak</p>
-              <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.longestStreak} days</p>
+              <p className="text-xs text-muted-foreground">Current Streak</p>
+              <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.currentStreak} days</p>
             </div>
             
             <div className="p-2.5 rounded-md bg-muted/30">
