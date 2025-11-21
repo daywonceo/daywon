@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays } from 'date-fns';
@@ -26,6 +27,9 @@ interface AnalyticsData {
     currentStreak: number;
     favoriteCategory: string;
     totalSocialPosts: number;
+    bestDayPercentage: number;
+    currentStreakHabit: string;
+    topHabitPercentage: number;
   };
 }
 
@@ -34,6 +38,7 @@ export const AnalyticsDashboard: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month');
+  const [selectedInsight, setSelectedInsight] = useState<'bestDay' | 'streak' | 'topHabit' | 'social' | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -233,19 +238,28 @@ export const AnalyticsDashboard: React.FC = () => {
       .slice(0, 5);
 
     const dayOfWeekStats: { [key: string]: number } = {};
+    const dayOfWeekTotal: { [key: string]: number } = {};
+    
     validActivities.forEach(activity => {
+      const dayOfWeek = format(new Date(activity.activity_date), 'EEEE');
+      dayOfWeekTotal[dayOfWeek] = (dayOfWeekTotal[dayOfWeek] || 0) + 1;
       if (activity.status === 'completed') {
-        const dayOfWeek = format(new Date(activity.activity_date), 'EEEE');
         dayOfWeekStats[dayOfWeek] = (dayOfWeekStats[dayOfWeek] || 0) + 1;
       }
     });
     
     const bestDay = Object.entries(dayOfWeekStats)
       .sort(([,a], [,b]) => b - a)[0]?.[0] || 'Monday';
+    
+    const bestDayPercentage = dayOfWeekTotal[bestDay] 
+      ? Math.round((dayOfWeekStats[bestDay] / dayOfWeekTotal[bestDay]) * 100)
+      : 0;
 
     const favoriteCategory = habitPerformance[0]?.name || 'Wellness';
+    const topHabitPercentage = habitPerformance[0]?.completion || 0;
 
     let currentStreak = 0;
+    let currentStreakHabit = '';
     const activitiesByHabitForStreak = new Map<string, any[]>();
     
     // Use all activities for accurate streak calculation
@@ -264,6 +278,7 @@ export const AnalyticsDashboard: React.FC = () => {
       })));
       if (streakData.currentStreak > currentStreak) {
         currentStreak = streakData.currentStreak;
+        currentStreakHabit = habitActivities[0]?.habit_name || 'Unknown';
       }
     });
 
@@ -284,7 +299,10 @@ export const AnalyticsDashboard: React.FC = () => {
         bestDay,
         currentStreak,
         favoriteCategory,
-        totalSocialPosts: posts.length
+        totalSocialPosts: posts.length,
+        bestDayPercentage,
+        currentStreakHabit,
+        topHabitPercentage
       }
     };
   };
@@ -460,32 +478,126 @@ export const AnalyticsDashboard: React.FC = () => {
       <Card className="border-border/50">
         <CardHeader className="pb-2 px-4 pt-3">
           <CardTitle className="text-base">Insights</CardTitle>
-          <CardDescription className="text-xs">Your key highlights</CardDescription>
+          <CardDescription className="text-xs">Click any insight for details</CardDescription>
         </CardHeader>
         <CardContent className="pb-3 px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-            <div className="p-2.5 rounded-md bg-muted/30">
+            <button 
+              onClick={() => setSelectedInsight('bestDay')}
+              className="p-2.5 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-left cursor-pointer"
+            >
               <p className="text-xs text-muted-foreground">Best Day</p>
               <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.bestDay}</p>
-            </div>
+            </button>
             
-            <div className="p-2.5 rounded-md bg-muted/30">
+            <button 
+              onClick={() => setSelectedInsight('streak')}
+              className="p-2.5 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-left cursor-pointer"
+            >
               <p className="text-xs text-muted-foreground">Current Streak</p>
               <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.currentStreak} days</p>
-            </div>
+            </button>
             
-            <div className="p-2.5 rounded-md bg-muted/30">
+            <button 
+              onClick={() => setSelectedInsight('topHabit')}
+              className="p-2.5 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-left cursor-pointer"
+            >
               <p className="text-xs text-muted-foreground">Top Habit</p>
               <p className="text-sm font-semibold mt-0.5 line-clamp-1">{analyticsData.insights.favoriteCategory}</p>
-            </div>
+            </button>
             
-            <div className="p-2.5 rounded-md bg-muted/30">
+            <button 
+              onClick={() => setSelectedInsight('social')}
+              className="p-2.5 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-left cursor-pointer"
+            >
               <p className="text-xs text-muted-foreground">Social Posts</p>
               <p className="text-sm font-semibold mt-0.5">{analyticsData.insights.totalSocialPosts}</p>
-            </div>
+            </button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Insights Detail Dialog */}
+      <Dialog open={selectedInsight !== null} onOpenChange={() => setSelectedInsight(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedInsight === 'bestDay' && 'Best Day Details'}
+              {selectedInsight === 'streak' && 'Current Streak Details'}
+              {selectedInsight === 'topHabit' && 'Top Habit Details'}
+              {selectedInsight === 'social' && 'Social Posts Details'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedInsight === 'bestDay' && 'Your most productive day of the week'}
+              {selectedInsight === 'streak' && 'Your longest active streak'}
+              {selectedInsight === 'topHabit' && 'Your best performing habit'}
+              {selectedInsight === 'social' && 'Your social activity summary'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-4">
+            {selectedInsight === 'bestDay' && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Day</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.bestDay}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Completion Rate</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.bestDayPercentage}%</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  On {analyticsData.insights.bestDay}s, you complete {analyticsData.insights.bestDayPercentage}% of your tracked habits on average.
+                </p>
+              </>
+            )}
+            
+            {selectedInsight === 'streak' && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Habit</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.currentStreakHabit}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Streak Length</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.currentStreak} days</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Keep going! This is your longest active streak across all habits.
+                </p>
+              </>
+            )}
+            
+            {selectedInsight === 'topHabit' && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Habit</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.favoriteCategory}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Completion Rate</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.topHabitPercentage}%</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  This is your best performing habit in the selected period.
+                </p>
+              </>
+            )}
+            
+            {selectedInsight === 'social' && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Total Posts</span>
+                  <span className="text-lg font-semibold">{analyticsData.insights.totalSocialPosts}</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  You've shared {analyticsData.insights.totalSocialPosts} updates in the selected period.
+                </p>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
