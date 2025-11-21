@@ -328,7 +328,7 @@ export const AnalyticsDashboard: React.FC = () => {
       </div>
 
       {/* Compact Overview Grid - No Icons */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
         <Card className="border-border/50">
           <CardContent className="p-3">
             <p className="text-xs text-muted-foreground mb-1">Active Habits</p>
@@ -354,13 +354,6 @@ export const AnalyticsDashboard: React.FC = () => {
           <CardContent className="p-3">
             <p className="text-xs text-muted-foreground mb-1">Workouts</p>
             <p className="text-xl font-bold">{analyticsData.overview.totalWorkouts}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="p-3">
-            <p className="text-xs text-muted-foreground mb-1">App Time</p>
-            <p className="text-xl font-bold">{analyticsData.overview.appUsageHours}h</p>
           </CardContent>
         </Card>
       </div>
