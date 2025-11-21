@@ -249,7 +249,10 @@ export const AnalyticsDashboard: React.FC = () => {
     });
     
     activitiesByHabitForStreak.forEach((habitActivities) => {
-      const streakData = calculateStreaks(habitActivities);
+      const streakData = calculateStreaks(habitActivities.map(a => ({
+        date: a.activity_date,
+        status: a.status
+      })));
       if (streakData.currentStreak > currentStreak) {
         currentStreak = streakData.currentStreak;
       }
