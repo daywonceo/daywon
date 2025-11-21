@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import ProfileSettings from "@/components/ProfileSettings";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import BestFriends from "@/components/profile/BestFriends";
-import ShareMilestoneCard from "@/components/social/ShareMilestoneCard";
+
 import MembershipMilestone from "@/components/profile/MembershipMilestone";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
@@ -207,8 +207,6 @@ const Profile = () => {
               </DialogContent>
             </Dialog>
           </div>
-          
-          <ShareMilestoneCard />
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <BestFriends bestFriends={profile.bestFriends} />
