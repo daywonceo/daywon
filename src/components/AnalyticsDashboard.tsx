@@ -8,6 +8,8 @@ import { format, subDays } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { calculateStreaks } from '@/utils/shared/streakCalculations';
 import { getUserTimeWindowSync } from '@/utils/userTimeWindow';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 interface AnalyticsData {
   overview: {
@@ -35,6 +37,7 @@ interface AnalyticsData {
 
 export const AnalyticsDashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month');
@@ -334,9 +337,19 @@ export const AnalyticsDashboard: React.FC = () => {
     <div className="max-w-7xl mx-auto p-3 sm:p-4 space-y-3">
       {/* Compact Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Analytics</h1>
-          <p className="text-sm text-muted-foreground">Track your progress and insights</p>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Analytics</h1>
+            <p className="text-sm text-muted-foreground">Track your progress and insights</p>
+          </div>
         </div>
         
         <div className="flex gap-1.5">
