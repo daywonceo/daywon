@@ -383,6 +383,10 @@ export const AnalyticsDashboard: React.FC = () => {
                   stroke="hsl(var(--muted-foreground))"
                   style={{ fontSize: '10px' }}
                   tickMargin={8}
+                  interval={0}
+                  angle={-45}
+                  textAnchor="end"
+                  height={50}
                 />
                 <YAxis 
                   stroke="hsl(var(--muted-foreground))"
