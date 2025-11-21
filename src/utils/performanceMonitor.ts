@@ -19,6 +19,9 @@ class PerformanceMonitor {
   private static instance: PerformanceMonitor;
   private metrics: (PerformanceMetrics & CustomMetrics)[] = [];
   private observers: PerformanceObserver[] = [];
+  private sentMetrics = new Set<string>();
+  private memoryLogCount = 0;
+  private readonly MAX_MEMORY_LOGS = 10;
 
   static getInstance(): PerformanceMonitor {
     if (!PerformanceMonitor.instance) {
@@ -110,15 +113,20 @@ class PerformanceMonitor {
   }
 
   private monitorMemoryUsage() {
-    // Monitor memory every 30 seconds
+    // Monitor memory every 30 seconds, but limit total logs
     setInterval(() => {
+      if (this.memoryLogCount >= this.MAX_MEMORY_LOGS) {
+        return; // Stop logging after max reached
+      }
+      
       if ('memory' in performance) {
         const memory = (performance as any).memory;
-        console.log('Memory usage:', {
+        console.info('Memory usage:', {
           used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
           total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
           limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB'
         });
+        this.memoryLogCount++;
       }
     }, 30000);
   }
@@ -132,14 +140,33 @@ class PerformanceMonitor {
       timestamp: Date.now(),
     };
     
-    this.metrics.push(fullMetric);
+    // Create a unique key for deduplication (exclude timestamp for grouping)
+    const metricKey = JSON.stringify({
+      route: fullMetric.route,
+      cls: fullMetric.cls,
+      lcp: fullMetric.lcp,
+      fid: fullMetric.fid,
+    });
     
-    // Log in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Performance metric:', fullMetric);
+    // Deduplicate: only send if we haven't sent this exact metric recently
+    if (this.sentMetrics.has(metricKey)) {
+      return;
     }
     
-    // In production, you could send to analytics service
+    this.metrics.push(fullMetric);
+    this.sentMetrics.add(metricKey);
+    
+    // Clean up old metric keys after 5 seconds to allow fresh measurements
+    setTimeout(() => {
+      this.sentMetrics.delete(metricKey);
+    }, 5000);
+    
+    // Log in development (throttled)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Performance metric:', fullMetric);
+    }
+    
+    // In production, send to analytics service
     if (process.env.NODE_ENV === 'production') {
       this.sendToAnalytics(fullMetric);
     }
