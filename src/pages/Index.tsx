@@ -4,7 +4,6 @@ import RecentActivities from "@/components/RecentActivities";
 import HabitStats from "@/components/HabitStats";
 import Progress from "@/components/Progress";
 import Footer from "@/components/Footer";
-import HabitCanvas from "@/components/HabitCanvas";
 import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -212,13 +211,6 @@ const Index = () => {
             <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />
             <HabitStats refreshTrigger={refreshTrigger} />
             <Progress userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-          </FeatureErrorBoundary>
-
-          {/* Canvas Visualization */}
-          <FeatureErrorBoundary featureName="Canvas Visualization">
-            <div className="mt-2">
-              <HabitCanvas userHabits={allActiveHabitNames.length > 0 ? allActiveHabitNames : activityHabits} />
-            </div>
           </FeatureErrorBoundary>
         </main>
       </PullToRefresh>
