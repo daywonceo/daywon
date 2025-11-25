@@ -24,15 +24,11 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
     isLoading,
   } = useHabitActivities(habitList);
 
-  // Listen for habit changes to trigger parent updates
+  // Listen for app state changes to refresh data
   React.useEffect(() => {
-    const handleHabitChange = () => {
-      onHabitUpdate?.();
-    };
-
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // User returned to the app, refresh streak data
+        // User returned to the app, refresh data
         refreshActivities();
         onHabitUpdate?.();
       }
@@ -44,12 +40,10 @@ const RecentActivities = ({ habitList, onHabitUpdate }: RecentActivitiesProps) =
       onHabitUpdate?.();
     };
 
-    window.addEventListener('habitStatusChanged', handleHabitChange);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
     
     return () => {
-      window.removeEventListener('habitStatusChanged', handleHabitChange);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
