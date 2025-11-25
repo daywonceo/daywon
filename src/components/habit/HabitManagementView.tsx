@@ -280,10 +280,6 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
       window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
         detail: { category: habit.name, status: newStatus, date: new Date().toISOString().split('T')[0] } 
       }));
-      
-      toast({ 
-        title: `${capitalizeHabitName(habit.name)} ${newStatus === 'completed' ? 'completed' : 'reset'}!` 
-      });
     } catch (error) {
       console.error('Error updating habit:', error);
       toast({ title: "Error updating habit", variant: "destructive" });
@@ -316,11 +312,6 @@ const HabitManagementView = ({ open, onClose, userHabits }: HabitManagementViewP
       window.dispatchEvent(new CustomEvent('habitStatusChanged', { 
         detail: { category: habitName, status: newStatus, date: dateStr } 
       }));
-
-      toast({
-        title: newStatus === 'completed' ? "Habit marked complete!" : "Habit unmarked",
-        description: `${habitName} for ${format(new Date(dateStr), 'MMM d')}`,
-      });
     } catch (error) {
       console.error('Error updating activity:', error);
       toast({
