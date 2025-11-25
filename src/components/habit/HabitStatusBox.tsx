@@ -28,83 +28,40 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   habit
 }) => {
   const [streak, setStreak] = useState(0);
-  const [isCalculating, setIsCalculating] = useState(false);
 
-  // Calculate streak and listen for updates using habit_id
+  // Calculate streak immediately on mount and when status changes
   useEffect(() => {
-    const calculateCurrentStreak = () => {
-      if (isCalculating) return; // Prevent multiple calculations
-      
-      setIsCalculating(true);
-      
-      if (status !== "completed") {
-        setStreak(0);
-        setIsCalculating(false);
-        return;
-      }
+    if (status !== "completed") {
+      setStreak(0);
+      return;
+    }
 
-      try {
-        const activities = getHabitActivities();
-        // Find the habit_id for this habit name
-        const habitActivity = activities.find(a => a.habitName === category && a.habitId);
-        
-        if (habitActivity?.habitId) {
-          let currentStreak = calculateStreakForDate(habitActivity.habitId, activityDate, habit?.ended_at);
+    try {
+      const activities = getHabitActivities();
+      const habitActivity = activities.find(a => a.habitName === category && a.habitId);
+      
+      if (habitActivity?.habitId) {
+        let currentStreak = calculateStreakForDate(habitActivity.habitId, activityDate, habit?.ended_at);
 
-          // Check for recovery that might restore the streak
-          if (hasRecentRecovery(category, activityDate)) {
-            const previousDayDate = new Date(activityDate);
-            previousDayDate.setDate(previousDayDate.getDate() - 1);
-            const previousStreak = calculateStreakForDate(habitActivity.habitId, previousDayDate, habit?.ended_at);
-            if (previousStreak > currentStreak) {
-              currentStreak = previousStreak + 1; // Restore the streak
-            }
+        // Check for recovery that might restore the streak
+        if (hasRecentRecovery(category, activityDate)) {
+          const previousDayDate = new Date(activityDate);
+          previousDayDate.setDate(previousDayDate.getDate() - 1);
+          const previousStreak = calculateStreakForDate(habitActivity.habitId, previousDayDate, habit?.ended_at);
+          if (previousStreak > currentStreak) {
+            currentStreak = previousStreak + 1;
           }
-
-          setStreak(currentStreak);
-        } else {
-          console.warn(`No habit_id found for ${category}, setting streak to 0`);
-          setStreak(0);
         }
-      } catch (error) {
-        console.error("Error calculating streak:", error);
+
+        setStreak(currentStreak);
+      } else {
         setStreak(0);
-      } finally {
-        setIsCalculating(false);
       }
-    };
-
-    // Calculate initial streak with debounce
-    const timeoutId = setTimeout(calculateCurrentStreak, 50);
-
-    // Listen for habit updates to recalculate streak
-    const handleHabitUpdate = (event: CustomEvent) => {
-      const { habitName, date } = event.detail;
-      // Re-calculate if this update affects our habit or date
-      if ((habitName === category || date === activityDate.toISOString().split('T')[0]) && !isCalculating) {
-        // Debounced recalculation to prevent rapid state changes
-        setTimeout(calculateCurrentStreak, 200);
-      }
-    };
-
-    // Listen for status changes to recalculate streak immediately
-    const handleStatusChange = (event: CustomEvent) => {
-      const { category: updatedCategory } = event.detail;
-      if (updatedCategory === category && !isCalculating) {
-        // Debounced recalculation for UI stability
-        setTimeout(calculateCurrentStreak, 100);
-      }
-    };
-
-    window.addEventListener('habitUpdated', handleHabitUpdate as EventListener);
-    window.addEventListener('habitStatusChanged', handleStatusChange as EventListener);
-
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('habitUpdated', handleHabitUpdate as EventListener);
-      window.removeEventListener('habitStatusChanged', handleStatusChange as EventListener);
-    };
-  }, [category, status, activityDate, isCalculating, habit?.ended_at]);
+    } catch (error) {
+      console.error("Error calculating streak:", error);
+      setStreak(0);
+    }
+  }, [category, status, activityDate, habit?.ended_at]);
 
   const showStreak = streak >= 3;
   const formattedStreak = formatStreakNumber(streak);
