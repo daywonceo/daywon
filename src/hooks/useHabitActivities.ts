@@ -214,25 +214,6 @@ export const useHabitActivities = (habitList?: string[]) => {
     loadActivities();
   }, [loadActivities]);
 
-  // Listen for habit data updates and refresh
-  useEffect(() => {
-    const handleDataUpdate = () => {
-      console.log('Habit data updated, refreshing activities...');
-      loadActivities();
-    };
-    
-    // Listen for both V2 specific events and general data updates
-    window.addEventListener('habitEndOfDayProcessedV2', handleDataUpdate);
-    window.addEventListener('habitDataUpdatedV2', handleDataUpdate);
-    window.addEventListener('habitDataSyncedV2', handleDataUpdate);
-    
-    return () => {
-      window.removeEventListener('habitEndOfDayProcessedV2', handleDataUpdate);
-      window.removeEventListener('habitDataUpdatedV2', handleDataUpdate);
-      window.removeEventListener('habitDataSyncedV2', handleDataUpdate);
-    };
-  }, [loadActivities]);
-
   return {
     activities,
     setActivities,
