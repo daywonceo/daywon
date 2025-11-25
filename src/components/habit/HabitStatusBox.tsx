@@ -27,13 +27,10 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   onStatusToggle,
   habit
 }) => {
-  const [streak, setStreak] = useState(0);
-
-  // Calculate streak immediately on mount and when status changes
-  useEffect(() => {
+  // Calculate streak only once on mount, memoize the result
+  const streak = React.useMemo(() => {
     if (status !== "completed") {
-      setStreak(0);
-      return;
+      return 0;
     }
 
     try {
@@ -53,15 +50,14 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
           }
         }
 
-        setStreak(currentStreak);
-      } else {
-        setStreak(0);
+        return currentStreak;
       }
+      return 0;
     } catch (error) {
       console.error("Error calculating streak:", error);
-      setStreak(0);
+      return 0;
     }
-  }, [category, status, activityDate, habit?.ended_at]);
+  }, [category, activityDate, habit?.ended_at, status]);
 
   const showStreak = streak >= 3;
   const formattedStreak = formatStreakNumber(streak);
@@ -69,7 +65,7 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
   return (
     <div
       className={cn(
-        "w-16 h-16 sm:w-22 sm:h-22 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors relative",
+        "w-16 h-16 sm:w-22 sm:h-22 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-150 relative",
         status === "completed" 
           ? "border-success hover:bg-success/10" 
           : status === "failed"
@@ -79,23 +75,11 @@ const HabitStatusBox: React.FC<HabitStatusBoxProps> = ({
           ? "ring-2 ring-primary ring-offset-2"
           : ""
       )}
-      onClick={async () => {
-        try {
-          onStatusToggle(activityIndex, category);
-        } catch (error) {
-          console.error('Error toggling habit status:', error);
-          toast({
-            title: "Unable to update habit",
-            description: "Your progress is saved locally and will sync when connection is restored.",
-            variant: "destructive",
-            duration: 4000,
-          });
-        }
-      }}
+      onClick={() => onStatusToggle(activityIndex, category)}
       aria-label={`${category} habit ${status === "completed" ? "completed" : status === "failed" ? "failed" : "not completed"}`}
     >
       {status === "completed" && (
-        <div className="w-4/5 h-4/5 bg-success rounded-md flex items-center justify-center animate-checkmark relative">
+        <div className="w-4/5 h-4/5 bg-success rounded-md flex items-center justify-center relative">
           {showStreak ? (
             <span className="text-success-foreground font-bold text-sm sm:text-lg leading-none text-center">
               {formattedStreak}
