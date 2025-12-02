@@ -63,10 +63,12 @@ export const useHabitActivities = (habitList?: string[]) => {
           topHabitsData?.map(item => [item.month, item.habits]) || []
         );
         
-        // Get habits for each date from the map
+        // Get habits for each date from the map, sorted alphabetically for consistent ordering
         const habitsForDates = dates.map(date => {
           const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-          return topHabitsMap.get(monthStr) || userHabits;
+          const habits = topHabitsMap.get(monthStr) || userHabits;
+          // Sort alphabetically to ensure consistent row positions across months
+          return [...habits].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
         });
       
         // Get stored activities
