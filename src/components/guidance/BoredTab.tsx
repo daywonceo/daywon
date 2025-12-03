@@ -102,13 +102,7 @@ const BoredTab = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 p-4 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {preferences.completedActivities.length}
-          </div>
-          <div className="text-sm text-blue-600 dark:text-blue-400">Completed</div>
-        </div>
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 p-4 rounded-lg">
           <div className="text-2xl font-bold text-green-600 dark:text-green-400">
             {preferences.inProgressActivities.length}
