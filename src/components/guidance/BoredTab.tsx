@@ -147,14 +147,14 @@ const BoredTab = () => {
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <h4 className="text-lg font-semibold">Explore All Activities</h4>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <Filter className="w-4 h-4 text-muted-foreground" />
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger className="w-[130px] h-9">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     {categories.map(cat => (
                       <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
                     ))}
@@ -165,7 +165,7 @@ const BoredTab = () => {
                     <SelectValue placeholder="Difficulty" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="beginner">Beginner</SelectItem>
                     <SelectItem value="intermediate">Intermediate</SelectItem>
                     <SelectItem value="advanced">Advanced</SelectItem>
@@ -176,7 +176,7 @@ const BoredTab = () => {
                     <SelectValue placeholder="Cost" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Costs</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="free">Free</SelectItem>
                     <SelectItem value="low">Low</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
