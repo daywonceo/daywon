@@ -1916,7 +1916,60 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_integrations_safe: {
+        Row: {
+          connected_at: string | null
+          created_at: string | null
+          id: string | null
+          ignore_before: string | null
+          integration_scopes: string[] | null
+          integration_settings: Json | null
+          integration_status: string | null
+          integration_type: string | null
+          is_connected: boolean | null
+          last_sync_at: string | null
+          last_synced_at: string | null
+          provider_user_id: string | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          connected_at?: string | null
+          created_at?: string | null
+          id?: string | null
+          ignore_before?: string | null
+          integration_scopes?: string[] | null
+          integration_settings?: Json | null
+          integration_status?: string | null
+          integration_type?: string | null
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          last_synced_at?: string | null
+          provider_user_id?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          connected_at?: string | null
+          created_at?: string | null
+          id?: string | null
+          ignore_before?: string | null
+          integration_scopes?: string[] | null
+          integration_settings?: Json | null
+          integration_status?: string | null
+          integration_type?: string | null
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          last_synced_at?: string | null
+          provider_user_id?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_habit_streak: {
