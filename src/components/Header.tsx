@@ -34,7 +34,7 @@ const Header = () => {
         <img 
           src={dayWonLogo} 
           alt="Day Won" 
-          className="h-28 sm:h-30 md:h-32 w-auto flex-shrink-0"
+          className="h-32 sm:h-36 md:h-40 w-auto flex-shrink-0 -my-4"
         />
 
         <div className="flex-1 flex justify-end items-center gap-1 sm:gap-1.5 min-w-0">
