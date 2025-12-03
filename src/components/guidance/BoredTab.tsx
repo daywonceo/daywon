@@ -318,67 +318,21 @@ const BoredTab = () => {
 
         <TabsContent value="progress" className="space-y-6">
           <div>
-            <h4 className="text-lg font-semibold mb-4">Your Activity Journey</h4>
+            <h4 className="text-lg font-semibold mb-4">Your Completed Activities</h4>
             
-            {/* In Progress Activities */}
-            {preferences.inProgressActivities.length > 0 && (
-              <div className="mb-8">
-                <h5 className="font-medium mb-3 text-primary">Currently Working On</h5>
-                <div className="grid gap-4">
-                  {(expandedTabs.progressInProgress ? preferences.inProgressActivities : preferences.inProgressActivities.slice(0, 3)).map((activityId) => {
-                    const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
-                    return activity ? (
-                      <EnhancedActivityCard
-                        key={activity.id}
-                        activity={activity}
-                        onStartActivity={handleStartActivity}
-                        hideTags
-                      />
-                    ) : null;
-                  })}
-                </div>
-                {preferences.inProgressActivities.length > 3 && (
-                  <div className="text-center mt-4">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => toggleExpanded('progressInProgress')}
-                      className="flex items-center gap-2"
-                    >
-                      {expandedTabs.progressInProgress ? (
-                        <>
-                          <ChevronUp className="w-4 h-4" />
-                          Show Less
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="w-4 h-4" />
-                          Show More ({preferences.inProgressActivities.length - 3} more)
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Completed Activities */}
-            {preferences.completedActivities.length > 0 && (
-              <div>
-                <h5 className="font-medium mb-3 text-success">Completed Activities</h5>
-                <div className="grid gap-4">
-                  {(expandedTabs.progressCompleted ? preferences.completedActivities : preferences.completedActivities.slice(0, 3)).map((activityId) => {
-                    const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
-                    return activity ? (
-                      <EnhancedActivityCard
-                        key={activity.id}
-                        activity={activity}
-                        onStartActivity={handleStartActivity}
-                        hideTags
-                      />
-                    ) : null;
-                  })}
-                </div>
+            {preferences.completedActivities.length > 0 ? (
+              <div className="grid gap-4">
+                {(expandedTabs.progressCompleted ? preferences.completedActivities : preferences.completedActivities.slice(0, 3)).map((activityId) => {
+                  const activity = ENHANCED_ACTIVITIES.find(a => a.id === activityId);
+                  return activity ? (
+                    <EnhancedActivityCard
+                      key={activity.id}
+                      activity={activity}
+                      onStartActivity={handleStartActivity}
+                      hideTags
+                    />
+                  ) : null;
+                })}
                 {preferences.completedActivities.length > 3 && (
                   <div className="text-center mt-4">
                     <Button 
@@ -402,13 +356,11 @@ const BoredTab = () => {
                   </div>
                 )}
               </div>
-            )}
-
-            {preferences.inProgressActivities.length === 0 && preferences.completedActivities.length === 0 && (
+            ) : (
               <div className="text-center py-12">
-                <TrendingUp className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                <Check className="w-12 h-12 mx-auto text-gray-300 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  Start your first activity to begin tracking your progress!
+                  No completed activities yet. Mark an activity as complete to see it here!
                 </p>
                 <Button onClick={() => setActiveTab("discover")}>
                   Browse Activities
