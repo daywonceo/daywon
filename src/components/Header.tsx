@@ -8,6 +8,7 @@ import { SettingsProvider } from "@/contexts/SettingsContext";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { cn } from "@/lib/utils";
 import { SPACING } from "@/utils/designSystem";
+import dayWonLogo from "@/assets/day-won-logo.png";
 
 const Header = () => {
   const isMobile = useIsMobile();
@@ -30,9 +31,11 @@ const Header = () => {
           {/* Spacer for layout balance */}
         </div>
 
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter flex items-center flex-shrink-0">
-          Day<span className="tracking-[-0.1em] text-gradient-primary">Won</span>
-        </h1>
+        <img 
+          src={dayWonLogo} 
+          alt="Day Won" 
+          className="h-8 sm:h-10 md:h-12 w-auto flex-shrink-0"
+        />
 
         <div className="flex-1 flex justify-end items-center gap-1 sm:gap-1.5 min-w-0">
           <ThemeToggle />
