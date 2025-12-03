@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Lightbulb, TrendingUp, Heart, Zap, ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { Settings, Lightbulb, TrendingUp, Heart, Check, Zap, ChevronDown, ChevronUp, Filter } from "lucide-react";
 import { useActivityPreferences } from "@/hooks/useActivityPreferences";
 import { useActivityRecommendations } from "@/hooks/useActivityRecommendations";
 import EnhancedActivityCard from "./EnhancedActivityCard";
@@ -116,7 +116,7 @@ const BoredTab = () => {
             <span className="hidden sm:inline">Favorites</span>
           </TabsTrigger>
           <TabsTrigger value="progress" className="flex items-center gap-2">
-            <Zap className="w-4 h-4" />
+            <Check className="w-4 h-4" />
             <span className="hidden sm:inline">Progress</span>
           </TabsTrigger>
         </TabsList>
