@@ -101,16 +101,6 @@ const BoredTab = () => {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="mb-6">
-        <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 p-4 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {preferences.favoriteActivities.length}
-          </div>
-          <div className="text-sm text-purple-600 dark:text-purple-400">Favorites</div>
-        </div>
-      </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="discover" className="flex items-center gap-2">
