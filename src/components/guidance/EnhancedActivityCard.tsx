@@ -28,12 +28,14 @@ interface EnhancedActivityCardProps {
   activity: EnhancedActivity;
   showFullDetails?: boolean;
   onStartActivity?: (activityId: string) => void;
+  hideTags?: boolean;
 }
 
 const EnhancedActivityCard: React.FC<EnhancedActivityCardProps> = ({
   activity,
   showFullDetails = false,
-  onStartActivity
+  onStartActivity,
+  hideTags = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(showFullDetails);
   const { preferences, addFavorite, removeFavorite, markInProgress, markCompleted } = useActivityPreferences();
@@ -99,17 +101,19 @@ const EnhancedActivityCard: React.FC<EnhancedActivityCardProps> = ({
               {isCompleted && <CheckCircle className="w-5 h-5 text-green-600" />}
               {inProgress && <Play className="w-5 h-5 text-blue-600" />}
             </CardTitle>
-            <div className="flex flex-wrap gap-2 mb-3">
-              <Badge className={getDifficultyColor(activity.difficulty)}>
-                {activity.difficulty}
-              </Badge>
-              <Badge variant="outline" className="capitalize">
-                {activity.category}
-              </Badge>
-              <Badge className={getCostColor(activity.estimatedCost)}>
-                {activity.estimatedCost === 'free' ? 'Free' : `${activity.estimatedCost} cost`}
-              </Badge>
-            </div>
+            {!hideTags && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                <Badge className={getDifficultyColor(activity.difficulty)}>
+                  {activity.difficulty}
+                </Badge>
+                <Badge variant="outline" className="capitalize">
+                  {activity.category}
+                </Badge>
+                <Badge className={getCostColor(activity.estimatedCost)}>
+                  {activity.estimatedCost === 'free' ? 'Free' : `${activity.estimatedCost} cost`}
+                </Badge>
+              </div>
+            )}
           </div>
           <Button
             variant="ghost"
