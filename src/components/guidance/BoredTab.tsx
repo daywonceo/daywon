@@ -1,14 +1,15 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Lightbulb, TrendingUp, Heart, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Settings, Lightbulb, TrendingUp, Heart, Zap, ChevronDown, ChevronUp, Filter } from "lucide-react";
 import { useActivityPreferences } from "@/hooks/useActivityPreferences";
 import { useActivityRecommendations } from "@/hooks/useActivityRecommendations";
 import EnhancedActivityCard from "./EnhancedActivityCard";
 import ActivityPreferencesDialog from "./ActivityPreferencesDialog";
-import { ENHANCED_ACTIVITIES, ACTIVITY_SERIES } from "@/data/enhancedActivities";
+import { ENHANCED_ACTIVITIES, ACTIVITY_SERIES, ActivityCategory } from "@/data/enhancedActivities";
 import { useToast } from "@/components/ui/use-toast";
 
 const BoredTab = () => {
@@ -21,9 +22,24 @@ const BoredTab = () => {
     progressInProgress: false,
     progressCompleted: false
   });
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+  const [costFilter, setCostFilter] = useState<string>("all");
+  
   const { preferences, isLoading } = useActivityPreferences();
   const { recommendations, getRandomActivity, getTopRecommendations } = useActivityRecommendations(preferences);
   const { toast } = useToast();
+
+  const filteredActivities = useMemo(() => {
+    return ENHANCED_ACTIVITIES.filter(activity => {
+      if (categoryFilter !== "all" && activity.category !== categoryFilter) return false;
+      if (difficultyFilter !== "all" && activity.difficulty !== difficultyFilter) return false;
+      if (costFilter !== "all" && activity.estimatedCost !== costFilter) return false;
+      return true;
+    });
+  }, [categoryFilter, difficultyFilter, costFilter]);
+
+  const categories: ActivityCategory[] = ['creative', 'learning', 'physical', 'social', 'professional', 'mindfulness', 'technology', 'culinary', 'crafts', 'music', 'writing', 'outdoor'];
 
   const toggleExpanded = (tab: string) => {
     setExpandedTabs(prev => ({
@@ -129,17 +145,64 @@ const BoredTab = () => {
 
         <TabsContent value="discover" className="space-y-6">
           <div>
-            <h4 className="text-lg font-semibold mb-4">Explore All Activities</h4>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              <h4 className="text-lg font-semibold">Explore All Activities</h4>
+              <div className="flex flex-wrap items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-[130px] h-9">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                  <SelectTrigger className="w-[130px] h-9">
+                    <SelectValue placeholder="Difficulty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={costFilter} onValueChange={setCostFilter}>
+                  <SelectTrigger className="w-[110px] h-9">
+                    <SelectValue placeholder="Cost" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Costs</SelectItem>
+                    <SelectItem value="free">Free</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <div className="grid gap-6">
-              {(expandedTabs.discover ? ENHANCED_ACTIVITIES : ENHANCED_ACTIVITIES.slice(0, 3)).map((activity) => (
+              {(expandedTabs.discover ? filteredActivities : filteredActivities.slice(0, 3)).map((activity) => (
                 <EnhancedActivityCard
                   key={activity.id}
                   activity={activity}
                   onStartActivity={handleStartActivity}
+                  hideTags
                 />
               ))}
             </div>
-            {ENHANCED_ACTIVITIES.length > 3 && (
+            {filteredActivities.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No activities match your filters. Try adjusting them.
+                </p>
+              </div>
+            )}
+            {filteredActivities.length > 3 && (
               <div className="text-center mt-6">
                 <Button 
                   variant="outline" 
@@ -154,7 +217,7 @@ const BoredTab = () => {
                   ) : (
                     <>
                       <ChevronDown className="w-4 h-4" />
-                      Show More ({ENHANCED_ACTIVITIES.length - 3} more)
+                      Show More ({filteredActivities.length - 3} more)
                     </>
                   )}
                 </Button>
@@ -184,6 +247,7 @@ const BoredTab = () => {
                   key={activity.id}
                   activity={activity}
                   onStartActivity={handleStartActivity}
+                  hideTags
                 />
               ))}
             </div>
@@ -236,6 +300,7 @@ const BoredTab = () => {
                     key={activity.id}
                     activity={activity}
                     onStartActivity={handleStartActivity}
+                    hideTags
                   />
                 ) : null;
               })}
@@ -289,6 +354,7 @@ const BoredTab = () => {
                         key={activity.id}
                         activity={activity}
                         onStartActivity={handleStartActivity}
+                        hideTags
                       />
                     ) : null;
                   })}
@@ -330,6 +396,7 @@ const BoredTab = () => {
                         key={activity.id}
                         activity={activity}
                         onStartActivity={handleStartActivity}
+                        hideTags
                       />
                     ) : null;
                   })}
