@@ -41,6 +41,7 @@ import { useAuthErrorHandler } from "./hooks/useAuthErrorHandler";
 import { GlobalErrorHandler, errorLogger } from "./components/ErrorLogger";
 import { AccessibilityProvider } from "./components/ui/accessibility";
 import { performanceMonitor } from "./utils/performanceMonitor";
+import { GuidedTourProvider } from "./contexts/GuidedTourContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -290,12 +291,14 @@ const App: React.FC = () => {
                 <TooltipProvider>
                   <GlobalErrorHandler />
                   <BrowserRouter>
-                    <div id="main-content" role="main">
-                      <Toaster />
-                      <Sonner />
-                      <OfflineIndicator />
-                      <AppContent />
-                    </div>
+                    <GuidedTourProvider>
+                      <div id="main-content" role="main">
+                        <Toaster />
+                        <Sonner />
+                        <OfflineIndicator />
+                        <AppContent />
+                      </div>
+                    </GuidedTourProvider>
                   </BrowserRouter>
                 </TooltipProvider>
               </AccessibilityProvider>
