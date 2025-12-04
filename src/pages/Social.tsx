@@ -1,17 +1,13 @@
-
 import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MainFeed from "@/components/social/MainFeed";
-import ActivityTimeline from "@/components/social/ActivityTimeline";
 import NotificationCenter from "@/components/social/NotificationCenter";
-import HabitLeaderboard from "@/components/social/HabitLeaderboard";
 import FriendList from "@/components/social/FriendList";
 import Groups from "@/components/social/Groups";
+import ActivityTab from "@/components/social/ActivityTab";
 import { useHabitSocialIntegration } from "@/hooks/useHabitSocialIntegration";
-
 const Social = () => {
   // Initialize habit social integration (auto-creates posts on completions)
   useHabitSocialIntegration();
@@ -38,35 +34,21 @@ const Social = () => {
         </div>
 
         <FeatureErrorBoundary featureName="Social Feed">
-          <Tabs defaultValue="timeline" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6 glass border h-11 bg-warm/20">
-              <TabsTrigger value="timeline" className="text-xs sm:text-sm font-medium px-1">
-                TIMELINE
+          <Tabs defaultValue="activity" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6 glass border h-11 bg-warm/20">
+              <TabsTrigger value="activity" className="text-sm font-medium">
+                ACTIVITY
               </TabsTrigger>
-              <TabsTrigger value="feed" className="text-xs sm:text-sm font-medium px-1">
-                FEED
-              </TabsTrigger>
-              <TabsTrigger value="ranks" className="text-xs sm:text-sm font-medium px-1">
-                RANKS
-              </TabsTrigger>
-              <TabsTrigger value="groups" className="text-xs sm:text-sm font-medium px-1">
+              <TabsTrigger value="groups" className="text-sm font-medium">
                 GROUPS
               </TabsTrigger>
-              <TabsTrigger value="friends" className="text-xs sm:text-sm font-medium px-1">
+              <TabsTrigger value="friends" className="text-sm font-medium">
                 FRIENDS
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="timeline" className="animate-fade-in">
-              <ActivityTimeline />
-            </TabsContent>
-            
-            <TabsContent value="feed" className="animate-fade-in">
-              <MainFeed />
-            </TabsContent>
-            
-            <TabsContent value="ranks" className="animate-fade-in">
-              <HabitLeaderboard />
+            <TabsContent value="activity" className="animate-fade-in">
+              <ActivityTab />
             </TabsContent>
             
             <TabsContent value="groups" className="animate-fade-in">
