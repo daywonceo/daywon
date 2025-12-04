@@ -1,7 +1,7 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Settings, Share2, LogOut, RefreshCcw } from "lucide-react";
+import { Settings, LogOut, Compass, RefreshCcw } from "lucide-react";
+import { useGuidedTourContext } from "@/contexts/GuidedTourContext";
 
 interface ProfileActionsProps {
   onOpenSettings: () => void;
@@ -9,10 +9,17 @@ interface ProfileActionsProps {
 }
 
 const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
+  const { startTour, resetTour } = useGuidedTourContext();
+
   const handleStartOnboarding = () => {
     localStorage.removeItem('onboardingComplete');
     localStorage.removeItem('onboardingData');
     window.location.reload();
+  };
+
+  const handleTakeTour = () => {
+    resetTour();
+    startTour();
   };
 
   return (
@@ -28,7 +35,18 @@ const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
           <span className="text-sm">Settings</span>
         </div>
       </Button>
-      
+
+      <Button 
+        variant="outline" 
+        className="glass-card border-primary/20 hover:border-primary/40 hover:bg-primary/10 group h-14 relative overflow-hidden flex items-center justify-center text-center"
+        onClick={handleTakeTour}
+      >
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="flex items-center justify-center relative z-10">
+          <Compass className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+          <span className="text-sm">Take a Tour</span>
+        </div>
+      </Button>
       
       <Button 
         variant="outline" 
@@ -36,7 +54,10 @@ const ProfileActions = ({ onOpenSettings, onSignOut }: ProfileActionsProps) => {
         onClick={handleStartOnboarding}
       >
         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <span className="relative z-10 text-sm">Restart Onboarding</span>
+        <div className="flex items-center justify-center relative z-10">
+          <RefreshCcw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+          <span className="text-sm">Restart Onboarding</span>
+        </div>
       </Button>
       
       <Button 
