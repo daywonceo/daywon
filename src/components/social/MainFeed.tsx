@@ -9,6 +9,7 @@ import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import CreatePostModal from "./CreatePostModal";
+import SocialEmptyState from "./SocialEmptyState";
 
 interface MainFeedProps {}
 
@@ -82,11 +83,10 @@ const MainFeed = ({}: MainFeedProps) => {
             <p className="text-sm text-muted-foreground mt-2">Loading posts...</p>
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-muted-foreground mb-2">📱</div>
-            <p className="text-sm text-muted-foreground">No posts to show</p>
-            <p className="text-xs text-muted-foreground/70 mt-1">Complete some habits to see activity here!</p>
-          </div>
+          <SocialEmptyState 
+            type="no-posts" 
+            actionLabel="Share your progress"
+          />
         ) : (
           filteredPosts.map((post) => {
             const displayName = post.profiles.display_name || post.profiles.email;
