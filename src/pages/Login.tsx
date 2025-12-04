@@ -30,9 +30,9 @@ const Login = () => {
   } = useLoginLogic();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+        <Card className="border border-border/50 shadow-2xl bg-card/95 backdrop-blur-md">
           <LoginHeader isSignUp={isSignUp} showForgotPassword={showForgotPassword} />
           
           <CardContent className="space-y-6">
