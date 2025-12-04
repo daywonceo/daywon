@@ -37,17 +37,17 @@ const Header = () => {
           className="h-32 sm:h-36 md:h-40 w-auto flex-shrink-0 -my-4"
         />
 
-        <div className="flex-1 flex justify-end items-center gap-1 sm:gap-1.5 min-w-0">
+        <div className="flex-1 flex justify-end items-center gap-2 sm:gap-3 min-w-0">
           <ThemeToggle />
           <HabitAddSheet
             trigger={
               <Button 
-                variant="glass" 
-                className="hover:bg-primary/10 hover:border-primary/30 rounded-full"
-                size="icon-sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-full font-medium"
+                size={isMobile ? "sm" : "default"}
                 aria-label="Add new habit"
               >
-                <Plus size={isMobile ? 18 : 20} />
+                <Plus size={isMobile ? 16 : 18} className="mr-1" />
+                {isMobile ? "Add" : "Add Habit"}
               </Button>
             }
             onHabitSelected={handleHabitSelected}
