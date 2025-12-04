@@ -16,6 +16,7 @@ import {
 import { useOptimizedChallenges } from '@/hooks/useOptimizedChallenges';
 import ChallengeCard from './ChallengeCard';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import SocialEmptyState from './SocialEmptyState';
 
 interface OptimizedChallengeListProps {
   category?: string;
@@ -129,27 +130,26 @@ const OptimizedChallengeList: React.FC<OptimizedChallengeListProps> = ({
 
   // Empty state component
   const EmptyState = () => (
-    <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
-      <CardContent className="p-8 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-          <Search className="h-8 w-8 text-gray-400" />
-        </div>
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-          No challenges found
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {debouncedSearch 
-            ? `No challenges match "${debouncedSearch}"`
-            : 'No challenges available in this category'
-          }
-        </p>
-        {debouncedSearch && (
+    debouncedSearch ? (
+      <Card className="bg-card/90 backdrop-blur-sm">
+        <CardContent className="p-8 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-muted/50 rounded-full flex items-center justify-center">
+            <Search className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="font-semibold text-foreground mb-2">
+            No matches found
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            No challenges match "{debouncedSearch}"
+          </p>
           <Button variant="outline" onClick={() => setSearchQuery('')}>
             Clear search
           </Button>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    ) : (
+      <SocialEmptyState type="no-challenges" />
+    )
   );
 
   return (

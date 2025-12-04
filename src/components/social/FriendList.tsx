@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { UserPlus, MessageCircle, Search, Users, UserCheck, UserX, Clock } from 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useFriends } from "@/hooks/useFriends";
 import { useSocialProfiles } from "@/hooks/useSocialProfiles";
+import SocialEmptyState from "./SocialEmptyState";
 
 interface FriendListProps {
   defaultTab?: 'friends' | 'pending' | 'discover';
@@ -251,18 +251,11 @@ const FriendList = ({ defaultTab = 'friends' }: FriendListProps) => {
 
       {/* Empty States */}
       {filteredItems.length === 0 && !searchTerm && !friendsLoading && !profilesLoading && (
-        <div className="text-center py-8">
-          <p className="text-sm text-gray-500">
-            {activeTab === 'friends' ? "You haven't added any friends yet" :
-             activeTab === 'pending' ? "No pending friend requests" :
-             "No new users to discover"}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            {activeTab === 'friends' ? "Start connecting with others!" :
-             activeTab === 'pending' ? "Friend requests will appear here" :
-             "Check back later for more users"}
-          </p>
-        </div>
+        <SocialEmptyState 
+          type={activeTab === 'friends' ? 'no-friends' : activeTab === 'pending' ? 'no-requests' : 'no-discover'}
+          onAction={activeTab === 'friends' ? () => setActiveTab('discover') : undefined}
+          actionLabel={activeTab === 'friends' ? 'Find Friends' : undefined}
+        />
       )}
     </div>
   );

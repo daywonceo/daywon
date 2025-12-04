@@ -9,6 +9,7 @@ import CommentSection from './CommentSection';
 import ExtendedReactions from './ExtendedReactions';
 import { useFriends } from '@/hooks/useFriends';
 import { formatDistanceToNow, isToday, isYesterday, format } from 'date-fns';
+import SocialEmptyState from './SocialEmptyState';
 
 interface TimelineViewProps {
   showOnlyFriends?: boolean;
@@ -220,15 +221,10 @@ const ActivityTimeline = ({ showOnlyFriends = false }: TimelineViewProps) => {
       {/* Timeline */}
       <div className="space-y-6">
         {Object.keys(groupedPosts).length === 0 ? (
-          <div className="text-center py-12 animate-fade-in">
-            <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="text-muted-foreground" size={24} />
-            </div>
-            <p className="text-lg font-semibold text-foreground mb-2">No activities found</p>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              {showOnlyFriends ? 'Your friends haven\'t shared any activities yet. Encourage them to start their journey!' : 'Complete some habits to see them here and inspire others!'}
-            </p>
-          </div>
+          <SocialEmptyState 
+            type="no-activity"
+            actionLabel={showOnlyFriends ? "Find Friends" : undefined}
+          />
         ) : (
           Object.entries(groupedPosts).map(([dateKey, dayPosts]) => (
             <div key={dateKey} className="space-y-3">
