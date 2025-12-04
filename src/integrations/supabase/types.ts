@@ -1397,6 +1397,33 @@ export type Database = {
           },
         ]
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          earned_at: string
+          id: string
+          metadata: Json | null
+          progress: number | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          earned_at?: string
+          id?: string
+          metadata?: Json | null
+          progress?: number | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          earned_at?: string
+          id?: string
+          metadata?: Json | null
+          progress?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_habit_scores: {
         Row: {
           consistency_rate: number | null

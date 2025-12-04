@@ -13,6 +13,7 @@ import { IntegrationsPage } from "@/components/integrations/IntegrationsPage";
 import { MobileProfileEditor } from "@/components/profile/MobileProfileEditor";
 import { FriendManagementWidget } from "@/components/profile/FriendManagementWidget";
 import { FriendSuggestionsCarousel } from "@/components/profile/FriendSuggestionsCarousel";
+import AchievementsSection from "@/components/gamification/AchievementsSection";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -126,6 +127,9 @@ const Profile = () => {
         
         <div className="space-y-8 px-2">
           {isProfileLoaded && <ProfileHeader profile={profile} />}
+          
+          {/* Achievements & Gamification */}
+          <AchievementsSection />
           
           {/* Friends & Connections Section */}
           <FriendManagementWidget />
