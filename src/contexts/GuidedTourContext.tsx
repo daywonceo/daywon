@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useGuidedTour } from '@/hooks/useGuidedTour';
 import GuidedTour from '@/components/onboarding/GuidedTour';
+import WelcomeModal from '@/components/onboarding/WelcomeModal';
 
 interface GuidedTourContextType {
   startTour: () => void;
@@ -28,6 +29,7 @@ export function GuidedTourProvider({ children }: { children: ReactNode }) {
   return (
     <GuidedTourContext.Provider value={{ startTour, resetTour, hasCompleted }}>
       {children}
+      <WelcomeModal />
       <GuidedTour
         isActive={isActive}
         currentStep={currentStep}

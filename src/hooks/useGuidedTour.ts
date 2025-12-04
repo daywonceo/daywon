@@ -83,19 +83,8 @@ export function useGuidedTour() {
     setCurrentStepIndex(0);
   }, []);
 
-  // Auto-start tour for new users (after onboarding)
-  useEffect(() => {
-    const onboardingComplete = localStorage.getItem('onboardingCompleted') === 'true';
-    const tourCompleted = localStorage.getItem(STORAGE_KEY) === 'true';
-    
-    if (onboardingComplete && !tourCompleted && !isActive) {
-      // Small delay to let the UI settle
-      const timer = setTimeout(() => {
-        startTour();
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isActive, startTour]);
+  // Don't auto-start tour - WelcomeModal handles the initial prompt
+  // Tour can be started via WelcomeModal or Profile settings
 
   return {
     isActive,
