@@ -171,7 +171,14 @@ const AppContent: React.FC = () => {
             return;
           }
           
-          // Check if user has any existing habits
+          // If localStorage says onboarding is complete, trust it and skip
+          if (onboardingCompleted === 'true') {
+            setShowOnboarding(false);
+            setCheckingHabits(false);
+            return;
+          }
+          
+          // Check if user has any existing habits (for users without localStorage flag)
           try {
             const { data: habits } = await import('./integrations/supabase/client').then(m => 
               m.supabase
@@ -181,20 +188,18 @@ const AppContent: React.FC = () => {
                 .limit(1)
             );
             
-            // If user has habits, skip onboarding
+            // If user has habits, skip onboarding and set flag
             if (habits && habits.length > 0) {
               localStorage.setItem('onboardingCompleted', 'true');
               setShowOnboarding(false);
             } else {
-              // New user with no habits - show onboarding if not completed
-              const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
-              setShowOnboarding(shouldShowOnboarding);
+              // New user with no habits and no localStorage flag - show onboarding
+              setShowOnboarding(true);
             }
           } catch (error) {
             console.error('Error checking habits:', error);
-            // On error, fall back to localStorage check
-            const shouldShowOnboarding = !onboardingCompleted || onboardingCompleted === 'false';
-            setShowOnboarding(shouldShowOnboarding);
+            // On error, don't show onboarding (assume they've been through it)
+            setShowOnboarding(false);
           }
         }
       } finally {
