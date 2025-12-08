@@ -1,6 +1,7 @@
+
 import React, { useState } from "react";
-import PageLayout from "@/components/layout/PageLayout";
-import PageHeader from "@/components/layout/PageHeader";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import SearchBar from "@/components/guidance/SearchBar";
 import GuidanceTabs from "@/components/guidance/GuidanceTabs";
 import { FeatureErrorBoundary } from "@/lib/errors/ErrorHandler";
@@ -16,11 +17,31 @@ const Guidance = () => {
   const showSearchBar = activeTab === "workouts";
 
   return (
-    <PageLayout>
-      <PageHeader 
-        title="Daily Guidance" 
-        subtitle="Workouts, nutrition, and spiritual guidance for your journey"
-      />
+    <div className="min-h-screen gradient-subtle">
+      <Header />
+      
+      {/* Enhanced hero section with color and spacing */}
+      <div className="gradient-warm border-b border-primary-light/20">
+        <div className="container-responsive pt-8 pb-6">
+          <div className="text-center">
+            <div className="mb-4">
+              <h1 className="text-gradient-primary text-3xl sm:text-4xl font-bold mb-3">
+                Daily Guidance
+              </h1>
+              <p className="text-muted-foreground max-w-md mx-auto text-base">
+                Workouts, nutrition, and spiritual guidance for your journey
+              </p>
+            </div>
+            
+            {/* Decorative accent */}
+            <div className="flex justify-center mb-2">
+              <div className="w-16 h-1 gradient-primary rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <main className="px-responsive py-8 pb-safe-mobile max-w-4xl mx-auto w-full">
 
         {showSearchBar && (
           <div className="mb-8">
@@ -45,7 +66,10 @@ const Guidance = () => {
             onTranslationDialogOpenChange={setTranslationDialogOpen}
           />
         </FeatureErrorBoundary>
-    </PageLayout>
+      </main>
+      
+      <Footer />
+    </div>
   );
 };
 

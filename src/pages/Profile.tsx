@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PageLayout from "@/components/layout/PageLayout";
-import PageHeader from "@/components/layout/PageHeader";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import ProfileSettings from "@/components/ProfileSettings";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import BestFriends from "@/components/profile/BestFriends";
@@ -113,13 +114,18 @@ const Profile = () => {
   }
 
   return (
-    <PageLayout hideFooter>
-      <PageHeader 
-        title="Your Profile" 
-        subtitle="Track your progress and achievements"
-      />
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
+      <Header />
       
-      <div className="space-y-8 px-2">
+      <main className="flex-grow px-responsive pb-safe-mobile pt-6 max-w-4xl mx-auto w-full">
+        <div className="text-center mb-8 px-2">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+            Your Profile
+          </h1>
+          <p className="text-sm text-muted-foreground mt-2">Track your progress and achievements</p>
+        </div>
+        
+        <div className="space-y-8 px-2">
           {isProfileLoaded && <ProfileHeader profile={profile} />}
           
           {/* Achievements & Gamification */}
@@ -208,10 +214,13 @@ const Profile = () => {
             onOpenSettings={() => setSettingsOpen(true)}
             onSignOut={handleSignOut}
           />
-      </div>
+        </div>
+      </main>
+      
+      <Footer />
       
       <ProfileSettings open={settingsOpen} onOpenChange={setSettingsOpen} />
-    </PageLayout>
+    </div>
   );
 };
 

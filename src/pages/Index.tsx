@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import PageLayout from "@/components/layout/PageLayout";
-import PageHeader from "@/components/layout/PageHeader";
+import Header from "@/components/Header";
 import RecentActivities from "@/components/RecentActivities";
 import HabitStats from "@/components/HabitStats";
+import Footer from "@/components/Footer";
 import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -12,7 +12,7 @@ import { saveOfflineData, getOfflineData } from "@/utils/offlineStorage";
 import { hapticSuccess } from "@/utils/haptics";
 import { initializeDefaultHabits } from "@/utils/habitCategories";
 import { Button } from "@/components/ui/button";
-import { List } from "lucide-react";
+import { List, Calendar } from "lucide-react";
 import HabitAddSheet from "@/components/habit/HabitAddSheet";
 import { useNavigate } from "react-router-dom";
 import { useTopHabits, getCurrentMonthString } from "@/hooks/useTopHabits";
@@ -154,13 +154,16 @@ const Index = () => {
   const allActiveHabitNames = allHabits?.filter(h => h.status === 'active' && !h.ended_at && !h.archived_at).map(h => h.name) || [];
 
   return (
-    <PageLayout hideFooter>
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/20 via-background to-accent/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex flex-col">
+      <Header />
       <PullToRefresh onRefresh={handleRefresh}>
-        <div id="main-content">
-          <PageHeader 
-            title={getGreeting()} 
-            subtitle="Ready to build some great habits?"
-          />
+        <main id="main-content" className="flex-grow px-2 sm:px-4 pb-safe-mobile pt-6 max-w-4xl mx-auto w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+              {getGreeting()}
+            </h1>
+            <p className="text-sm text-muted-foreground">Ready to build some great habits?</p>
+          </div>
 
           {/* Streamlined Progress Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
@@ -207,10 +210,11 @@ const Index = () => {
             <RecentActivities habitList={activityHabits} onHabitUpdate={handleHabitUpdate} />
             <HabitStats refreshTrigger={refreshTrigger} />
           </FeatureErrorBoundary>
-        </div>
+        </main>
       </PullToRefresh>
       <AppEnhancements />
-    </PageLayout>
+      <Footer />
+    </div>
   );
 };
 
