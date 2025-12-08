@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import PageLayout from "@/components/layout/PageLayout";
+import PageHeader from "@/components/layout/PageHeader";
 import { FeatureErrorBoundary } from "@/components/errors/FeatureErrorBoundary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NotificationCenter from "@/components/social/NotificationCenter";
@@ -12,26 +12,18 @@ const Social = () => {
   // Initialize habit social integration (auto-creates posts on completions)
   useHabitSocialIntegration();
   return (
-    <div className="min-h-screen bg-subtle/30 flex flex-col">
-      <Header />
-      
-      <main className="flex-grow px-responsive pb-safe-mobile pt-4 max-w-4xl mx-auto w-full">
-        {/* Header with Notifications */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex-1 text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-              Connect & Grow
-            </h1>
-            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-              Share your journey and celebrate wins with your community
-            </p>
-          </div>
-          
-          {/* Notification Center */}
-          <div className="absolute top-4 right-4">
-            <NotificationCenter />
-          </div>
+    <PageLayout>
+      <div className="relative">
+        <PageHeader 
+          title="Connect & Grow" 
+          subtitle="Share your journey and celebrate wins with your community"
+        />
+        
+        {/* Notification Center */}
+        <div className="absolute top-0 right-0">
+          <NotificationCenter />
         </div>
+      </div>
 
         <FeatureErrorBoundary featureName="Social Feed">
           <Tabs defaultValue="activity" className="w-full">
@@ -60,10 +52,7 @@ const Social = () => {
             </TabsContent>
           </Tabs>
         </FeatureErrorBoundary>
-      </main>
-      
-      <Footer />
-    </div>
+    </PageLayout>
   );
 };
 

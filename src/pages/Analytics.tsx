@@ -1,13 +1,17 @@
 import React from 'react';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
-import Header from '@/components/Header';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 const Analytics: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <PageLayout>
+      <PageHeader 
+        title="Analytics" 
+        subtitle="Track your habit performance and trends"
+      />
       <AnalyticsDashboard />
-    </div>
+    </PageLayout>
   );
 };
 
