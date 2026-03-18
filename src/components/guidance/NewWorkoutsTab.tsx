@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Target, Clock, TrendingUp, Calendar, Dumbbell, Square } from "lucide-react";
+import { AlertCircle, Target, Clock, TrendingUp, Calendar, Dumbbell, Square, Medal } from "lucide-react";
+// @ts-ignore
+import TrainingDashboard from "./TrainingDashboard";
 import { format, differenceInMinutes } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -27,7 +29,7 @@ import { useWorkoutPlans } from "@/hooks/useWorkoutPlans";
 import { useWorkoutSessions } from "@/hooks/useWorkoutSessions";
 
 const NewWorkoutsTab = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'history' | 'templates' | 'week-view' | 'schedule-workout' | 'manual-workout'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'plan-selector' | 'active-workout' | 'progress' | 'history' | 'templates' | 'week-view' | 'schedule-workout' | 'manual-workout' | 'training-dashboard'>('overview');
   const [selectedWorkoutForDetail, setSelectedWorkoutForDetail] = useState<any>(null);
   const [completingSessionId, setCompletingSessionId] = useState<string | null>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
@@ -207,6 +209,20 @@ const NewWorkoutsTab = () => {
 
   if (currentView === 'manual-workout') {
     return <ManualWorkoutCreator onBack={() => setCurrentView('overview')} />;
+  }
+
+  if (currentView === 'training-dashboard') {
+    return (
+      <div className="animate-fade-in">
+        <button
+          onClick={() => setCurrentView('overview')}
+          className="text-primary hover:text-primary/80 transition-colors mb-4 block"
+        >
+          ← Back to Overview
+        </button>
+        <TrainingDashboard />
+      </div>
+    );
   }
 
   if (currentView === 'week-view') {
@@ -487,6 +503,16 @@ const NewWorkoutsTab = () => {
         >
           <Dumbbell className="w-6 h-6 text-primary" />
           <span className="font-semibold">Templates</span>
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={() => setCurrentView('training-dashboard')}
+          className="h-24 col-span-2 flex flex-col items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+        >
+          <Medal className="w-6 h-6 text-primary" />
+          <span className="font-semibold">Race Training Planner</span>
+          <span className="text-xs text-muted-foreground">AI-powered plans for 5K → Triathlon</span>
         </Button>
       </div>
 
