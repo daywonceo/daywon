@@ -59,3 +59,9 @@ verify_jwt = false
 
 [functions.integrations-revoke]
 verify_jwt = true
+
+[functions.generate-race-training-plan]
+verify_jwt = false
+
+[functions.race-coach-chat]
+verify_jwt = false
