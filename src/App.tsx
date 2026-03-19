@@ -27,6 +27,7 @@ const Help = lazy(() => import("./pages/Help"));
 const Advanced = lazy(() => import("./pages/Advanced"));
 const RedeemInvite = lazy(() => import("./pages/RedeemInvite"));
 const SettingsConnections = lazy(() => import("./pages/SettingsConnections"));
+const RaceTraining = lazy(() => import("./pages/RaceTraining"));
 
 
 import { SettingsProvider } from "./contexts/SettingsContext";
