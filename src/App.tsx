@@ -271,6 +271,7 @@ const AppContent: React.FC = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/redeem" element={<RedeemInvite />} />
           <Route path="/settings/connections" element={<SettingsConnections />} />
+          <Route path="/race-training" element={<RaceTraining />} />
           
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
