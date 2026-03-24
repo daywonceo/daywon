@@ -34,14 +34,18 @@ const RaceTraining: React.FC = () => {
   };
 
   const generateCategory = useCallback(
-    async (category: string) => {
+    async (section: string) => {
       if (!raceType || !params) return;
 
-      setLoading((prev) => ({ ...prev, [category]: true }));
+      setLoading((prev) => ({ ...prev, [section]: true }));
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const profile = mkProf(raceType, params, wks);
+        const sr = params.specificRace;
+        const courseContext = sr
+          ? `\n\nCOURSE: ${sr.name} in ${sr.loc}. Elevation: ${sr.elevGain}ft gain. Surface: ${sr.surface}. Difficulty: ${sr.difficulty}. Tags: ${sr.tags?.join(", ") || "none"}.`
+          : "";
 
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-race-training-plan`,
@@ -50,22 +54,31 @@ const RaceTraining: React.FC = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${session?.access_token}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
-            body: JSON.stringify({ profile, category }),
+            body: JSON.stringify({
+              section,
+              profile,
+              courseContext,
+              planWeeks: wks,
+            }),
           }
         );
 
-        if (!response.ok) throw new Error("Failed to generate plan");
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || "Failed to generate plan");
+        }
         const data = await response.json();
-        setPlans((prev) => ({ ...prev, [category]: data.plan }));
-      } catch (err) {
+        setPlans((prev) => ({ ...prev, [section]: data.content }));
+      } catch (err: any) {
         toast({
           title: "Generation Failed",
-          description: "Couldn't generate the plan. Please try again.",
+          description: err.message || "Couldn't generate the plan. Please try again.",
           variant: "destructive",
         });
       } finally {
-        setLoading((prev) => ({ ...prev, [category]: false }));
+        setLoading((prev) => ({ ...prev, [section]: false }));
       }
     },
     [raceType, params, wks, toast]
@@ -74,11 +87,16 @@ const RaceTraining: React.FC = () => {
   const handleGenerate = async (p: TrainingParams) => {
     setParams(p);
     setView("plan");
-    // Auto-generate training plan
+    // Auto-generate training plan on entry
+    const computedWks = p.startDate && p.raceDate ? wksBetween(p.startDate, p.raceDate) : null;
     setLoading({ training: true });
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const profile = mkProf(raceType!, p, p.startDate && p.raceDate ? wksBetween(p.startDate, p.raceDate) : null);
+      const profile = mkProf(raceType!, p, computedWks);
+      const sr = p.specificRace;
+      const courseContext = sr
+        ? `\n\nCOURSE: ${sr.name} in ${sr.loc}. Elevation: ${sr.elevGain}ft gain. Surface: ${sr.surface}. Difficulty: ${sr.difficulty}. Tags: ${sr.tags?.join(", ") || "none"}.`
+        : "";
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-race-training-plan`,
@@ -87,14 +105,20 @@ const RaceTraining: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session?.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
-          body: JSON.stringify({ profile, category: "training" }),
+          body: JSON.stringify({
+            section: "training",
+            profile,
+            courseContext,
+            planWeeks: computedWks,
+          }),
         }
       );
 
       if (!response.ok) throw new Error("Failed");
       const data = await response.json();
-      setPlans({ training: data.plan });
+      setPlans({ training: data.content });
     } catch {
       toast({
         title: "Generation Failed",
