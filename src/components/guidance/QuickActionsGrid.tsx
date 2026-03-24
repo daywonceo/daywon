@@ -1,7 +1,8 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Target, Dumbbell, Calendar } from "lucide-react";
+import { Target, Dumbbell, Calendar, Flag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface QuickActionsGridProps {
   workoutPlansCount: number;
@@ -22,6 +23,8 @@ const QuickActionsGrid = ({
   onViewHistory,
   onViewTemplates
 }: QuickActionsGridProps) => {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
@@ -55,6 +58,16 @@ const QuickActionsGrid = ({
           <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <Calendar className="w-5 h-5 group-hover:scale-110 transition-transform duration-300 relative z-10" />
           <span className="text-xs relative z-10">Week Schedule</span>
+        </Button>
+
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/race-training")}
+          className="h-16 flex flex-col items-center gap-1 group hover:scale-105 transition-all duration-300 delay-200 relative overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Flag className="w-5 h-5 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+          <span className="text-xs relative z-10">Race Training</span>
         </Button>
       </div>
     </>
