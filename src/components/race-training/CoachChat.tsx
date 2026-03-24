@@ -20,6 +20,33 @@ interface Message {
   content: string;
 }
 
+/** Parse SSE stream and extract text content deltas */
+function parseSSEChunk(chunk: string): string {
+  let text = "";
+  const lines = chunk.split("\n");
+  for (const line of lines) {
+    if (line.startsWith("data: ")) {
+      const data = line.slice(6).trim();
+      if (data === "[DONE]") continue;
+      try {
+        const parsed = JSON.parse(data);
+        const delta = parsed.choices?.[0]?.delta?.content;
+        if (delta) text += delta;
+      } catch {
+        // not valid JSON, skip
+      }
+    }
+  }
+  return text;
+}
+
+const QUICK_QUESTIONS = [
+  "What should my long run pace be?",
+  "How do I fuel during the race?",
+  "Best taper strategy?",
+  "What if I miss a week of training?",
+];
+
 const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -30,19 +57,20 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || streaming) return;
+  const sendMessage = async (overrideInput?: string) => {
+    const userMsg = (overrideInput || input).trim();
+    if (!userMsg || streaming) return;
 
-    const userMsg = input.trim();
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    const newMessages: Message[] = [...messages, { role: "user", content: userMsg }];
+    setMessages(newMessages);
     setStreaming(true);
 
     try {
       const profile = mkProf(raceType, params, wks);
       const planContext = Object.entries(plans)
-        .map(([k, v]) => `${k}: ${v.slice(0, 500)}`)
-        .join("\n");
+        .map(([k, v]) => `[${k.toUpperCase()}]: ${v.slice(0, 600)}`)
+        .join("\n\n");
 
       const { data: { session } } = await supabase.auth.getSession();
 
@@ -53,16 +81,20 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session?.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({
-            messages: [...messages, { role: "user", content: userMsg }],
+            messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
             profile,
             planContext,
           }),
         }
       );
 
-      if (!response.ok) throw new Error("Coach unavailable");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Coach unavailable");
+      }
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
@@ -71,22 +103,53 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       if (reader) {
+        let buffer = "";
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          assistantContent += chunk;
-          setMessages((prev) => {
-            const updated = [...prev];
-            updated[updated.length - 1] = { role: "assistant", content: assistantContent };
-            return updated;
-          });
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Process complete lines from the buffer
+          const extracted = parseSSEChunk(buffer);
+          if (extracted) {
+            assistantContent += extracted;
+            buffer = ""; // Clear processed buffer
+            setMessages((prev) => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { role: "assistant", content: assistantContent };
+              return updated;
+            });
+          }
+        }
+        // Process any remaining buffer
+        if (buffer.trim()) {
+          const remaining = parseSSEChunk(buffer);
+          if (remaining) {
+            assistantContent += remaining;
+            setMessages((prev) => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { role: "assistant", content: assistantContent };
+              return updated;
+            });
+          }
         }
       }
-    } catch {
+
+      // If no content was extracted (fallback for non-SSE responses)
+      if (!assistantContent) {
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            role: "assistant",
+            content: "I received your question but couldn't parse the response. Please try again.",
+          };
+          return updated;
+        });
+      }
+    } catch (err: any) {
       setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, I couldn't connect to the coach right now. Please try again." },
+        ...prev.filter((m) => !(m.role === "assistant" && m.content === "")),
+        { role: "assistant", content: err.message || "Sorry, I couldn't connect to the coach right now. Please try again." },
       ]);
     } finally {
       setStreaming(false);
@@ -98,8 +161,13 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-primary" />
-          <span className="font-semibold text-foreground">AI Race Coach</span>
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Bot className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <span className="font-semibold text-foreground text-sm">AI Race Coach</span>
+            <p className="text-xs text-muted-foreground">{raceType.icon} {raceType.name} specialist</p>
+          </div>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-5 w-5" />
@@ -109,14 +177,25 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center py-12 space-y-3">
-            <Bot className="h-12 w-12 text-primary/40 mx-auto" />
-            <p className="text-muted-foreground text-sm">
-              Ask me anything about your {raceType.name} training plan — pacing, nutrition, recovery, race-day strategy...
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {["What should my long run pace be?", "How do I fuel during the race?", "Best taper strategy?"].map((q) => (
-                <Button key={q} variant="outline" size="sm" onClick={() => { setInput(q); }}>
+          <div className="text-center py-12 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <Bot className="h-8 w-8 text-primary/60" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground">Your AI Race Coach</p>
+              <p className="text-muted-foreground text-sm mt-1">
+                Ask me anything about your {raceType.name} training — pacing, nutrition, recovery, race-day strategy...
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2 max-w-md mx-auto">
+              {QUICK_QUESTIONS.map((q) => (
+                <Button
+                  key={q}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => sendMessage(q)}
+                >
                   {q}
                 </Button>
               ))}
@@ -127,36 +206,36 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : ""}`}>
             {msg.role === "assistant" && (
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
                 <Bot className="h-4 w-4 text-primary" />
               </div>
             )}
-            <Card className={`max-w-[80%] ${msg.role === "user" ? "bg-primary text-primary-foreground" : ""}`}>
+            <Card className={`max-w-[80%] ${msg.role === "user" ? "bg-primary text-primary-foreground border-primary" : ""}`}>
               <CardContent className="p-3">
                 {msg.role === "assistant" ? (
-                  <div
-                    className="text-sm prose prose-sm max-w-none [&_strong]:text-foreground"
-                    dangerouslySetInnerHTML={{ __html: mdParse(msg.content) }}
-                  />
+                  msg.content ? (
+                    <div
+                      className="text-sm prose prose-sm max-w-none [&_strong]:text-foreground"
+                      dangerouslySetInnerHTML={{ __html: mdParse(msg.content) }}
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span className="text-xs">Thinking...</span>
+                    </div>
+                  )
                 ) : (
                   <p className="text-sm">{msg.content}</p>
                 )}
               </CardContent>
             </Card>
             {msg.role === "user" && (
-              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
                 <User className="h-4 w-4 text-primary-foreground" />
               </div>
             )}
           </div>
         ))}
-
-        {streaming && messages[messages.length - 1]?.content === "" && (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-sm">Coach is thinking...</span>
-          </div>
-        )}
       </div>
 
       {/* Input */}
@@ -168,12 +247,12 @@ const CoachChat: React.FC<CoachChatProps> = ({ raceType, params, wks, plans, onC
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask your coach..."
+            placeholder="Ask your coach anything..."
             disabled={streaming}
             className="flex-1"
           />
           <Button type="submit" size="icon" disabled={!input.trim() || streaming}>
-            <Send className="h-4 w-4" />
+            {streaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </form>
       </div>
