@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const { messages, profile } = await req.json();
+    const { messages, profile, planContext } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'Missing messages array' }), {
@@ -25,7 +25,11 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `You are an elite endurance sports coach. Today is ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. Be direct, specific, warm. Use markdown.\n\nATHLETE: ${profile || 'Unknown'}\n\nAnswer concisely and helpfully. You know the athlete's full plan and course details.`;
+    const systemPrompt = `You are an elite endurance sports coach. Today is ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. Be direct, specific, warm. Use markdown.
+
+ATHLETE: ${profile || 'Unknown'}
+
+${planContext ? `CURRENT PLAN CONTEXT:\n${planContext}\n\n` : ''}Answer concisely and helpfully. Reference the athlete's specific plan details when relevant. Keep responses under 300 words unless asked for detail.`;
 
     console.log('Race coach chat - streaming response');
 
